@@ -1,0 +1,16 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: service - validations
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+tests:
+  - it: automatic Service Account determination should fail when >1 Service Account is enabled
+    set:
+      serviceAccount:
+        mySA: {}
+        mySA2: {}
+    asserts:
+      - failedTemplate:
+          errorMessage: "serviceAccount field is required because automatic Service Account detection is not possible. (controller: main)"

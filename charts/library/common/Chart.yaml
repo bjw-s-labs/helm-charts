@@ -3,7 +3,7 @@ apiVersion: v2
 name: common
 description: Function library for Helm charts
 type: library
-version: 4.0.1
+version: 4.1.0
 kubeVersion: ">=1.28.0-0"
 keywords:
   - common
@@ -16,51 +16,12 @@ sources:
   - https://github.com/bjw-s-labs/helm-charts
 annotations:
   artifacthub.io/changes: |-
-    - kind: removed
-      description: |-
-        Individual `valuesToObject` functions have been removed in favor of a centralized `bjw-s.common.lib.valuesToObject` function.
     - kind: fixed
       description: |-
-        Fixed empty backendRefs in HTTPRoute leading to invalid spec
+        Fixed a bug where probes were not being configured correctly for Services that autodetect their controller.
     - kind: added
       description: |-
-        Added support for setting `parentRefs[].port` in HTTPRoute
+        Added support for configuring the `serviceName` field for StatefulSets.
     - kind: added
       description: |-
-        Added support for setting `sessionPersistence` in HTTPRoute
-    - kind: added
-      description: |-
-        Added support for setting `resources` on the Pod Level in Kubernetes >= 1.32
-    - kind: added
-      description: |-
-        Added explicit JSON schema for `rbac` root key
-    - kind: added
-      description: |-
-        Allow configuring the merge strategy for `defaultPodOptions`
-    - kind: added
-      description: |-
-        Added support for setting `subPathExpr` on globalMounts and advancedMounts persistence items
-    - kind: added
-      description: |-
-        Added support for automatically determining the target controller for Services if there is only one enabled controller
-    - kind: added
-      description: |-
-        Added support for automatically determining the target service for Ingress paths if there is only one enabled Service
-    - kind: added
-      description: |-
-        Added support for automatically determining the target service for Route backends if there is only one enabled Service
-    - kind: changed
-      description: |-
-        **Breaking**: Standardized resource name logic for all resources. This may cause changes in the generated resource names.
-      links:
-        - name: Documentation
-          url: https://bjw-s-labs.github.io/helm-charts/docs/common-library/resources/names/
-    - kind: changed
-      description: |-
-        **Breaking**: Increased the minimum supported Kubernetes version to 1.28.0
-    - kind: changed
-      description: |-
-        **Breaking**: ServiceAccounts no longer create a static token by default. This is now controlled by the `staticToken` field in the `serviceAccount` object.
-    - kind: changed
-      description: |-
-        **Breaking**: Renamed the hardcoded app.kubernetes.io/component label to app.kubernetes.io/controller
+        Added support for automatically selecting the ServiceAccount when only one is defined.
