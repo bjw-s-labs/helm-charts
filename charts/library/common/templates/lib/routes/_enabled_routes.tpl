@@ -19,5 +19,11 @@ Return the enabled routes.
     {{- end -}}
   {{- end -}}
 
+  {{- range $identifier, $objectValues := $enabledRoutes -}}
+    {{- $object := include "bjw-s.common.lib.valuesToObject" (dict "rootContext" $rootContext "id" $identifier "values" $objectValues "itemCount" (len $enabledRoutes)) | fromYaml -}}
+    {{- $object = include "bjw-s.common.lib.route.autoDetectService" (dict "rootContext" $rootContext "object" $object) | fromYaml -}}
+    {{- $_ := set $enabledRoutes $identifier $object -}}
+  {{- end -}}
+
   {{- $enabledRoutes | toYaml -}}
 {{- end -}}

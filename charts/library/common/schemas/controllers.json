@@ -299,6 +299,22 @@
           }
         }
       },
+      "serviceName": {
+        "oneOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "identifier": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
       "volumeClaimTemplates": {
         "type": "array",
         "items": {

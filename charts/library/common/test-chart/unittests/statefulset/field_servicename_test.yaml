@@ -1,0 +1,70 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: statefulset - fields - serviceName
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+set:
+  controllers.main.type: statefulset
+tests:
+  - it: default should pass
+    documentSelector:
+      path: $[?(@.kind == "StatefulSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.serviceName
+          value: RELEASE-NAME
+
+  - it: custom serviceName
+    set:
+      controllers.main.statefulset:
+        serviceName: test
+    documentSelector:
+      path: $[?(@.kind == "StatefulSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.serviceName
+          value: test
+
+  - it: custom serviceName with template
+    set:
+      controllers.main.statefulset:
+        serviceName: "{{ .Release.Name | lower }}"
+      service:
+        main:
+          controller: main
+          ports:
+            http:
+              port: 8081
+    documentSelector:
+      path: $[?(@.kind == "StatefulSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.serviceName
+          value: release-name
+
+  - it: serviceName with identifier
+    set:
+      controllers.main.statefulset:
+        serviceName:
+          identifier: headless
+      service:
+        main:
+          ports:
+            http:
+              port: 8081
+        headless:
+          ports:
+            http:
+              port: 8081
+    documentSelector:
+      path: $[?(@.kind == "StatefulSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.serviceName
+          value: release-name-headless

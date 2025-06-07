@@ -72,3 +72,29 @@ tests:
               labelSelector:
                 matchLabels:
                   app: foo
+
+  - it: topologySpreadConstraints with template should pass
+    set:
+      controllers:
+        main:
+          pod:
+            topologySpreadConstraints:
+              - maxSkew: 2
+                topologyKey: kubernetes.io/hostname
+                whenUnsatisfiable: DoNotSchedule
+                labelSelector:
+                  matchLabels:
+                    app: "{{ .Release.Name }}"
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.topologySpreadConstraints
+          value:
+            - maxSkew: 2
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: DoNotSchedule
+              labelSelector:
+                matchLabels:
+                  app: RELEASE-NAME
