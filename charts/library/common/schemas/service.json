@@ -109,6 +109,18 @@
       "port": {
         "type": ["string", "integer"]
       },
+      "portRange": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "start": {
+            "type": ["string", "integer"]
+          },
+          "end": {
+            "type": ["string", "integer"]
+          },
+        },
+      },
       "protocol": {
         "type": "string",
         "enum": ["HTTP", "HTTPS", "TCP", "UDP"]

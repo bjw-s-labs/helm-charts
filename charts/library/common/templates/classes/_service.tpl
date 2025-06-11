@@ -93,6 +93,28 @@ spec:
   {{- end }}
   ports:
   {{- range $name, $port := $enabledPorts }}
+    {{- if $port.portRange }}
+      {{- range $portnum := untilStep $port.portRange.start $port.portRange.stop 1 }}
+    - port: {{ $portnum }}
+      targetPort: {{ $port.targetPort | default $port.port }}
+        {{- if $port.protocol }}
+          {{- if or ( eq $port.protocol "HTTP" ) ( eq $port.protocol "HTTPS" ) ( eq $port.protocol "TCP" ) }}
+      protocol: TCP
+          {{- else }}
+      protocol: {{ $port.protocol }}
+          {{- end }}
+        {{- else }}
+      protocol: TCP
+        {{- end }}
+      name: {{ $name }}
+        {{- if (not (empty $port.nodePort)) }}
+      nodePort: {{ $port.nodePort }}
+        {{ end }}
+        {{- if (not (empty $port.appProtocol)) }}
+      appProtocol: {{ $port.appProtocol }}
+        {{ end }}
+      {{ - end }}
+    {{- end }}
     - port: {{ $port.port }}
       targetPort: {{ $port.targetPort | default $port.port }}
         {{- if $port.protocol }}
