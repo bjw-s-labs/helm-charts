@@ -132,7 +132,7 @@ jobs:
         working-directory: charts/${{ matrix.chart }}
         run: |
           yq -i '. |= .dependencies |= map(select(.name == "common" and .repository == "https://bjw-s-labs.github.io/helm-charts").version = ">0.0.0-0")' Chart.yaml
-          yq -i '. |= .dependencies |= map(select(.name == "common" and .repository == "https://bjw-s-labs.github.io/helm-charts").repository = "file://${COMMON_LIBRARY_LOCATION}")' Chart.yaml
+          yq -i '. |= .dependencies |= map(select(.name == "common" and .repository == "https://bjw-s-labs.github.io/helm-charts").repository = "file://" + strenv(COMMON_LIBRARY_LOCATION))' Chart.yaml
           echo "::group::Modified Chart.yaml"
           cat Chart.yaml
           echo "::endgroup::"
