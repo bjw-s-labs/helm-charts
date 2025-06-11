@@ -16,6 +16,16 @@ tests:
           name: release-name
           any: true
 
+  - it: name includes identifier when alwaysAppendIdentifierToResourceName is enabled
+    set:
+      global.alwaysAppendIdentifierToResourceName: true
+    asserts:
+      - containsDocument:
+          kind: ServiceAccount
+          apiVersion: v1
+          name: release-name-main
+          any: true
+
   - it: forceRename
     set:
       serviceAccount.main.forceRename: forceRename
@@ -98,6 +108,7 @@ tests:
 
   - it: multiple items
     set:
+      controllers.main.serviceAccount.identifier: main
       serviceAccount.second: {}
     asserts:
       - containsDocument:
@@ -113,6 +124,7 @@ tests:
 
   - it: multiple items with prefix
     set:
+      controllers.main.serviceAccount.identifier: main
       serviceAccount.second:
         prefix: prefix
     asserts:
@@ -129,6 +141,7 @@ tests:
 
   - it: multiple items with suffix
     set:
+      controllers.main.serviceAccount.identifier: main
       serviceAccount.second:
         suffix: suffix
     asserts:
@@ -145,6 +158,7 @@ tests:
 
   - it: multiple items with prefix and suffix
     set:
+      controllers.main.serviceAccount.identifier: main
       serviceAccount.second:
         prefix: prefix
         suffix: suffix
@@ -162,6 +176,7 @@ tests:
 
   - it: multiple items with prefix, suffix and forceRename (illegal combination)
     set:
+      controllers.main.serviceAccount.identifier: main
       serviceAccount.second:
         forceRename: forceRename
         prefix: prefix

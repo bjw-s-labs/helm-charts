@@ -47,7 +47,15 @@ spec:
     matchLabels:
       app.kubernetes.io/controller: {{ $statefulsetObject.identifier }}
       {{- include "bjw-s.common.lib.metadata.selectorLabels" $rootContext | nindent 6 }}
-  serviceName: {{ include "bjw-s.common.lib.chart.names.fullname" $rootContext }}
+  {{- $serviceName := include "bjw-s.common.lib.chart.names.fullname" $rootContext }}
+  {{- with (dig "statefulset" "serviceName" nil $statefulsetObject) }}
+    {{- if kindIs "map" . }}
+      {{- $serviceName = (include "bjw-s.common.lib.service.getByIdentifier" (dict "rootContext" $rootContext "id" .identifier) | fromYaml ).name }}
+    {{- else }}
+      {{- $serviceName = tpl . $rootContext }}
+    {{- end }}
+  {{- end }}
+  serviceName: {{ $serviceName }}
   {{- with (dig "statefulset" "persistentVolumeClaimRetentionPolicy" nil $statefulsetObject) }}
   persistentVolumeClaimRetentionPolicy:  {{ . | toYaml | nindent 4 }}
   {{- end }}

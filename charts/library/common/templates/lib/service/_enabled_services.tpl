@@ -5,20 +5,24 @@ Return the enabled services.
   {{- $rootContext := .rootContext -}}
   {{- $enabledServices := dict -}}
 
-  {{- range $name, $service := $rootContext.Values.service -}}
-    {{- if kindIs "map" $service -}}
+  {{- range $identifier, $objectValues := $rootContext.Values.service -}}
+    {{- if kindIs "map" $objectValues -}}
       {{- /* Enable Service by default, but allow override */ -}}
       {{- $serviceEnabled := true -}}
-      {{- if hasKey $service "enabled" -}}
-        {{- $serviceEnabled = $service.enabled -}}
+      {{- if hasKey $objectValues "enabled" -}}
+        {{- $serviceEnabled = $objectValues.enabled -}}
       {{- end -}}
 
       {{- if $serviceEnabled -}}
-
-
-        {{- $_ := set $enabledServices $name . -}}
+        {{- $_ := set $enabledServices $identifier $objectValues -}}
       {{- end -}}
     {{- end -}}
+  {{- end -}}
+
+  {{- range $identifier, $objectValues := $enabledServices -}}
+    {{- $object := include "bjw-s.common.lib.valuesToObject" (dict "rootContext" $rootContext "id" $identifier "values" $objectValues "itemCount" (len $enabledServices)) | fromYaml -}}
+    {{- $object = include "bjw-s.common.lib.service.autoDetectController" (dict "rootContext" $rootContext "object" $object) | fromYaml -}}
+    {{- $_ := set $enabledServices $identifier $object -}}
   {{- end -}}
 
   {{- $enabledServices | toYaml -}}

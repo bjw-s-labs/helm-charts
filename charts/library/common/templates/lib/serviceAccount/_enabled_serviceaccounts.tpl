@@ -19,5 +19,10 @@ Return the enabled serviceAccounts.
     {{- end -}}
   {{- end -}}
 
+  {{- range $identifier, $objectValues := $enabledServiceAccounts -}}
+    {{- $object := include "bjw-s.common.lib.valuesToObject" (dict "rootContext" $rootContext "id" $identifier "values" $objectValues "itemCount" (len $enabledServiceAccounts)) | fromYaml -}}
+    {{- $_ := set $enabledServiceAccounts $identifier $object -}}
+  {{- end -}}
+
   {{- $enabledServiceAccounts | toYaml -}}
 {{- end -}}

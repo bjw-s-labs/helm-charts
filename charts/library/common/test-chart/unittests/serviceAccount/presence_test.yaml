@@ -40,6 +40,7 @@ tests:
 
   - it: multiple serviceAccounts can be enabled
     set:
+      controllers.main.serviceAccount.identifier: myAccount
       serviceAccount:
         myAccount: {}
         mySA: {}

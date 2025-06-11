@@ -19,5 +19,11 @@ Return the enabled Ingresses.
     {{- end -}}
   {{- end -}}
 
+  {{- range $identifier, $objectValues := $enabledIngress -}}
+    {{- $object := include "bjw-s.common.lib.valuesToObject" (dict "rootContext" $rootContext "id" $identifier "values" $objectValues "itemCount" (len $enabledIngress)) | fromYaml -}}
+    {{- $object = include "bjw-s.common.lib.ingress.autoDetectService" (dict "rootContext" $rootContext "object" $object) | fromYaml -}}
+    {{- $_ := set $enabledIngress $identifier $object -}}
+  {{- end -}}
+
   {{- $enabledIngress | toYaml -}}
 {{- end -}}

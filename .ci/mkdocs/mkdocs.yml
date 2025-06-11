@@ -12,6 +12,9 @@ repo_url: https://github.com/bjw-s-labs/helm-charts
 docs_dir: ../../docs
 site_dir: ../../site
 
+extra_css:
+  - stylesheets/extra.css
+
 theme:
   name: material
   custom_dir: ../../docs/overrides

@@ -21,6 +21,16 @@ tests:
           name: release-name
           any: true
 
+  - it: name includes identifier when alwaysAppendIdentifierToResourceName is enabled
+    set:
+      global.alwaysAppendIdentifierToResourceName: true
+    asserts:
+      - containsDocument:
+          kind: NetworkPolicy
+          apiVersion: networking.k8s.io/v1
+          name: release-name-main
+          any: true
+
   - it: forceRename
     set:
       networkpolicies.main.forceRename: forceRename

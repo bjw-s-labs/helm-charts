@@ -18,6 +18,16 @@ tests:
           name: release-name
           any: true
 
+  - it: name includes identifier when alwaysAppendIdentifierToResourceName is enabled
+    set:
+      global.alwaysAppendIdentifierToResourceName: true
+    asserts:
+      - containsDocument:
+          kind: ConfigMap
+          apiVersion: v1
+          name: release-name-main
+          any: true
+
   - it: forceRename
     set:
       configMaps.main.forceRename: forceRename

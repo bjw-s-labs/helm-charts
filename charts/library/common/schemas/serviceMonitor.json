@@ -1,7 +1,7 @@
 {
   "instance": {
     "allOf": [
-      { "$ref": "definitions.json#/resourceIdentifier" },
+      {"$ref": "definitions.json#/resourceIdentifier"},
       {
         "type": "object",
         "additionalProperties": false,
@@ -10,6 +10,7 @@
           "prefix": {},
           "suffix": {},
           "enabled": {
+            "description": "Whether this ServiceMonitor is enabled or not.",
             "type": "boolean",
             "default": true
           },
@@ -20,22 +21,26 @@
             "$ref": "definitions.json#/labels"
           },
           "endpoints": {
+            "description": "A list of endpoints allowed as part of this ServiceMonitor.",
             "type": "array",
             "items": {
               "type": "object"
             }
           },
           "selector": {
+            "description": "Selector to select Endpoints objects.",
             "type": "object",
             "additionalProperties": false,
             "properties": {
               "matchLabels": {
+                "description": "matchLabels is a map of {key,value} pairs. The requirements are ANDed.",
                 "type": "object",
                 "additionalProperties": {
                   "type": "string"
                 }
               },
               "matchExpressions": {
+                "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
                 "type": "array",
                 "items": {
                   "type": "object",
@@ -52,17 +57,47 @@
               }
             }
           },
+          "service": {
+            "description": "Which service to monitor. Either 'serviceName' or 'service' must be specified.",
+            "oneOf": [
+              {
+                "description": "A reference to a Service name. Helm templates can be used.",
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": ["name"]
+              },
+              {
+                "description": "A reference to a service identifier that is defined within the chart values.",
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "identifier": {
+                    "type": "string"
+                  }
+                },
+                "required": ["identifier"]
+              }
+            ]
+          },
           "serviceName": {
-            "type": "string"
+            "description": "A reference to a Service name to monitor. Helm templates can be used. Deprecated in favor of 'service'.",
+            "type": "string",
+            "deprecated": true
           },
           "targetLabels": {
+            "description": "TargetLabels transfers labels from the Kubernetes Service onto the created metrics.",
             "type": "array"
           }
         },
-        "oneOf": [{"required": ["serviceName"]}, {"required": ["selector"]}],
         "dependencies": {
-          "selector": {"not": {"required": ["serviceName"]}},
-          "serviceName": {"not": {"required": ["selector"]}}
+          "selector": {"not": {"required": ["serviceName", "service"]}},
+          "serviceName": {"not": {"required": ["selector", "service"]}},
+          "service": {"not": {"required": ["selector", "serviceName"]}}
         }
       }
     ]
