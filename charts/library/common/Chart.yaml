@@ -21,7 +21,7 @@ annotations:
         Fixed a bug where probes were not being configured correctly for Services that autodetect their controller.
     - kind: fixed
       description: |-
-        Fixed a bug where topologySpreadConstraints field did not properly render Helm templates
+        Fixed a bug where topologySpreadConstraints field did not properly render Helm templates.
     - kind: added
       description: |-
         Added support for configuring the `serviceName` field for StatefulSets.
@@ -30,4 +30,7 @@ annotations:
         Added support for automatically selecting the ServiceAccount when only one is defined.
     - kind: added
       description: |-
-        Added support for automatically determining the target service for ServiceMonitors if there is only one enabled Service
+        - Added support for referencing target service for ServiceMonitors by identifier.
+    - kind: added
+      description: |-
+        Added support for automatically determining the target service for ServiceMonitors if there is only one enabled Service.
