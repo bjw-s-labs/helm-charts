@@ -16,6 +16,16 @@ tests:
           name: release-name
           any: true
 
+  - it: name includes identifier when alwaysAppendIdentifierToResourceName is enabled
+    set:
+      global.alwaysAppendIdentifierToResourceName: true
+    asserts:
+      - containsDocument:
+          kind: Ingress
+          apiVersion: networking.k8s.io/v1
+          name: release-name-main
+          any: true
+
   - it: forceRename
     set:
       ingress.main.forceRename: forceRename

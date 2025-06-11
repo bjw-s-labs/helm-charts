@@ -19,6 +19,16 @@ tests:
           name: release-name
           any: true
 
+  - it: name includes identifier when alwaysAppendIdentifierToResourceName is enabled
+    set:
+      global.alwaysAppendIdentifierToResourceName: true
+    asserts:
+      - containsDocument:
+          kind: PersistentVolumeClaim
+          apiVersion: v1
+          name: release-name-main
+          any: true
+
   - it: forceRename
     set:
       persistence.main.forceRename: forceRename

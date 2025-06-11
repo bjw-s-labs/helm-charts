@@ -21,6 +21,11 @@
             "null"
           ]
         },
+        "alwaysAppendIdentifierToResourceName": {
+          "description": "Always append identifier slugs to resource names, regardless of the enabled resource count.",
+          "type": "boolean",
+          "default": false
+        },
         "propagateGlobalMetadataToPods": {
           "description": "Propagate global metadata to Pod labels",
           "type": "boolean",

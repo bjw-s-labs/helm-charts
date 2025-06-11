@@ -20,8 +20,11 @@ Determine a recourse name based on Helm values
     {{- end -}}
 
     {{- if not (empty $itemCount) -}}
-      {{- if (gt $itemCount 1) -}}
-        {{- if not (hasSuffix (printf "-%s" $identifier) $objectName) -}}
+      {{- if or (gt $itemCount 1) ($rootContext.Values.global.alwaysAppendIdentifierToResourceName) -}}
+        {{- if and
+          (not (hasSuffix (printf "-%s" $identifier) $objectName))
+          (not (eq $identifier $objectName))
+        -}}
           {{- $objectName = printf "%s-%s" $objectName $identifier -}}
         {{- end -}}
       {{- end -}}

@@ -1,0 +1,4 @@
+/* Maximum space for text block */
+.md-grid {
+  max-width: 100%; /* 100% to stretch to full-width */
+}

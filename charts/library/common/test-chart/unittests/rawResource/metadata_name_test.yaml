@@ -20,6 +20,16 @@ tests:
           name: release-name
           any: true
 
+  - it: name includes identifier when alwaysAppendIdentifierToResourceName is enabled
+    set:
+      global.alwaysAppendIdentifierToResourceName: true
+    asserts:
+      - containsDocument:
+          kind: Endpoint
+          apiVersion: v1
+          name: release-name-main
+          any: true
+
   - it: forceRename
     set:
       rawResources.main.forceRename: forceRename

@@ -19,6 +19,16 @@ tests:
           name: release-name
           any: true
 
+  - it: name includes identifier when alwaysAppendIdentifierToResourceName is enabled
+    set:
+      global.alwaysAppendIdentifierToResourceName: true
+    asserts:
+      - containsDocument:
+          kind: HTTPRoute
+          apiVersion: gateway.networking.k8s.io/v1alpha2
+          name: release-name-main
+          any: true
+
   - it: forceRename
     set:
       route.main.forceRename: forceRename

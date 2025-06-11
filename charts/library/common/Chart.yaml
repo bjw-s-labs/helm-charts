@@ -34,3 +34,9 @@ annotations:
     - kind: added
       description: |-
         Added support for automatically determining the target service for ServiceMonitors if there is only one enabled Service.
+    - kind: added
+      description: |-
+        Added support for always adding the identifier suffix even if there is only a single resource.
+      links:
+        - name: Updated documentation
+          url: https://bjw-s-labs.github.io/helm-charts/docs/common-library/resources/names/
