@@ -10,7 +10,7 @@ maintainers:
 dependencies:
   - name: common
     repository: https://bjw-s-labs.github.io/helm-charts
-    version: 4.0.1
+    version: 4.1.0
 sources:
   - https://github.com/bjw-s-labs/helm-charts
 annotations:
