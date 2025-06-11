@@ -9,6 +9,19 @@
     ($serviceMonitorObject.annotations | default dict)
     (include "bjw-s.common.lib.metadata.globalAnnotations" $rootContext | fromYaml)
   -}}
+  {{ $service := dict -}}
+  {{ $serviceName := "" -}}
+  {{ if $serviceMonitorObject.serviceName -}}
+    {{ $serviceName = tpl $serviceMonitorObject.serviceName $rootContext -}}
+  {{ else if not (empty (dig "service" "name" nil $serviceMonitorObject)) -}}
+    {{ $serviceName = tpl $serviceMonitorObject.service.name $rootContext -}}
+  {{ else if not (empty (dig "service" "identifier" nil $serviceMonitorObject)) -}}
+    {{ $service = (include "bjw-s.common.lib.service.getByIdentifier" (dict "rootContext" $rootContext "id" $serviceMonitorObject.service.identifier) | fromYaml ) -}}
+    {{ if not $service -}}
+      {{fail (printf "No enabled Service found with this identifier. (serviceMonitor: '%s', identifier: '%s')" $serviceMonitorObject.identifier $serviceMonitorObject.service.identifier)}}
+    {{ end -}}
+    {{ $serviceName = $service.name -}}
+  {{ end -}}
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
@@ -37,7 +50,7 @@ spec:
       {{- tpl ($serviceMonitorObject.selector | toYaml) $rootContext | nindent 4}}
     {{- else }}
     matchLabels:
-      app.kubernetes.io/service: {{ tpl $serviceMonitorObject.serviceName $rootContext }}
+      app.kubernetes.io/service: {{ $serviceName }}
       {{- include "bjw-s.common.lib.metadata.selectorLabels" $rootContext | nindent 6 }}
     {{- end }}
   endpoints: {{- tpl (toYaml $serviceMonitorObject.endpoints) $rootContext | nindent 4 }}

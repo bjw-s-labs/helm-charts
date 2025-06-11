@@ -7,7 +7,7 @@ Return the enabled serviceMonitors.
 
   {{- range $identifier, $serviceMonitor := $rootContext.Values.serviceMonitor -}}
     {{- if kindIs "map" $serviceMonitor -}}
-      {{- /* Enable Service by default, but allow override */ -}}
+      {{- /* Enable serviceMonitors by default, but allow override */ -}}
       {{- $serviceMonitorEnabled := true -}}
       {{- if hasKey $serviceMonitor "enabled" -}}
         {{- $serviceMonitorEnabled = $serviceMonitor.enabled -}}
@@ -17,6 +17,12 @@ Return the enabled serviceMonitors.
         {{- $_ := set $enabledServiceMonitors $identifier . -}}
       {{- end -}}
     {{- end -}}
+  {{- end -}}
+
+  {{- range $identifier, $objectValues := $enabledServiceMonitors -}}
+    {{- $object := include "bjw-s.common.lib.valuesToObject" (dict "rootContext" $rootContext "id" $identifier "values" $objectValues "itemCount" (len $enabledServiceMonitors)) | fromYaml -}}
+    {{- $object = include "bjw-s.common.lib.serviceMonitor.autoDetectService" (dict "rootContext" $rootContext "object" $object) | fromYaml -}}
+    {{- $_ := set $enabledServiceMonitors $identifier $object -}}
   {{- end -}}
 
   {{- $enabledServiceMonitors | toYaml -}}

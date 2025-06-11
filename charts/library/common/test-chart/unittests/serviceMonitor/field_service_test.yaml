@@ -1,18 +1,17 @@
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
-suite: serviceMonitor - fields - selector
+suite: serviceMonitor - fields - service
 templates:
   - common.yaml
 values:
   - ../_values/controllers_main_default_container.yaml
 tests:
-  - it: a custom selector can be configured
+  - it: a templated service name can be configured
     set:
       serviceMonitor:
         main:
-          selector:
-            matchExpressions:
-              - {key: k8s-app, operator: Exists}
+          service:
+            name: "{{ .Release.Name }}"
           endpoints:
             - port: http
               scheme: http
@@ -24,18 +23,20 @@ tests:
       value: release-name
     asserts:
       - equal:
-          path: spec.selector
+          path: spec.selector.matchLabels
           value:
-            matchExpressions:
-              - key: k8s-app
-                operator: Exists
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/service: RELEASE-NAME
 
-  - it: selector can determine default service automatically
+  - it: a service identifier can be configured
     values:
-      - ../_values/service_main_default.yaml
+    - ../_values/service_main_default.yaml
     set:
       serviceMonitor:
         main:
+          service:
+            identifier: main
           endpoints:
             - port: http
               scheme: http

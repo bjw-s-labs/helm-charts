@@ -87,7 +87,7 @@
                       },
                       "identifier": {
                         "type": "string",
-                        "description": "A reference to a backend service that is defined within the chart values."
+                        "description": "A reference to a service identifier that is defined within the chart values."
                       },
                       "port": {
                         "type": ["string", "integer"]

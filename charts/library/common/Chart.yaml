@@ -28,3 +28,6 @@ annotations:
     - kind: added
       description: |-
         Added support for automatically selecting the ServiceAccount when only one is defined.
+    - kind: added
+      description: |-
+        Added support for automatically determining the target service for ServiceMonitors if there is only one enabled Service

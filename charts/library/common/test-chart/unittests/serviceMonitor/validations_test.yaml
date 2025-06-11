@@ -1,0 +1,62 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: serviceMonitor - validations
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+tests:
+  - it: service reference to non-existing service identifier should fail
+    set:
+      serviceMonitor:
+        main:
+          service:
+            identifier: main
+          endpoints:
+            - port: http
+              scheme: http
+              path: /metrics
+              interval: 1m
+              scrapeTimeout: 10s
+    asserts:
+      - failedTemplate:
+          errorMessage: "No enabled Service found with this identifier. (serviceMonitor: 'main', identifier: 'main')"
+
+  - it: automatic service determination should fail when no service is enabled
+    set:
+      serviceMonitor:
+        main:
+          endpoints:
+            - port: http
+              scheme: http
+              path: /metrics
+              interval: 1m
+              scrapeTimeout: 10s
+    asserts:
+      - failedTemplate:
+          errorMessage: "Either service.name or service.identifier is required because automatic Service detection is not possible. (serviceMonitor: main)"
+
+  - it: automatic service determination should fail when >1 service is enabled
+    set:
+      service:
+        main:
+          controller: main
+          ports:
+            ui:
+              port: 8082
+        second:
+          controller: main
+          ports:
+            ui:
+              port: 8082
+      serviceMonitor:
+        main:
+          endpoints:
+            - port: http
+              scheme: http
+              path: /metrics
+              interval: 1m
+              scrapeTimeout: 10s
+    asserts:
+      - failedTemplate:
+          errorMessage: "Either service.name or service.identifier is required because automatic Service detection is not possible. (serviceMonitor: main)"
