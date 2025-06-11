@@ -6,12 +6,14 @@ Migrating from v3.x to v4.x introduces a number of breaking changes. Additionall
 
 #### Resource names
 
-The second breaking change is the new and consistent resource naming scheme. See [here](../common-library/resources/names.md) for more information on how the new naming scheme works.
+A new and consistent resource naming scheme has been implemented throughout the chart.
+
+!!! info
+    See **[here](../common-library/resources/names.md)** for more information on how the new naming scheme works.
 
 This change may lead to generated resources getting new names, causing resources with the old naming scheme to be removed.
 
 !!! warning
-
     **IMPORTANT** As with any major software version upgrade, please verify that you have a working backup of your data.
 
 #### serviceAccounts
@@ -43,6 +45,9 @@ controllers:
 #### Controller labels
 
 The hardcoded `app.kubernetes.io/component` label that is used to target specific controllers has been renamed to `app.kubernetes.io/controller`.
+
+!!! info
+    Because controller labels are considered immutable by Kubernetes existing Deployments / StatefulSets / etc will have to be recreated.
 
 ## From 2.x.x to 3.0.x
 

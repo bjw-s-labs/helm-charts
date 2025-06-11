@@ -82,7 +82,7 @@ jobs:
       # ----------------------------
       - name: Get chart details
         id: chart-details
-        uses: bjw-s-labs/helm-charts-actions/get-chart-details@a9b80447285dab611d107e09389a2b7b4e129694
+        uses: bjw-s-labs/helm-charts-actions/get-chart-details@a417f7fcb9dc76bf87b39182d1d01481e91f5c80
         with:
           path: src/charts/${{ inputs.chart }}
           validateChartYaml: true
@@ -133,7 +133,7 @@ jobs:
       # Package Helm chart
       # ----------------------------
       - name: Dereference JSON schema before packaging
-        uses: bjw-s-labs/helm-charts-actions/dereference-json-schema@a9b80447285dab611d107e09389a2b7b4e129694
+        uses: bjw-s-labs/helm-charts-actions/dereference-json-schema@a417f7fcb9dc76bf87b39182d1d01481e91f5c80
         with:
           schemaFile: "src/charts/${{ inputs.chart }}/values.schema.json"
           outputFile: "src/charts/${{ inputs.chart }}/values.schema.json"
@@ -188,7 +188,7 @@ jobs:
 
       - name: Commit Changes
         if: ${{ inputs.publishToGhPages }}
-        uses: stefanzweifel/git-auto-commit-action@b863ae1933cb653a53c021fe36dbb774e1fb9403 # v5.2.0
+        uses: stefanzweifel/git-auto-commit-action@3cc016cfc892e0844046da36fc68da4e525e081f # v6.0.0
         with:
           commit_message: "feat: Add Chart package ${{ steps.chart-folder.outputs.chart_folder }}/${{ steps.chart-details.outputs.name }}-${{ steps.chart-details.outputs.version }}"
           repository: gh-pages

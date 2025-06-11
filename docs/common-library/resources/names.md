@@ -23,6 +23,10 @@ Suffix to append to the resource name. Defaults to the resource identifier if th
 
 ### Behavior
 
+
+!!! info
+    All resource names are based on the `bjw-s.common.lib.chart.names.fullname` template. This defaults to the Helm Release name, but can be further controlled by the `global.nameOverride` and `global.fullnameOverride` values. The identifier only comes in to play when there are multiple resources of the same kind.
+
 Assuming a Helm Release with the name `base_name`, the following table gives an overview of how the resource name is generated:
 
 | item key | enabled items | `prefix` | `suffix` | `forceRename`              | Generated name         |
