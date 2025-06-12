@@ -7,6 +7,10 @@ Autodetects the service for a Route object
   {{- $enabledServices := (include "bjw-s.common.lib.service.enabledServices" (dict "rootContext" $rootContext) | fromYaml ) -}}
 
   {{- if eq 1 (len $enabledServices) -}}
+    {{- if empty $routeObject.rules -}}
+      {{- $_ := set $routeObject "rules" (list (dict "backendRefs" (list dict))) -}}
+    {{- end -}}
+
     {{- range $routeObject.rules -}}
       {{- range .backendRefs }}
         {{- $backendRef := . -}}

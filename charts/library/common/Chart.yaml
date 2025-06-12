@@ -19,3 +19,6 @@ annotations:
     - kind: fixed
       description: |-
         Fixed an edge-case bug where specifying a merge defaultPodOptionsStrategy could crash the chart.
+    - kind: fixed
+      description: |-
+        Fixed Route automatic service detection if there are no rules defined.

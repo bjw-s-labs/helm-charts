@@ -136,3 +136,48 @@ tests:
               statusCode: 301
       - notExists:
           path: spec.rules[0].backendRefs[0]
+
+  - it: automatic service and port reference should pass with empty rules
+    values:
+      - ../_values/service_main_default.yaml
+    set:
+      route.main:
+        parentRefs:
+          - name: parentName
+            namespace: parentNamespace
+        rules: []
+    documentSelector:
+      path: $[?(@.kind == "HTTPRoute")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.rules[0].backendRefs[0]
+          value:
+            group: ""
+            kind: Service
+            name: release-name
+            namespace: NAMESPACE
+            port: 8081
+            weight: 1
+
+  - it: automatic service and port reference should pass with absent rules field
+    values:
+      - ../_values/service_main_default.yaml
+    set:
+      route.main:
+        parentRefs:
+          - name: parentName
+            namespace: parentNamespace
+    documentSelector:
+      path: $[?(@.kind == "HTTPRoute")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.rules[0].backendRefs[0]
+          value:
+            group: ""
+            kind: Service
+            name: release-name
+            namespace: NAMESPACE
+            port: 8081
+            weight: 1
