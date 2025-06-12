@@ -5,32 +5,32 @@ Returns the value for the specified field
   {{- $rootContext := .ctx.rootContext -}}
   {{- $controllerObject := .ctx.controllerObject -}}
   {{- $option := .option -}}
-  {{- $default := default "" .default -}}
+  {{- $default := default nil .default -}}
   {{- $value := $default -}}
 
   {{- $defaultPodOptionsStrategy := dig "defaultPodOptionsStrategy" "overwrite" $rootContext.Values -}}
 
-  {{- /* Set to the default if it is set */ -}}
-  {{- $defaultOption := dig $option nil (default dict $rootContext.Values.defaultPodOptions) -}}
-  {{- if kindIs "bool" $defaultOption -}}
-    {{- $value = $defaultOption -}}
-  {{- else if not (empty $defaultOption) -}}
-    {{- $value = $defaultOption -}}
+  {{- /* Set to the default Pod option if one is set */ -}}
+  {{- $defaultPodOption := dig $option nil (default dict $rootContext.Values.defaultPodOptions) -}}
+  {{- if kindIs "bool" $defaultPodOption -}}
+    {{- $value = $defaultPodOption -}}
+  {{- else if not (empty $defaultPodOption) -}}
+    {{- $value = $defaultPodOption -}}
   {{- end -}}
 
   {{- /* See if a pod-specific override is needed */ -}}
-  {{- $podOption := dig $option nil (default dict $controllerObject.pod) -}}
+  {{- $podSpecificOption := dig $option nil (default dict $controllerObject.pod) -}}
 
-  {{- if kindIs "bool" $podOption -}}
-    {{- $value = $podOption -}}
-  {{- else if kindIs "map" $podOption -}}
+  {{- if kindIs "bool" $podSpecificOption -}}
+    {{- $value = $podSpecificOption -}}
+  {{- else if kindIs "map" $podSpecificOption -}}
     {{- if eq "merge" $defaultPodOptionsStrategy -}}
-      {{- $value = merge $podOption $value -}}
+      {{- $value = merge $podSpecificOption $value -}}
     {{- else if eq "overwrite" $defaultPodOptionsStrategy -}}
-      {{- $value = $podOption -}}
+      {{- $value = $podSpecificOption -}}
     {{- end -}}
-  {{- else if not (empty $podOption) -}}
-    {{- $value = $podOption -}}
+  {{- else if not (empty $podSpecificOption) -}}
+    {{- $value = $podSpecificOption -}}
   {{- end -}}
 
   {{- if kindIs "bool" $value -}}

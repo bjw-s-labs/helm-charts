@@ -3,7 +3,7 @@ apiVersion: v2
 name: common
 description: Function library for Helm charts
 type: library
-version: 4.1.0
+version: 4.1.1
 kubeVersion: ">=1.28.0-0"
 keywords:
   - common
@@ -18,25 +18,4 @@ annotations:
   artifacthub.io/changes: |-
     - kind: fixed
       description: |-
-        Fixed a bug where probes were not being configured correctly for Services that autodetect their controller.
-    - kind: fixed
-      description: |-
-        Fixed a bug where topologySpreadConstraints field did not properly render Helm templates.
-    - kind: added
-      description: |-
-        Added support for configuring the `serviceName` field for StatefulSets.
-    - kind: added
-      description: |-
-        Added support for automatically selecting the ServiceAccount when only one is defined.
-    - kind: added
-      description: |-
-        - Added support for referencing target service for ServiceMonitors by identifier.
-    - kind: added
-      description: |-
-        Added support for automatically determining the target service for ServiceMonitors if there is only one enabled Service.
-    - kind: added
-      description: |-
-        Added support for always adding the identifier suffix even if there is only a single resource.
-      links:
-        - name: Updated documentation
-          url: https://bjw-s-labs.github.io/helm-charts/docs/common-library/resources/names/
+        Fixed an edge-case bug where specifying a merge defaultPodOptionsStrategy could crash the chart.

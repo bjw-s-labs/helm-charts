@@ -47,3 +47,21 @@ tests:
           path: spec.template.spec.nodeSelector
           value:
             disktype: hdd
+
+  - it: empty defaultPodOptions with pod override can be merged
+    set:
+      defaultPodOptionsStrategy: merge
+      defaultPodOptions: {}
+      controllers:
+        main:
+          pod:
+            nodeSelector:
+              location: apartment
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.nodeSelector
+          value:
+            location: apartment
