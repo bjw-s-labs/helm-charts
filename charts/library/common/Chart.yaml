@@ -19,3 +19,6 @@ annotations:
     - kind: changed
       description: |-
         Improved and standardized descriptions for JSONSchema properties.
+    - kind: fixed
+      description: |-
+        Fixed Route validation when relying on automatic Service detection when multiple services are present.

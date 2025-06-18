@@ -9,6 +9,10 @@ Validate Route values
 
   {{/* Verify automatic Service detection */}}
   {{- if not (eq 1 (len $enabledServices)) -}}
+    {{- if empty $routeObject.rules -}}
+      {{- fail (printf "An explicit rule is required because automatic Service detection is not possible. (route: %s)" $routeObject.identifier) -}}
+    {{- end -}}
+
     {{- range $routeObject.rules -}}
       {{- $rule := . -}}
       {{- range $rule.backendRefs }}
@@ -27,7 +31,6 @@ Validate Route values
   {{- end }}
 
   {{/* Route Rules */}}
-
   {{- range $routeObject.rules }}
   {{- if and (.filters) (.backendRefs) }}
     {{- range .filters }}

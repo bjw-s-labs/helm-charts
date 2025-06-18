@@ -78,3 +78,24 @@ tests:
     asserts:
       - failedTemplate:
           errorMessage: "Either name or identifier is required because automatic Service detection is not possible. (route: main)"
+
+  - it: automatic service and port reference should fail with absent rules field and when >1 service is enabled
+    set:
+      service:
+        main:
+          controller: main
+          ports:
+            ui:
+              port: 8082
+        second:
+          controller: main
+          ports:
+            ui:
+              port: 8082
+      route.main:
+        parentRefs:
+          - name: parentName
+            namespace: parentNamespace
+    asserts:
+      - failedTemplate:
+          errorMessage: "An explicit rule is required because automatic Service detection is not possible. (route: main)"

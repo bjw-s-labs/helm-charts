@@ -5,6 +5,7 @@ templates:
   - common.yaml
 values:
   - ../_values/controllers_main_default_container.yaml
+  - ../_values/service_main_default.yaml
 tests:
   - it: an HTTPRoute is not created by default
     asserts:

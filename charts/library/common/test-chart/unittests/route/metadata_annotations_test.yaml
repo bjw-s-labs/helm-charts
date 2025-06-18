@@ -5,6 +5,7 @@ templates:
   - common.yaml
 values:
   - ../_values/controllers_main_default_container.yaml
+  - ../_values/service_main_default.yaml
 set:
   route.main.parentRefs:
     - name: test
