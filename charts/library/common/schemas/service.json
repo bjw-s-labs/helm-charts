@@ -1,7 +1,7 @@
 {
   "instance": {
     "allOf": [
-      { "$ref": "definitions.json#/resourceIdentifier" },
+      {"$ref": "definitions.json#/resourceIdentifier"},
       {
         "type": "object",
         "additionalProperties": false,
@@ -10,84 +10,67 @@
           "prefix": {},
           "suffix": {},
           "enabled": {
+            "description": "Set to false to disable the Service.",
             "type": "boolean",
             "default": true
           },
-          "annotations": {
-            "$ref": "definitions.json#/annotations"
-          },
-          "labels": {
-            "$ref": "definitions.json#/labels"
-          },
+          "annotations": {"$ref": "definitions.json#/annotations"},
+          "labels": {"$ref": "definitions.json#/labels"},
           "type": {
-            "type": "string"
+            "description": "Service type. Supported values: ClusterIP, NodePort, LoadBalancer, ExternalName.",
+            "type": "string",
+            "enum": ["ClusterIP", "NodePort", "LoadBalancer", "ExternalName"]
           },
-          "clusterIP": {
-            "type": "string"
-          },
-          "externalName": {
-            "type": "string"
-          },
-          "loadBalancerIP": {
-            "type": "string"
-          },
+          "clusterIP": {"type": "string"},
+          "externalName": {"type": "string"},
+          "loadBalancerIP": {"type": "string"},
           "loadBalancerSourceRanges": {
             "type": "array",
             "items": {"type": "string"}
           },
-          "loadBalancerClass": {
-            "type": "string"
-          },
+          "loadBalancerClass": {"type": "string"},
           "internalTrafficPolicy": {
+            "description": "internalTrafficPolicy for the Service. Supported values: Cluster, Local.\nSee https://kubernetes.io/docs/concepts/services-networking/service-traffic-policy/",
             "type": "string",
             "enum": ["Cluster", "Local"]
           },
           "externalTrafficPolicy": {
+            "description": "externalTrafficPolicy for the Service. Supported values: Cluster, Local.\nSee https://kubernetes.io/docs/tutorials/services/source-ip/",
             "type": "string",
             "enum": ["Cluster", "Local"]
           },
-          "allocateLoadBalancerNodePorts": {
-            "type": "boolean"
-          },
-          "sessionAffinity": {
-            "type": "string",
-            "enum": ["None", "ClientIP"]
-          },
-          "sessionAffinityConfig": {
-            "type": "object"
-          },
-          "externalIPs": {
-            "type": "array",
-            "items": {"type": "string"}
-          },
-          "publishNotReadyAddresses": {
-            "type": "boolean"
-          },
+          "allocateLoadBalancerNodePorts": {"type": "boolean"},
+          "sessionAffinity": {"type": "string", "enum": ["None", "ClientIP"]},
+          "sessionAffinityConfig": {"type": "object"},
+          "externalIPs": {"type": "array", "items": {"type": "string"}},
+          "publishNotReadyAddresses": {"type": "boolean"},
           "ipFamilyPolicy": {
+            "description": "ipFamilyPolicy for the Service. Supported values: SingleStack, PreferDualStack, RequireDualStack.",
             "type": "string",
             "enum": ["SingleStack", "PreferDualStack", "RequireDualStack"]
           },
           "ipFamilies": {
+            "description": "IP families for the Service. Supported values: IPv4, IPv6.",
             "type": "array",
-            "items": {
-              "type": "string",
-              "enum": ["IPv4", "IPv6"]
-            }
+            "items": {"type": "string", "enum": ["IPv4", "IPv6"]}
           },
-          "ports": {
-            "type": "object",
-            "additionalProperties": {
-              "$ref": "#/servicePort"
-            }
+          "controller": {
+            "description": "Controller this Service should target.",
+            "type": "string"
           },
           "primary": {
+            "description": "Set to true to make this the primary Service for the controller (used in probes, notes, etc). Only one Service can be marked as primary.",
             "type": "boolean",
             "default": false
           },
-          "controller": {
-            "type": "string"
+          "extraSelectorLabels": {
+            "description": "Additional match labels for the Service selector."
           },
-          "extraSelectorLabels": {}
+          "ports": {
+            "description": "Service port(s) configuration.",
+            "type": "object",
+            "additionalProperties": {"$ref": "#/servicePort"}
+          }
         },
         "required": []
       }
@@ -99,27 +82,34 @@
     "additionalProperties": false,
     "properties": {
       "enabled": {
+        "description": "Set to false to disable the port.",
         "type": "boolean",
         "default": true
       },
       "primary": {
+        "description": "Set to true to make this the primary port (used in probes, notes, etc).\nOnly one port can be marked as primary.",
         "type": "boolean",
         "default": false
       },
       "port": {
+        "description": "Port name / number.",
         "type": ["string", "integer"]
       },
       "protocol": {
+        "description": "Port protocol. Supported values: HTTP, HTTPS, TCP, UDP.\nHTTP and HTTPS spawn a TCP service and are used for internal URL and name generation.",
         "type": "string",
         "enum": ["HTTP", "HTTPS", "TCP", "UDP"]
       },
       "targetPort": {
+        "description": "Set the targetPort if you want the Service port to differ from the application port. If set, this value is used in the container definition instead of 'port'.\nNamed ports are not supported for this field.",
         "type": ["string", "integer"]
       },
       "nodePort": {
+        "description": "nodePort value for LoadBalancer and NodePort Service types.\nSee https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport",
         "type": ["string", "integer"]
       },
       "appProtocol": {
+        "description": "appProtocol value for the port.\nSee https://kubernetes.io/docs/concepts/services-networking/service/#application-protocol",
         "type": "string"
       }
     },

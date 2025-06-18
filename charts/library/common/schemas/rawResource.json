@@ -1,7 +1,7 @@
 {
   "instance": {
     "allOf": [
-      { "$ref": "definitions.json#/resourceIdentifier" },
+      {"$ref": "definitions.json#/resourceIdentifier"},
       {
         "type": "object",
         "additionalProperties": false,
@@ -10,22 +10,23 @@
           "prefix": {},
           "suffix": {},
           "enabled": {
+            "description": "Set to false to disable the resource.",
             "type": "boolean",
             "default": true
           },
           "apiVersion": {
+            "description": "apiVersion of the resource.",
             "type": "string"
           },
           "kind": {
+            "description": "Kind of the resource.",
             "type": "string"
           },
-          "annotations": {
-            "$ref": "definitions.json#/annotations"
-          },
-          "labels": {
-            "$ref": "definitions.json#/labels"
-          },
-          "spec": {}
+          "annotations": {"$ref": "definitions.json#/annotations"},
+          "labels": {"$ref": "definitions.json#/labels"},
+          "spec": {
+            "description": "Contents of the raw resource to be rendered."
+          }
         },
         "required": ["apiVersion", "kind", "spec"]
       }

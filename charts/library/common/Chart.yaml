@@ -3,7 +3,7 @@ apiVersion: v2
 name: common
 description: Function library for Helm charts
 type: library
-version: 4.1.1
+version: 4.1.2  # bumped version for schema description improvements
 kubeVersion: ">=1.28.0-0"
 keywords:
   - common
@@ -16,9 +16,6 @@ sources:
   - https://github.com/bjw-s-labs/helm-charts
 annotations:
   artifacthub.io/changes: |-
-    - kind: fixed
+    - kind: changed
       description: |-
-        Fixed an edge-case bug where specifying a merge defaultPodOptionsStrategy could crash the chart.
-    - kind: fixed
-      description: |-
-        Fixed Route automatic service detection if there are no rules defined.
+        Improved and standardized descriptions for JSONSchema properties.

@@ -1,29 +1,40 @@
 {
+  "envVarName": {
+    "description": "Environment variable name.",
+    "type": "string"
+  },
+
   "envVarValue": {
+    "description": "Environment variable value.",
     "type": ["string", "number", "boolean", "null"]
   },
 
   "envVarListItem": {
+    "description": "Environment variable as a name/value pair.",
     "type": "object",
     "additionalProperties": false,
     "properties": {
-      "name": {"type": "string"},
+      "name": {"$ref": "#/envVarName"},
       "value": {"$ref": "#/envVarValue"}
     },
     "required": ["name", "value"]
   },
 
   "envVarItem": {
+    "description": "Define an environment variable value as a dictionary item with optional dependencies.",
     "type": "object",
     "additionalProperties": false,
     "properties": {
       "value": {"$ref": "#/envVarValue"},
-      "dependsOn": {"$ref": "#/envVarDependsOn"}
+      "dependsOn": {
+        "$ref": "#/envVarDependsOn"
+      }
     },
     "required": ["value"]
   },
 
   "valueFromListItem": {
+    "description": "Define an environment variable using valueFrom syntax.",
     "oneOf": [
       {"$ref": "#/valueFromListItemExplicit"},
       {"$ref": "#/valueFromListItemImplicit"}
@@ -31,20 +42,22 @@
   },
 
   "valueFromListItemExplicit": {
+    "description": "Explicit valueFrom environment variable.",
     "type": "object",
     "additionalProperties": false,
     "properties": {
-      "name": {"type": "string"},
+      "name": {"$ref": "#/envVarName"},
       "valueFrom": {"$ref": "#/valueFromOptions"}
     },
     "required": ["name", "valueFrom"]
   },
 
   "valueFromListItemImplicit": {
+    "description": "Implicit valueFrom environment variable.",
     "type": "object",
     "additionalProperties": false,
     "properties": {
-      "name": {"type": "string"},
+      "name": {"$ref": "#/envVarName"},
       "fieldRef": {"$ref": "#/fieldRefSelector"},
       "resourceFieldRef": {"$ref": "#/resourceFieldRefSelector"},
       "secretKeyRef": {"$ref": "#/objectKeySelector"},
@@ -87,10 +100,12 @@
     "oneOf": [
       {"$ref": "#/valueFromItemExplicit"},
       {"$ref": "#/valueFromItemImplicit"}
-    ]
+    ],
+    "description": "Define an environment variable using valueFrom syntax (map style)."
   },
 
   "valueFromItemExplicit": {
+    "description": "Explicit valueFrom environment variable.",
     "type": "object",
     "additionalProperties": false,
     "properties": {
@@ -101,6 +116,7 @@
   },
 
   "valueFromItemImplicit": {
+    "description": "Implicit valueFrom environment variable.",
     "type": "object",
     "additionalProperties": false,
     "properties": {
@@ -144,6 +160,7 @@
 
   "valueFromOptions": {
     "type": "object",
+    "description": "Set the valueFrom options for the environment variable.",
     "oneOf": [
       {"$ref": "#/fieldRef"},
       {"$ref": "#/resourceFieldRef"},
@@ -153,6 +170,7 @@
   },
 
   "secretKeyRef": {
+    "description": "Reference a key from a Secret using secretKeyRef syntax.",
     "type": "object",
     "additionalProperties": false,
     "properties": {
@@ -162,6 +180,7 @@
   },
 
   "configMapKeyRef": {
+    "description": "Reference a key from a ConfigMap using configMapKeyRef syntax.",
     "type": "object",
     "additionalProperties": false,
     "properties": {
@@ -171,6 +190,7 @@
   },
 
   "fieldRef": {
+    "description": "Reference a field from the pod spec using fieldRef syntax.",
     "type": "object",
     "additionalProperties": false,
     "properties": {
@@ -180,13 +200,16 @@
   },
 
   "fieldRefSelector": {
+    "description": "Selector for a fieldRef.",
     "type": "object",
     "additionalProperties": false,
     "properties": {
       "apiVersion": {
+        "description": "Set the API version for the fieldRef.",
         "type": "string"
       },
       "fieldPath": {
+        "description": "Set the field path for the fieldRef.",
         "type": "string"
       }
     },
@@ -194,6 +217,7 @@
   },
 
   "resourceFieldRef": {
+    "description": "Reference a resource field from the pod spec using resourceFieldRef syntax.",
     "type": "object",
     "additionalProperties": false,
     "properties": {
@@ -203,16 +227,20 @@
   },
 
   "resourceFieldRefSelector": {
+    "description": "Selector for a resourceFieldRef.",
     "type": "object",
     "additionalProperties": false,
     "properties": {
       "containerName": {
+        "description": "Set the container name for the resource field reference.",
         "type": "string"
       },
       "divisor": {
+        "description": "Set the divisor for the resource field reference.",
         "oneOf": [{"type": "string"}, {"type": "number"}]
       },
       "resource": {
+        "description": "Set the resource name for the resource field reference.",
         "type": "string"
       }
     },
@@ -220,6 +248,7 @@
   },
 
   "envVarDependsOn": {
+    "description": "Specify other environment variables that the environment variable depends on.",
     "oneOf": [
       {"type": "string"},
       {
@@ -230,13 +259,16 @@
   },
 
   "objectKeySelector": {
+    "description": "Selector for a key in a Secret or ConfigMap.",
     "type": "object",
     "additionalProperties": false,
     "properties": {
       "name": {
+        "description": "Set the name of the Secret or ConfigMap.",
         "type": "string"
       },
       "key": {
+        "description": "Set the key within the Secret or ConfigMap.",
         "type": "string"
       }
     },

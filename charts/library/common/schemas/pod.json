@@ -5,55 +5,67 @@
     "properties": {
       "affinity": {
         "type": "object",
-        "$ref": "k8s-api.json#/core.v1.Affinity"
+        "$ref": "k8s-api.json#/core.v1.Affinity",
+        "description": "Set affinity constraint rules. Helm templates can be used.\nSee https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity"
       },
       "annotations": {
         "$ref": "definitions.json#/annotations"
       },
       "automountServiceAccountToken": {
         "type": "boolean",
-        "default": true
+        "default": true,
+        "description": "Set to true to automatically mount the service account token."
       },
       "dnsConfig": {
         "type": "object",
-        "$ref": "k8s-api.json#/core.v1.PodDNSConfig"
+        "$ref": "k8s-api.json#/core.v1.PodDNSConfig",
+        "description": "Specifies the DNS parameters of a pod. Parameters specified here will be merged to the generated DNS configuration based on DNSPolicy."
       },
       "dnsPolicy": {
-        "type": "string"
+        "type": "string",
+        "description": "Configure the Pod DNS policy. Defaults to 'ClusterFirst' if hostNetwork is false and 'ClusterFirstWithHostNet' if hostNetwork is true."
       },
       "enableServiceLinks": {
         "type": "boolean",
-        "default": false
+        "default": false,
+        "description": "Enable/disable the generation of environment variables for services.\nSee https://kubernetes.io/docs/concepts/services-networking/connect-applications-service/#accessing-the-service"
       },
       "hostAliases": {
         "type": "array",
         "items": {
           "$ref": "k8s-api.json#/core.v1.HostAlias"
-        }
+        },
+        "description": "Use hostAliases to add custom entries to /etc/hosts - mapping IP addresses to hostnames.\nSee https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/"
       },
       "hostIPC": {
         "type": "boolean",
-        "default": false
+        "default": false,
+        "description": "Set to true to use the host's ipc namespace."
       },
       "hostNetwork": {
         "type": "boolean",
-        "default": false
+        "default": false,
+        "description": "Set to false to disable host networking on the Pod. When using hostNetwork, make sure you set dnsPolicy to 'ClusterFirstWithHostNet'"
       },
       "hostPID": {
         "type": "boolean",
-        "default": false
+        "default": false,
+        "description": "Set to true to use the host's pid namespace."
       },
       "hostUsers": {
-        "type": ["boolean", "null"]
+        "type": ["boolean", "null"],
+        "description": "Set to false to create a new userns for the Pod. (Requires Kubernetes 1.29 or newer)"
       },
       "hostname": {
-        "type": "string"
+        "type": "string",
+        "description": "Set the Pod's hostname."
       },
       "imagePullSecrets": {
         "type": "array",
         "items": {
           "$ref": "k8s-api.json#/core.v1.LocalObjectReference"
-        }
+        },
+        "description": "Set image pull secrets."
       },
       "labels": {
         "$ref": "definitions.json#/annotations"
@@ -62,44 +74,55 @@
         "type": "object",
         "additionalProperties": {
           "type": ["string"]
-        }
+        },
+        "description": "Node selection constraint.\nSee https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector"
       },
       "priorityClassName": {
-        "type": "string"
+        "type": "string",
+        "description": "Custom priority class for different treatment by the scheduler."
       },
       "resources": {
-        "$ref": "k8s-api.json#/core.v1.ResourceRequirements"
+        "$ref": "k8s-api.json#/core.v1.ResourceRequirements",
+        "description": "Set the resource requests / limits for the Pod. (Requires Kubernetes 1.32 or newer)"
       },
       "restartPolicy": {
-        "type": "string"
+        "type": "string",
+        "description": "Set container restart policy. Defaults to 'Always'. When controller.type is 'cronjob' it defaults to 'Never'."
       },
       "runtimeClassName": {
-        "type": "string"
+        "type": "string",
+        "description": "Set a runtimeClassName other than the default one (ie: `nvidia`)."
       },
       "schedulerName": {
-        "type": "string"
+        "type": "string",
+        "description": "Set a custom scheduler name."
       },
       "securityContext": {
-        "$ref": "k8s-api.json#/core.v1.PodSecurityContext"
+        "$ref": "k8s-api.json#/core.v1.PodSecurityContext",
+        "description": "Configure the Security Context for the Pod."
       },
       "shareProcessNamespace": {
         "type": ["boolean", "null"],
-        "default": false
+        "default": false,
+        "description": "Allows sharing process namespace between containers in a Pod.\nSee https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/"
       },
       "terminationGracePeriodSeconds": {
-        "type": ["integer", "null"]
+        "type": ["integer", "null"],
+        "description": "Duration in seconds the pod needs to terminate gracefully.\nSee https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#lifecycle"
       },
       "tolerations": {
         "type": "array",
         "items": {
           "$ref": "k8s-api.json#/core.v1.Toleration"
-        }
+        },
+        "description": "Specify taint tolerations.\nSee https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/"
       },
       "topologySpreadConstraints": {
         "type": "array",
         "items": {
           "$ref": "k8s-api.json#/core.v1.TopologySpreadConstraint"
-        }
+        },
+        "description": "Defines topologySpreadConstraint rules.\nSee https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/"
       }
     }
   }

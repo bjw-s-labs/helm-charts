@@ -1,7 +1,7 @@
 {
   "instance": {
     "allOf": [
-      { "$ref": "definitions.json#/resourceIdentifier" },
+      {"$ref": "definitions.json#/resourceIdentifier"},
       {
         "type": "object",
         "additionalProperties": false,
@@ -10,10 +10,12 @@
           "prefix": {},
           "suffix": {},
           "enabled": {
+            "description": "Set to false to disable the ConfigMap.",
             "type": "boolean",
             "default": true
           },
           "includeInChecksum": {
+            "description": "Set to true to include this ConfigMap in the checksum calculation for rolling updates.",
             "type": "boolean",
             "default": true
           },
@@ -24,22 +26,21 @@
             "$ref": "definitions.json#/labels"
           },
           "data": {
+            "description": "ConfigMap data content. Helm templates are supported.",
             "type": "object",
             "additionalProperties": {
               "type": "string"
             }
           },
           "binaryData": {
+            "description": "ConfigMap binaryData content.",
             "type": "object",
             "additionalProperties": {
               "type": "string"
             }
           }
         },
-        "oneOf": [
-            {"required": ["data"]},
-            {"required": ["binaryData"]}
-        ]
+        "oneOf": [{"required": ["data"]}, {"required": ["binaryData"]}]
       }
     ]
   }

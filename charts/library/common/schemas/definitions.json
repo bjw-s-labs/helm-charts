@@ -3,38 +3,36 @@
     "type": "object",
     "properties": {
       "forceRename": {
-        "type": "string",
-        "description": "Override the default resource name. This field is mutually exclusive with the prefix and suffix fields."
+        "description": "Override the default resource name. Mutually exclusive with prefix and suffix.",
+        "type": "string"
       },
       "prefix": {
+        "description": "Prefix to prepend to the resource name. Mutually exclusive with forceRename.",
         "type": "string",
-        "description": "Prefix to prepend to the resource name. This field is mutually exclusive with the forceRename field.",
         "default": ""
       },
       "suffix": {
-        "type": "string",
-        "description": "Suffix to append to the resource name. Defaults to the resource identifier if there are multiple items, otherwise it defaults to empty. This field is mutually exclusive with the forceRename field."
+        "description": "Suffix to append to the resource name. Defaults to the resource identifier if there are multiple items, otherwise empty. Mutually exclusive with forceRename.",
+        "type": "string"
       }
     },
-    "not" : {
-      "anyOf" : [
-        {"required" : ["forceRename", "suffix"]},
-        {"required" : ["forceRename", "prefix"]}
+    "not": {
+      "anyOf": [
+        {"required": ["forceRename", "suffix"]},
+        {"required": ["forceRename", "prefix"]}
       ]
     }
   },
 
   "annotations": {
+    "description": "Annotations to set on the item.",
     "type": ["object", "null"],
-    "additionalProperties": {
-      "type": ["string", "null"]
-    }
+    "additionalProperties": {"type": ["string", "null"]}
   },
 
   "labels": {
+    "description": "Labels to set on the item.",
     "type": ["object", "null"],
-    "additionalProperties": {
-      "type": ["string", "null"]
-    }
+    "additionalProperties": {"type": ["string", "null"]}
   }
 }

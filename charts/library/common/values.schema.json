@@ -8,14 +8,14 @@
       "type": "object",
       "properties": {
         "nameOverride": {
-          "description": "Override the chart name",
+          "description": "Set the chart name",
           "type": [
             "string",
             "null"
           ]
         },
         "fullnameOverride": {
-          "description": "Override the chart fullname definition",
+          "description": "Set the chart fullname definition",
           "type": [
             "string",
             "null"
@@ -27,7 +27,7 @@
           "default": false
         },
         "propagateGlobalMetadataToPods": {
-          "description": "Propagate global metadata to Pod labels",
+          "description": "Set to true to propagate global metadata to Pod labels.",
           "type": "boolean",
           "default": false
         },
@@ -44,7 +44,7 @@
       }
     },
     "defaultPodOptionsStrategy": {
-      "description": "Set the strategy for the default pod options.\noverwrite: If pod-level options are set, use those instead of the defaults.\nmerge: If pod-level options are set, merge them with the defaults.",
+      "description": "Set the strategy for the default pod options. Defaults to overwrite.\noverwrite: If pod-level options are set, use those instead of the defaults.\nmerge: If pod-level options are set, merge them with the defaults.",
       "type": "string",
       "default": "overwrite",
       "enum": [
@@ -53,7 +53,7 @@
       ]
     },
     "defaultPodOptions": {
-      "description": "Define defaults for pod-level configuration options",
+      "description": "Set default options for all controllers / pods here. Each of these options can be overridden on a controller level.",
       "type": "object",
       "$ref": "schemas/pod.json#/options"
     },

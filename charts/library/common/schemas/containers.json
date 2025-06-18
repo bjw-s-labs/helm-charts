@@ -5,85 +5,102 @@
 
     "properties": {
       "enabled": {
+        "description": "Set to false to disable the container.",
         "type": "boolean",
         "default": true
       },
       "args": {
+        "description": "Arguments for the container entrypoint.",
         "$ref": "#/args"
       },
       "command": {
+        "description": "Command for the container entrypoint.",
         "$ref": "#/command"
       },
       "dependsOn": {
+        "description": "Specify container dependencies to determine render order.",
         "oneOf": [
-          {
-            "type": "array",
-            "items": {"type": "string"}
-          },
+          {"type": "array", "items": {"type": "string"}},
           {"type": "string"}
         ]
       },
       "env": {
+        "description": "Environment variables for the container.",
         "$ref": "#/env"
       },
       "envFrom": {
+        "description": "Secrets and/or ConfigMaps to load as environment variables.",
         "$ref": "#/envFrom"
       },
       "image": {
+        "description": "Image configuration for the container.",
         "$ref": "#/image"
       },
       "lifecycle": {
+        "description": "Lifecycle event hooks for the container.",
         "$ref": "k8s-api.json#/core.v1.Lifecycle"
       },
       "nameOverride": {
+        "description": "Override the container name.",
         "type": "string"
       },
       "ports": {
+        "description": "Ports to expose from the container.",
         "type": "array",
-        "items": {
-          "$ref": "k8s-api.json#/core.v1.ContainerPort"
-        }
+        "items": {"$ref": "k8s-api.json#/core.v1.ContainerPort"}
       },
       "probes": {
+        "description": "Probe settings for the container.",
         "type": "object",
         "additionalProperties": false,
         "properties": {
           "liveness": {
+            "description": "Liveness probe configuration.",
             "$ref": "#/probe"
           },
           "readiness": {
+            "description": "Readiness probe configuration.",
             "$ref": "#/probe"
           },
           "startup": {
+            "description": "Startup probe configuration.",
             "$ref": "#/probe"
           }
         }
       },
       "resources": {
+        "description": "Resource requests and limits for the container.",
         "$ref": "k8s-api.json#/core.v1.ResourceRequirements"
       },
       "restartPolicy": {
+        "description": "Restart policy for the container.",
         "type": "string"
       },
       "securityContext": {
+        "description": "Security context for the container.",
         "$ref": "k8s-api.json#/core.v1.ContainerSecurityContext"
       },
       "stdin": {
+        "description": "Keep the standard input open on the container.",
         "type": "boolean",
         "default": false
       },
       "terminationMessagePath": {
+        "description": "Path for the container's termination message file.",
         "type": "string"
       },
       "terminationMessagePolicy": {
+        "description": "How the container's termination message should be populated. Supported values: 'File', 'FallbackToLogsOnError'.",
         "type": "string",
         "enum": ["File", "FallbackToLogsOnError"]
       },
       "tty": {
+        "description": "Allocate a TTY for the container.",
         "type": "boolean",
         "default": false
       },
       "workingDir": {
+        "description": "Working directory for the container.",
         "type": "string"
       }
     }

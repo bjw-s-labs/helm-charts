@@ -14,7 +14,7 @@
 
   "persistentVolumeClaimItem": {
     "allOf": [
-      { "$ref": "definitions.json#/resourceIdentifier" },
+      {"$ref": "definitions.json#/resourceIdentifier"},
       {
         "type": "object",
         "additionalProperties": false,
@@ -28,37 +28,50 @@
           "suffix": {},
           "enabled": {
             "type": "boolean",
-            "default": true
+            "default": true,
+            "description": "Set to false to disable the persistence item."
           },
           "accessMode": {
-            "type": "string"
+            "type": "string",
+            "description": "AccessMode for the persistent volume. Make sure to select an access mode that is supported by your storage provider!\nSee https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes"
           },
           "annotations": {
             "$ref": "definitions.json#/annotations"
           },
           "dataSource": {
-            "$ref": "#/dataSourceReference"
+            "$ref": "#/dataSourceReference",
+            "description": "The optional data source for the persistentVolumeClaim.\nSee https://kubernetes.io/docs/concepts/storage/persistent-volumes/#volume-populators-and-data-sources"
           },
           "dataSourceRef": {
-            "$ref": "#/dataSourceReference"
+            "$ref": "#/dataSourceReference",
+            "description": "The optional volume populator for the persistentVolumeClaim.\nSee https://kubernetes.io/docs/concepts/storage/persistent-volumes/#volume-populators-and-data-sources"
           },
           "labels": {
             "$ref": "definitions.json#/labels"
           },
           "retain": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Set to true to retain the PVC upon helm uninstall."
           },
           "size": {
-            "type": "string"
+            "type": "string",
+            "description": "The amount of storage that is requested for the persistent volume."
           },
           "storageClass": {
-            "type": "string"
+            "type": "string",
+            "description": "Storage Class for the config volume.\nIf set to '-', dynamic provisioning is disabled.\nIf set to something else, the given storageClass is used.\nIf undefined (the default) or set to null, no storageClassName spec is set, choosing the default provisioner."
           },
           "volumeName": {
             "type": "string"
           },
-          "advancedMounts": {"$ref": "#/advancedMounts"},
-          "globalMounts": {"$ref": "#/globalMounts"}
+          "advancedMounts": {
+            "$ref": "#/advancedMounts",
+            "description": "Explicitly configure mounts for specific controllers and containers.\nSee https://bjw-s-labs.github.io/helm-charts/docs/common-library/storage/globalOptions/#advancedmounts"
+          },
+          "globalMounts": {
+            "$ref": "#/globalMounts",
+            "description": "Configure mounts to all controllers and containers.\nBy default the persistence item will be mounted to /<name_of_the_peristence_item>.\nSee https://bjw-s-labs.github.io/helm-charts/docs/common-library/storage/globalOptions/#globalmounts"
+          }
         },
         "required": ["accessMode", "size"]
       }

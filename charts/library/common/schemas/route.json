@@ -1,7 +1,7 @@
 {
   "instance": {
     "allOf": [
-      { "$ref": "definitions.json#/resourceIdentifier" },
+      {"$ref": "definitions.json#/resourceIdentifier"},
       {
         "type": "object",
         "additionalProperties": false,
@@ -10,95 +10,77 @@
           "prefix": {},
           "suffix": {},
           "enabled": {
+            "description": "Set to false to disable the Route.",
             "type": "boolean",
             "default": true
           },
-
-          "annotations": {
-            "$ref": "definitions.json#/annotations"
-          },
-          "labels": {
-            "$ref": "definitions.json#/labels"
-          },
-
+          "annotations": {"$ref": "definitions.json#/annotations"},
+          "labels": {"$ref": "definitions.json#/labels"},
           "hostnames": {
+            "description": "Host addresses for the Route. Helm templates are supported.",
             "type": "array",
             "items": {"type": "string"}
           },
-
           "kind": {
+            "description": "Route kind. Supported values: GRPCRoute, HTTPRoute, TCPRoute, TLSRoute, UDPRoute.",
             "type": "string",
-            "enum": ["GRPCRoute", "HTTPRoute", "TCPRoute", "TLSRoute", "UDPRoute"]
+            "enum": [
+              "GRPCRoute",
+              "HTTPRoute",
+              "TCPRoute",
+              "TLSRoute",
+              "UDPRoute"
+            ]
           },
-
           "parentRefs": {
+            "description": "Resource the Route attaches to.",
             "type": "array",
             "items": {
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "group": {
-                  "type": "string"
-                },
-                "kind": {
-                  "type": "string"
-                },
-                "namespace": {
-                  "type": "string"
-                },
-                "name": {
-                  "type": "string"
-                },
-                "sectionName": {
-                  "type": "string"
-                },
-                "port": {
-                  "type": "integer"
-                }
+                "group": {"type": "string"},
+                "kind": {"type": "string"},
+                "namespace": {"type": "string"},
+                "name": {"type": "string"},
+                "sectionName": {"type": "string"},
+                "port": {"type": "integer"}
               },
               "required": ["name"]
             }
           },
-
           "rules": {
+            "description": "Rules for routing. Defaults to the primary service.",
             "type": "array",
             "items": {
               "type": "object",
               "additionalProperties": false,
               "properties": {
                 "backendRefs": {
+                  "description": "Backend references.",
                   "type": "array",
                   "items": {
                     "type": "object",
                     "additionalProperties": false,
                     "properties": {
-                      "group": {
-                        "type": "string"
-                      },
-                      "kind": {
-                        "type": "string"
-                      },
-                      "namespace": {
-                        "type": "string"
-                      },
+                      "group": {"type": "string"},
+                      "kind": {"type": "string"},
+                      "namespace": {"type": "string"},
                       "name": {
-                        "type": "string",
-                        "description": "A reference to a backend Service name."
+                        "description": "Reference to a backend Service name.",
+                        "type": "string"
                       },
                       "identifier": {
-                        "type": "string",
-                        "description": "A reference to a service identifier that is defined within the chart values."
+                        "description": "Reference to a service identifier defined within the chart values.",
+                        "type": "string"
                       },
-                      "port": {
-                        "type": ["string", "integer"]
-                      },
-                      "weight": {
-                        "type": "integer"
-                      }
+                      "port": {"type": ["string", "integer"]},
+                      "weight": {"type": "integer"}
                     }
                   }
                 },
                 "matches": {
+                  "description": "Match rules.",
                   "type": "array",
                   "items": {
                     "type": "object",
@@ -108,26 +90,24 @@
                         "type": "object",
                         "additionalProperties": false,
                         "properties": {
-                          "type": {
-                            "type": "string"
-                          },
-                          "value": {
-                            "type": "string"
-                          }
+                          "type": {"type": "string"},
+                          "value": {"type": "string"}
                         }
                       }
                     }
                   }
                 },
                 "filters": {
+                  "description": "Filters for the route.",
                   "type": "array",
                   "items": {}
                 },
                 "sessionPersistence": {
-                  "description": "SessionPersistence defines the desired state of SessionPersistence",
+                  "description": "SessionPersistence defines the desired state of SessionPersistence.",
                   "type": "object"
                 },
                 "timeouts": {
+                  "description": "Timeouts for the route.",
                   "type": "object"
                 }
               }
