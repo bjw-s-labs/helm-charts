@@ -15,25 +15,25 @@ tasks:
   lint:
     desc: Run ct-lint on charts
     cmds:
-      - docker run --rm -it --workdir=/data --volume $(pwd):/data {{.CT_IMAGE}} ct lint --config {{.CT_CONFIG_FILE}} --excluded-charts "{{.CHARTS_EXCLUDED_FROM_LINT}}"
+    - docker run --rm -it --workdir=/data --volume $(pwd):/data {{.CT_IMAGE}} ct lint --config {{.CT_CONFIG_FILE}} --excluded-charts "{{.CHARTS_EXCLUDED_FROM_LINT}}"
     silent: true
 
   lint-all:
     desc: Run ct-lint on all charts
     cmds:
-      - docker run --rm -it --workdir=/data --volume $(pwd):/data {{.CT_IMAGE}} ct lint --config {{.CT_CONFIG_FILE}} --all --excluded-charts "{{.CHARTS_EXCLUDED_FROM_LINT}}"
+    - docker run --rm -it --workdir=/data --volume $(pwd):/data {{.CT_IMAGE}} ct lint --config {{.CT_CONFIG_FILE}} --all --excluded-charts "{{.CHARTS_EXCLUDED_FROM_LINT}}"
     silent: true
 
   test:
     desc: Test chart [CHART=required]
     preconditions:
-      # Requires https://github.com/kstasik/schema-tools
-      - which helm schematools yq
-      - test -d "{{.CHART_DIR}}"
-      - test -d "{{.CHART_TEST_DIR}}"
+    # Requires https://github.com/kstasik/schema-tools
+    - which helm schematools-cli yq
+    - test -d "{{.CHART_DIR}}"
+    - test -d "{{.CHART_TEST_DIR}}"
     requires:
       vars:
-        - CHART
+      - CHART
     vars:
       GLOB: "{{.GLOB | default \"**/*_test.yaml\"}}"
       CHART_DIR: "{{.PROJECT_DIR}}/charts/{{.CHART}}"
@@ -44,7 +44,7 @@ tasks:
     dir: "{{.CHART_TEST_DIR}}"
     cmds:
     - cp "{{.CHART_DIR}}/values.schema.json" "{{.CHART_DIR}}/values.schema.bak"
-    - schematools process dereference "{{.CHART_DIR}}/values.schema.json" --to-file "{{.CHART_DIR}}/values.schema.json"
+    - schematools-cli process dereference "{{.CHART_DIR}}/values.schema.json" --to-file "{{.CHART_DIR}}/values.schema.json"
     - defer: mv "{{.CHART_DIR}}/values.schema.bak" "{{.CHART_DIR}}/values.schema.json"
     - helm dep update
     - helm unittest --color -f "unittests/{{.GLOB}}" .

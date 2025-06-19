@@ -6,9 +6,9 @@ rbac:
     defaultRole:
       type: Role
       rules:
-        - apiGroups: [""]
-          resources: ["pods"]
-          verbs: ["get", "list"]
+      - apiGroups: [ "" ]
+        resources: [ "pods" ]
+        verbs: [ "get", "list" ]
 
   bindings:
     defaultBinding:
@@ -16,4 +16,4 @@ rbac:
       roleRef:
         identifier: defaultRole
       subjects:
-        - identifier: default
+      - identifier: default
