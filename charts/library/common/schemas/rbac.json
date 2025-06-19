@@ -105,7 +105,7 @@
                   "description": "The kind of the referenced subject. Supported values: ServiceAccount, User, Group."
                 },
                 "namespace": {
-                  "type": ["string", null],
+                  "type": "string",
                   "description": "The namespace of the referenced subject. Do not define if kind is User or Group."
                 }
               },
