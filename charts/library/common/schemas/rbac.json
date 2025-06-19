@@ -102,16 +102,16 @@
                 },
                 "kind": {
                   "type": "string",
-                  "description": "The kind of the referenced subject."
+                  "description": "The kind of the referenced subject. Supported values: ServiceAccount, User, Group."
                 },
                 "namespace": {
-                  "type": "string",
-                  "description": "The namespace of the referenced subject."
+                  "type": ["string", null],
+                  "description": "The namespace of the referenced subject. Do not define if kind is User or Group."
                 }
               },
               "oneOf": [
                 {"required": ["identifier"]},
-                {"required": ["name", "kind", "namespace"]}
+                {"required": ["name", "kind"]}
               ]
             }
           }

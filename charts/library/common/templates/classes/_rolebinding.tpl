@@ -25,7 +25,13 @@ This template serves as a blueprint for generating RoleBinding objects in Kubern
         {{- $_ := set $subject "kind" "ServiceAccount" -}}
         {{- $_ := set $subject "namespace" $rootContext.Release.Namespace -}}
         {{- $subjects = mustAppend $subjects $subject -}}
+      {{- else if dict "kind" = "Group" -}}
+        {{- $subject := dict "name" .name "kind" .kind -}}
+        {{- $subjects = mustAppend $subjects $subject -}}
       {{- else -}}
+        {{- if not .namespace }}
+          {{- fail (printf "No namespace provided for subject in rolebinding '%s'. Please provide a namespace." $roleBindingObject.name) -}}
+        {{- end -}}
         {{- $subject := dict "name" .name "kind" .kind "namespace" .namespace -}}
         {{- $subjects = mustAppend $subjects $subject -}}
       {{- end -}}
