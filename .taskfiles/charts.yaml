@@ -35,7 +35,8 @@ tasks:
       vars:
       - CHART
     vars:
-      GLOB: "{{.GLOB | default \"**/*_test.yaml\"}}"
+      GLOB: >-
+        {{.GLOB | default "**/*_test.yaml"}}
       CHART_DIR: "{{.PROJECT_DIR}}/charts/{{.CHART}}"
       CHART_TYPE:
         sh: yq eval '.type // "application"' {{.PROJECT_DIR}}/charts/{{.CHART}}/Chart.yaml

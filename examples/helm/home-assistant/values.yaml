@@ -37,15 +37,15 @@ controllers:
           # this example is not automatically updated, so be sure to use the latest image
           tag: 4.19.0
         args:
-          - --auth
-          - "none"
-          - --user-data-dir
-          - "/config/.vscode"
-          - --extensions-dir
-          - "/config/.vscode"
-          - --port
-          - "8081"
-          - "/config"
+        - --auth
+        - "none"
+        - --user-data-dir
+        - "/config/.vscode"
+        - --extensions-dir
+        - "/config/.vscode"
+        - --port
+        - "8081"
+        - "/config"
 
 service:
   # Configure a service for the main application
@@ -68,37 +68,37 @@ ingress:
   main:
     className: "external-nginx"
     hosts:
-      - host: &host "hass.example.local"
-        paths:
-          - path: /
-            pathType: Prefix
-            service:
-              identifier: main
-              port: http
+    - host: &host "hass.example.local"
+      paths:
+      - path: /
+        pathType: Prefix
+        service:
+          identifier: main
+          port: http
     tls:
-      - hosts:
-          - *host
+    - hosts:
+      - *host
   # Configure an Ingress for the code-server sidecar
   code:
     className: "internal-nginx"
     hosts:
-      - host: &host-code "hass-code.example.local"
-        paths:
-          - path: /
-            pathType: Prefix
-            service:
-              identifier: code
-              port: http
+    - host: &host-code "hass-code.example.local"
+      paths:
+      - path: /
+        pathType: Prefix
+        service:
+          identifier: code
+          port: http
     tls:
-      - hosts:
-          - *host-code
+    - hosts:
+      - *host-code
 
 persistence:
   # Configure the main configuration storage location
   config:
     existingClaim: home-assistant-config
     globalMounts:
-      - path: /config
+    - path: /config
 
   # Configure an NFS mount to store backups on
   backup:
@@ -106,4 +106,4 @@ persistence:
     server: nas.example.lan
     path: /volume/Backups/k8s/hass
     globalMounts:
-      - path: /config/backups
+    - path: /config/backups

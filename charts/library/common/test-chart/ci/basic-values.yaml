@@ -20,12 +20,12 @@ controllers:
 ingress:
   main:
     hosts:
-      - host: "test.local"
-        paths:
-          - path: /
+    - host: "test.local"
+      paths:
+      - path: /
     tls:
-      - hosts:
-          - "test.local"
+    - hosts:
+      - "test.local"
 
 service:
   main:
