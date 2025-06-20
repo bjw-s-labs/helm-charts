@@ -9,7 +9,7 @@ rules:
     require-starting-space: true
     min-spaces-from-content: 1
   indentation:
-    spaces: consistent
+    spaces: 2
     indent-sequences: false
     check-multi-line-strings: false
   line-length: disable
