@@ -1,0 +1,7 @@
+[env]
+_.python.venv = { path = ".venv", create = true }
+
+[tools]
+"python" = "latest"
+"rust" = "latest"
+"cargo:schematools-cli" = "latest"
