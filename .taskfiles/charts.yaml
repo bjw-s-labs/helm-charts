@@ -28,7 +28,7 @@ tasks:
     desc: Test chart [CHART=required]
     preconditions:
     # Requires https://github.com/kstasik/schema-tools
-    - which helm schematools yq
+    - which helm schematools-cli yq
     - test -d "{{.CHART_DIR}}"
     - test -d "{{.CHART_TEST_DIR}}"
     requires:
@@ -45,7 +45,7 @@ tasks:
     dir: "{{.CHART_TEST_DIR}}"
     cmds:
     - cp "{{.CHART_DIR}}/values.schema.json" "{{.CHART_DIR}}/values.schema.bak"
-    - schematools process dereference "{{.CHART_DIR}}/values.schema.json" --to-file "{{.CHART_DIR}}/values.schema.json"
+    - schematools-cli process dereference "{{.CHART_DIR}}/values.schema.json" --to-file "{{.CHART_DIR}}/values.schema.json"
     - defer: mv "{{.CHART_DIR}}/values.schema.bak" "{{.CHART_DIR}}/values.schema.json"
     - helm dep update
     - helm unittest --color -f "unittests/{{.GLOB}}" .

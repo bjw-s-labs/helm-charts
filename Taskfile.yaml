@@ -9,6 +9,7 @@ vars:
 includes:
   charts: .taskfiles/charts.yaml
   docs: .taskfiles/docs.yaml
+  install: .taskfiles/install.yaml
 
 tasks:
   default:
