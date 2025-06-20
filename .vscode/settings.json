@@ -1,23 +1,7 @@
 {
-  "prettier.configPath": ".ci/prettier/.prettierrc.yaml",
-  "prettier.ignorePath": ".ci/prettier/.prettierignore",
-  "yaml.schemas": {
-    "https://json.schemastore.org/taskfile.json": [
-      "Taskfile.yaml",
-      ".taskfiles/*.yaml"
-    ],
-    "http://json.schemastore.org/github-workflow.json": [
-      ".github/workflows/*.yaml"
-    ],
-    "https://squidfunk.github.io/mkdocs-material/schema.json": [
-        "mkdocs.yml"
-    ]
+  "[yaml]": {
+    "editor.defaultFormatter": "kennylong.kubernetes-yaml-formatter"
   },
-  "yaml.customTags": [
-    "!ENV scalar",
-    "!ENV sequence",
-    "tag:yaml.org,2002:python/name:material.extensions.emoji.to_svg",
-    "tag:yaml.org,2002:python/name:material.extensions.emoji.twemoji",
-    "tag:yaml.org,2002:python/name:pymdownx.superfences.fence_code_format"
-  ]
+  "better-yaml.indentSeq": false,
+  "better-yaml.directives": true
 }

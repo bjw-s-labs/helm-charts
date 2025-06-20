@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
 version: "3"
 
 vars:
@@ -13,4 +14,4 @@ tasks:
   default:
     silent: true
     cmds:
-      - task -l
+    - task -l

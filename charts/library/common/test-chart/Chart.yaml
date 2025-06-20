@@ -5,9 +5,9 @@ name: common-test
 version: 1.0.0
 kubeVersion: ">=1.28.0-0"
 maintainers:
-  - name: bjw-s
-    email: me@bjw-s.dev
+- name: bjw-s
+  email: me@bjw-s.dev
 dependencies:
-  - name: common
-    repository: file://../
-    version: ">0.0.0-0"
+- name: common
+  repository: file://../
+  version: ">0.0.0-0"

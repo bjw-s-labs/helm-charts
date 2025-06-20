@@ -6,8 +6,7 @@ on:
     inputs:
       chart:
         description: >
-          Json encoded list of Helm charts to release.
-          Defaults to releasing everything.
+          Json encoded list of Helm charts to release. Defaults to releasing everything.
         required: true
         type: string
       createGithubRelease:
@@ -56,195 +55,195 @@ jobs:
       packages: write
 
     steps:
-      # ----------------------------
-      # Setup
-      # ----------------------------
-      - name: Checkout source branch
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        with:
-          path: src
+    # ----------------------------
+    # Setup
+    # ----------------------------
+    - name: Checkout source branch
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      with:
+        path: src
 
-      - name: Install Helm
-        uses: azure/setup-helm@b9e51907a09c216f16ebe8536097933489208112 # v4.3.0
-        with:
-          version: ${{ inputs.helmVersion }}
+    - name: Install Helm
+      uses: azure/setup-helm@b9e51907a09c216f16ebe8536097933489208112 # v4.3.0
+      with:
+        version: ${{ inputs.helmVersion }}
 
-      - name: Login to OCI Registry
-        if: ${{ inputs.publishToOciRegistry }}
-        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.4.0
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ github.token }}
+    - name: Login to OCI Registry
+      if: ${{ inputs.publishToOciRegistry }}
+      uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.4.0
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
 
-      # ----------------------------
-      # Collect chart metadata
-      # ----------------------------
-      - name: Get chart details
-        id: chart-details
-        uses: bjw-s-labs/helm-charts-actions/get-chart-details@7becde57b30c339814c0c736d1eefb3c96dfb0be
-        with:
-          path: src/charts/${{ inputs.chart }}
-          validateChartYaml: true
-          requireChangelog: true
+    # ----------------------------
+    # Collect chart metadata
+    # ----------------------------
+    - name: Get chart details
+      id: chart-details
+      uses: bjw-s-labs/helm-charts-actions/get-chart-details@7becde57b30c339814c0c736d1eefb3c96dfb0be
+      with:
+        path: src/charts/${{ inputs.chart }}
+        validateChartYaml: true
+        requireChangelog: true
 
-      - name: Store chart folder
-        id: chart-folder
-        shell: bash
-        env:
-          CHART_DIR: "${{ inputs.chart }}"
-        run: |
-          TARGET_DIR=$(basename $(dirname ${CHART_DIR}))
-          echo "chart_folder=${TARGET_DIR}" >> "$GITHUB_OUTPUT"
+    - name: Store chart folder
+      id: chart-folder
+      shell: bash
+      env:
+        CHART_DIR: "${{ inputs.chart }}"
+      run: |
+        TARGET_DIR=$(basename $(dirname ${CHART_DIR}))
+        echo "chart_folder=${TARGET_DIR}" >> "$GITHUB_OUTPUT"
 
-      - name: Format changelog
-        id: format-changelog
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
-        env:
-          INPUTS_CHANGES: ${{ steps.chart-details.outputs.changes }}
-        with:
-          script: |
-            let input = process.env.INPUTS_CHANGES ?? '';
-            let changelog = "## Changelog:";
-            let inputParsed = JSON.parse(input);
+    - name: Format changelog
+      id: format-changelog
+      uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+      env:
+        INPUTS_CHANGES: ${{ steps.chart-details.outputs.changes }}
+      with:
+        script: |
+          let input = process.env.INPUTS_CHANGES ?? '';
+          let changelog = "## Changelog:";
+          let inputParsed = JSON.parse(input);
 
-            var changelogGrouped = inputParsed.reduce((result, currentValue) => {
-              (result[currentValue['kind']] = result[currentValue['kind']] || []).push(currentValue);
-              return result;
-            }, {});
+          var changelogGrouped = inputParsed.reduce((result, currentValue) => {
+            (result[currentValue['kind']] = result[currentValue['kind']] || []).push(currentValue);
+            return result;
+          }, {});
 
-            for (const key in changelogGrouped) {
-              changelog = changelog + `\n### ${key[0].toUpperCase() + key.slice(1)}`;
-              let entries = changelogGrouped[key];
+          for (const key in changelogGrouped) {
+            changelog = changelog + `\n### ${key[0].toUpperCase() + key.slice(1)}`;
+            let entries = changelogGrouped[key];
 
-              entries.forEach(function (entry) {
-                changelog = changelog + `\n- ${entry.description}`;
-                if ('links' in entry) {
-                  entry.links.forEach(function (link) {
-                    changelog = changelog + `\n  - [${link.name}](${link.url})`;
-                  });
-                }
-              });
-              changelog = changelog + `\n`;
-            }
-            core.setOutput('changelog', changelog);
+            entries.forEach(function (entry) {
+              changelog = changelog + `\n- ${entry.description}`;
+              if ('links' in entry) {
+                entry.links.forEach(function (link) {
+                  changelog = changelog + `\n  - [${link.name}](${link.url})`;
+                });
+              }
+            });
+            changelog = changelog + `\n`;
+          }
+          core.setOutput('changelog', changelog);
 
-      # ----------------------------
-      # Package Helm chart
-      # ----------------------------
-      - name: Dereference JSON schema before packaging
-        uses: bjw-s-labs/helm-charts-actions/dereference-json-schema@7becde57b30c339814c0c736d1eefb3c96dfb0be
-        with:
-          schemaFile: "src/charts/${{ inputs.chart }}/values.schema.json"
-          outputFile: "src/charts/${{ inputs.chart }}/values.schema.json"
-          allowFileNotFound: true
+    # ----------------------------
+    # Package Helm chart
+    # ----------------------------
+    - name: Dereference JSON schema before packaging
+      uses: bjw-s-labs/helm-charts-actions/dereference-json-schema@7becde57b30c339814c0c736d1eefb3c96dfb0be
+      with:
+        schemaFile: "src/charts/${{ inputs.chart }}/values.schema.json"
+        outputFile: "src/charts/${{ inputs.chart }}/values.schema.json"
+        allowFileNotFound: true
 
-      - name: Package Helm Chart
-        id: package-chart
-        shell: bash
-        env:
-          CHART_DIR: "src/charts/${{ inputs.chart }}"
-          TARGET_DIR: "${{ runner.temp }}/charts_out"
-        run: |
-          mkdir -p "${TARGET_DIR}"
-          helm package "${CHART_DIR}" --dependency-update --destination "${TARGET_DIR}"
-          echo "result=$(ls ${TARGET_DIR}/*.tgz)" >> "$GITHUB_OUTPUT"
+    - name: Package Helm Chart
+      id: package-chart
+      shell: bash
+      env:
+        CHART_DIR: "src/charts/${{ inputs.chart }}"
+        TARGET_DIR: "${{ runner.temp }}/charts_out"
+      run: |
+        mkdir -p "${TARGET_DIR}"
+        helm package "${CHART_DIR}" --dependency-update --destination "${TARGET_DIR}"
+        echo "result=$(ls ${TARGET_DIR}/*.tgz)" >> "$GITHUB_OUTPUT"
 
-      # ----------------------------
-      # Add chart to GitHub Pages
-      # ----------------------------
-      - name: Checkout gh-pages branch
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        if: ${{ inputs.publishToGhPages }}
-        with:
-          path: gh-pages
-          ref: gh-pages
+    # ----------------------------
+    # Add chart to GitHub Pages
+    # ----------------------------
+    - name: Checkout gh-pages branch
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      if: ${{ inputs.publishToGhPages }}
+      with:
+        path: gh-pages
+        ref: gh-pages
 
-      - name: Copy package to gh-pages structure
-        id: copy-package
-        if: ${{ inputs.publishToGhPages }}
-        shell: bash
-        env:
-          CHART_DIR: "${{ inputs.chart }}"
-          CHART_FOLDER: ${{ steps.chart-folder.outputs.chart_folder }}
-          PACKAGE_FILE: ${{ steps.package-chart.outputs.result }}
-        run: |
-          TARGET_DIR=$(dirname ${CHART_DIR})
-          cp "${PACKAGE_FILE}" "gh-pages/${CHART_FOLDER}/"
+    - name: Copy package to gh-pages structure
+      id: copy-package
+      if: ${{ inputs.publishToGhPages }}
+      shell: bash
+      env:
+        CHART_DIR: "${{ inputs.chart }}"
+        CHART_FOLDER: ${{ steps.chart-folder.outputs.chart_folder }}
+        PACKAGE_FILE: ${{ steps.package-chart.outputs.result }}
+      run: |
+        TARGET_DIR=$(dirname ${CHART_DIR})
+        cp "${PACKAGE_FILE}" "gh-pages/${CHART_FOLDER}/"
 
-      - name: Update repository
-        if: ${{ inputs.publishToGhPages }}
-        shell: bash
-        working-directory: gh-pages
-        run: |
-          git pull
+    - name: Update repository
+      if: ${{ inputs.publishToGhPages }}
+      shell: bash
+      working-directory: gh-pages
+      run: |
+        git pull
 
-      - name: Update Helm chart index
-        if: ${{ inputs.publishToGhPages && inputs.deployGhPages }}
-        shell: bash
-        working-directory: gh-pages
-        run: |
-          helm repo index . --url https://bjw-s-labs.github.io/helm-charts/
+    - name: Update Helm chart index
+      if: ${{ inputs.publishToGhPages && inputs.deployGhPages }}
+      shell: bash
+      working-directory: gh-pages
+      run: |
+        helm repo index . --url https://bjw-s-labs.github.io/helm-charts/
 
-      - name: Commit Changes
-        if: ${{ inputs.publishToGhPages }}
-        uses: stefanzweifel/git-auto-commit-action@778341af668090896ca464160c2def5d1d1a3eb0 # v6.0.1
-        with:
-          commit_message: "feat: Add Chart package ${{ steps.chart-folder.outputs.chart_folder }}/${{ steps.chart-details.outputs.name }}-${{ steps.chart-details.outputs.version }}"
-          repository: gh-pages
-          branch: gh-pages
-          file_pattern: "index.yaml **/*.tgz"
-          commit_user_name: github-actions[bot]
-          commit_user_email: 41898282+github-actions[bot]@users.noreply.github.com
-          commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+    - name: Commit Changes
+      if: ${{ inputs.publishToGhPages }}
+      uses: stefanzweifel/git-auto-commit-action@778341af668090896ca464160c2def5d1d1a3eb0 # v6.0.1
+      with:
+        commit_message: "feat: Add Chart package ${{ steps.chart-folder.outputs.chart_folder }}/${{ steps.chart-details.outputs.name }}-${{ steps.chart-details.outputs.version }}"
+        repository: gh-pages
+        branch: gh-pages
+        file_pattern: "index.yaml **/*.tgz"
+        commit_user_name: github-actions[bot]
+        commit_user_email: 41898282+github-actions[bot]@users.noreply.github.com
+        commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
 
-      - name: Deploy changes to GitHub Pages
-        if: ${{ inputs.publishToGhPages && inputs.deployGhPages }}
-        uses: ./src/.github/actions/publish-folder-to-pages
-        with:
-          path: gh-pages/
-          deleteArtifactAfterPublish: true
+    - name: Deploy changes to GitHub Pages
+      if: ${{ inputs.publishToGhPages && inputs.deployGhPages }}
+      uses: ./src/.github/actions/publish-folder-to-pages
+      with:
+        path: gh-pages/
+        deleteArtifactAfterPublish: true
 
-      # ----------------------------
-      # Create GitHub release
-      # ----------------------------
-      - name: Create tag
-        if: ${{ inputs.createGithubRelease }}
-        uses: EndBug/latest-tag@c24a76ea69bf06f7f0e43a48b61c2b51b99d6c42 # latest
-        with:
-          ref: ${{ steps.chart-details.outputs.name }}-${{ steps.chart-details.outputs.version }}
-          git-directory: src
+    # ----------------------------
+    # Create GitHub release
+    # ----------------------------
+    - name: Create tag
+      if: ${{ inputs.createGithubRelease }}
+      uses: EndBug/latest-tag@c24a76ea69bf06f7f0e43a48b61c2b51b99d6c42 # latest
+      with:
+        ref: ${{ steps.chart-details.outputs.name }}-${{ steps.chart-details.outputs.version }}
+        git-directory: src
 
-      - name: Create release for tag
-        uses: ncipollo/release-action@440c8c1cb0ed28b9f43e4d1d670870f059653174 # v1.16.0
-        if: ${{ inputs.createGithubRelease }}
-        with:
-          allowUpdates: true
-          tag: ${{ steps.chart-details.outputs.name }}-${{ steps.chart-details.outputs.version }}
-          body: ${{ steps.format-changelog.outputs.changelog }}
+    - name: Create release for tag
+      uses: ncipollo/release-action@440c8c1cb0ed28b9f43e4d1d670870f059653174 # v1.16.0
+      if: ${{ inputs.createGithubRelease }}
+      with:
+        allowUpdates: true
+        tag: ${{ steps.chart-details.outputs.name }}-${{ steps.chart-details.outputs.version }}
+        body: ${{ steps.format-changelog.outputs.changelog }}
 
-      # ----------------------------
-      # Publish chart to bjw-s OCI registry
-      # ----------------------------
-      - name: Install Cosign
-        if: ${{ inputs.publishToOciRegistry }}
-        uses: sigstore/cosign-installer@3454372f43399081ed03b604cb2d021dabca52bb # v3.8.2
+    # ----------------------------
+    # Publish chart to bjw-s OCI registry
+    # ----------------------------
+    - name: Install Cosign
+      if: ${{ inputs.publishToOciRegistry }}
+      uses: sigstore/cosign-installer@3454372f43399081ed03b604cb2d021dabca52bb # v3.8.2
 
-      - name: Push Helm charts to OCI registry
-        if: ${{ inputs.publishToOciRegistry }}
-        shell: bash
-        env:
-          PACKAGE_FILE: ${{ steps.package-chart.outputs.result }}
-          CHART_NAME: ${{ steps.chart-details.outputs.name }}
-          CHART_VERSION: ${{ steps.chart-details.outputs.version }}
-          CHART_TAG_BASE: ghcr.io/bjw-s-labs/helm
-          CHART_TAG: ${{ steps.chart-details.outputs.name }}:${{ steps.chart-details.outputs.version }}
-          GITHUB_REF: ${{ github.ref }}
-        run: |
-          helm push "${PACKAGE_FILE}" oci://${CHART_TAG_BASE} &> push-metadata.txt
-          cat push-metadata.txt
-          CHART_DIGEST=$(awk '/Digest: /{print $2}' push-metadata.txt)
-          cosign sign --yes "${CHART_TAG_BASE}/${CHART_TAG}@${CHART_DIGEST}"
-          cosign verify "${CHART_TAG_BASE}/${CHART_TAG}@${CHART_DIGEST}" \
-            --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
-            --certificate-identity "https://github.com/${{ github.repository }}/.github/workflows/chart-release-steps.yaml@${GITHUB_REF}"
+    - name: Push Helm charts to OCI registry
+      if: ${{ inputs.publishToOciRegistry }}
+      shell: bash
+      env:
+        PACKAGE_FILE: ${{ steps.package-chart.outputs.result }}
+        CHART_NAME: ${{ steps.chart-details.outputs.name }}
+        CHART_VERSION: ${{ steps.chart-details.outputs.version }}
+        CHART_TAG_BASE: ghcr.io/bjw-s-labs/helm
+        CHART_TAG: ${{ steps.chart-details.outputs.name }}:${{ steps.chart-details.outputs.version }}
+        GITHUB_REF: ${{ github.ref }}
+      run: |
+        helm push "${PACKAGE_FILE}" oci://${CHART_TAG_BASE} &> push-metadata.txt
+        cat push-metadata.txt
+        CHART_DIGEST=$(awk '/Digest: /{print $2}' push-metadata.txt)
+        cosign sign --yes "${CHART_TAG_BASE}/${CHART_TAG}@${CHART_DIGEST}"
+        cosign verify "${CHART_TAG_BASE}/${CHART_TAG}@${CHART_DIGEST}" \
+          --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+          --certificate-identity "https://github.com/${{ github.repository }}/.github/workflows/chart-release-steps.yaml@${GITHUB_REF}"
