@@ -5,7 +5,6 @@ rules:
   brackets:
     max-spaces-inside: 1
     min-spaces-inside: 0
-    require-spaces: false
   comments:
     require-starting-space: true
     min-spaces-from-content: 1
