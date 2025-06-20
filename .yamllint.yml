@@ -5,13 +5,12 @@ rules:
   brackets:
     max-spaces-inside: 1
     min-spaces-inside: 0
-    require-spaces: false
   comments:
     require-starting-space: true
     min-spaces-from-content: 1
   indentation:
     spaces: consistent
-    indent-sequences: false
+    indent-sequences: consistent
     check-multi-line-strings: false
   line-length: disable
   quoted-strings:
