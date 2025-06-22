@@ -13,9 +13,9 @@ on:
         default: "[]"
   push:
     branches:
-    - main
+      - main
     paths:
-    - "charts/**"
+      - "charts/**"
 
 permissions:
   contents: read
@@ -28,119 +28,119 @@ jobs:
       libraryChartsToRelease: ${{ steps.filtered-charts.outputs.libraryChartsToRelease }}
       otherChartsToRelease: ${{ steps.filtered-charts.outputs.otherChartsToRelease }}
     steps:
-    # ----------------------------
-    # Setup
-    # ----------------------------
-    - name: Checkout
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      with:
-        persist-credentials: false
+      # ----------------------------
+      # Setup
+      # ----------------------------
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
 
-    - name: Grab repository configuration
-      id: repo-config
-      shell: bash
-      run: |
-        echo "config=$(yq '.' '.ci/repo-config.yaml' -o json -I=0)" >> "$GITHUB_OUTPUT"
+      - name: Grab repository configuration
+        id: repo-config
+        shell: bash
+        run: |
+          echo "config=$(yq '.' '.ci/repo-config.yaml' -o json -I=0)" >> "$GITHUB_OUTPUT"
 
-    - name: Get changed library charts
-      id: changed-library-charts
-      if: ${{ github.event_name != 'workflow_dispatch' }}
-      uses: bjw-s-labs/action-changed-files@930cef8463348e168cab7235c47fe95a7a235f65 # v0.3.3
-      with:
-        path: charts
-        include_only_directories: true
-        max_depth: 2
-        patterns: |
-          library/**
+      - name: Get changed library charts
+        id: changed-library-charts
+        if: ${{ github.event_name != 'workflow_dispatch' }}
+        uses: bjw-s-labs/action-changed-files@930cef8463348e168cab7235c47fe95a7a235f65 # v0.3.3
+        with:
+          path: charts
+          include_only_directories: true
+          max_depth: 2
+          patterns: |
+            library/**
 
-    - name: Get changed charts
-      id: changed-charts
-      if: ${{ github.event_name != 'workflow_dispatch' }}
-      uses: bjw-s-labs/action-changed-files@930cef8463348e168cab7235c47fe95a7a235f65 # v0.3.3
-      with:
-        path: charts
-        include_only_directories: true
-        max_depth: 2
-        patterns: |
-          !library/**
+      - name: Get changed charts
+        id: changed-charts
+        if: ${{ github.event_name != 'workflow_dispatch' }}
+        uses: bjw-s-labs/action-changed-files@930cef8463348e168cab7235c47fe95a7a235f65 # v0.3.3
+        with:
+          path: charts
+          include_only_directories: true
+          max_depth: 2
+          patterns: |
+            !library/**
 
-    - name: Get specified charts
-      id: specified-charts
-      if: ${{ github.event_name == 'workflow_dispatch' }}
-      uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
-      env:
-        INPUTS_CHARTS: ${{ inputs.charts }}
-      with:
-        script: |
-          const fs = require('fs');
-          let input = process.env.INPUTS_CHARTS ?? '[]';
-          let cwd = process.cwd();
+      - name: Get specified charts
+        id: specified-charts
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        env:
+          INPUTS_CHARTS: ${{ inputs.charts }}
+        with:
+          script: |
+            const fs = require('fs');
+            let input = process.env.INPUTS_CHARTS ?? '[]';
+            let cwd = process.cwd();
 
-          let tmpCharts = []
-          if (input === '[]') {
-            console.log("Empty charts input, scanning for charts in repository");
-            const globber = await glob.create('charts/*/*', { implicitDescendants: false });
-            for await (const file of globber.globGenerator()) {
-              if (fs.lstatSync(file).isDirectory()) {
-                relativePath = file.slice(`${cwd}/charts/`.length);
-                tmpCharts.push(relativePath);
+            let tmpCharts = []
+            if (input === '[]') {
+              console.log("Empty charts input, scanning for charts in repository");
+              const globber = await glob.create('charts/*/*', { implicitDescendants: false });
+              for await (const file of globber.globGenerator()) {
+                if (fs.lstatSync(file).isDirectory()) {
+                  relativePath = file.slice(`${cwd}/charts/`.length);
+                  tmpCharts.push(relativePath);
+                }
               }
+            } else {
+              tmpCharts = JSON.parse(input);
+              tmpCharts.forEach(function (chart) {
+                const fullPath = `${cwd}/charts/${chart}`;
+                if (!fs.existsSync(fullPath)) {
+                  core.setFailed(`Chart ${chart} does not exist in repository`);
+                  process.exit(1);
+                }
+                if (!fs.lstatSync(fullPath).isDirectory()) {
+                  core.setFailed(`${chart} is not a valid directory`);
+                  process.exit(1);
+                }
+              });
             }
-          } else {
-            tmpCharts = JSON.parse(input);
-            tmpCharts.forEach(function (chart) {
-              const fullPath = `${cwd}/charts/${chart}`;
-              if (!fs.existsSync(fullPath)) {
-                core.setFailed(`Chart ${chart} does not exist in repository`);
-                process.exit(1);
-              }
-              if (!fs.lstatSync(fullPath).isDirectory()) {
-                core.setFailed(`${chart} is not a valid directory`);
-                process.exit(1);
-              }
-            });
-          }
 
-          let libraryCharts = tmpCharts.filter(chart => chart.startsWith('library/'));
-          core.setOutput('libraryChartsToRelease', JSON.stringify(libraryCharts));
-          let otherCharts = tmpCharts.filter(chart => !chart.startsWith('library/'));
-          core.setOutput('otherChartsToRelease', JSON.stringify(otherCharts));
+            let libraryCharts = tmpCharts.filter(chart => chart.startsWith('library/'));
+            core.setOutput('libraryChartsToRelease', JSON.stringify(libraryCharts));
+            let otherCharts = tmpCharts.filter(chart => !chart.startsWith('library/'));
+            core.setOutput('otherChartsToRelease', JSON.stringify(otherCharts));
 
-    - name: Filter out excluded charts
-      id: filtered-charts
-      uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
-      env:
-        SPECIFIED_LIBRARY_CHARTS: ${{ steps.specified-charts.outputs.libraryChartsToRelease }}
-        CHANGED_LIBRARY_CHARTS: ${{ steps.changed-library-charts.outputs.changed_files }}
-        SPECIFIED_CHARTS: ${{ steps.specified-charts.outputs.otherChartsToRelease }}
-        CHANGED_CHARTS: ${{ steps.changed-charts.outputs.changed_files }}
-        REPO_SETTINGS: ${{ steps.repo-config.outputs.config }}
-      with:
-        script: |
-          const SPECIFIED_LIBRARY_CHARTS = process.env.SPECIFIED_LIBRARY_CHARTS ?? '[]';
-          const CHANGED_LIBRARY_CHARTS = process.env.CHANGED_LIBRARY_CHARTS ?? '[]';
-          const SPECIFIED_CHARTS = process.env.SPECIFIED_CHARTS ?? '[]';
-          const CHANGED_CHARTS = process.env.CHANGED_CHARTS ?? '[]';
-          const REPO_SETTINGS = process.env.REPO_SETTINGS ?? '{}';
+      - name: Filter out excluded charts
+        id: filtered-charts
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        env:
+          SPECIFIED_LIBRARY_CHARTS: ${{ steps.specified-charts.outputs.libraryChartsToRelease }}
+          CHANGED_LIBRARY_CHARTS: ${{ steps.changed-library-charts.outputs.changed_files }}
+          SPECIFIED_CHARTS: ${{ steps.specified-charts.outputs.otherChartsToRelease }}
+          CHANGED_CHARTS: ${{ steps.changed-charts.outputs.changed_files }}
+          REPO_SETTINGS: ${{ steps.repo-config.outputs.config }}
+        with:
+          script: |
+            const SPECIFIED_LIBRARY_CHARTS = process.env.SPECIFIED_LIBRARY_CHARTS ?? '[]';
+            const CHANGED_LIBRARY_CHARTS = process.env.CHANGED_LIBRARY_CHARTS ?? '[]';
+            const SPECIFIED_CHARTS = process.env.SPECIFIED_CHARTS ?? '[]';
+            const CHANGED_CHARTS = process.env.CHANGED_CHARTS ?? '[]';
+            const REPO_SETTINGS = process.env.REPO_SETTINGS ?? '{}';
 
-          const eventName = '${{ github.event_name }}';
-          const repoSettings = JSON.parse(REPO_SETTINGS);
+            const eventName = '${{ github.event_name }}';
+            const repoSettings = JSON.parse(REPO_SETTINGS);
 
-          const libraryChartsInput = JSON.parse(eventName === 'workflow_dispatch' ? SPECIFIED_LIBRARY_CHARTS : CHANGED_LIBRARY_CHARTS);
-          const otherChartsInput = JSON.parse(eventName === 'workflow_dispatch' ? SPECIFIED_CHARTS : CHANGED_CHARTS);
-          const excludedFromRelease = repoSettings['excluded-charts-release'];
+            const libraryChartsInput = JSON.parse(eventName === 'workflow_dispatch' ? SPECIFIED_LIBRARY_CHARTS : CHANGED_LIBRARY_CHARTS);
+            const otherChartsInput = JSON.parse(eventName === 'workflow_dispatch' ? SPECIFIED_CHARTS : CHANGED_CHARTS);
+            const excludedFromRelease = repoSettings['excluded-charts-release'];
 
-          const libraryCharts = libraryChartsInput.filter(item => excludedFromRelease.indexOf(item) < 0);
-          core.setOutput('libraryChartsToRelease', JSON.stringify(libraryCharts));
-          console.log('Library charts to release:', JSON.stringify(libraryCharts, null, 2));
-          const otherCharts = otherChartsInput.filter(item => excludedFromRelease.indexOf(item) < 0);
-          core.setOutput('otherChartsToRelease', JSON.stringify(otherCharts));
-          console.log('Other charts to release:', JSON.stringify(otherCharts, null, 2));
+            const libraryCharts = libraryChartsInput.filter(item => excludedFromRelease.indexOf(item) < 0);
+            core.setOutput('libraryChartsToRelease', JSON.stringify(libraryCharts));
+            console.log('Library charts to release:', JSON.stringify(libraryCharts, null, 2));
+            const otherCharts = otherChartsInput.filter(item => excludedFromRelease.indexOf(item) < 0);
+            core.setOutput('otherChartsToRelease', JSON.stringify(otherCharts));
+            console.log('Other charts to release:', JSON.stringify(otherCharts, null, 2));
 
   release-library-charts:
     name: Release library charts
     needs:
-    - prepare
+      - prepare
     if: ${{ needs.prepare.outputs.libraryChartsToRelease != '[]' && needs.prepare.outputs.libraryChartsToRelease != '' }}
     strategy:
       matrix:
@@ -163,8 +163,8 @@ jobs:
   release-other-charts:
     name: Release other charts
     needs:
-    - prepare
-    - release-library-charts
+      - prepare
+      - release-library-charts
     if: |-
       ${{
         !cancelled() &&

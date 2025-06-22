@@ -6,12 +6,12 @@ on:
   workflow_dispatch:
   pull_request:
     branches:
-    - main
+      - main
   push:
     branches:
-    - main
+      - main
   schedule:
-  - cron: "30 6 * * *"
+    - cron: "30 6 * * *"
 
 permissions:
   contents: read
@@ -31,27 +31,27 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        - language: actions
-          build-mode: none
-          source-root: .
+          - language: actions
+            build-mode: none
+            source-root: .
 
     steps:
-    - name: Checkout
-      id: checkout
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      with:
-        persist-credentials: false
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
 
-    - name: Initialize CodeQL
-      id: initialize
-      uses: github/codeql-action/init@ce28f5bb42b7a9f2c824e633a3f6ee835bab6858 # v3.29.0
-      with:
-        languages: ${{ matrix.language }}
-        build-mode: ${{ matrix.build-mode }}
-        source-root: ${{ matrix.source-root }}
+      - name: Initialize CodeQL
+        id: initialize
+        uses: github/codeql-action/init@ce28f5bb42b7a9f2c824e633a3f6ee835bab6858 # v3.29.0
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+          source-root: ${{ matrix.source-root }}
 
-    - name: Perform CodeQL Analysis
-      id: analyze
-      uses: github/codeql-action/analyze@ce28f5bb42b7a9f2c824e633a3f6ee835bab6858 # v3.29.0
-      with:
-        category: "/language:${{matrix.language}}"
+      - name: Perform CodeQL Analysis
+        id: analyze
+        uses: github/codeql-action/analyze@ce28f5bb42b7a9f2c824e633a3f6ee835bab6858 # v3.29.0
+        with:
+          category: "/language:${{matrix.language}}"
