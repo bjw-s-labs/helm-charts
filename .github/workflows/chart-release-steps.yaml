@@ -33,12 +33,6 @@ on:
         default: false
         required: false
         type: boolean
-      helmVersion:
-        description: >
-          Helm version to use.
-        default: "latest"
-        required: false
-        type: string
 
 permissions:
   contents: read
@@ -63,10 +57,8 @@ jobs:
         with:
           path: src
 
-      - name: Install Helm
-        uses: azure/setup-helm@b9e51907a09c216f16ebe8536097933489208112 # v4.3.0
-        with:
-          version: ${{ inputs.helmVersion }}
+      - name: Install Mise and required tools
+        uses: jdx/mise-action@13abe502c30c1559a5c37dff303831bab82c9402 # v2.2.3
 
       - name: Login to OCI Registry
         if: ${{ inputs.publishToOciRegistry }}
@@ -225,10 +217,6 @@ jobs:
       # ----------------------------
       # Publish chart to bjw-s OCI registry
       # ----------------------------
-      - name: Install Cosign
-        if: ${{ inputs.publishToOciRegistry }}
-        uses: sigstore/cosign-installer@3454372f43399081ed03b604cb2d021dabca52bb # v3.8.2
-
       - name: Push Helm charts to OCI registry
         if: ${{ inputs.publishToOciRegistry }}
         shell: bash

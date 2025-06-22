@@ -7,10 +7,12 @@ pipx_uvx = true
 [tools]
 python = "3.13" # Required for documentation generation
 rust = "1.87" # Required for schematools
+cosign = "2.5.2"
 "aqua:astral-sh/uv" = "0.7.13"
 "aqua:google/yamlfmt" = "0.17.1"
 "aqua:helm" = "3.18.3"
 "aqua:helm/chart-testing" = "3.13.0"
+"aqua:mikefarah/yq" = "4.45.4"
 "cargo:schematools-cli" = "0.22.0"
 "pipx:yamllint" = "1.37.1"
 "pipx:yamale" = "6.0.0"
