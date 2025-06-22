@@ -6,14 +6,14 @@ type: library
 version: 4.1.2
 kubeVersion: ">=1.28.0-0"
 keywords:
-- common
-- library
+  - common
+  - library
 home: https://github.com/bjw-s-labs/helm-charts/tree/main/charts/library/common
 maintainers:
-- name: bjw-s
-  email: me@bjw-s.dev
+  - name: bjw-s
+    email: me@bjw-s.dev
 sources:
-- https://github.com/bjw-s-labs/helm-charts
+  - https://github.com/bjw-s-labs/helm-charts
 annotations:
   artifacthub.io/changes: |-
     - kind: changed
@@ -22,3 +22,6 @@ annotations:
     - kind: fixed
       description: |-
         Fixed Route validation when relying on automatic Service detection when multiple services are present.
+    - kind: fixed
+      description: |-
+        Fixed namespace validation when setting non-ServiceAccount subject in RoleBinding.
