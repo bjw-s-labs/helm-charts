@@ -13,3 +13,4 @@ rust = "1.87" # Required for schematools
 "aqua:helm/chart-testing" = "3.13.0"
 "cargo:schematools-cli" = "0.22.0"
 "pipx:yamllint" = "1.37.1"
+"pipx:yamale" = "6.0.0"
