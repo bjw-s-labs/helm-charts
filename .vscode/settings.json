@@ -1,7 +1,5 @@
 {
   "[yaml]": {
-    "editor.defaultFormatter": "kennylong.kubernetes-yaml-formatter"
-  },
-  "better-yaml.indentSeq": false,
-  "better-yaml.directives": true
+    "editor.defaultFormatter": "bluebrown.yamlfmt"
+  }
 }

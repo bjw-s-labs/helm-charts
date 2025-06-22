@@ -6,12 +6,12 @@ tasks:
   serve:
     desc: Serve documentation locally
     deps:
-    - install_prerequisies
+      - install_prerequisies
     cmds:
-    - mkdocs serve -c -f .ci/mkdocs/mkdocs.yml
+      - mkdocs serve -c -f .ci/mkdocs/mkdocs.yml
 
   install_prerequisies:
     desc: Install prerequisites
     internal: true
     cmds:
-    - pip install -r docs/requirements.txt
+      - pip install -r docs/requirements.txt

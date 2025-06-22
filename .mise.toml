@@ -2,6 +2,7 @@
 _.python.venv = { path = ".venv", create = true }
 
 [tools]
-"python" = "latest"
-"rust" = "latest"
+python = "latest"
+rust = "latest"
+"aqua:google/yamlfmt" = ["latest"]
 "cargo:schematools-cli" = "latest"

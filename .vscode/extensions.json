@@ -1,6 +1,3 @@
 {
-  "recommendations": [
-    "kennylong.kubernetes-yaml-formatter",
-    "editorconfig.editorconfig"
-  ]
+  "recommendations": ["editorconfig.editorconfig", "bluebrown.yamlfmt"]
 }

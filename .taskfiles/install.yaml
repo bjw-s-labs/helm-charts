@@ -1,74 +1,78 @@
-version: '3'
+---
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
 
 tasks:
   ensure-cargo:
     desc: Ensure cargo (Rust) is installed
     internal: true
     cmds:
-    - silent: true
-      cmd: |
-        # Check if the shell is bash or zsh
-        if [[ "$SHELL" != *bash* && "$SHELL" != *zsh* ]]; then
-          echo "⚠️ This install script is designed to run in bash or zsh shell."
-          exit 1
-        fi
-        # Check if cargo is already installed
-        if command -v cargo >/dev/null 2>&1; then
-          echo "✅ cargo is already installed"
-          exit 0
-        fi
+      - silent: true
+        cmd: |
+          # Check if the shell is bash or zsh
+          if [[ "$SHELL" != *bash* && "$SHELL" != *zsh* ]]; then
+            echo "⚠️ This install script is designed to run in bash or zsh shell."
+            exit 1
+          fi
+          # Check if cargo is already installed
+          if command -v cargo >/dev/null 2>&1; then
+            echo "✅ cargo is already installed"
+            exit 0
+          fi
 
-        # Check if Homebrew is installed
-        if not command -v brew >/dev/null 2>&1; then
-          echo "✨ brew is not installed, installing Homebrew..."
-          # Steps to install Homebrew from the official script: https://brew.sh/
-          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-        fi
+          # Check if Homebrew is installed
+          if not command -v brew >/dev/null 2>&1; then
+            echo "✨ brew is not installed, installing Homebrew..."
+            # Steps to install Homebrew from the official script: https://brew.sh/
+            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          fi
 
-        # If Homebrew is installed, install Rust (which includes cargo)
-        if command -v brew >/dev/null 2>&1; then
-          echo "✨ Installing cargo using brew..."
-          brew install rust
-        fi
+          # If Homebrew is installed, install Rust (which includes cargo)
+          if command -v brew >/dev/null 2>&1; then
+            echo "✨ Installing cargo using brew..."
+            brew install rust
+          fi
 
-        # Make sure that ".cargo" is in the existing $PATH variable
-        if [[ ":$PATH:" != *":$HOME/.cargo/bin:"* ]]; then
-          echo "Adding ~/.cargo/bin to PATH"
-          echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> "${HOME}/.$(echo ${SHELL##*/})rc"
-          echo "Please restart your terminal or run 'source ${HOME}/.${SHELL##*/}rc' to update your PATH"
-        fi
+          # Make sure that ".cargo" is in the existing $PATH variable
+          if [[ ":$PATH:" != *":$HOME/.cargo/bin:"* ]]; then
+            echo "Adding ~/.cargo/bin to PATH"
+            echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> "${HOME}/.$(echo ${SHELL##*/})rc"
+            echo "Please restart your terminal or run 'source ${HOME}/.${SHELL##*/}rc' to update your PATH"
+          fi
 
   ensure-helm-unittest:
     desc: Ensure helm-unittest plugin is installed
     internal: true
     cmds:
-    - silent: true
-      cmd: |
-        if ! helm plugin list | grep -q 'unittest'; then
-          echo "Installing helm-unittest plugin..."
-          helm plugin install https://github.com/helm-unittest/helm-unittest.git
-          helm dep update
-        else
-          echo "✅ helm-unittest plugin is already installed"
-        fi
+      - silent: true
+        cmd: |
+          if ! helm plugin list | grep -q 'unittest'; then
+            echo "Installing helm-unittest plugin..."
+            helm plugin install https://github.com/helm-unittest/helm-unittest.git
+            helm dep update
+          else
+            echo "✅ helm-unittest plugin is already installed"
+          fi
 
   dev:
     desc: Set up a MacOS or Linux development environment
-    deps: [ ensure-cargo, ensure-helm-unittest ]
+    deps:
+      - ensure-cargo
+      - ensure-helm-unittest
     cmds:
-    - silent: true
-      cmd: |
-        # Get the latest version of schematools-cli from GitHub
-        latest_version=$(curl -s https://api.github.com/repos/kstasik/schema-tools/releases/latest | grep '"tag_name":' | sed -E 's/.*"v?([^"]+)".*/\1/')
-        if [ -z "$latest_version" ]; then
-          echo "Could not determine latest schematools-cli version"
-          exit 1
-        fi
-        # Check if the latest version is already installed
-        if cargo install --list | grep -q "schematools-cli v${latest_version}"; then
-          echo "✅ schematools-cli@${latest_version} is already installed"
-          exit 0
-        else
-          echo "Installing schematools-cli@${latest_version}"
-          cargo install schematools-cli --version "${latest_version}"
-        fi
+      - silent: true
+        cmd: |
+          # Get the latest version of schematools-cli from GitHub
+          latest_version=$(curl -s https://api.github.com/repos/kstasik/schema-tools/releases/latest | grep '"tag_name":' | sed -E 's/.*"v?([^"]+)".*/\1/')
+          if [ -z "$latest_version" ]; then
+            echo "Could not determine latest schematools-cli version"
+            exit 1
+          fi
+          # Check if the latest version is already installed
+          if cargo install --list | grep -q "schematools-cli v${latest_version}"; then
+            echo "✅ schematools-cli@${latest_version} is already installed"
+            exit 0
+          else
+            echo "Installing schematools-cli@${latest_version}"
+            cargo install schematools-cli --version "${latest_version}"
+          fi
