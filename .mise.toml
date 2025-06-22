@@ -1,8 +1,13 @@
 [env]
 _.python.venv = { path = ".venv", create = true }
 
+[settings]
+pipx_uvx = true
+
 [tools]
-python = "latest"
-rust = "latest"
-"aqua:google/yamlfmt" = ["latest"]
+python = "latest" # Required for documentation generation
+rust = "latest" # Required for schematools
+"aqua:astral-sh/uv" = "latest"
+"aqua:google/yamlfmt" = "latest"
 "cargo:schematools-cli" = "latest"
+"pipx:yamllint" = "latest"
