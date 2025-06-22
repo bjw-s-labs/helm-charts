@@ -10,12 +10,6 @@ on:
         default: "[]"
         required: true
         type: string
-      helmVersion:
-        description: >
-          Helm version to use.
-        default: "latest"
-        required: false
-        type: string
 
 permissions:
   contents: read
@@ -51,19 +45,15 @@ jobs:
             exit 1
           fi
 
-      - name: Install Kubernetes tools
+      - name: Install kubectl matching k8s version
         uses: yokawasa/action-setup-kube-tools@9e25a4277af127b60011c95b6ed2da7e3b3613b1 # v0.11.2
         with:
           setup-tools: |
-            helmv3
             kubectl
-          helm: "${{ inputs.helmVersion }}"
           kubectl: "${{ matrix.k8s_version }}"
 
-      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
-
-      - name: Set up chart-testing
-        uses: helm/chart-testing-action@0d28d3144d3a25ea2cc349d6e59901c4ff469b3b # v2.7.0
+      - name: Install Mise and required tools
+        uses: jdx/mise-action@13abe502c30c1559a5c37dff303831bab82c9402 # v2.2.3
 
       - name: Create k3d cluster
         uses: nolar/setup-k3d-k3s@293b8e5822a20bc0d5bcdd4826f1a665e72aba96 # v1.0.9
@@ -139,12 +129,8 @@ jobs:
             exit 1
           fi
 
-      - name: Install Kubernetes tools
-        uses: yokawasa/action-setup-kube-tools@9e25a4277af127b60011c95b6ed2da7e3b3613b1 # v0.11.2
-        with:
-          setup-tools: |
-            helmv3
-          helm: "${{ inputs.helmVersion }}"
+      - name: Install Mise and required tools
+        uses: jdx/mise-action@13abe502c30c1559a5c37dff303831bab82c9402 # v2.2.3
 
       - name: Dereference JSON schema
         uses: bjw-s-labs/helm-charts-actions/dereference-json-schema@a560fa2e1a1718226d802b0f78cc1e4a265a80bf
