@@ -22,41 +22,41 @@ inputs:
 runs:
   using: "composite"
   steps:
-  - name: Prepare gh-pages artifact
-    shell: sh
-    env:
-      INPUT_PATH: ${{ inputs.path }}
-    run: |
-      echo ::group::Archive artifact
-      tar \
-        --dereference --hard-dereference \
-        --directory "$INPUT_PATH" \
-        -cvf "$RUNNER_TEMP/artifact.tar" \
-        --exclude=.git \
-        --exclude=.github \
-        --exclude=".[^/]*" \
-        .
-      echo ::endgroup::
+    - name: Prepare gh-pages artifact
+      shell: sh
+      env:
+        INPUT_PATH: ${{ inputs.path }}
+      run: |
+        echo ::group::Archive artifact
+        tar \
+          --dereference --hard-dereference \
+          --directory "$INPUT_PATH" \
+          -cvf "$RUNNER_TEMP/artifact.tar" \
+          --exclude=.git \
+          --exclude=.github \
+          --exclude=".[^/]*" \
+          .
+        echo ::endgroup::
 
-  - name: Upload gh-pages artifact
-    id: upload-artifact
-    uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-    with:
-      name: ${{ inputs.artifactName }}
-      path: ${{ runner.temp }}/artifact.tar
-      retention-days: 1
-      if-no-files-found: error
+    - name: Upload gh-pages artifact
+      id: upload-artifact
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      with:
+        name: ${{ inputs.artifactName }}
+        path: ${{ runner.temp }}/artifact.tar
+        retention-days: 1
+        if-no-files-found: error
 
-  - name: Deploy to GitHub Pages
-    id: deploy-gh-pages
-    uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
-    with:
-      artifact_name: ${{ inputs.artifactName }}
+    - name: Deploy to GitHub Pages
+      id: deploy-gh-pages
+      uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
+      with:
+        artifact_name: ${{ inputs.artifactName }}
 
-  - name: Clean up artifact
-    if: ${{ inputs.deleteArtifactAfterPublish == 'true' }}
-    uses: joernott/rm-artifact@ddae76700af6756a6dbb164be87d62d25d85febd # v1.0.4
-    with:
-      name: ${{ inputs.artifactName }}
-      useGlob: false
-      failOnError: true
+    - name: Clean up artifact
+      if: ${{ inputs.deleteArtifactAfterPublish == 'true' }}
+      uses: joernott/rm-artifact@ddae76700af6756a6dbb164be87d62d25d85febd # v1.0.4
+      with:
+        name: ${{ inputs.artifactName }}
+        useGlob: false
+        failOnError: true

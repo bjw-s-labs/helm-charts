@@ -50,7 +50,7 @@ controllers:
         securityContext:
           capabilities:
             add:
-            - NET_ADMIN
+              - NET_ADMIN
 
       port-forward:
         dependsOn: gluetun
@@ -58,12 +58,12 @@ controllers:
           repository: docker.io/snoringdragon/gluetun-qbittorrent-port-manager
           tag: "1.0"
         env:
-        - name: QBITTORRENT_SERVER
-          value: localhost
-        - name: QBITTORRENT_PORT
-          value: "8080"
-        - name: PORT_FORWARDED
-          value: "/tmp/gluetun/forwarded_port"
+          - name: QBITTORRENT_SERVER
+            value: localhost
+          - name: QBITTORRENT_PORT
+            value: "8080"
+          - name: PORT_FORWARDED
+            value: "/tmp/gluetun/forwarded_port"
 
 service:
   # Configure a service for the main application
@@ -79,16 +79,16 @@ ingress:
   main:
     className: "external-nginx"
     hosts:
-    - host: &host "qb.example.local"
-      paths:
-      - path: /
-        pathType: Prefix
-        service:
-          identifier: main
-          port: http
+      - host: &host "qb.example.local"
+        paths:
+          - path: /
+            pathType: Prefix
+            service:
+              identifier: main
+              port: http
     tls:
-    - hosts:
-      - *host
+      - hosts:
+          - *host
 
 persistence:
   # Configure the main configuration storage location
@@ -97,14 +97,14 @@ persistence:
     advancedMounts:
       main:
         main:
-        - path: /config
+          - path: /config
   # Configure an emptyDir to share the port-forwarding location between containers
   gluetun-data:
     type: emptyDir
     advancedMounts:
       main:
         gluetun:
-        - path: /tmp/gluetun
+          - path: /tmp/gluetun
         port-forward:
-        - path: /tmp/gluetun
-          readOnly: true
+          - path: /tmp/gluetun
+            readOnly: true

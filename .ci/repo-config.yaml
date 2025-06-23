@@ -2,6 +2,6 @@
 excluded-charts-lint: []
 
 excluded-charts-install:
-- other/app-template
+  - other/app-template
 
 excluded-charts-release: []
