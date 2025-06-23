@@ -1,9 +1,10 @@
 ---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
 suite: rbac - presence
 templates:
   - common.yaml
 tests:
-  - it: role and rolebinding can be configured are not created by default
+  - it: role and rolebinding are not created by default
     asserts:
       - not: true
         containsDocument:
@@ -25,7 +26,9 @@ tests:
           value: release-name
         equal:
           path: rules[0].verbs
-          value: ["get", "list"]
+          value:
+            - "get"
+            - "list"
       - documentSelector:
           path: $[?(@.kind == "RoleBinding")].metadata.name
           value: release-name
@@ -60,13 +63,22 @@ tests:
       rbac.roles.customRole:
         type: ClusterRole
         rules:
-          - apiGroups: ["*"]
-            resources: ["*"]
-            verbs: ["get", "list", "watch"]
+          - apiGroups:
+              - "*"
+            resources:
+              - "*"
+            verbs:
+              - "get"
+              - "list"
+              - "watch"
     asserts:
-      - documentSelector:
-          path: $[?(@.kind == "ClusterRole")].metadata.name
-          value: release-name-customrole
-        equal:
-          path: rules[0].verbs
-          value: ["get", "list", "watch"]
+      - containsDocument:
+          kind: Role
+          apiVersion: rbac.authorization.k8s.io/v1
+          any: true
+          name: release-name-defaultrole
+      - containsDocument:
+          kind: ClusterRole
+          apiVersion: rbac.authorization.k8s.io/v1
+          any: true
+          name: release-name-customrole

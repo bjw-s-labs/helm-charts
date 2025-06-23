@@ -1,0 +1,26 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: rbac - role tests
+templates:
+  - common.yaml
+values:
+  - ../_values/rbac_values.yaml
+tests:
+  - it: Role should be namespaced
+    documentSelector:
+      path: $[?(@.kind == "Role")].metadata.name
+      value: release-name
+    asserts:
+      - exists:
+          path: metadata.namespace
+
+  - it: ClusterRole should not be namespaced
+    set:
+      rbac.roles.defaultRole:
+        type: ClusterRole
+    documentSelector:
+      path: $[?(@.kind == "ClusterRole")].metadata.name
+      value: release-name
+    asserts:
+      - notExists:
+          path: metadata.namespace

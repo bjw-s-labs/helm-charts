@@ -1,62 +1,84 @@
 ---
-suite: rbac - rolebinding subjects - validations
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: rbac - rolebinding tests
 templates:
-- common.yaml
+  - common.yaml
+set:
+  rbac:
+    bindings:
+      defaultBinding:
+        enabled: true
+        type: RoleBinding
+        roleRef:
+          name: defaultBinding
+          kind: Role
+        subjects:
+          - kind: Group
+            name: oidc:/default-group
+          - kind: User
+            name: default-username
+          - kind: ServiceAccount
+            name: default
+            namespace: default
 tests:
+  - it: RoleBinding should be namespaced
+    documentSelector:
+      path: $[?(@.kind == "RoleBinding")].metadata.name
+      value: release-name
+    asserts:
+      - exists:
+          path: metadata.namespace
 
-- it: subject must be a valid group
-  values:
-  - ../_values/rolebinding_values.yaml
-  asserts:
-  - documentSelector:
-      path: $[?(@.kind == "RoleBinding")].metadata.name
-      value: "release-name"
-    equal:
-      path: subjects[0].kind
-      value: "Group"
-  - documentSelector:
-      path: $[?(@.kind == "RoleBinding")].metadata.name
-      value: "release-name"
-    equal:
-      path: subjects[0].name
-      value: "oidc:/default-group"
+  - it: ClusterRoleBinding should not be namespaced
+    set:
+      rbac.bindings.defaultBinding:
+        type: ClusterRoleBinding
+    documentSelector:
+      path: $[?(@.kind == "ClusterRoleBinding")].metadata.name
+      value: release-name
+    asserts:
+      - notExists:
+          path: metadata.namespace
 
-- it: subject must be a valid user
-  values:
-  - ../_values/rolebinding_values.yaml
-  asserts:
-  - documentSelector:
+  - it: subject must be a valid group
+    documentSelector:
       path: $[?(@.kind == "RoleBinding")].metadata.name
-      value: "release-name"
-    equal:
-      path: subjects[1].kind
-      value: "User"
-  - documentSelector:
-      path: $[?(@.kind == "RoleBinding")].metadata.name
-      value: "release-name"
-    equal:
-      path: subjects[1].name
-      value: "default-username"
+      value: release-name
+    asserts:
+      - equal:
+          path: subjects[0].kind
+          value: Group
+      - equal:
+          path: subjects[0].name
+          value: oidc:/default-group
+      - notExists:
+          path: subjects[0].namespace
 
-- it: subject must be a valid user
-  values:
-  - ../_values/rolebinding_values.yaml
-  asserts:
-  - documentSelector:
+  - it: subject must be a valid user
+    documentSelector:
       path: $[?(@.kind == "RoleBinding")].metadata.name
-      value: "release-name"
-    equal:
-      path: subjects[2].kind
-      value: "ServiceAccount"
-  - documentSelector:
+      value: release-name
+    asserts:
+      - equal:
+          path: subjects[1].kind
+          value: User
+      - equal:
+          path: subjects[1].name
+          value: default-username
+      - notExists:
+          path: subjects[0].namespace
+
+  - it: subject must be a valid user
+    documentSelector:
       path: $[?(@.kind == "RoleBinding")].metadata.name
-      value: "release-name"
-    equal:
-      path: subjects[2].name
-      value: "default"
-  - documentSelector:
-      path: $[?(@.kind == "RoleBinding")].metadata.name
-      value: "release-name"
-    equal:
-      path: subjects[2].namespace
-      value: "default"
+      value: release-name
+    asserts:
+      - equal:
+          path: subjects[2].kind
+          value: ServiceAccount
+      - equal:
+          path: subjects[2].name
+          value: default
+      - equal:
+          path: subjects[2].namespace
+          value: default
