@@ -32,9 +32,6 @@ jobs:
       - name: Install Mise and required tools
         uses: jdx/mise-action@13abe502c30c1559a5c37dff303831bab82c9402 # v2.2.3
 
-      - name: Install requirements
-        run: pip install -r docs/requirements.txt
-
       - name: Build and publish docs
         run: mkdocs build -f .ci/mkdocs/mkdocs.yml
 

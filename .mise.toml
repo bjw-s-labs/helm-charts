@@ -3,6 +3,7 @@ _.python.venv = { path = ".venv", create = true }
 
 [settings]
 pipx_uvx = true
+python.uv_venv_auto = true
 
 [tools]
 python = "3.13" # Required for documentation generation
@@ -16,3 +17,6 @@ cosign = "2.5.2"
 "cargo:schematools-cli" = "0.22.0"
 "pipx:yamllint" = "1.37.1"
 "pipx:yamale" = "6.0.0"
+
+[hooks]
+postinstall = "uv pip install --upgrade -r docs/requirements.txt"
