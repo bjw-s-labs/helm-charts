@@ -29,13 +29,18 @@ See `git help commit`:
 1. Remember to sign off your commits as described above
 1. Submit a pull request
 
-***NOTE***: In order to make testing and merging of PRs easier, please submit changes to multiple charts in separate PRs.
+**_NOTE_**: In order to make testing and merging of PRs easier, please submit changes to multiple charts in separate PRs.
+
+### Setting up a local development environment
+
+I rely on [mise-en-place](https://mise.jdx.dev) to set up my development environment. Once you have installed mise-en-place, you can run the `mise up` command which will then install all the required tools.
+To see which tools are installed you can take a look at the [mise configuration](.mise.toml) file.
 
 ### Technical Requirements
 
-* Must follow [Charts best practices](https://helm.sh/docs/topics/chart_best_practices/).
-* Must pass CI jobs for linting and installing changed charts.
-* Any change to a chart requires a version bump following [semver](https://semver.org/) principles. See [Immutability](#immutability) and [Versioning](#versioning) below.
+- Must follow [Charts best practices](https://helm.sh/docs/topics/chart_best_practices/).
+- Must pass CI jobs for linting and installing changed charts.
+- Any change to a chart requires a version bump following [semver](https://semver.org/) principles. See [Immutability](#immutability) and [Versioning](#versioning) below.
 
 Once changes have been merged, the release job will automatically run to package and release changed charts.
 

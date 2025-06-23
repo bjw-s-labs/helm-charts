@@ -45,6 +45,12 @@ If you like this project, please consider supporting my work through my [GitHub 
 
 ---
 
+### Contributing
+
+If you wish to contribute to this repository, take a look at the [contributing instructions](CONTRIBUTING.md).
+
+---
+
 ## How do I find people running these charts?
 
 ### Discord
