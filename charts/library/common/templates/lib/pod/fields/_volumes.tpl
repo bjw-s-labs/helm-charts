@@ -43,7 +43,7 @@ Returns the value for volumes
       {{- $pvcName := (include "bjw-s.common.lib.chart.names.fullname" $rootContext) -}}
       {{- if $persistenceValues.existingClaim -}}
         {{- /* Always prefer an existingClaim if that is set */ -}}
-        {{- $pvcName = $persistenceValues.existingClaim -}}
+        {{- $pvcName = tpl $persistenceValues.existingClaim  $rootContext -}}
       {{- else -}}
         {{- /* Otherwise refer to the PVC name */ -}}
         {{- $object := (include "bjw-s.common.lib.pvc.getByIdentifier" (dict "rootContext" $rootContext "id" $identifier) | fromYaml) -}}

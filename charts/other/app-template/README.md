@@ -30,7 +30,7 @@ helm install bjw-s app-template -f values.yaml
 
 ```bash
 # Install the chart
-helm install oci://ghcr.io/bjw-s/helm/app-template -f values.yaml
+helm install oci://ghcr.io/bjw-s-labs/helm/app-template -f values.yaml
 ```
 
 ## Configuration

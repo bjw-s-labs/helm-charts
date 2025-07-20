@@ -3,7 +3,7 @@ apiVersion: v2
 name: common
 description: Function library for Helm charts
 type: library
-version: 4.1.2
+version: 4.2.0
 kubeVersion: ">=1.28.0-0"
 keywords:
   - common
@@ -16,12 +16,9 @@ sources:
   - https://github.com/bjw-s-labs/helm-charts
 annotations:
   artifacthub.io/changes: |-
-    - kind: changed
+    - kind: added
       description: |-
-        Improved and standardized descriptions for JSONSchema properties.
-    - kind: fixed
+        Allow Helm templating for existingClaim field in persistence items.
+    - kind: added
       description: |-
-        Fixed Route validation when relying on automatic Service detection when multiple services are present.
-    - kind: fixed
-      description: |-
-        Fixed namespace validation when setting non-ServiceAccount subject in RoleBinding.
+        Allow Helm templating for subPath and Path fields in persistence items.

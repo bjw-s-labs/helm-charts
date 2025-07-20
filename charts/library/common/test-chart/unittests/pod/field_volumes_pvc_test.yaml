@@ -39,6 +39,22 @@ tests:
             persistentVolumeClaim:
               claimName: myClaim
 
+  - it: with templated existingClaim should pass
+    set:
+      persistence:
+        existingClaim:
+          existingClaim: myClaim-{{ .Release.Name }}
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[0]
+          value:
+            name: existingClaim
+            persistentVolumeClaim:
+              claimName: myClaim-RELEASE-NAME
+
   - it: disabled suffix should pass
     set:
       persistence:

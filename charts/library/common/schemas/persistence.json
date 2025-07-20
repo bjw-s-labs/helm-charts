@@ -1,20 +1,20 @@
 {
   "item": {
     "oneOf": [
-      {"$ref": "#/persistentVolumeClaimItem"},
-      {"$ref": "#/persistentVolumeClaimWithExistingClaimItem"},
-      {"$ref": "#/configMapItem"},
-      {"$ref": "#/secretItem"},
-      {"$ref": "#/nfsItem"},
-      {"$ref": "#/emptyDirItem"},
-      {"$ref": "#/hostPathItem"},
-      {"$ref": "#/customItem"}
+      { "$ref": "#/persistentVolumeClaimItem" },
+      { "$ref": "#/persistentVolumeClaimWithExistingClaimItem" },
+      { "$ref": "#/configMapItem" },
+      { "$ref": "#/secretItem" },
+      { "$ref": "#/nfsItem" },
+      { "$ref": "#/emptyDirItem" },
+      { "$ref": "#/hostPathItem" },
+      { "$ref": "#/customItem" }
     ]
   },
 
   "persistentVolumeClaimItem": {
     "allOf": [
-      {"$ref": "definitions.json#/resourceIdentifier"},
+      { "$ref": "definitions.json#/resourceIdentifier" },
       {
         "type": "object",
         "additionalProperties": false,
@@ -91,10 +91,11 @@
         "default": true
       },
       "existingClaim": {
-        "type": "string"
+        "type": "string",
+        "description": "The name of an existing PersistentVolumeClaim to use. Helm templates are supported.\nThis will not create a new PVC, but use the existing one instead."
       },
-      "advancedMounts": {"$ref": "#/advancedMounts"},
-      "globalMounts": {"$ref": "#/globalMounts"}
+      "advancedMounts": { "$ref": "#/advancedMounts" },
+      "globalMounts": { "$ref": "#/globalMounts" }
     },
     "required": ["existingClaim"]
   },
@@ -139,16 +140,16 @@
           }
         }
       },
-      "advancedMounts": {"$ref": "#/advancedMounts"},
-      "globalMounts": {"$ref": "#/globalMounts"}
+      "advancedMounts": { "$ref": "#/advancedMounts" },
+      "globalMounts": { "$ref": "#/globalMounts" }
     },
-    "oneOf": [{"required": ["name"]}, {"required": ["identifier"]}],
+    "oneOf": [{ "required": ["name"] }, { "required": ["identifier"] }],
     "dependencies": {
       "name": {
-        "not": {"required": ["identifier"]}
+        "not": { "required": ["identifier"] }
       },
       "identifier": {
-        "not": {"required": ["name"]}
+        "not": { "required": ["name"] }
       }
     }
   },
@@ -193,16 +194,16 @@
           }
         }
       },
-      "advancedMounts": {"$ref": "#/advancedMounts"},
-      "globalMounts": {"$ref": "#/globalMounts"}
+      "advancedMounts": { "$ref": "#/advancedMounts" },
+      "globalMounts": { "$ref": "#/globalMounts" }
     },
-    "oneOf": [{"required": ["name"]}, {"required": ["identifier"]}],
+    "oneOf": [{ "required": ["name"] }, { "required": ["identifier"] }],
     "dependencies": {
       "name": {
-        "not": {"required": ["identifier"]}
+        "not": { "required": ["identifier"] }
       },
       "identifier": {
-        "not": {"required": ["name"]}
+        "not": { "required": ["name"] }
       }
     }
   },
@@ -225,8 +226,8 @@
       "server": {
         "type": "string"
       },
-      "advancedMounts": {"$ref": "#/advancedMounts"},
-      "globalMounts": {"$ref": "#/globalMounts"}
+      "advancedMounts": { "$ref": "#/advancedMounts" },
+      "globalMounts": { "$ref": "#/globalMounts" }
     },
     "required": ["server", "path"]
   },
@@ -249,8 +250,8 @@
       "sizeLimit": {
         "type": "string"
       },
-      "advancedMounts": {"$ref": "#/advancedMounts"},
-      "globalMounts": {"$ref": "#/globalMounts"}
+      "advancedMounts": { "$ref": "#/advancedMounts" },
+      "globalMounts": { "$ref": "#/globalMounts" }
     }
   },
 
@@ -272,8 +273,8 @@
       "hostPathType": {
         "type": "string"
       },
-      "advancedMounts": {"$ref": "#/advancedMounts"},
-      "globalMounts": {"$ref": "#/globalMounts"}
+      "advancedMounts": { "$ref": "#/advancedMounts" },
+      "globalMounts": { "$ref": "#/globalMounts" }
     }
   },
 
@@ -292,8 +293,8 @@
       "volumeSpec": {
         "type": "object"
       },
-      "globalMounts": {"$ref": "#/globalMounts"},
-      "advancedMounts": {"$ref": "#/advancedMounts"}
+      "globalMounts": { "$ref": "#/globalMounts" },
+      "advancedMounts": { "$ref": "#/advancedMounts" }
     },
     "required": ["volumeSpec"]
   },
@@ -333,20 +334,22 @@
 
   "mountPathCollection": {
     "type": "array",
-    "items": {"$ref": "#/mountPath"}
+    "items": { "$ref": "#/mountPath" }
   },
 
   "mountPath": {
     "additionalProperties": false,
     "properties": {
       "path": {
-        "type": "string"
+        "type": "string",
+        "description": "The path where the volume should be mounted in the container. Helm templates are supported.\nIf not specified, the mount path will be set to /<identifier_of_the_peristence_item>."
       },
       "readOnly": {
         "type": "boolean"
       },
       "subPath": {
-        "type": "string"
+        "type": "string",
+        "description": "The subPath within the volume to mount. Helm templates are supported.\nIf not specified, the entire volume will be mounted."
       },
       "subPathExpr": {
         "type": "string"

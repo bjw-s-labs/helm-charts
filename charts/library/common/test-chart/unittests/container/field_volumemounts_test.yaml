@@ -135,7 +135,44 @@ tests:
             name: config
             mountPath: /custom
 
+  - it: custom mountPath with template should pass
+    set:
+      persistence:
+        config:
+          accessMode: ReadWriteMany
+          size: 1G
+          globalMounts:
+            - path: /data/{{ .Release.Name }}
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[0]
+          value:
+            name: config
+            mountPath: /data/RELEASE-NAME
+
   - it: mount with subPath should pass
+    set:
+      persistence:
+        config:
+          existingClaim: myClaim
+          globalMounts:
+            - path: /config
+              subPath: "{{ .Release.Name }}"
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[0]
+          value:
+            name: config
+            mountPath: /config
+            subPath: RELEASE-NAME
+
+  - it: mount with templated subPath should pass
     set:
       persistence:
         config:

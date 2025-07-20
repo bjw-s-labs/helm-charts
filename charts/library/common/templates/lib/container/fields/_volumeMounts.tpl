@@ -75,13 +75,13 @@ volumeMounts used by the container.
 
         {{- /* Use the specified mountPath if provided */ -}}
         {{- with .path -}}
-          {{- $mountPath = . -}}
+          {{- $mountPath = (tpl . $rootContext) -}}
         {{- end -}}
         {{- $_ := set $volumeMount "mountPath" $mountPath -}}
 
         {{- /* Use the specified subPath if provided */ -}}
         {{- with .subPath -}}
-          {{- $_ := set $volumeMount "subPath" . -}}
+          {{- $_ := set $volumeMount "subPath" (tpl . $rootContext) -}}
         {{- end -}}
 
         {{- /* Use the specified subPathExpr if provided */ -}}
