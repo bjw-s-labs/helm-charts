@@ -14,7 +14,7 @@ tests:
       persistence:
         test:
           type: image
-          reference: quay.io/crio/artifact:v2
+          image: quay.io/crio/artifact:v2
     capabilities:
       majorVersion: 1
       minorVersion: 32
@@ -27,7 +27,7 @@ tests:
       persistence:
         test:
           type: image
-          reference: quay.io/crio/artifact:v2
+          image: quay.io/crio/artifact:v2
     documentSelector:
       path: $[?(@.kind == "Deployment")].metadata.name
       value: release-name
@@ -44,7 +44,7 @@ tests:
       persistence:
         test:
           type: image
-          reference: quay.io/crio/artifact:v2
+          image: quay.io/crio/artifact:v2
           pullPolicy: Always
     documentSelector:
       path: $[?(@.kind == "Deployment")].metadata.name
@@ -63,7 +63,7 @@ tests:
       persistence:
         test:
           type: image
-          reference: quay.io/crio/artifact:v2
+          image: quay.io/crio/artifact:v2
           pullPolicy: Never
     documentSelector:
       path: $[?(@.kind == "Deployment")].metadata.name
@@ -82,7 +82,7 @@ tests:
       persistence:
         test:
           type: image
-          reference: quay.io/crio/artifact:v2
+          image: quay.io/crio/artifact:v2
           pullPolicy: IfNotPresent
     documentSelector:
       path: $[?(@.kind == "Deployment")].metadata.name

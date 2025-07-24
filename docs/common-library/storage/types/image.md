@@ -13,7 +13,7 @@ for more information.
 
 | Field        | Mandatory | Docs / Description                 |
 | ------------ | --------- | ---------------------------------- |
-| `reference`  | Yes       | OCI artifact reference to be used. |
+| `image`      | Yes       | OCI artifact reference to be used. |
 | `pullPolicy` | No        | Configure the image pull behavior. |
 
 ## Minimal configuration
@@ -22,7 +22,7 @@ for more information.
 persistence:
   config:
     type: image
-    reference: quay.io/crio/artifact:v2
+    image: quay.io/crio/artifact:v2
 ```
 
 This will create an image volume based on the `quay.io/crio/artifact:v2` OCI artifact and mount it to `/config`.

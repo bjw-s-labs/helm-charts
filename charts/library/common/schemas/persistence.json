@@ -292,7 +292,7 @@
         "type": "boolean",
         "default": true
       },
-      "reference": {
+      "image": {
         "description": "OCI artifact reference to be used.",
         "type": "string"
       },
@@ -304,7 +304,7 @@
       "advancedMounts": { "$ref": "#/advancedMounts" },
       "globalMounts": { "$ref": "#/globalMounts" }
     },
-    "required": ["reference"]
+    "required": ["image"]
   },
 
   "customItem": {

@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-4.1.2/charts/library/common/values.schema.json",
+  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-4.2.0/charts/library/common/values.schema.json",
   "type": "object",
   "properties": {
     "global": {
@@ -9,17 +9,11 @@
       "properties": {
         "nameOverride": {
           "description": "Set the chart name",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "fullnameOverride": {
           "description": "Set the chart fullname definition",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "alwaysAppendIdentifierToResourceName": {
           "description": "Always append identifier slugs to resource names, regardless of the enabled resource count.",
@@ -47,10 +41,7 @@
       "description": "Set the strategy for the default pod options. Defaults to overwrite.\noverwrite: If pod-level options are set, use those instead of the defaults.\nmerge: If pod-level options are set, merge them with the defaults.",
       "type": "string",
       "default": "overwrite",
-      "enum": [
-        "overwrite",
-        "merge"
-      ]
+      "enum": ["overwrite", "merge"]
     },
     "defaultPodOptions": {
       "description": "Set default options for all controllers / pods here. Each of these options can be overridden on a controller level.",
