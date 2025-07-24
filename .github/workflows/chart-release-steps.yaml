@@ -73,7 +73,7 @@ jobs:
       # ----------------------------
       - name: Get chart details
         id: chart-details
-        uses: bjw-s-labs/helm-charts-actions/get-chart-details@2b9ae0a99aac78366ec95546cab22fa6680541f2
+        uses: bjw-s-labs/helm-charts-actions/get-chart-details@d8850d9a52899703bbf1409574eecb404b0bc99b
         with:
           path: src/charts/${{ inputs.chart }}
           validateChartYaml: true
@@ -124,7 +124,7 @@ jobs:
       # Package Helm chart
       # ----------------------------
       - name: Dereference JSON schema before packaging
-        uses: bjw-s-labs/helm-charts-actions/dereference-json-schema@2b9ae0a99aac78366ec95546cab22fa6680541f2
+        uses: bjw-s-labs/helm-charts-actions/dereference-json-schema@d8850d9a52899703bbf1409574eecb404b0bc99b
         with:
           schemaFile: "src/charts/${{ inputs.chart }}/values.schema.json"
           outputFile: "src/charts/${{ inputs.chart }}/values.schema.json"
@@ -219,7 +219,7 @@ jobs:
       # ----------------------------
       - name: Install Cosign
         if: ${{ inputs.publishToOciRegistry }}
-        uses: sigstore/cosign-installer@398d4b0eeef1380460a10c8013a76f728fb906ac # v3.9.1
+        uses: sigstore/cosign-installer@d58896d6a1865668819e1d91763c7751a165e159 # v3.9.2
 
       - name: Push Helm charts to OCI registry
         if: ${{ inputs.publishToOciRegistry }}
