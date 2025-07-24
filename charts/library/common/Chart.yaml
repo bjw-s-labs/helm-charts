@@ -22,3 +22,9 @@ annotations:
     - kind: added
       description: |-
         Allow Helm templating for subPath and Path fields in persistence items.
+    - kind: added
+      description: |-
+        Allow mounting of container images as persistence items in Kubernetes >= 1.33.
+      links:
+        - name: Kubernetes documentation
+          url: https://kubernetes.io/docs/concepts/storage/volumes/#image

@@ -8,6 +8,7 @@
       { "$ref": "#/nfsItem" },
       { "$ref": "#/emptyDirItem" },
       { "$ref": "#/hostPathItem" },
+      { "$ref": "#/imageItem" },
       { "$ref": "#/customItem" }
     ]
   },
@@ -276,6 +277,34 @@
       "advancedMounts": { "$ref": "#/advancedMounts" },
       "globalMounts": { "$ref": "#/globalMounts" }
     }
+  },
+
+  "imageItem": {
+    "type": "object",
+    "additionalProperties": false,
+
+    "properties": {
+      "type": {
+        "const": "image"
+      },
+      "enabled": {
+        "description": "Set to false to disable the persistence item.",
+        "type": "boolean",
+        "default": true
+      },
+      "reference": {
+        "description": "OCI artifact reference to be used.",
+        "type": "string"
+      },
+      "pullPolicy": {
+        "description": "The image pull policy for the image persistence item.",
+        "type": "string",
+        "enum": ["Always", "Never", "IfNotPresent"]
+      },
+      "advancedMounts": { "$ref": "#/advancedMounts" },
+      "globalMounts": { "$ref": "#/globalMounts" }
+    },
+    "required": ["reference"]
   },
 
   "customItem": {

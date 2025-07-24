@@ -1,0 +1,97 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: pod - fields - volumes (image)
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+capabilities:
+  majorVersion: 1
+  minorVersion: 33
+tests:
+  - it: should not be work in kubernetes < 1.33
+    set:
+      persistence:
+        test:
+          type: image
+          reference: quay.io/crio/artifact:v2
+    capabilities:
+      majorVersion: 1
+      minorVersion: 32
+    asserts:
+      - failedTemplate:
+          errorMessage: "Not a valid persistence.type (image)"
+
+  - it: image persistence type should pass
+    set:
+      persistence:
+        test:
+          type: image
+          reference: quay.io/crio/artifact:v2
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[0]
+          value:
+            name: test
+            image:
+              reference: quay.io/crio/artifact:v2
+
+  - it: image pull policy can be set to Always
+    set:
+      persistence:
+        test:
+          type: image
+          reference: quay.io/crio/artifact:v2
+          pullPolicy: Always
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[0]
+          value:
+            name: test
+            image:
+              reference: quay.io/crio/artifact:v2
+              pullPolicy: Always
+
+  - it: image pull policy can be set to Never
+    set:
+      persistence:
+        test:
+          type: image
+          reference: quay.io/crio/artifact:v2
+          pullPolicy: Never
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[0]
+          value:
+            name: test
+            image:
+              reference: quay.io/crio/artifact:v2
+              pullPolicy: Never
+
+  - it: image pull policy can be set to IfNotPresent
+    set:
+      persistence:
+        test:
+          type: image
+          reference: quay.io/crio/artifact:v2
+          pullPolicy: IfNotPresent
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[0]
+          value:
+            name: test
+            image:
+              reference: quay.io/crio/artifact:v2
+              pullPolicy: IfNotPresent

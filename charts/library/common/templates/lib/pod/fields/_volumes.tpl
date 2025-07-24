@@ -111,6 +111,14 @@ Returns the value for volumes
         {{- $_ := set $volume.hostPath "type" . -}}
       {{- end -}}
 
+    {{- /* image persistence type */ -}}
+    {{- else if and (ge ($rootContext.Capabilities.KubeVersion.Minor | int) 33) (eq $persistenceValues.type "image") -}}
+      {{- $_ := set $volume "image" dict -}}
+      {{- $_ := set $volume.image "reference" $persistenceValues.reference -}}
+      {{- with $persistenceValues.pullPolicy -}}
+        {{- $_ := set $volume.image "pullPolicy" . -}}
+      {{- end -}}
+
     {{- /* nfs persistence type */ -}}
     {{- else if eq $persistenceValues.type "nfs" -}}
       {{- $_ := set $volume "nfs" dict -}}

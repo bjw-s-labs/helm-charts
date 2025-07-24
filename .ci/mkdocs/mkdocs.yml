@@ -80,6 +80,7 @@ nav:
               - Custom: common-library/storage/types/custom.md
               - emptyDir: common-library/storage/types/emptyDir.md
               - hostPath: common-library/storage/types/hostPath.md
+              - OCI artifact: common-library/storage/types/image.md
               - NFS share: common-library/storage/types/nfs-share.md
               - persistentVolumeClaim: common-library/storage/types/persistentVolumeClaim.md
               - Secret: common-library/storage/types/secret.md
