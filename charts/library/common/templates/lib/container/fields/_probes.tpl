@@ -31,51 +31,56 @@ Probes used by the container.
         {{- if $primaryService -}}
           {{- $primaryServiceDefaultPort = include "bjw-s.common.lib.service.primaryPort" (dict "rootContext" $rootContext "serviceObject" $primaryService) | fromYaml -}}
         {{- end -}}
-        {{- if $primaryServiceDefaultPort -}}
-          {{- $probeType := "" -}}
-          {{- if eq $probeValues.type "AUTO" -}}
-            {{- $probeType = $primaryServiceDefaultPort.protocol -}}
-          {{- else -}}
-            {{- $probeType = $probeValues.type | default "TCP" -}}
-          {{- end -}}
 
-          {{- $_ := set $probeDefinition "initialDelaySeconds" (include "bjw-s.common.lib.defaultKeepNonNullValue" (dict "value" $probeSpec.initialDelaySeconds "default" 0) | int) -}}
-          {{- $_ := set $probeDefinition "failureThreshold" (include "bjw-s.common.lib.defaultKeepNonNullValue" (dict "value" $probeSpec.failureThreshold "default" 3) | int) -}}
-          {{- $_ := set $probeDefinition "timeoutSeconds" (include "bjw-s.common.lib.defaultKeepNonNullValue" (dict "value" $probeSpec.timeoutSeconds "default" 1) | int) -}}
-          {{- $_ := set $probeDefinition "periodSeconds" (include "bjw-s.common.lib.defaultKeepNonNullValue" (dict "value" $probeSpec.periodSeconds "default" 10) | int) -}}
+        {{- $_ := set $probeDefinition "initialDelaySeconds" (include "bjw-s.common.lib.defaultKeepNonNullValue" (dict "value" $probeSpec.initialDelaySeconds "default" 0) | int) -}}
+        {{- $_ := set $probeDefinition "failureThreshold" (include "bjw-s.common.lib.defaultKeepNonNullValue" (dict "value" $probeSpec.failureThreshold "default" 3) | int) -}}
+        {{- $_ := set $probeDefinition "timeoutSeconds" (include "bjw-s.common.lib.defaultKeepNonNullValue" (dict "value" $probeSpec.timeoutSeconds "default" 1) | int) -}}
+        {{- $_ := set $probeDefinition "periodSeconds" (include "bjw-s.common.lib.defaultKeepNonNullValue" (dict "value" $probeSpec.periodSeconds "default" 10) | int) -}}
 
-          {{- $probeHeader := "" -}}
-          {{- if or ( eq $probeType "HTTPS" ) ( eq $probeType "HTTP" ) -}}
-            {{- $probeHeader = "httpGet" -}}
+        {{- $probeType := "" -}}
+        {{- $probeHeader := "" -}}
 
-            {{- $_ := set $probeDefinition $probeHeader (
-              dict
-                "path" $probeValues.path
-                "scheme" $probeType
-              )
-            -}}
-          {{- else if (eq $probeType "GRPC") -}}
-            {{- $probeHeader = "grpc" -}}
-            {{- $_ := set $probeDefinition $probeHeader dict -}}
-              {{- if $probeValues.service -}}
-                {{- $_ := set (index $probeDefinition $probeHeader) "service" $probeValues.service -}}
-              {{- end -}}
-          {{- else -}}
-            {{- $probeHeader = "tcpSocket" -}}
-            {{- $_ := set $probeDefinition $probeHeader dict -}}
-          {{- end -}}
+        {{- /* Determine probe type */ -}}
+        {{- if eq $probeValues.type "AUTO" -}}
+          {{- $probeType = $primaryServiceDefaultPort.protocol -}}
+        {{- else -}}
+          {{- $probeType = $probeValues.type | default "TCP" -}}
+        {{- end -}}
 
-          {{- if $probeValues.port -}}
-            {{- if kindIs "float64" $probeValues.port -}}
-              {{- $_ := set (index $probeDefinition $probeHeader) "port" $probeValues.port -}}
-            {{- else if kindIs "string" $probeValues.port -}}
-              {{- $_ := set (index $probeDefinition $probeHeader) "port" (tpl ( $probeValues.port | toString ) $rootContext) -}}
+        {{- /* HTTP(S) probe configuration */ -}}
+        {{- if or ( eq $probeType "HTTPS" ) ( eq $probeType "HTTP" ) -}}
+          {{- $probeHeader = "httpGet" -}}
+          {{- $_ := set $probeDefinition $probeHeader (
+            dict
+              "path" $probeValues.path
+              "scheme" $probeType
+            )
+          -}}
+
+        {{- /* GPRC probe configuration */ -}}
+        {{- else if (eq $probeType "GRPC") -}}
+          {{- $probeHeader = "grpc" -}}
+          {{- $_ := set $probeDefinition $probeHeader dict -}}
+            {{- if $probeValues.service -}}
+              {{- $_ := set (index $probeDefinition $probeHeader) "service" $probeValues.service -}}
             {{- end -}}
-          {{- else if $primaryServiceDefaultPort.targetPort -}}
-            {{- $_ := set (index $probeDefinition $probeHeader) "port" $primaryServiceDefaultPort.targetPort -}}
-          {{- else -}}
-            {{- $_ := set (index $probeDefinition $probeHeader) "port" ($primaryServiceDefaultPort.port | toString | atoi ) -}}
+
+        {{- /* default to tcpSocket probe */ -}}
+        {{- else -}}
+          {{- $probeHeader = "tcpSocket" -}}
+          {{- $_ := set $probeDefinition $probeHeader dict -}}
+        {{- end -}}
+
+        {{- if $probeValues.port -}}
+          {{- if kindIs "float64" $probeValues.port -}}
+            {{- $_ := set (index $probeDefinition $probeHeader) "port" $probeValues.port -}}
+          {{- else if kindIs "string" $probeValues.port -}}
+            {{- $_ := set (index $probeDefinition $probeHeader) "port" (tpl ( $probeValues.port | toString ) $rootContext) -}}
           {{- end -}}
+        {{- else if $primaryServiceDefaultPort.targetPort -}}
+          {{- $_ := set (index $probeDefinition $probeHeader) "port" $primaryServiceDefaultPort.targetPort -}}
+        {{- else if $primaryServiceDefaultPort.port -}}
+          {{- $_ := set (index $probeDefinition $probeHeader) "port" ($primaryServiceDefaultPort.port | toString | atoi ) -}}
         {{- end -}}
       {{- end -}}
 

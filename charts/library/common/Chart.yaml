@@ -31,3 +31,6 @@ annotations:
     - kind: fixed
       description: |-
         Fixed advancedMounts validation to not fail when persistence item is disabled.
+    - kind: fixed
+      description: |-
+        Allow probes to be configured when no services are enabled.

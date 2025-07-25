@@ -48,16 +48,12 @@ tests:
   - it: custom primary port gets picked up by probes
     set:
       service.main.ports.test:
-        enabled: true
         primary: true
         port: 8080
     documentSelector:
       path: $[?(@.kind == "Deployment")].metadata.name
       value: release-name
     asserts:
-      - documentIndex: 0
-        isKind:
-          of: Deployment
       - equal:
           path: spec.template.spec.containers[0].livenessProbe
           value:
@@ -183,12 +179,31 @@ tests:
           path: spec.template.spec.containers[0].startupProbe.tcpSocket.port
           value: 8080
 
-  - it: no probes are defined when services are disabled
+  - it: probe can be defined when no services are enabled
     set:
-      service:
-        main:
-          enabled: false
-          controller: main
+      service.main.enabled: false
+      controllers.main.containers.main.probes:
+        liveness:
+          port: 8081
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe
+          value:
+            failureThreshold: 3
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            tcpSocket:
+              port: 8081
+            timeoutSeconds: 1
+
+  - it: no probes are defined when probes are disabled
+    set:
+      controllers.main.containers.main.probes.liveness.enabled: false
+      controllers.main.containers.main.probes.readiness.enabled: false
+      controllers.main.containers.main.probes.startup.enabled: false
     documentSelector:
       path: $[?(@.kind == "Deployment")].metadata.name
       value: release-name
@@ -212,11 +227,7 @@ tests:
       path: $[?(@.kind == "Deployment")].metadata.name
       value: release-name
     asserts:
-      - documentIndex: 0
-        isKind:
-          of: Deployment
-      - documentIndex: 0
-        equal:
+      - equal:
           path: spec.template.spec.containers[0].livenessProbe
           value:
             httpGet:
@@ -413,8 +424,7 @@ tests:
       path: $[?(@.kind == "Deployment")].metadata.name
       value: release-name
     asserts:
-      - documentIndex: 0
-        equal:
+      - equal:
           path: spec.template.spec.containers[0].livenessProbe
           value:
             failureThreshold: 3
