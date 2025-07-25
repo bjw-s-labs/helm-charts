@@ -28,3 +28,6 @@ annotations:
       links:
         - name: Kubernetes documentation
           url: https://kubernetes.io/docs/concepts/storage/volumes/#image
+    - kind: fixed
+      description: |-
+        Fixed advancedMounts validation to not fail when persistence item is disabled.

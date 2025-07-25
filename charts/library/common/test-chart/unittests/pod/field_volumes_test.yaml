@@ -75,7 +75,6 @@ tests:
                   subPath: config.yaml
         no-mounts:
           existingClaim: test
-
     asserts:
       - documentSelector:
           path: $[?(@.kind == "Deployment")].metadata.name

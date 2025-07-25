@@ -22,3 +22,20 @@ tests:
     asserts:
       - failedTemplate:
           errorMessage: "No enabled controller found with this identifier. (persistence item: 'data', controller: 'test')"
+
+  - it: advancedMounts for disabled persistence should not fail
+    set:
+      persistence:
+        data:
+          enabled: false
+          type: configMap
+          name: myConfigMap
+          advancedMounts:
+            test:
+              main:
+                - path: /data/config.yaml
+                  readOnly: false
+                  mountPropagation: HostToContainer
+                  subPath: config.yaml
+    asserts:
+      - notFailedTemplate: {}
