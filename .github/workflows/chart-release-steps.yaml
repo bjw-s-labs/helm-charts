@@ -58,7 +58,7 @@ jobs:
           path: src
 
       - name: Install Mise and required tools
-        uses: jdx/mise-action@bfb9fa0b029db830a8c570757cee683df207a6c5 # v2.4.0
+        uses: jdx/mise-action@eb2f5cb41b0a8175dad2f797e3daca6fe7795a19 # v2.4.2
 
       - name: Login to OCI Registry
         if: ${{ inputs.publishToOciRegistry }}
@@ -73,7 +73,7 @@ jobs:
       # ----------------------------
       - name: Get chart details
         id: chart-details
-        uses: bjw-s-labs/helm-charts-actions/get-chart-details@d8850d9a52899703bbf1409574eecb404b0bc99b
+        uses: bjw-s-labs/helm-charts-actions/get-chart-details@a2085ba53ee544b88098353ce1477c97c98e4962
         with:
           path: src/charts/${{ inputs.chart }}
           validateChartYaml: true
@@ -124,7 +124,7 @@ jobs:
       # Package Helm chart
       # ----------------------------
       - name: Dereference JSON schema before packaging
-        uses: bjw-s-labs/helm-charts-actions/dereference-json-schema@d8850d9a52899703bbf1409574eecb404b0bc99b
+        uses: bjw-s-labs/helm-charts-actions/dereference-json-schema@a2085ba53ee544b88098353ce1477c97c98e4962
         with:
           schemaFile: "src/charts/${{ inputs.chart }}/values.schema.json"
           outputFile: "src/charts/${{ inputs.chart }}/values.schema.json"
