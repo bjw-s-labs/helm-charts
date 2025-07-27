@@ -28,6 +28,9 @@ annotations:
       links:
         - name: Kubernetes documentation
           url: https://kubernetes.io/docs/concepts/storage/volumes/#image
+    - kind: added
+      description: |-
+        Allow configuring a portRange instead of a single port in Services.
     - kind: fixed
       description: |-
         Fixed advancedMounts validation to not fail when persistence item is disabled.

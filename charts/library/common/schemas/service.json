@@ -1,7 +1,7 @@
 {
   "instance": {
     "allOf": [
-      {"$ref": "definitions.json#/resourceIdentifier"},
+      { "$ref": "definitions.json#/resourceIdentifier" },
       {
         "type": "object",
         "additionalProperties": false,
@@ -14,21 +14,21 @@
             "type": "boolean",
             "default": true
           },
-          "annotations": {"$ref": "definitions.json#/annotations"},
-          "labels": {"$ref": "definitions.json#/labels"},
+          "annotations": { "$ref": "definitions.json#/annotations" },
+          "labels": { "$ref": "definitions.json#/labels" },
           "type": {
             "description": "Service type. Supported values: ClusterIP, NodePort, LoadBalancer, ExternalName.",
             "type": "string",
             "enum": ["ClusterIP", "NodePort", "LoadBalancer", "ExternalName"]
           },
-          "clusterIP": {"type": "string"},
-          "externalName": {"type": "string"},
-          "loadBalancerIP": {"type": "string"},
+          "clusterIP": { "type": "string" },
+          "externalName": { "type": "string" },
+          "loadBalancerIP": { "type": "string" },
           "loadBalancerSourceRanges": {
             "type": "array",
-            "items": {"type": "string"}
+            "items": { "type": "string" }
           },
-          "loadBalancerClass": {"type": "string"},
+          "loadBalancerClass": { "type": "string" },
           "internalTrafficPolicy": {
             "description": "internalTrafficPolicy for the Service. Supported values: Cluster, Local.\nSee https://kubernetes.io/docs/concepts/services-networking/service-traffic-policy/",
             "type": "string",
@@ -39,11 +39,11 @@
             "type": "string",
             "enum": ["Cluster", "Local"]
           },
-          "allocateLoadBalancerNodePorts": {"type": "boolean"},
-          "sessionAffinity": {"type": "string", "enum": ["None", "ClientIP"]},
-          "sessionAffinityConfig": {"type": "object"},
-          "externalIPs": {"type": "array", "items": {"type": "string"}},
-          "publishNotReadyAddresses": {"type": "boolean"},
+          "allocateLoadBalancerNodePorts": { "type": "boolean" },
+          "sessionAffinity": { "type": "string", "enum": ["None", "ClientIP"] },
+          "sessionAffinityConfig": { "type": "object" },
+          "externalIPs": { "type": "array", "items": { "type": "string" } },
+          "publishNotReadyAddresses": { "type": "boolean" },
           "ipFamilyPolicy": {
             "description": "ipFamilyPolicy for the Service. Supported values: SingleStack, PreferDualStack, RequireDualStack.",
             "type": "string",
@@ -52,7 +52,7 @@
           "ipFamilies": {
             "description": "IP families for the Service. Supported values: IPv4, IPv6.",
             "type": "array",
-            "items": {"type": "string", "enum": ["IPv4", "IPv6"]}
+            "items": { "type": "string", "enum": ["IPv4", "IPv6"] }
           },
           "controller": {
             "description": "Controller this Service should target.",
@@ -69,7 +69,7 @@
           "ports": {
             "description": "Service port(s) configuration.",
             "type": "object",
-            "additionalProperties": {"$ref": "#/servicePort"}
+            "additionalProperties": { "$ref": "#/servicePort" }
           }
         },
         "required": []
@@ -95,6 +95,22 @@
         "description": "Port name / number.",
         "type": ["string", "integer"]
       },
+      "portRange": {
+        "description": "A range of ports to include in the Service.",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "start": {
+            "description": "Start of the port range.",
+            "type": "integer"
+          },
+          "end": {
+            "description": "End of the port range (inclusive).",
+            "type": "integer"
+          }
+        },
+        "required": ["start", "end"]
+      },
       "protocol": {
         "description": "Port protocol. Supported values: HTTP, HTTPS, TCP, UDP.\nHTTP and HTTPS spawn a TCP service and are used for internal URL and name generation.",
         "type": "string",
@@ -113,6 +129,6 @@
         "type": "string"
       }
     },
-    "required": ["port"]
+    "oneOf": [{ "required": ["port"] }, { "required": ["portRange"] }]
   }
 }

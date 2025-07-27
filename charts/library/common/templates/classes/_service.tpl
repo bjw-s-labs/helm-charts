@@ -93,17 +93,16 @@ spec:
   {{- end }}
   ports:
   {{- range $name, $port := $enabledPorts }}
+    {{- $portProtocol := "TCP" }}
+    {{- if $port.protocol }}
+      {{- if not (has $port.protocol (list "HTTP" "HTTPS" "TCP")) }}
+        {{- $portProtocol = $port.protocol }}
+      {{- end }}
+    {{- end }}
+    {{- if $port.port }}
     - port: {{ $port.port }}
       targetPort: {{ $port.targetPort | default $port.port }}
-        {{- if $port.protocol }}
-          {{- if or ( eq $port.protocol "HTTP" ) ( eq $port.protocol "HTTPS" ) ( eq $port.protocol "TCP" ) }}
-      protocol: TCP
-          {{- else }}
-      protocol: {{ $port.protocol }}
-          {{- end }}
-        {{- else }}
-      protocol: TCP
-        {{- end }}
+      protocol: {{ $portProtocol }}
       name: {{ $name }}
         {{- if (not (empty $port.nodePort)) }}
       nodePort: {{ $port.nodePort }}
@@ -111,7 +110,18 @@ spec:
         {{- if (not (empty $port.appProtocol)) }}
       appProtocol: {{ $port.appProtocol }}
         {{ end }}
-      {{- end -}}
+    {{- else if $port.portRange }}
+      {{- range $portnum := untilStep ($port.portRange.start | int) ((add $port.portRange.end 1) | int) 1 }}
+    - port: {{ $portnum }}
+      name: {{ $name }}-{{ $portnum }}
+      targetPort: {{ $portnum }}
+      protocol: {{ $portProtocol }}
+        {{- if (not (empty $port.appProtocol)) }}
+      appProtocol: {{ $port.appProtocol }}
+        {{ end }}
+      {{- end }}
+    {{- end }}
+  {{- end -}}
   {{- with (merge
     ($serviceObject.extraSelectorLabels | default dict)
     (dict "app.kubernetes.io/controller" $serviceObject.controller)

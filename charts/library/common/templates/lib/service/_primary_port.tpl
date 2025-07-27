@@ -6,10 +6,17 @@ Return the primary port for a given Service object.
   {{- $serviceObject := .serviceObject -}}
   {{- $result := "" -}}
 
-  {{- /* Loop over all enabled ports */ -}}
+  {{- /* Loop over all enabled ports that explicitly define a port */ -}}
   {{- $enabledPorts := include "bjw-s.common.lib.service.enabledPorts" (dict "rootContext" $rootContext "serviceObject" $serviceObject) | fromYaml }}
+  {{- $filteredPorts := dict -}}
   {{- range $name, $port := $enabledPorts -}}
-    {{- /* Determine the port that has been marked as primary */ -}}
+    {{- if hasKey $port "port" -}}
+      {{- $_ := set $filteredPorts $name $port -}}
+    {{- end -}}
+  {{- end -}}
+
+  {{- /* Determine the port that has been marked as primary */ -}}
+  {{- range $name, $port := $filteredPorts -}}
     {{- if and (hasKey $port "primary") $port.primary -}}
       {{- $result = $port -}}
     {{- end -}}
@@ -17,9 +24,9 @@ Return the primary port for a given Service object.
 
   {{- /* Return the first port (alphabetically) if none has been explicitly marked as primary */ -}}
   {{- if not $result -}}
-    {{- $firstPortKey := keys $enabledPorts | sortAlpha | first -}}
+    {{- $firstPortKey := keys $filteredPorts | sortAlpha | first -}}
     {{- if $firstPortKey -}}
-      {{- $result = get $enabledPorts $firstPortKey -}}
+      {{- $result = get $filteredPorts $firstPortKey -}}
     {{- end -}}
   {{- end -}}
 

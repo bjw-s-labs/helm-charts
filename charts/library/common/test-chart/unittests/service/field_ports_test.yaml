@@ -51,3 +51,38 @@ tests:
             port: 8080
             protocol: TCP
             targetPort: 8080
+
+  - it: a portRange can be configured
+    set:
+      service:
+        main:
+          ports:
+            server:
+              portRange:
+                start: 8080
+                end: 8082
+    documentSelector:
+      path: $[?(@.kind == "Service")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.ports[1]
+          value:
+            name: server-8080
+            port: 8080
+            protocol: TCP
+            targetPort: 8080
+      - equal:
+          path: spec.ports[2]
+          value:
+            name: server-8081
+            port: 8081
+            protocol: TCP
+            targetPort: 8081
+      - equal:
+          path: spec.ports[3]
+          value:
+            name: server-8082
+            port: 8082
+            protocol: TCP
+            targetPort: 8082
