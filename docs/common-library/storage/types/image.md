@@ -5,6 +5,9 @@ hide:
 
 # Image
 
+!!! warning
+**IMPORTANT** This feature requires Kubernetes version >= 1.33 and a compatible container runtime!
+
 When you want to mount the contents of an OCI object (a container image or artifact)
 you will want to use the `image` persistence type.
 
