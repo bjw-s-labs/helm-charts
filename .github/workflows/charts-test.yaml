@@ -28,7 +28,8 @@ jobs:
           - "v1.30.11"
           - "v1.31.7"
           - "v1.32.3"
-          - "v1.33.0"
+          - "v1.33.3"
+          - "v1.34.0"
       fail-fast: false
     steps:
       - name: Checkout
@@ -88,6 +89,8 @@ jobs:
           if [ -d "test-chart" ]; then
             cd "test-chart"
           fi
+
+          pwd
 
           ct install --config "${GITHUB_WORKSPACE}/.ci/ct/ct.yaml" --charts .
 
