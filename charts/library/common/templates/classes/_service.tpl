@@ -91,6 +91,9 @@ spec:
   ipFamilies:
     {{ toYaml . | nindent 4 }}
   {{- end }}
+  {{- if and (ge ($rootContext.Capabilities.KubeVersion.Minor | int) 33) ($serviceObject.trafficDistribution) }}
+  trafficDistribution: {{ $serviceObject.trafficDistribution }}
+  {{- end }}
   ports:
   {{- range $name, $port := $enabledPorts }}
     {{- $portProtocol := "TCP" }}

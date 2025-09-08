@@ -1,0 +1,39 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: service - fields - trafficDistribution
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+  - ../_values/service_main_default.yaml
+tests:
+  - it: trafficDistribution can be configured in Kubernetes >= v1.33
+    capabilities:
+      majorVersion: 1
+      minorVersion: 33
+    set:
+      service:
+        main:
+          trafficDistribution: PreferClose
+    documentSelector:
+      path: $[?(@.kind == "Service")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.trafficDistribution
+          value: PreferClose
+
+  - it: trafficDistribution can not be configured in Kubernetes < v1.33
+    capabilities:
+      majorVersion: 1
+      minorVersion: 32
+    set:
+      service:
+        main:
+          trafficDistribution: PreferClose
+    documentSelector:
+      path: $[?(@.kind == "Service")].metadata.name
+      value: release-name
+    asserts:
+      - notExists:
+          path: spec.trafficDistribution

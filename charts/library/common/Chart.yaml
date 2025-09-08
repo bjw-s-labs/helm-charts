@@ -3,7 +3,7 @@ apiVersion: v2
 name: common
 description: Function library for Helm charts
 type: library
-version: 4.2.0
+version: 4.3.0
 kubeVersion: ">=1.28.0-0"
 keywords:
   - common
@@ -18,22 +18,4 @@ annotations:
   artifacthub.io/changes: |-
     - kind: added
       description: |-
-        Allow Helm templating for existingClaim field in persistence items.
-    - kind: added
-      description: |-
-        Allow Helm templating for subPath and Path fields in persistence items.
-    - kind: added
-      description: |-
-        Allow mounting of container images as persistence items in Kubernetes >= 1.33.
-      links:
-        - name: Kubernetes documentation
-          url: https://kubernetes.io/docs/concepts/storage/volumes/#image
-    - kind: added
-      description: |-
-        Allow configuring a portRange instead of a single port in Services.
-    - kind: fixed
-      description: |-
-        Fixed advancedMounts validation to not fail when persistence item is disabled.
-    - kind: fixed
-      description: |-
-        Allow probes to be configured when no services are enabled.
+        Allow configuring Service trafficDistribution in Kubernetes >=v1.33.

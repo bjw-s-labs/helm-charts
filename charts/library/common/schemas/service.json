@@ -54,6 +54,11 @@
             "type": "array",
             "items": { "type": "string", "enum": ["IPv4", "IPv6"] }
           },
+          "trafficDistribution": {
+            "description": "trafficDistribution for the Service. Supported values: PreferClose, PreferSameZone, PreferSameNode.",
+            "type": "string",
+            "enum": ["PreferClose", "PreferSameZone", "PreferSameNode"]
+          },
           "controller": {
             "description": "Controller this Service should target.",
             "type": "string"
