@@ -19,3 +19,6 @@ annotations:
     - kind: added
       description: |-
         Allow configuring Service trafficDistribution in Kubernetes >=v1.33.
+    - kind: added
+      description: |-
+        Allow `headers`, `queryParams`, and `method` matchers in HTTPRoutes.
