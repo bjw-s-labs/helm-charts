@@ -93,6 +93,38 @@
                           "type": {"type": "string"},
                           "value": {"type": "string"}
                         }
+                      },
+                      "headers": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "type": {"type": "string"},
+                          "name": {"type": "string"},
+                          "value": {"type": "string"}
+                        }
+                      },
+                      "queryParams": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "type": {"type": "string"},
+                          "name": {"type": "string"},
+                          "value": {"type": "string"}
+                        }
+                      },
+                      "method": {
+                        "type": "string",
+                        "enum": [
+                          "GET",
+                          "HEAD",
+                          "POST",
+                          "PUT",
+                          "DELETE",
+                          "CONNECT",
+                          "OPTIONS",
+                          "TRACE",
+                          "PATCH"
+                        ]
                       }
                     }
                   }
