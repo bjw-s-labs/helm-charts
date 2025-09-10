@@ -1,7 +1,7 @@
 {
   "instance": {
     "allOf": [
-      {"$ref": "definitions.json#/resourceIdentifier"},
+      { "$ref": "definitions.json#/resourceIdentifier" },
       {
         "type": "object",
         "additionalProperties": false,
@@ -14,12 +14,12 @@
             "type": "boolean",
             "default": true
           },
-          "annotations": {"$ref": "definitions.json#/annotations"},
-          "labels": {"$ref": "definitions.json#/labels"},
+          "annotations": { "$ref": "definitions.json#/annotations" },
+          "labels": { "$ref": "definitions.json#/labels" },
           "hostnames": {
             "description": "Host addresses for the Route. Helm templates are supported.",
             "type": "array",
-            "items": {"type": "string"}
+            "items": { "type": "string" }
           },
           "kind": {
             "description": "Route kind. Supported values: GRPCRoute, HTTPRoute, TCPRoute, TLSRoute, UDPRoute.",
@@ -39,12 +39,12 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "group": {"type": "string"},
-                "kind": {"type": "string"},
-                "namespace": {"type": "string"},
-                "name": {"type": "string"},
-                "sectionName": {"type": "string"},
-                "port": {"type": "integer"}
+                "group": { "type": "string" },
+                "kind": { "type": "string" },
+                "namespace": { "type": "string" },
+                "name": { "type": "string" },
+                "sectionName": { "type": "string" },
+                "port": { "type": "integer" }
               },
               "required": ["name"]
             }
@@ -63,9 +63,9 @@
                     "type": "object",
                     "additionalProperties": false,
                     "properties": {
-                      "group": {"type": "string"},
-                      "kind": {"type": "string"},
-                      "namespace": {"type": "string"},
+                      "group": { "type": "string" },
+                      "kind": { "type": "string" },
+                      "namespace": { "type": "string" },
                       "name": {
                         "description": "Reference to a backend Service name.",
                         "type": "string"
@@ -74,65 +74,38 @@
                         "description": "Reference to a service identifier defined within the chart values.",
                         "type": "string"
                       },
-                      "port": {"type": ["string", "integer"]},
-                      "weight": {"type": "integer"}
+                      "port": { "type": ["string", "integer"] },
+                      "weight": { "type": "integer" }
                     }
                   }
                 },
                 "matches": {
-                  "description": "Match rules.",
+                  "description": "Matches define conditions used for matching the rule against incoming requests. Each match is independent, i.e. this rule will be matched\nif **any** one of the matches is satisfied.",
                   "type": "array",
                   "items": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "properties": {
-                      "path": {
-                        "type": "object",
-                        "additionalProperties": false,
-                        "properties": {
-                          "type": {"type": "string"},
-                          "value": {"type": "string"}
-                        }
+                    "anyOf": [
+                      {
+                        "$ref": "gw-api.json#/grpcRoute.v1.grpcRouteMatch"
                       },
-                      "headers": {
-                        "type": "object",
-                        "additionalProperties": false,
-                        "properties": {
-                          "type": {"type": "string"},
-                          "name": {"type": "string"},
-                          "value": {"type": "string"}
-                        }
-                      },
-                      "queryParams": {
-                        "type": "object",
-                        "additionalProperties": false,
-                        "properties": {
-                          "type": {"type": "string"},
-                          "name": {"type": "string"},
-                          "value": {"type": "string"}
-                        }
-                      },
-                      "method": {
-                        "type": "string",
-                        "enum": [
-                          "GET",
-                          "HEAD",
-                          "POST",
-                          "PUT",
-                          "DELETE",
-                          "CONNECT",
-                          "OPTIONS",
-                          "TRACE",
-                          "PATCH"
-                        ]
+                      {
+                        "$ref": "gw-api.json#/httpRoute.v1.httpRouteMatch"
                       }
-                    }
+                    ]
                   }
                 },
                 "filters": {
-                  "description": "Filters for the route.",
+                  "description": "Filters define processing steps that must be completed during the\nrequest or response lifecycle.",
                   "type": "array",
-                  "items": {}
+                  "items": {
+                    "anyOf": [
+                      {
+                        "$ref": "gw-api.json#/grpcRoute.v1.grpcRouteFilter"
+                      },
+                      {
+                        "$ref": "gw-api.json#/httpRoute.v1.httpRouteFilter"
+                      }
+                    ]
+                  }
                 },
                 "sessionPersistence": {
                   "description": "SessionPersistence defines the desired state of SessionPersistence.",

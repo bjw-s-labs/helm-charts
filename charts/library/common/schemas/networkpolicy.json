@@ -1,7 +1,7 @@
 {
   "instance": {
     "allOf": [
-      {"$ref": "definitions.json#/resourceIdentifier"},
+      { "$ref": "definitions.json#/resourceIdentifier" },
       {
         "type": "object",
         "additionalProperties": false,
@@ -15,19 +15,19 @@
             "type": "boolean",
             "default": true
           },
-          "annotations": {"$ref": "definitions.json#/annotations"},
+          "annotations": { "$ref": "definitions.json#/annotations" },
           "controller": {
             "description": "Controller this NetworkPolicy should target.",
             "type": "string"
           },
-          "labels": {"$ref": "definitions.json#/labels"},
+          "labels": { "$ref": "definitions.json#/labels" },
           "podSelector": {
             "description": "Custom podSelector for the NetworkPolicy. Takes precedence over targeting a controller."
           },
           "policyTypes": {
             "description": "Policy types for the NetworkPolicy.",
             "type": "array",
-            "items": {"type": "string"}
+            "items": { "type": "string" }
           },
           "rules": {
             "description": "Ingress and egress rules for the NetworkPolicy.",

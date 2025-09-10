@@ -1,7 +1,7 @@
 {
   "instance": {
     "allOf": [
-      {"$ref": "definitions.json#/resourceIdentifier"},
+      { "$ref": "definitions.json#/resourceIdentifier" },
       {
         "type": "object",
         "additionalProperties": false,
@@ -14,8 +14,8 @@
             "type": "boolean",
             "default": true
           },
-          "annotations": {"$ref": "definitions.json#/annotations"},
-          "labels": {"$ref": "definitions.json#/labels"},
+          "annotations": { "$ref": "definitions.json#/annotations" },
+          "labels": { "$ref": "definitions.json#/labels" },
           "className": {
             "description": "Set the ingressClass used for this Ingress.",
             "type": "string"
@@ -27,12 +27,12 @@
           "hosts": {
             "description": "Configure the hosts for the Ingress.",
             "type": "array",
-            "items": {"$ref": "#/hostEntry"}
+            "items": { "$ref": "#/hostEntry" }
           },
           "tls": {
             "description": "Configure TLS for the Ingress.",
             "type": "array",
-            "items": {"$ref": "#/tlsEntry"}
+            "items": { "$ref": "#/tlsEntry" }
           }
         }
       }
@@ -53,12 +53,12 @@
         "items": {
           "additionalProperties": false,
           "properties": {
-            "path": {"type": "string"},
-            "pathType": {"type": "string", "default": "Prefix"},
+            "path": { "type": "string" },
+            "pathType": { "type": "string", "default": "Prefix" },
             "service": {
               "oneOf": [
-                {"$ref": "#/serviceReferenceByName"},
-                {"$ref": "#/serviceReferenceByIdentifier"}
+                { "$ref": "#/serviceReferenceByName" },
+                { "$ref": "#/serviceReferenceByIdentifier" }
               ]
             }
           },
@@ -75,7 +75,7 @@
       "hosts": {
         "description": "Set the hosts for the TLS entry. Helm templates are supported.",
         "type": "array",
-        "items": {"type": ["string"]}
+        "items": { "type": ["string"] }
       },
       "secretName": {
         "description": "Set the secretName for the TLS entry. Helm templates are supported.",
@@ -89,8 +89,8 @@
     "type": "object",
     "additionalProperties": false,
     "properties": {
-      "name": {"type": "string"},
-      "port": {"type": ["integer"]}
+      "name": { "type": "string" },
+      "port": { "type": ["integer"] }
     },
     "required": ["name", "port"]
   },
@@ -99,8 +99,8 @@
     "type": "object",
     "additionalProperties": false,
     "properties": {
-      "identifier": {"type": "string"},
-      "port": {"type": ["string", "integer"]}
+      "identifier": { "type": "string" },
+      "port": { "type": ["string", "integer"] }
     }
   }
 }

@@ -1,7 +1,7 @@
 {
   "instance": {
     "allOf": [
-      {"$ref": "definitions.json#/resourceIdentifier"},
+      { "$ref": "definitions.json#/resourceIdentifier" },
       {
         "type": "object",
         "additionalProperties": false,
@@ -14,12 +14,12 @@
             "type": "boolean",
             "default": true
           },
-          "annotations": {"$ref": "definitions.json#/annotations"},
-          "labels": {"$ref": "definitions.json#/labels"},
+          "annotations": { "$ref": "definitions.json#/annotations" },
+          "labels": { "$ref": "definitions.json#/labels" },
           "endpoints": {
             "description": "Endpoints allowed as part of this ServiceMonitor.",
             "type": "array",
-            "items": {"type": "object"}
+            "items": { "type": "object" }
           },
           "selector": {
             "description": "Selector to select Endpoints objects.",
@@ -29,7 +29,7 @@
               "matchLabels": {
                 "description": "matchLabels is a map of {key,value} pairs. The requirements are ANDed.",
                 "type": "object",
-                "additionalProperties": {"type": "string"}
+                "additionalProperties": { "type": "string" }
               },
               "matchExpressions": {
                 "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
@@ -38,11 +38,11 @@
                   "type": "object",
                   "additionalProperties": false,
                   "properties": {
-                    "key": {"type": "string"},
-                    "operator": {"type": "string"},
+                    "key": { "type": "string" },
+                    "operator": { "type": "string" },
                     "values": {
                       "type": "array",
-                      "items": {"type": "string"}
+                      "items": { "type": "string" }
                     }
                   }
                 }
@@ -57,7 +57,7 @@
                 "type": "object",
                 "additionalProperties": false,
                 "properties": {
-                  "name": {"type": "string"}
+                  "name": { "type": "string" }
                 },
                 "required": ["name"]
               },
@@ -66,7 +66,7 @@
                 "type": "object",
                 "additionalProperties": false,
                 "properties": {
-                  "identifier": {"type": "string"}
+                  "identifier": { "type": "string" }
                 },
                 "required": ["identifier"]
               }
@@ -83,9 +83,9 @@
           }
         },
         "dependencies": {
-          "selector": {"not": {"required": ["serviceName", "service"]}},
-          "serviceName": {"not": {"required": ["selector", "service"]}},
-          "service": {"not": {"required": ["selector", "serviceName"]}}
+          "selector": { "not": { "required": ["serviceName", "service"] } },
+          "serviceName": { "not": { "required": ["selector", "service"] } },
+          "service": { "not": { "required": ["selector", "serviceName"] } }
         }
       }
     ]

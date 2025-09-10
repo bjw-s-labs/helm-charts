@@ -1,7 +1,7 @@
 {
   "role": {
     "allOf": [
-      {"$ref": "definitions.json#/resourceIdentifier"},
+      { "$ref": "definitions.json#/resourceIdentifier" },
       {
         "type": "object",
         "additionalProperties": false,
@@ -38,7 +38,7 @@
 
   "roleBinding": {
     "allOf": [
-      {"$ref": "definitions.json#/resourceIdentifier"},
+      { "$ref": "definitions.json#/resourceIdentifier" },
       {
         "type": "object",
         "additionalProperties": false,
@@ -82,8 +82,8 @@
               }
             },
             "oneOf": [
-              {"required": ["identifier"]},
-              {"required": ["name", "kind"]}
+              { "required": ["identifier"] },
+              { "required": ["name", "kind"] }
             ]
           },
           "subjects": {
@@ -110,8 +110,8 @@
                 }
               },
               "oneOf": [
-                {"required": ["identifier"]},
-                {"required": ["name", "kind"]}
+                { "required": ["identifier"] },
+                { "required": ["name", "kind"] }
               ]
             }
           }

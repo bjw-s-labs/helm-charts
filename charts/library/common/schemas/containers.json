@@ -20,8 +20,8 @@
       "dependsOn": {
         "description": "Specify container dependencies to determine render order.",
         "oneOf": [
-          {"type": "array", "items": {"type": "string"}},
-          {"type": "string"}
+          { "type": "array", "items": { "type": "string" } },
+          { "type": "string" }
         ]
       },
       "env": {
@@ -47,7 +47,7 @@
       "ports": {
         "description": "Ports to expose from the container.",
         "type": "array",
-        "items": {"$ref": "k8s-api.json#/core.v1.ContainerPort"}
+        "items": { "$ref": "k8s-api.json#/core.v1.ContainerPort" }
       },
       "probes": {
         "description": "Probe settings for the container.",
@@ -110,9 +110,9 @@
     "oneOf": [
       {
         "type": "array",
-        "items": {"type": "string"}
+        "items": { "type": "string" }
       },
-      {"type": "string"}
+      { "type": "string" }
     ]
   },
 
@@ -120,9 +120,9 @@
     "oneOf": [
       {
         "type": "array",
-        "items": {"type": "string"}
+        "items": { "type": "string" }
       },
-      {"type": "string"}
+      { "type": "string" }
     ]
   },
 
@@ -132,8 +132,8 @@
         "type": "array",
         "items": {
           "anyOf": [
-            {"$ref": "envVars.json#/envVarListItem"},
-            {"$ref": "envVars.json#/valueFromListItem"}
+            { "$ref": "envVars.json#/envVarListItem" },
+            { "$ref": "envVars.json#/valueFromListItem" }
           ]
         }
       },
@@ -141,9 +141,9 @@
         "type": "object",
         "additionalProperties": {
           "anyOf": [
-            {"$ref": "envVars.json#/envVarValue"},
-            {"$ref": "envVars.json#/envVarItem"},
-            {"$ref": "envVars.json#/valueFromItem"}
+            { "$ref": "envVars.json#/envVarValue" },
+            { "$ref": "envVars.json#/envVarItem" },
+            { "$ref": "envVars.json#/valueFromItem" }
           ]
         }
       }
@@ -163,11 +163,11 @@
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "name": {"type": "string"},
-            "identifier": {"type": "string"},
-            "optional": {"type": "boolean"}
+            "name": { "type": "string" },
+            "identifier": { "type": "string" },
+            "optional": { "type": "boolean" }
           },
-          "oneOf": [{"required": ["name"]}, {"required": ["identifier"]}]
+          "oneOf": [{ "required": ["name"] }, { "required": ["identifier"] }]
         },
         "prefix": {
           "type": ["string", "null"]
@@ -179,11 +179,11 @@
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "name": {"type": "string"},
-            "identifier": {"type": "string"},
-            "optional": {"type": "boolean"}
+            "name": { "type": "string" },
+            "identifier": { "type": "string" },
+            "optional": { "type": "boolean" }
           },
-          "oneOf": [{"required": ["name"]}, {"required": ["identifier"]}]
+          "oneOf": [{ "required": ["name"] }, { "required": ["identifier"] }]
         }
       }
     }

@@ -1,7 +1,7 @@
 {
   "instance": {
     "allOf": [
-      {"$ref": "definitions.json#/resourceIdentifier"},
+      { "$ref": "definitions.json#/resourceIdentifier" },
       {
         "type": "object",
         "additionalProperties": false,
@@ -40,7 +40,7 @@
             }
           }
         },
-        "oneOf": [{"required": ["data"]}, {"required": ["binaryData"]}]
+        "oneOf": [{ "required": ["data"] }, { "required": ["binaryData"] }]
       }
     ]
   }
