@@ -94,6 +94,7 @@ nav:
       - How To...:
           - app-template/howto/index.md
           - Helm templates: app-template/howto/helm-templates.md
+          - Set up environment variables: app-template/howto/environment-variables.md
           - Multiple subPaths for 1 volume: app-template/howto/multiple-subpath.md
           - Multiple services with 1 or more controllers: app-template/howto/multiple-services.md
       - Examples:
