@@ -18,18 +18,14 @@ Returns the value for annotations
     -}}
   {{- end -}}
 
-  {{- /* Set to the default if it is set */ -}}
-  {{- $defaultOption := get (default dict $rootContext.Values.defaultPodOptions) "annotations" -}}
-  {{- if not (empty $defaultOption) -}}
-    {{- $annotations = merge $defaultOption $annotations -}}
-  {{- end -}}
-
-  {{- /* See if a pod-specific override is set */ -}}
-  {{- if hasKey $controllerObject "pod" -}}
-    {{- $podOption := get $controllerObject.pod "annotations" -}}
-    {{- if not (empty $podOption) -}}
-      {{- $annotations = merge $podOption $annotations -}}
-    {{- end -}}
+  {{- /* Fetch the configured annotations */ -}}
+  {{- $ctx := dict "rootContext" $rootContext "controllerObject" $controllerObject -}}
+  {{- $podAnnotations := (include "bjw-s.common.lib.pod.getOption" (dict "ctx" $ctx "option" "annotations")) | fromYaml -}}
+  {{- if not (empty $podAnnotations) -}}
+    {{- $annotations = merge
+      $podAnnotations
+      $annotations
+    -}}
   {{- end -}}
 
   {{- /* Add configMaps checksum */ -}}

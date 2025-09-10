@@ -25,7 +25,10 @@ Returns the value for the specified field
     {{- $value = $podSpecificOption -}}
   {{- else if kindIs "map" $podSpecificOption -}}
     {{- if eq "merge" $defaultPodOptionsStrategy -}}
-      {{- $value = merge $podSpecificOption $value -}}
+      {{- $value = merge
+        (deepCopy $podSpecificOption)
+        $value
+      -}}
     {{- else if eq "overwrite" $defaultPodOptionsStrategy -}}
       {{- $value = $podSpecificOption -}}
     {{- end -}}

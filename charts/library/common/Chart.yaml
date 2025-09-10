@@ -16,6 +16,9 @@ sources:
   - https://github.com/bjw-s-labs/helm-charts
 annotations:
   artifacthub.io/changes: |-
+    - kind: fixed
+      description: |-
+        defaultPodOptions no longer get accidentally overwritten when there are multiple controllers.
     - kind: added
       description: |-
         Allow configuring Service trafficDistribution in Kubernetes >=v1.33.

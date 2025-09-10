@@ -72,3 +72,32 @@ tests:
           path: spec.template.metadata.labels
           content:
             globalLabel: test
+
+  - it: labels from multiple controllers should not interfere with each other
+    set:
+      defaultPodOptions.labels:
+        defaultPodOptionsLabel: test
+      controllers:
+        second:
+          containers:
+            main:
+              image:
+                repository: ghcr.io/mendhak/http-https-echo
+                tag: 31
+    asserts:
+      - documentSelector:
+          path: $[?(@.kind == "Deployment")].metadata.name
+          value: release-name-main
+        isSubset:
+          path: spec.template.metadata.labels
+          content:
+            app.kubernetes.io/controller: main
+            defaultPodOptionsLabel: test
+      - documentSelector:
+          path: $[?(@.kind == "Deployment")].metadata.name
+          value: release-name-second
+        isSubset:
+          path: spec.template.metadata.labels
+          content:
+            app.kubernetes.io/controller: second
+            defaultPodOptionsLabel: test
