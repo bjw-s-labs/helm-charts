@@ -38,9 +38,13 @@ tests:
     values:
       - ../_values/controllers_main_default_container.yaml
     set:
+      variables:
+        image:
+          repository: ghcr.io/mendhak/http-https-echo
+          tag: 1.0.0
       controllers.main.containers.main.image:
-        repository: ghcr.io/mendhak/http-https-echo
-        tag: "{{.Chart.Version}}"
+        repository: "{{ .Values.variables.image.repository }}"
+        tag: "{{ .Values.variables.image.tag }}"
     documentSelector:
       path: $[?(@.kind == "Deployment")].metadata.name
       value: release-name

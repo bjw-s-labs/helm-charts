@@ -44,9 +44,6 @@ Convert container values to an object
       {{- $imageTag = $imageTag | toString -}}
     {{- end -}}
 
-    {{- /* Process any templates in the tag */ -}}
-    {{- $imageTag = tpl $imageTag $rootContext -}}
-
     {{- $_ := set $objectValues.image "tag" $imageTag -}}
   {{- end -}}
 
