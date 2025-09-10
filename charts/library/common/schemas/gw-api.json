@@ -1,5 +1,5 @@
 {
-  "grpcroute.v1.grpcRouteMatch": {
+  "v1.grpcRouteMatch": {
     "description": "GRPCRouteMatch defines the predicate used to match requests to a given\naction. Multiple match types are ANDed together, i.e. the match will\nevaluate to true only if all conditions are satisfied.\n\nFor example, the match below will match a gRPC request only if its service\nis `foo` AND it contains the `version: v1` header:\n\n```\nmatches:\n  - method:\n    type: Exact\n    service: \"foo\"\n    headers:\n  - name: \"version\"\n    value \"v1\"\n\n```",
     "properties": {
       "headers": {
@@ -78,7 +78,7 @@
     "additionalProperties": false
   },
 
-  "grpcroute.v1.grpcRouteFilter": {
+  "v1.grpcRouteFilter": {
     "description": "GRPCRouteFilter defines processing steps that must be completed during the\nrequest or response lifecycle. GRPCRouteFilters are meant as an extension\npoint to express processing that may be done in Gateway implementations. Some\nexamples include request or response modification, implementing\nauthentication strategies, rate-limiting, and traffic shaping. API\nguarantee/conformance is defined based on the type of the filter.",
     "properties": {
       "extensionRef": {
@@ -397,7 +397,7 @@
     "additionalProperties": false
   },
 
-  "httpRoute.v1.httpRouteMatch": {
+  "v1.httpRouteMatch": {
     "description": "HTTPRouteMatch defines the predicate used to match requests to a given\naction. Multiple match types are ANDed together, i.e. the match will\nevaluate to true only if all conditions are satisfied.\n\nFor example, the match below will match a HTTP request only if its path\nstarts with `/foo` AND it contains the `version: v1` header:\n\n```\nmatch:\n\n\tpath:\n\t  value: \"/foo\"\n\theaders:\n\t- name: \"version\"\n\t  value \"v1\"\n\n```",
     "properties": {
       "headers": {
@@ -557,7 +557,7 @@
     "additionalProperties": false
   },
 
-  "httpRoute.v1.httpRouteFilter": {
+  "v1.httpRouteFilter": {
     "description": "HTTPRouteFilter defines processing steps that must be completed during the\nrequest or response lifecycle. HTTPRouteFilters are meant as an extension\npoint to express processing that may be done in Gateway implementations. Some\nexamples include request or response modification, implementing\nauthentication strategies, rate-limiting, and traffic shaping. API\nguarantee/conformance is defined based on the type of the filter.",
     "properties": {
       "extensionRef": {

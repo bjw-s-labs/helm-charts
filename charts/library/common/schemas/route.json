@@ -85,10 +85,10 @@
                   "items": {
                     "anyOf": [
                       {
-                        "$ref": "gw-api.json#/grpcRoute.v1.grpcRouteMatch"
+                        "$ref": "gw-api.json#/v1.grpcRouteMatch"
                       },
                       {
-                        "$ref": "gw-api.json#/httpRoute.v1.httpRouteMatch"
+                        "$ref": "gw-api.json#/v1.httpRouteMatch"
                       }
                     ]
                   }
@@ -99,10 +99,10 @@
                   "items": {
                     "anyOf": [
                       {
-                        "$ref": "gw-api.json#/grpcRoute.v1.grpcRouteFilter"
+                        "$ref": "gw-api.json#/v1.grpcRouteFilter"
                       },
                       {
-                        "$ref": "gw-api.json#/httpRoute.v1.httpRouteFilter"
+                        "$ref": "gw-api.json#/v1.httpRouteFilter"
                       }
                     ]
                   }
