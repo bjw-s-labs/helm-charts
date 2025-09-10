@@ -6,8 +6,8 @@ Image used by the container.
   {{- $rootContext := $ctx.rootContext -}}
   {{- $containerObject := $ctx.containerObject -}}
 
-  {{- $imageRepo := $containerObject.image.repository -}}
-  {{- $imageTag := $containerObject.image.tag -}}
+  {{- $imageRepo := tpl $containerObject.image.repository $rootContext -}}
+  {{- $imageTag := tpl $containerObject.image.tag $rootContext -}}
 
   {{- if and $imageRepo $imageTag -}}
     {{- printf "%s:%s" $imageRepo $imageTag -}}

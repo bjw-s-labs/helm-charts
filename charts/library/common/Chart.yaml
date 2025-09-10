@@ -25,3 +25,6 @@ annotations:
     - kind: added
       description: |-
         Allow `headers`, `queryParams`, and `method` matchers in HTTPRoutes.
+    - kind: added
+      description: |-
+        Allow templating in `image.repository` and `image.tag`.
