@@ -24,12 +24,12 @@ jobs:
         chart: ${{ fromJSON(inputs.charts) }}
         k8s_version:
           - "v1.28.15"
-          - "v1.29.13"
-          - "v1.30.11"
-          - "v1.31.7"
-          - "v1.32.3"
-          - "v1.33.3"
-          - "v1.34.0"
+          - "v1.29.14"
+          - "v1.30.14"
+          - "v1.31.12"
+          - "v1.32.8"
+          - "v1.33.4"
+          # - "v1.34.0" TODO: Implement when k3d supports it
       fail-fast: false
     steps:
       - name: Checkout
