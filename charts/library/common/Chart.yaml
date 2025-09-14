@@ -28,3 +28,6 @@ annotations:
     - kind: added
       description: |-
         Allow templating in `image.repository` and `image.tag`.
+    - kind: added
+      description: |-
+        Add support for `pod.resourceClaims` in Kubernetes >=v1.32.

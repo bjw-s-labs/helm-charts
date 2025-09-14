@@ -82,8 +82,15 @@
         "description": "Custom priority class for different treatment by the scheduler."
       },
       "resources": {
-        "$ref": "k8s-api.json#/core.v1.ResourceRequirements",
-        "description": "Set the resource requests / limits for the Pod. (Requires Kubernetes 1.32 or newer)"
+        "description": "Set the resource requests / limits for the Pod. (Requires Kubernetes 1.32 or newer)",
+        "$ref": "k8s-api.json#/core.v1.ResourceRequirements"
+      },
+      "resourceClaims": {
+        "description": "ResourceClaims defines which ResourceClaims must be allocated and reserved before the Pod is allowed to start. The resources will be made available to those containers which consume them by name. (Requires Kubernetes 1.32 or newer)",
+        "type": "array",
+        "items": {
+          "$ref": "k8s-api.json#/core.v1.PodResourceClaim"
+        }
       },
       "restartPolicy": {
         "type": "string",

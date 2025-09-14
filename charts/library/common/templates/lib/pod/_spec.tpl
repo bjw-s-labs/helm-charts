@@ -52,6 +52,9 @@ terminationGracePeriodSeconds: {{ . | trim }}
     {{- with (include "bjw-s.common.lib.pod.getOption" (dict "ctx" $ctx "option" "resources")) }}
 resources: {{ . | nindent 2 }}
     {{- end -}}
+    {{- with (include "bjw-s.common.lib.pod.getOption" (dict "ctx" $ctx "option" "resourceClaims")) }}
+resourceClaims: {{ . | nindent 2 }}
+    {{- end -}}
   {{- end -}}
   {{- with (include "bjw-s.common.lib.pod.getOption" (dict "ctx" $ctx "option" "restartPolicy")) }}
 restartPolicy: {{ . | trim }}

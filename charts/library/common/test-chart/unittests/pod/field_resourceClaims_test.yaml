@@ -1,0 +1,105 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: pod - fields - resourceClaims
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+capabilities:
+  majorVersion: 1
+  minorVersion: 32
+tests:
+  - it: should not be present by default for kubernetes < 1.32
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    capabilities:
+      majorVersion: 1
+      minorVersion: 31
+    asserts:
+      - notExists:
+          path: spec.resourceClaims
+
+  - it: should not be present even if specified for kubernetes < 1.32
+    capabilities:
+      majorVersion: 1
+      minorVersion: 31
+    set:
+      controllers:
+        main:
+          pod:
+            resourceClaims:
+              - name: test
+                resourceClaimTemplateName: test-claim-template
+    asserts:
+      - notExists:
+          path: spec.resourceClaims
+
+  - it: should not be present by default for kubernetes >= 1.32
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - notExists:
+          path: spec.resourceClaims
+
+  - it: defaultPodOption should pass
+    set:
+      defaultPodOptions:
+        resourceClaims:
+          - name: test
+            resourceClaimTemplateName: test-claim-template
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.resourceClaims
+          value:
+            - name: test
+              resourceClaimTemplateName: test-claim-template
+
+  - it: defaultPodOption with pod override should overwrite by default
+    set:
+      defaultPodOptions:
+        resourceClaims:
+          - name: test
+            resourceClaimTemplateName: test-claim-template
+      controllers:
+        main:
+          pod:
+            resourceClaims:
+              - name: test2
+                resourceClaimTemplateName: test2-claim-template
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.resourceClaims
+          value:
+            - name: test2
+              resourceClaimTemplateName: test2-claim-template
+
+  - it: defaultPodOption with pod override can not be merged
+    set:
+      defaultPodOptionsStrategy: merge
+      defaultPodOptions:
+        resourceClaims:
+          - name: test
+            resourceClaimTemplateName: test-claim-template
+      controllers:
+        main:
+          pod:
+            resourceClaims:
+              - name: test2
+                resourceClaimTemplateName: test2-claim-template
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.resourceClaims
+          value:
+            - name: test2
+              resourceClaimTemplateName: test2-claim-template
