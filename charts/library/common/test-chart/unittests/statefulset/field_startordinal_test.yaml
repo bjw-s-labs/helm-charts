@@ -1,0 +1,61 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: statefulset - fields - startOrdinal
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+capabilities:
+  majorVersion: 1
+  minorVersion: 31
+set:
+  controllers.main:
+    type: statefulset
+tests:
+  - it: default should pass
+    documentSelector:
+      path: $[?(@.kind == "StatefulSet")].metadata.name
+      value: release-name
+    asserts:
+      - notExists:
+          path: spec.ordinals.start
+
+  - it: should not be present by default for kubernetes < 1.31
+    documentSelector:
+      path: $[?(@.kind == "StatefulSet")].metadata.name
+      value: release-name
+    capabilities:
+      majorVersion: 1
+      minorVersion: 30
+    asserts:
+      - notExists:
+          path: spec.ordinals.start
+
+  - it: should not be present even if specified for kubernetes < 1.31
+    capabilities:
+      majorVersion: 1
+      minorVersion: 30
+    set:
+      controllers.main.statefulset.startOrdinal: 1
+    asserts:
+      - notExists:
+          path: spec.ordinals.start
+
+  - it: should not be present by default for kubernetes >= 1.31
+    documentSelector:
+      path: $[?(@.kind == "StatefulSet")].metadata.name
+      value: release-name
+    asserts:
+      - notExists:
+          path: spec.ordinals.start
+
+  - it: can be configured for kubernetes >= 1.31
+    documentSelector:
+      path: $[?(@.kind == "StatefulSet")].metadata.name
+      value: release-name
+    set:
+      controllers.main.statefulset.startOrdinal: 1
+    asserts:
+      - equal:
+          path: spec.ordinals.start
+          value: 1

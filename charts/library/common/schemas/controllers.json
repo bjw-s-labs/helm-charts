@@ -273,6 +273,11 @@
           }
         ]
       },
+      "startOrdinal": {
+        "type": "integer",
+        "minimum": 0,
+        "default": 0
+      },
       "volumeClaimTemplates": {
         "type": "array",
         "items": {

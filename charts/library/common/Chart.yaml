@@ -34,3 +34,6 @@ annotations:
     - kind: added
       description: |-
         Add support for using `fileKeyRef` in `valueFrom` in environment variables in Kubernetes >=v1.34.
+    - kind: added
+      description: |-
+        Add support for configuring StatefulSet start ordinal in Kubernetes >=v1.31.
