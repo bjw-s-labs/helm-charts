@@ -31,3 +31,6 @@ annotations:
     - kind: added
       description: |-
         Add support for `pod.resourceClaims` in Kubernetes >=v1.32.
+    - kind: added
+      description: |-
+        Add support for using `fileKeyRef` in `valueFrom` in environment variables in Kubernetes >=v1.34.

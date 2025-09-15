@@ -14,8 +14,8 @@
     "type": "object",
     "additionalProperties": false,
     "properties": {
-      "name": {"$ref": "#/envVarName"},
-      "value": {"$ref": "#/envVarValue"}
+      "name": { "$ref": "#/envVarName" },
+      "value": { "$ref": "#/envVarValue" }
     },
     "required": ["name", "value"]
   },
@@ -25,7 +25,7 @@
     "type": "object",
     "additionalProperties": false,
     "properties": {
-      "value": {"$ref": "#/envVarValue"},
+      "value": { "$ref": "#/envVarValue" },
       "dependsOn": {
         "$ref": "#/envVarDependsOn"
       }
@@ -36,8 +36,8 @@
   "valueFromListItem": {
     "description": "Define an environment variable using valueFrom syntax.",
     "oneOf": [
-      {"$ref": "#/valueFromListItemExplicit"},
-      {"$ref": "#/valueFromListItemImplicit"}
+      { "$ref": "#/valueFromListItemExplicit" },
+      { "$ref": "#/valueFromListItemImplicit" }
     ]
   },
 
@@ -46,8 +46,8 @@
     "type": "object",
     "additionalProperties": false,
     "properties": {
-      "name": {"$ref": "#/envVarName"},
-      "valueFrom": {"$ref": "#/valueFromOptions"}
+      "name": { "$ref": "#/envVarName" },
+      "valueFrom": { "$ref": "#/valueFromOptions" }
     },
     "required": ["name", "valueFrom"]
   },
@@ -57,40 +57,40 @@
     "type": "object",
     "additionalProperties": false,
     "properties": {
-      "name": {"$ref": "#/envVarName"},
-      "fieldRef": {"$ref": "#/fieldRefSelector"},
-      "resourceFieldRef": {"$ref": "#/resourceFieldRefSelector"},
-      "secretKeyRef": {"$ref": "#/objectKeySelector"},
-      "configMapKeyRef": {"$ref": "#/objectKeySelector"}
+      "name": { "$ref": "#/envVarName" },
+      "fieldRef": { "$ref": "#/fieldRefSelector" },
+      "resourceFieldRef": { "$ref": "#/resourceFieldRefSelector" },
+      "secretKeyRef": { "$ref": "#/objectKeySelector" },
+      "configMapKeyRef": { "$ref": "#/objectKeySelector" }
     },
     "required": ["name"],
     "dependencies": {
       "fieldRef": {
         "allOf": [
-          {"not": {"required": ["resourceFieldRef"]}},
-          {"not": {"required": ["secretKeyRef"]}},
-          {"not": {"required": ["configMapKeyRef"]}}
+          { "not": { "required": ["resourceFieldRef"] } },
+          { "not": { "required": ["secretKeyRef"] } },
+          { "not": { "required": ["configMapKeyRef"] } }
         ]
       },
       "resourceFieldRef": {
         "allOf": [
-          {"not": {"required": ["fieldRef"]}},
-          {"not": {"required": ["secretKeyRef"]}},
-          {"not": {"required": ["configMapKeyRef"]}}
+          { "not": { "required": ["fieldRef"] } },
+          { "not": { "required": ["secretKeyRef"] } },
+          { "not": { "required": ["configMapKeyRef"] } }
         ]
       },
       "secretKeyRef": {
         "allOf": [
-          {"not": {"required": ["fieldRef"]}},
-          {"not": {"required": ["resourceFieldRef"]}},
-          {"not": {"required": ["configMapKeyRef"]}}
+          { "not": { "required": ["fieldRef"] } },
+          { "not": { "required": ["resourceFieldRef"] } },
+          { "not": { "required": ["configMapKeyRef"] } }
         ]
       },
       "configMapKeyRef": {
         "allOf": [
-          {"not": {"required": ["fieldRef"]}},
-          {"not": {"required": ["resourceFieldRef"]}},
-          {"not": {"required": ["secretKeyRef"]}}
+          { "not": { "required": ["fieldRef"] } },
+          { "not": { "required": ["resourceFieldRef"] } },
+          { "not": { "required": ["secretKeyRef"] } }
         ]
       }
     }
@@ -98,8 +98,8 @@
 
   "valueFromItem": {
     "oneOf": [
-      {"$ref": "#/valueFromItemExplicit"},
-      {"$ref": "#/valueFromItemImplicit"}
+      { "$ref": "#/valueFromItemExplicit" },
+      { "$ref": "#/valueFromItemImplicit" }
     ],
     "description": "Define an environment variable using valueFrom syntax (map style)."
   },
@@ -109,8 +109,8 @@
     "type": "object",
     "additionalProperties": false,
     "properties": {
-      "valueFrom": {"$ref": "#/valueFromOptions"},
-      "dependsOn": {"$ref": "#/envVarDependsOn"}
+      "valueFrom": { "$ref": "#/valueFromOptions" },
+      "dependsOn": { "$ref": "#/envVarDependsOn" }
     },
     "required": ["valueFrom"]
   },
@@ -120,39 +120,39 @@
     "type": "object",
     "additionalProperties": false,
     "properties": {
-      "fieldRef": {"$ref": "#/fieldRefSelector"},
-      "resourceFieldRef": {"$ref": "#/resourceFieldRefSelector"},
-      "secretKeyRef": {"$ref": "#/objectKeySelector"},
-      "configMapKeyRef": {"$ref": "#/objectKeySelector"},
-      "dependsOn": {"$ref": "#/envVarDependsOn"}
+      "fieldRef": { "$ref": "#/fieldRefSelector" },
+      "resourceFieldRef": { "$ref": "#/resourceFieldRefSelector" },
+      "secretKeyRef": { "$ref": "#/objectKeySelector" },
+      "configMapKeyRef": { "$ref": "#/objectKeySelector" },
+      "dependsOn": { "$ref": "#/envVarDependsOn" }
     },
     "dependencies": {
       "fieldRef": {
         "allOf": [
-          {"not": {"required": ["resourceFieldRef"]}},
-          {"not": {"required": ["secretKeyRef"]}},
-          {"not": {"required": ["configMapKeyRef"]}}
+          { "not": { "required": ["resourceFieldRef"] } },
+          { "not": { "required": ["secretKeyRef"] } },
+          { "not": { "required": ["configMapKeyRef"] } }
         ]
       },
       "resourceFieldRef": {
         "allOf": [
-          {"not": {"required": ["fieldRef"]}},
-          {"not": {"required": ["secretKeyRef"]}},
-          {"not": {"required": ["configMapKeyRef"]}}
+          { "not": { "required": ["fieldRef"] } },
+          { "not": { "required": ["secretKeyRef"] } },
+          { "not": { "required": ["configMapKeyRef"] } }
         ]
       },
       "secretKeyRef": {
         "allOf": [
-          {"not": {"required": ["fieldRef"]}},
-          {"not": {"required": ["resourceFieldRef"]}},
-          {"not": {"required": ["configMapKeyRef"]}}
+          { "not": { "required": ["fieldRef"] } },
+          { "not": { "required": ["resourceFieldRef"] } },
+          { "not": { "required": ["configMapKeyRef"] } }
         ]
       },
       "configMapKeyRef": {
         "allOf": [
-          {"not": {"required": ["fieldRef"]}},
-          {"not": {"required": ["resourceFieldRef"]}},
-          {"not": {"required": ["secretKeyRef"]}}
+          { "not": { "required": ["fieldRef"] } },
+          { "not": { "required": ["resourceFieldRef"] } },
+          { "not": { "required": ["secretKeyRef"] } }
         ]
       }
     }
@@ -162,10 +162,11 @@
     "type": "object",
     "description": "Set the valueFrom options for the environment variable.",
     "oneOf": [
-      {"$ref": "#/fieldRef"},
-      {"$ref": "#/resourceFieldRef"},
-      {"$ref": "#/secretKeyRef"},
-      {"$ref": "#/configMapKeyRef"}
+      { "$ref": "#/fieldRef" },
+      { "$ref": "#/resourceFieldRef" },
+      { "$ref": "#/secretKeyRef" },
+      { "$ref": "#/configMapKeyRef" },
+      { "$ref": "#/fileKeyRef" }
     ]
   },
 
@@ -174,7 +175,7 @@
     "type": "object",
     "additionalProperties": false,
     "properties": {
-      "secretKeyRef": {"$ref": "#/objectKeySelector"}
+      "secretKeyRef": { "$ref": "#/objectKeySelector" }
     },
     "required": ["secretKeyRef"]
   },
@@ -184,9 +185,19 @@
     "type": "object",
     "additionalProperties": false,
     "properties": {
-      "configMapKeyRef": {"$ref": "#/objectKeySelector"}
+      "configMapKeyRef": { "$ref": "#/objectKeySelector" }
     },
     "required": ["configMapKeyRef"]
+  },
+
+  "fileKeyRef": {
+    "description": "Reference an key in an env file using fileKeyRef syntax. Requires the EnvFiles feature gate to be enabled.",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "fileKeyRef": { "$ref": "#/FileKeySelector" }
+    },
+    "required": ["fileKeyRef"]
   },
 
   "fieldRef": {
@@ -194,7 +205,7 @@
     "type": "object",
     "additionalProperties": false,
     "properties": {
-      "fieldRef": {"$ref": "#/fieldRefSelector"}
+      "fieldRef": { "$ref": "#/fieldRefSelector" }
     },
     "required": ["fieldRef"]
   },
@@ -221,7 +232,7 @@
     "type": "object",
     "additionalProperties": false,
     "properties": {
-      "resourceFieldRef": {"$ref": "#/resourceFieldRefSelector"}
+      "resourceFieldRef": { "$ref": "#/resourceFieldRefSelector" }
     },
     "required": ["resourceFieldRef"]
   },
@@ -237,7 +248,7 @@
       },
       "divisor": {
         "description": "Set the divisor for the resource field reference.",
-        "oneOf": [{"type": "string"}, {"type": "number"}]
+        "oneOf": [{ "type": "string" }, { "type": "number" }]
       },
       "resource": {
         "description": "Set the resource name for the resource field reference.",
@@ -250,10 +261,10 @@
   "envVarDependsOn": {
     "description": "Specify other environment variables that the environment variable depends on.",
     "oneOf": [
-      {"type": "string"},
+      { "type": "string" },
       {
         "type": "array",
-        "items": {"type": "string"}
+        "items": { "type": "string" }
       }
     ]
   },
@@ -273,5 +284,28 @@
       }
     },
     "required": ["name", "key"]
+  },
+
+  "FileKeySelector": {
+    "description": "FileKeySelector selects a key of the env file.",
+    "properties": {
+      "key": {
+        "description": "The key within the env file. An invalid key will prevent the pod from starting. The keys defined within a source may consist of any printable ASCII characters except '='. During Alpha stage of the EnvFiles feature gate, the key size is limited to 128 characters.",
+        "type": "string"
+      },
+      "optional": {
+        "description": "Specify whether the file or its key must be defined. If the file or key does not exist, then the env var is not published. If optional is set to true and the specified key does not exist, the environment variable will not be set in the Pod's containers.\n\nIf optional is set to false and the specified key does not exist, an error will be returned during Pod creation.",
+        "type": "boolean"
+      },
+      "path": {
+        "description": "The path within the volume from which to select the file. Must be relative and may not contain the '..' path or start with '..'.",
+        "type": "string"
+      },
+      "volumeName": {
+        "description": "The name of the volume mount containing the env file.",
+        "type": "string"
+      }
+    },
+    "required": ["volumeName", "path", "key"]
   }
 }
