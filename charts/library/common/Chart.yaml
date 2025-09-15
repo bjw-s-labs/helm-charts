@@ -24,7 +24,7 @@ annotations:
         Allow configuring Service trafficDistribution in Kubernetes >=v1.33.
     - kind: added
       description: |-
-        Allow `headers`, `queryParams`, and `method` matchers in HTTPRoutes.
+        Add better support for GRPCRoute and HTTPRoute matchers.
     - kind: added
       description: |-
         Allow templating in `image.repository` and `image.tag`.
