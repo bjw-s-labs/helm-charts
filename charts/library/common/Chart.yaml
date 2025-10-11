@@ -18,7 +18,10 @@ annotations:
   artifacthub.io/changes: |-
     - kind: added
       description: |-
-        Add support for schedulingGates in pod specification to control pod scheduling readiness.
+        Add support for schedulingGates in pod specification.
     - kind: added
       description: |-
-        Add support for explicit image digest. Enables use of `digestReflectionPolicy` in Flux CD
+        Add support for explicit image digest. Enables use of `digestReflectionPolicy` in Flux CD.
+    - kind: fixed
+      description: |-
+        Fixed envFrom optional field being ignored.

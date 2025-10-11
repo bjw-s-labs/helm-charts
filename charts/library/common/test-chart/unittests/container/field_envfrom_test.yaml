@@ -178,3 +178,29 @@ tests:
           value:
             secretRef:
               name: RELEASE-NAME-secret2
+
+  - it: explicit envFrom with optional field should pass
+    set:
+      controllers.main.containers.main.envFrom:
+        - secretRef:
+            name: myCustomSecret
+            optional: true
+        - configMapRef:
+            name: myCustomConfig
+            optional: true
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].envFrom[0]
+          value:
+            secretRef:
+              name: myCustomSecret
+              optional: true
+      - equal:
+          path: spec.template.spec.containers[0].envFrom[1]
+          value:
+            configMapRef:
+              name: myCustomConfig
+              optional: true

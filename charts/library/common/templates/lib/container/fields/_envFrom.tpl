@@ -27,7 +27,9 @@ envFrom field used by the container.
         {{- else -}}
           {{- $_ := set $item "configMapRef" (dict "name" (tpl .configMapRef.name $rootContext)) -}}
         {{- end -}}
-
+        {{- if not (empty (dig "optional" nil .configMapRef)) -}}
+          {{- $_ := set $item.configMapRef "optional" .configMapRef.optional -}}
+        {{- end -}}
       {{- else if hasKey . "secret" -}}
         {{- $secret := include "bjw-s.common.lib.secret.getByIdentifier" (dict "rootContext" $rootContext "id" .secret) | fromYaml -}}
         {{- $secretName := default (tpl .secret $rootContext) $secret.name -}}
@@ -42,6 +44,9 @@ envFrom field used by the container.
           {{- $_ := set $item "secretRef" (dict "name" $secret.name) -}}
         {{- else -}}
           {{- $_ := set $item "secretRef" (dict "name" (tpl .secretRef.name $rootContext)) -}}
+        {{- end -}}
+        {{- if not (empty (dig "optional" nil .secretRef)) -}}
+          {{- $_ := set $item.secretRef "optional" .secretRef.optional -}}
         {{- end -}}
       {{- end -}}
 
