@@ -47,14 +47,14 @@ jobs:
           fi
 
       - name: Install kubectl matching k8s version
-        uses: yokawasa/action-setup-kube-tools@ebd6f098e4d66281876e21f576a024a3b97ed968 # v0.13.0
+        uses: yokawasa/action-setup-kube-tools@3e3886c11bfa25fe33f8eb90f59542dd151da442 # v0.13.1
         with:
           setup-tools: |
             kubectl
           kubectl: "${{ matrix.k8s_version }}"
 
       - name: Install Mise and required tools
-        uses: jdx/mise-action@5ac50f778e26fac95da98d50503682459e86d566 # v3.2.0
+        uses: jdx/mise-action@e3d7b8d67a7958d1207f6ed871e83b1ea780e7b0 # v3.3.1
 
       - name: Create k3d cluster
         uses: nolar/setup-k3d-k3s@293b8e5822a20bc0d5bcdd4826f1a665e72aba96 # v1.0.9
@@ -66,7 +66,7 @@ jobs:
           kubectl taint --all=true nodes node.cloudprovider.kubernetes.io/uninitialized- || true
 
       - name: Dereference JSON schema
-        uses: bjw-s-labs/helm-charts-actions/dereference-json-schema@47baacdc79796f54fb6bef9aa4dc7ae2dc946582
+        uses: bjw-s-labs/helm-charts-actions/dereference-json-schema@121fdf4fe6487372648b8d6d48111cb882299956
         with:
           schemaFile: "charts/${{ matrix.chart }}/values.schema.json"
           outputFile: "charts/${{ matrix.chart }}/values.schema.json"
@@ -131,10 +131,10 @@ jobs:
           fi
 
       - name: Install Mise and required tools
-        uses: jdx/mise-action@5ac50f778e26fac95da98d50503682459e86d566 # v3.2.0
+        uses: jdx/mise-action@e3d7b8d67a7958d1207f6ed871e83b1ea780e7b0 # v3.3.1
 
       - name: Dereference JSON schema
-        uses: bjw-s-labs/helm-charts-actions/dereference-json-schema@47baacdc79796f54fb6bef9aa4dc7ae2dc946582
+        uses: bjw-s-labs/helm-charts-actions/dereference-json-schema@121fdf4fe6487372648b8d6d48111cb882299956
         with:
           schemaFile: "charts/${{ matrix.chart }}/values.schema.json"
           outputFile: "charts/${{ matrix.chart }}/values.schema.json"

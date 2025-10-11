@@ -19,24 +19,6 @@ annotations:
     - kind: added
       description: |-
         Add support for schedulingGates in pod specification to control pod scheduling readiness.
-    - kind: fixed
-      description: |-
-        defaultPodOptions no longer get accidentally overwritten when there are multiple controllers.
     - kind: added
       description: |-
-        Allow configuring Service trafficDistribution in Kubernetes >=v1.33.
-    - kind: added
-      description: |-
-        Add better support for GRPCRoute and HTTPRoute matchers.
-    - kind: added
-      description: |-
-        Allow templating in `image.repository` and `image.tag`.
-    - kind: added
-      description: |-
-        Add support for `pod.resourceClaims` in Kubernetes >=v1.32.
-    - kind: added
-      description: |-
-        Add support for using `fileKeyRef` in `valueFrom` in environment variables in Kubernetes >=v1.34.
-    - kind: added
-      description: |-
-        Add support for configuring StatefulSet start ordinal in Kubernetes >=v1.31.
+        Add support for explicit image digest. Enables use of `digestReflectionPolicy` in Flux CD

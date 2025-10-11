@@ -47,6 +47,20 @@ Convert container values to an object
     {{- $_ := set $objectValues.image "tag" $imageTag -}}
   {{- end -}}
 
+  {{- /* Process image digests */ -}}
+  {{- if kindIs "map" $objectValues.image -}}
+    {{- $imageDigest := dig "image" "digest" "" $objectValues -}}
+    {{- /* Convert float64 image digests to string */ -}}
+    {{- if kindIs "float64" $imageDigest -}}
+      {{- $imageDigest = $imageDigest | toString -}}
+    {{- end -}}
+
+    {{- /* Process any templates in the digest */ -}}
+    {{- $imageDigest = tpl $imageDigest $rootContext -}}
+
+    {{- $_ := set $objectValues.image "digest" $imageDigest -}}
+  {{- end -}}
+
   {{- /* Return the container object */ -}}
   {{- $objectValues | toYaml -}}
 {{- end -}}

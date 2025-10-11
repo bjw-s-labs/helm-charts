@@ -232,6 +232,8 @@ controllers: {}
 #         repository:
 #         # -- Override the image tag for the containers
 #         tag:
+#         # -- Override the image digest for the containers
+#         digest:
 #         # -- Override the image pull policy for the containers
 #         pullPolicy:
 #       # -- Override the command(s) for the containers
@@ -261,6 +263,8 @@ controllers: {}
 #           repository:
 #           # -- image tag
 #           tag:
+#           # -- image digest
+#           digest:
 #           # -- image pull policy
 #           pullPolicy:
 

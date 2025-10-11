@@ -58,11 +58,11 @@ jobs:
           path: src
 
       - name: Install Mise and required tools
-        uses: jdx/mise-action@5ac50f778e26fac95da98d50503682459e86d566 # v3.2.0
+        uses: jdx/mise-action@e3d7b8d67a7958d1207f6ed871e83b1ea780e7b0 # v3.3.1
 
       - name: Login to OCI Registry
         if: ${{ inputs.publishToOciRegistry }}
-        uses: docker/login-action@184bdaa0721073962dff0199f1fb9940f07167d1 # v3.5.0
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3.6.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -73,7 +73,7 @@ jobs:
       # ----------------------------
       - name: Get chart details
         id: chart-details
-        uses: bjw-s-labs/helm-charts-actions/get-chart-details@47baacdc79796f54fb6bef9aa4dc7ae2dc946582
+        uses: bjw-s-labs/helm-charts-actions/get-chart-details@121fdf4fe6487372648b8d6d48111cb882299956
         with:
           path: src/charts/${{ inputs.chart }}
           validateChartYaml: true
@@ -124,7 +124,7 @@ jobs:
       # Package Helm chart
       # ----------------------------
       - name: Dereference JSON schema before packaging
-        uses: bjw-s-labs/helm-charts-actions/dereference-json-schema@47baacdc79796f54fb6bef9aa4dc7ae2dc946582
+        uses: bjw-s-labs/helm-charts-actions/dereference-json-schema@121fdf4fe6487372648b8d6d48111cb882299956
         with:
           schemaFile: "src/charts/${{ inputs.chart }}/values.schema.json"
           outputFile: "src/charts/${{ inputs.chart }}/values.schema.json"
