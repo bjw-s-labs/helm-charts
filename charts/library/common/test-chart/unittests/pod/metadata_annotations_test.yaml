@@ -103,10 +103,17 @@ tests:
           data:
             test: value 1
         test_default_enabled:
+          includeChecksumInControllers:
+            - main
           data:
             test: value 1
         test_not_in_checksum:
           includeInChecksum: false
+          data:
+            test: value 1
+        test_not_in_controllers:
+          includeChecksumInControllers:
+            - other-controller
           data:
             test: value 1
         test_disabled:
@@ -132,18 +139,25 @@ tests:
           value:
             checksum/configMaps: e83a24569d0b4f2ccc44aec36d4e9a1c44a29bcc92eefdffe14fb1ce81dff054
 
-  - it: secret checksum should be included in pod annotations
+  - it: secret checksum should be included in pod annotations by default
     set:
       secrets:
         secret_1:
           stringData:
             test: value 1
         secret_2: # default enabled
+          includeChecksumInControllers:
+            - main
           stringData:
             test_1: value 1
             test_2: value 2
         test_not_in_checksum:
           includeInChecksum: false
+          stringData:
+            test: value 1
+        test_not_in_controllers:
+          includeChecksumInControllers:
+            - other-controller
           stringData:
             test: value 1
         test_disabled:

@@ -25,6 +25,9 @@ annotations:
     - kind: added
       description: |-
         Allow image specification object in persistence.image field.
+    - kind: added
+      description: |-
+        Allow limiting configMap and Secret checksum annotations to specific controllers.
     - kind: fixed
       description: |-
         Fixed envFrom optional field being ignored.

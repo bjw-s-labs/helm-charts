@@ -19,6 +19,10 @@
             "type": "boolean",
             "default": true
           },
+          "includeChecksumInControllers": {
+            "description": "Specify a list of controller identifiers for which to include this ConfigMap in the checksum calculation for rolling updates.",
+            "type": "array"
+          },
           "annotations": {
             "$ref": "definitions.json#/annotations"
           },
