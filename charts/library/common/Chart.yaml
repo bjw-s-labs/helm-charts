@@ -28,6 +28,9 @@ annotations:
     - kind: added
       description: |-
         Allow limiting configMap and Secret checksum annotations to specific controllers.
+    - kind: added
+      description: |-
+        Allow specifying isEnvFile for files loaded via configMapsFromFolder.
     - kind: fixed
       description: |-
         Fixed envFrom optional field being ignored.

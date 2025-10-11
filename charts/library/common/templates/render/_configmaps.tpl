@@ -57,13 +57,23 @@ Renders configMap objects required by the chart from a folder in the repo's path
         {{- $fileContent := $.Files.Get $file_name -}}
         {{- if not $fileOverride.exclude -}}
           {{- if $fileOverride.binary -}}
-              {{- $fileContent = $fileContent | b64enc -}}
-              {{- $configMapBinaryData = merge $configMapBinaryData (dict $file $fileContent) -}}
+            {{- $fileContent = $fileContent | b64enc -}}
+            {{- $configMapBinaryData = merge $configMapBinaryData (dict $file $fileContent) -}}
           {{- else if $fileOverride.escaped -}}
-              {{- $fileContent = $fileContent | replace "{{" "{{ `{{` }}" -}}
-              {{- $configMapData = merge $configMapData (dict $file $fileContent) -}}
+            {{- $fileContent = $fileContent | replace "{{" "{{ `{{` }}" -}}
+            {{- $configMapData = merge $configMapData (dict $file $fileContent) -}}
+          {{- else if $fileOverride.isEnvFile -}}
+            {{- range $line := splitList "\n" $fileContent -}}
+                {{- $line = trim $line -}}
+                {{- if and (ne $line "") (not (hasPrefix $line "#")) -}}
+                    {{- $keyValue := splitList "=" $line -}}
+                    {{- $key := index $keyValue 0 | trim -}}
+                    {{- $value := index $keyValue 1 | replace "\"" "" | replace "'" "" | trim -}}
+                    {{- $configMapData = merge $configMapData (dict $key $value) -}}
+                {{- end -}}
+            {{- end -}}
           {{- else -}}
-              {{- $configMapData = merge $configMapData (dict $file $fileContent) -}}
+            {{- $configMapData = merge $configMapData (dict $file $fileContent) -}}
           {{- end -}}
         {{- end -}}
       {{- end -}}

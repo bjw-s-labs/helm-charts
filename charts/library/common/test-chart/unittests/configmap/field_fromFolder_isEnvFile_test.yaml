@@ -1,0 +1,55 @@
+---
+
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: configmap - fields - configMapsFromFolder - isEnvFile
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+set:
+  configMapsFromFolder:
+    enabled: true
+    basePath: ci/configMapsFolder/test_3
+tests:
+  - it: isEnvFile unset
+    asserts:
+      - documentSelector:
+          path: $[?(@.kind == "ConfigMap")].metadata.name
+          value: release-name
+        isNotEmpty:
+          path: data.envfile
+
+  - it: isEnvFile disabled
+    set:
+      configMapsFromFolder:
+        configMapsOverrides:
+          files:
+            fileAttributeOverrides:
+              envfile:
+                isEnvFile: false
+    asserts:
+      - documentSelector:
+          path: $[?(@.kind == "ConfigMap")].metadata.name
+          value: release-name
+        isNotEmpty:
+          path: data.envfile
+
+  - it: isEnvFile enabled
+    set:
+      configMapsFromFolder:
+        configMapsOverrides:
+          files:
+            fileAttributeOverrides:
+              envfile:
+                isEnvFile: true
+    asserts:
+      - documentSelector:
+          path: $[?(@.kind == "ConfigMap")].metadata.name
+          value: release-name
+        equal:
+          path: data
+          value:
+            ENVVAL1: value1
+            ENVVAL2: value2
+            ENVVAL3: double-quoted string
+            ENVVAL4: single-quoted string

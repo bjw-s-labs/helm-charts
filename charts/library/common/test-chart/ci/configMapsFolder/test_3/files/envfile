@@ -1,0 +1,4 @@
+ENVVAL1=value1
+ENVVAL2=value2
+ENVVAL3="double-quoted string"
+ENVVAL4='single-quoted string'
