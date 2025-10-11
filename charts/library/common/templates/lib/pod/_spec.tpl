@@ -71,6 +71,9 @@ topologySpreadConstraints: {{- tpl . $rootContext | nindent 2 }}
   {{- with (include "bjw-s.common.lib.pod.getOption" (dict "ctx" $ctx "option" "tolerations")) }}
 tolerations: {{ . | nindent 2 }}
   {{- end }}
+  {{- with (include "bjw-s.common.lib.pod.getOption" (dict "ctx" $ctx "option" "schedulingGates")) }}
+schedulingGates: {{ . | nindent 2 }}
+  {{- end }}
   {{- with (include "bjw-s.common.lib.pod.field.initContainers" (dict "ctx" $ctx) | trim) }}
 initContainers: {{ . | nindent 2 }}
   {{- end -}}

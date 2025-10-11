@@ -104,6 +104,21 @@
         "type": "string",
         "description": "Set a custom scheduler name."
       },
+      "schedulingGates": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Name of the scheduling gate. Each gate is a string literal that represents a criteria that Pod should be satisfied before considered schedulable."
+            }
+          },
+          "required": ["name"],
+          "additionalProperties": false
+        },
+        "description": "SchedulingGates is an opaque list of values that if specified will block scheduling the pod. If schedulingGates is not empty, the pod will stay in the SchedulingGated state and the scheduler will not attempt to schedule the pod.\nSee https://kubernetes.io/docs/concepts/scheduling-eviction/pod-scheduling-readiness/"
+      },
       "securityContext": {
         "$ref": "k8s-api.json#/core.v1.PodSecurityContext",
         "description": "Configure the Security Context for the Pod."
