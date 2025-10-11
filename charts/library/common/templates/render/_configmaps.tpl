@@ -36,7 +36,7 @@ Renders configMap objects required by the chart from a folder in the repo's path
     {{/* Generate a list of unique top level folders */}}
     {{- $basePath := $configMapsFromFolder.basePath -}}
     {{- $topLevelFolders := dict -}}
-    {{- range $path, $_ := .Files.Glob (printf "%s/*/*" $basePath) -}}
+    {{- range $path, $_ := ($.Files.Glob (printf "%s/*/*" $basePath)) -}}
         {{- $_ := set $topLevelFolders (dir $path) "" -}}
     {{- end -}}
     {{- $top_level_folder_list := keys $topLevelFolders | sortAlpha -}}
@@ -54,7 +54,7 @@ Renders configMap objects required by the chart from a folder in the repo's path
       {{- range $file_name, $content := $allFilesContent -}}
         {{- $file := base $file_name -}}
         {{- $fileOverride := dig "configMapsOverrides" $folder "fileAttributeOverrides" $file nil $configMapsFromFolder -}}
-        {{- $fileContent := $.Files.Get $file_name -}}
+        {{- $fileContent := ($.Files.Get $file_name) -}}
         {{- if not $fileOverride.exclude -}}
           {{- if $fileOverride.binary -}}
             {{- $fileContent = $fileContent | b64enc -}}
