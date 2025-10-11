@@ -1,0 +1,68 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: pod - fields - schedulingGates
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+tests:
+  - it: should not be present by default
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - notExists:
+          path: spec.template.spec.schedulingGates
+
+  - it: can be configured from pod
+    set:
+      controllers:
+        main:
+          pod:
+            schedulingGates:
+              - name: "example.com/quota-check"
+              - name: "example.com/resource-ready"
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.schedulingGates
+          value:
+            - name: "example.com/quota-check"
+            - name: "example.com/resource-ready"
+
+  - it: can be configured from defaultPodOption
+    set:
+      defaultPodOptions:
+        schedulingGates:
+          - name: "example.com/quota-check"
+          - name: "example.com/resource-ready"
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.schedulingGates
+          value:
+            - name: "example.com/quota-check"
+            - name: "example.com/resource-ready"
+
+  - it: defaultPodOption can be overridden
+    set:
+      defaultPodOptions:
+        schedulingGates:
+          - name: "example.com/quota-check"
+      controllers:
+        main:
+          pod:
+            schedulingGates:
+              - name: "example.com/resource-ready"
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.schedulingGates
+          value:
+            - name: "example.com/resource-ready"
