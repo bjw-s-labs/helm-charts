@@ -114,7 +114,11 @@ Returns the value for volumes
     {{- /* image persistence type */ -}}
     {{- else if and (ge ($rootContext.Capabilities.KubeVersion.Minor | int) 33) (eq $persistenceValues.type "image") -}}
       {{- $_ := set $volume "image" dict -}}
-      {{- $_ := set $volume.image "reference" $persistenceValues.image -}}
+      {{- if kindIs "string" $persistenceValues.image -}}
+        {{- $_ := set $volume.image "reference" $persistenceValues.image -}}
+      {{- else -}}
+        {{- $_ := set $volume.image "reference" (include "bjw-s.common.lib.imageSpecificationToImage" (dict "rootContext" $rootContext "imageSpec" $persistenceValues.image)) -}}
+      {{- end -}}
       {{- with $persistenceValues.pullPolicy -}}
         {{- $_ := set $volume.image "pullPolicy" . -}}
       {{- end -}}

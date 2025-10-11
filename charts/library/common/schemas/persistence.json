@@ -294,7 +294,10 @@
       },
       "image": {
         "description": "OCI artifact reference to be used.",
-        "type": "string"
+        "oneOf": [
+          { "type": "string" },
+          { "$ref": "definitions.json#/imageSpecification" }
+        ]
       },
       "pullPolicy": {
         "description": "The image pull policy for the image persistence item.",

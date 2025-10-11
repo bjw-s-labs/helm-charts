@@ -22,6 +22,9 @@ annotations:
     - kind: added
       description: |-
         Add support for explicit image digest. Enables use of `digestReflectionPolicy` in Flux CD.
+    - kind: added
+      description: |-
+        Allow image specification object in persistence.image field.
     - kind: fixed
       description: |-
         Fixed envFrom optional field being ignored.

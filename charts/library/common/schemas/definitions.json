@@ -18,8 +18,8 @@
     },
     "not": {
       "anyOf": [
-        {"required": ["forceRename", "suffix"]},
-        {"required": ["forceRename", "prefix"]}
+        { "required": ["forceRename", "suffix"] },
+        { "required": ["forceRename", "prefix"] }
       ]
     }
   },
@@ -27,12 +27,27 @@
   "annotations": {
     "description": "Annotations to set on the item.",
     "type": ["object", "null"],
-    "additionalProperties": {"type": ["string", "null"]}
+    "additionalProperties": { "type": ["string", "null"] }
   },
 
   "labels": {
     "description": "Labels to set on the item.",
     "type": ["object", "null"],
-    "additionalProperties": {"type": ["string", "null"]}
+    "additionalProperties": { "type": ["string", "null"] }
+  },
+
+  "imageSpecification": {
+    "type": "object",
+    "properties": {
+      "repository": {
+        "type": "string"
+      },
+      "tag": {
+        "type": ["string", "number"]
+      },
+      "digest": {
+        "type": ["string"]
+      }
+    }
   }
 }

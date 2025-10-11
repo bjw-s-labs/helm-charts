@@ -39,6 +39,25 @@ tests:
             image:
               reference: quay.io/crio/artifact:v2
 
+  - it: image persistence can be configured using image specification object
+    set:
+      persistence:
+        test:
+          type: image
+          image:
+            repository: quay.io/crio/artifact
+            tag: v2
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[0]
+          value:
+            name: test
+            image:
+              reference: quay.io/crio/artifact:v2
+
   - it: image pull policy can be set to Always
     set:
       persistence:
