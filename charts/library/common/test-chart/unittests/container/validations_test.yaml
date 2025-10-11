@@ -30,4 +30,4 @@ tests:
                 tag: ""
     asserts:
       - failedTemplate:
-          errorMessage: "No image tag specified for container. (controller main, container test)"
+          errorMessage: "No image tag or digest specified for container. (controller main, container test)"
