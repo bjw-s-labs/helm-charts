@@ -16,9 +16,6 @@ sources:
   - https://github.com/bjw-s-labs/helm-charts
 annotations:
   artifacthub.io/changes: |-
-    - kind: fixed
-      description: |-
-        defaultPodOptions no longer get accidentally overwritten when there are multiple controllers.
     - kind: added
       description: |-
-        Add support for image digest. Enables use of `digestReflectionPolicy` in Flux CD
+        Add support for explicit image digest. Enables use of `digestReflectionPolicy` in Flux CD

@@ -85,3 +85,34 @@ tests:
       - equal:
           path: spec.template.spec.containers[0].image
           value: ghcr.io/mendhak/http-https-echo-override:33
+
+  - it: tag with digest should pass
+    values:
+      - ../_values/controllers_main_default_container.yaml
+    set:
+      controllers.main.containers.main.image:
+        repository: ghcr.io/mendhak/http-https-echo
+        tag: latest@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: ghcr.io/mendhak/http-https-echo:latest@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+
+  - it: explicit digest should pass
+    values:
+      - ../_values/controllers_main_default_container.yaml
+    set:
+      controllers.main.containers.main.image:
+        repository: ghcr.io/mendhak/http-https-echo
+        tag: latest
+        digest: sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: ghcr.io/mendhak/http-https-echo:latest@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
