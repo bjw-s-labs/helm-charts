@@ -179,7 +179,7 @@ jobs:
 
       - name: Commit Changes
         if: ${{ inputs.publishToGhPages }}
-        uses: stefanzweifel/git-auto-commit-action@778341af668090896ca464160c2def5d1d1a3eb0 # v6.0.1
+        uses: stefanzweifel/git-auto-commit-action@28e16e81777b558cc906c8750092100bbb34c5e3 # v7.0.0
         with:
           commit_message: "feat: Add Chart package ${{ steps.chart-folder.outputs.chart_folder }}/${{ steps.chart-details.outputs.name }}-${{ steps.chart-details.outputs.version }}"
           repository: gh-pages
