@@ -30,7 +30,10 @@ annotations:
         Allow limiting configMap and Secret checksum annotations to specific controllers.
     - kind: added
       description: |-
-        Updated file selection logic to allow files nested in subfolders to be used in configMapsFromFolder and the new secretsFromFolder.
+        Updated file selection logic to allow files nested in subfolders for configMapsFromFolder and the new secretsFromFolder.
+    - kind: added
+      description: |-
+        Add best-effort automatic detection of binary files for configMapsFromFolder and the new secretsFromFolder.
     - kind: added
       description: |-
         Allow specifying isEnvFile for files loaded via configMapsFromFolder.
