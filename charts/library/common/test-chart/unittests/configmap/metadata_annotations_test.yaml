@@ -64,12 +64,14 @@ tests:
             test: test
       configMapsFromFolder:
         enabled: true
-        basePath: ci/configMapsFolder
+        basePath: testFiles
         configMapsOverrides:
-          test_2:
+          binary:
             fileAttributeOverrides:
               helm.jpg:
                 binary: true
+          escaped:
+            fileAttributeOverrides:
               test_2.yaml:
                 escaped: true
     asserts:
@@ -80,12 +82,7 @@ tests:
           path: metadata.annotations
       - documentSelector:
           path: $[?(@.kind == "ConfigMap")].metadata.name
-          value: release-name-test_1
-        notExists:
-          path: metadata.annotations
-      - documentSelector:
-          path: $[?(@.kind == "ConfigMap")].metadata.name
-          value: release-name-test_2
+          value: release-name-binary
         notExists:
           path: metadata.annotations
 
@@ -97,20 +94,31 @@ tests:
             test: test
       configMapsFromFolder:
         enabled: true
-        basePath: ci/configMapsFolder
+        basePath: testFiles
         configMapsOverrides:
-          test_2:
+          binary:
             annotations:
               test: test_annotation
             fileAttributeOverrides:
               helm.jpg:
                 binary: true
+          escaped:
+            annotations:
+              test: test_annotation
+            fileAttributeOverrides:
               test_2.yaml:
                 escaped: true
     asserts:
       - documentSelector:
           path: $[?(@.kind == "ConfigMap")].metadata.name
-          value: release-name-test_2
+          value: release-name-binary
+        equal:
+          path: metadata.annotations
+          value:
+            test: test_annotation
+      - documentSelector:
+          path: $[?(@.kind == "ConfigMap")].metadata.name
+          value: release-name-escaped
         equal:
           path: metadata.annotations
           value:

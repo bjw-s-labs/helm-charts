@@ -59,15 +59,18 @@ tests:
             test: test
       configMapsFromFolder:
         enabled: true
-        basePath: ci/configMapsFolder
+        basePath: testFiles
         configMapsOverrides:
-          test_2:
+          escaped:
             fileAttributeOverrides:
-              helm.jpg:
-                binary: true
               test_2.yaml:
                 escaped: true
     asserts:
+      - containsDocument:
+          apiVersion: v1
+          kind: ConfigMap
+          name: release-name-binary
+          any: true
       - containsDocument:
           apiVersion: v1
           kind: ConfigMap
@@ -76,10 +79,10 @@ tests:
       - containsDocument:
           apiVersion: v1
           kind: ConfigMap
-          name: release-name-test_1
+          name: release-name-envfile
           any: true
       - containsDocument:
           apiVersion: v1
           kind: ConfigMap
-          name: release-name-test_2
+          name: release-name-escaped
           any: true

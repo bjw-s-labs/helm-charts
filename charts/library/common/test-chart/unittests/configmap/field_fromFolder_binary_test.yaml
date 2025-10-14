@@ -1,0 +1,61 @@
+---
+
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: configmap - fields - configMapsFromFolder - binary
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+set:
+  configMapsFromFolder:
+    enabled: true
+    basePath: testFiles/binary
+tests:
+  - it: Binary files get added if binary unset
+    asserts:
+      - documentSelector:
+          path: $[?(@.kind == "ConfigMap")].metadata.name
+          value: release-name
+        notExists:
+          path: data.helm\.jpg
+      - documentSelector:
+          path: $[?(@.kind == "ConfigMap")].metadata.name
+          value: release-name
+        isNotEmpty:
+          path: binaryData.helm\.jpg
+
+  - it: Binary file cannot be added as text even if binary is explicitly disabled
+    set:
+      configMapsFromFolder:
+        configMapsOverrides:
+          binary:
+            fileAttributeOverrides:
+              "helm.jpg":
+                binary: false
+    asserts:
+      - not: true
+        containsDocument:
+          apiVersion: v1
+          kind: ConfigMap
+          name: release-name
+          any: true
+
+  - it: Binary files get added if binary is explicitly enabled
+    set:
+      configMapsFromFolder:
+        configMapsOverrides:
+          binary:
+            fileAttributeOverrides:
+              "helm.jpg":
+                binary: true
+    asserts:
+      - documentSelector:
+          path: $[?(@.kind == "ConfigMap")].metadata.name
+          value: release-name
+        notExists:
+          path: data.helm\.jpg
+      - documentSelector:
+          path: $[?(@.kind == "ConfigMap")].metadata.name
+          value: release-name
+        isNotEmpty:
+          path: binaryData.helm\.jpg

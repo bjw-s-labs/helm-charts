@@ -6,10 +6,6 @@ Validate configMap values
   {{- $configMapValues := .object -}}
   {{- $identifier := .id -}}
 
-  {{- if eq (len (without (keys $configMapValues) "name" "identifier")) 0 -}}
-    {{- fail (printf "There was an error loading ConfigMap: %s. If it was automatically generated from a folder verify that files are properly flagged as `binary` or `escaped`" $identifier) -}}
-  {{- end -}}
-
   {{- if and (empty (get $configMapValues "data")) (empty (get $configMapValues "binaryData")) -}}
     {{- fail (printf "No data or binaryData specified for configMap. (configMap: %s)" $configMapValues.identifier) }}
   {{- end -}}
@@ -20,13 +16,16 @@ Validate configMap from folder values
 */}}
 {{- define "bjw-s.common.lib.configMap.fromFolder.validate" -}}
   {{- $rootContext := .rootContext -}}
-  {{- $basePath := required "If you're using `configMapsFromFolder` you need to specify a `basePath` key" .basePath -}}
-  {{ $topLevelFolders := dict}}
-    {{- range $path, $_ := $rootContext.Files.Glob (printf "%s/*/*" $basePath) -}}
-        {{- $_ := set $topLevelFolders (dir $path) "" -}}
-    {{- end -}}
-    {{- $topLevelFoldersList := keys $topLevelFolders | sortAlpha -}}
-    {{- if empty $topLevelFoldersList -}}
-      {{- fail (printf "No configMaps found in the folder %s" $basePath) }}
-    {{- end -}}
+  {{- $basePath := required "If you're using `configMapsFromFolder` you need to specify a `basePath` key" (trimSuffix "/" .basePath) -}}
+  {{- $filteredPaths := $rootContext.Files.Glob (printf "%s/**" $basePath) -}}
+  {{- $folders := dict -}}
+
+  {{- range $path, $_ := $filteredPaths -}}
+    {{- $_ := set $folders (dir $path) "" -}}
+  {{- end -}}
+  {{- $folders = keys $folders | uniq | sortAlpha -}}
+
+  {{- if empty $folders -}}
+    {{- fail (printf "No usable files found in the folder %s" $basePath) }}
+  {{- end -}}
 {{- end -}}

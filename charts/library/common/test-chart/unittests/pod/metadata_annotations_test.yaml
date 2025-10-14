@@ -122,12 +122,10 @@ tests:
             test: value 1
       configMapsFromFolder:
         enabled: true
-        basePath: ci/configMapsFolder
+        basePath: testFiles
         configMapsOverrides:
-          test_2:
+          escaped:
             fileAttributeOverrides:
-              helm.jpg:
-                binary: true
               test_2.yaml:
                 escaped: true
     documentSelector:
@@ -137,7 +135,7 @@ tests:
       - equal:
           path: spec.template.metadata.annotations
           value:
-            checksum/configMaps: e83a24569d0b4f2ccc44aec36d4e9a1c44a29bcc92eefdffe14fb1ce81dff054
+            checksum/configMaps: e006c1cf3e635b4c63df9c661401e8ad68a1e0a8c7ac9cc7d4ee8576970ce113
 
   - it: secret checksum should be included in pod annotations by default
     set:

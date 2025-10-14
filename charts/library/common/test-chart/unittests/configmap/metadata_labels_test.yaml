@@ -77,12 +77,14 @@ tests:
             test: test
       configMapsFromFolder:
         enabled: true
-        basePath: ci/configMapsFolder
+        basePath: testFiles
         configMapsOverrides:
-          test_2:
+          binary:
             fileAttributeOverrides:
               helm.jpg:
                 binary: true
+          escaped:
+            fileAttributeOverrides:
               test_2.yaml:
                 escaped: true
     asserts:
@@ -98,7 +100,7 @@ tests:
             helm.sh/chart: common-test-1.0.0
       - documentSelector:
           path: $[?(@.kind == "ConfigMap")].metadata.name
-          value: release-name-test_1
+          value: release-name-binary
         equal:
           path: metadata.labels
           value:
@@ -108,7 +110,7 @@ tests:
             helm.sh/chart: common-test-1.0.0
       - documentSelector:
           path: $[?(@.kind == "ConfigMap")].metadata.name
-          value: release-name-test_2
+          value: release-name-escaped
         equal:
           path: metadata.labels
           value:
@@ -125,14 +127,16 @@ tests:
             test: test
       configMapsFromFolder:
         enabled: true
-        basePath: ci/configMapsFolder
+        basePath: testFiles
         configMapsOverrides:
-          test_2:
+          binary:
             labels:
               test: test_label
             fileAttributeOverrides:
               helm.jpg:
                 binary: true
+          escaped:
+            fileAttributeOverrides:
               test_2.yaml:
                 escaped: true
     asserts:
@@ -148,17 +152,7 @@ tests:
             helm.sh/chart: common-test-1.0.0
       - documentSelector:
           path: $[?(@.kind == "ConfigMap")].metadata.name
-          value: release-name-test_1
-        equal:
-          path: metadata.labels
-          value:
-            app.kubernetes.io/instance: RELEASE-NAME
-            app.kubernetes.io/managed-by: Helm
-            app.kubernetes.io/name: RELEASE-NAME
-            helm.sh/chart: common-test-1.0.0
-      - documentSelector:
-          path: $[?(@.kind == "ConfigMap")].metadata.name
-          value: release-name-test_2
+          value: release-name-binary
         equal:
           path: metadata.labels
           value:
@@ -167,3 +161,13 @@ tests:
             app.kubernetes.io/name: RELEASE-NAME
             helm.sh/chart: common-test-1.0.0
             test: test_label
+      - documentSelector:
+          path: $[?(@.kind == "ConfigMap")].metadata.name
+          value: release-name-escaped
+        equal:
+          path: metadata.labels
+          value:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: RELEASE-NAME
+            helm.sh/chart: common-test-1.0.0
