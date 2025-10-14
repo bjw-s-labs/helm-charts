@@ -8,7 +8,7 @@ The container definition included in the Pod.
   {{- $ctx := dict "rootContext" $rootContext "controllerObject" $controllerObject "containerObject" $containerObject -}}
 
 name: {{ include "bjw-s.common.lib.container.field.name" (dict "ctx" $ctx) | trim }}
-image: {{ include "bjw-s.common.lib.container.field.image" (dict "ctx" $ctx) | trim }}
+image: {{ include "bjw-s.common.lib.container.field.image" (dict "ctx" $ctx) | trim | quote }}
   {{- with $containerObject.image.pullPolicy }}
 imagePullPolicy: {{ . | trim }}
   {{- end -}}
