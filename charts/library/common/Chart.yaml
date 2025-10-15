@@ -43,3 +43,6 @@ annotations:
     - kind: fixed
       description: |-
         Fixed envFrom optional field being ignored.
+    - kind: fixed
+      description: |-
+        Fixed merge strategy for defaultPodOptions and defaultContainerOptions.

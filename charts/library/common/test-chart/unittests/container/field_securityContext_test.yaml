@@ -40,6 +40,7 @@ tests:
             securityContext:
               runAsUser: 1000
               runAsGroup: 1000
+              runAsNonRoot: true
           containers:
             main:
               securityContext:
@@ -54,3 +55,29 @@ tests:
           value:
             runAsUser: 568
             runAsGroup: 568
+
+  - it: defaultContainerOption with merge strategy should pass
+    set:
+      controllers:
+        main:
+          defaultContainerOptionsStrategy: merge
+          defaultContainerOptions:
+            securityContext:
+              runAsUser: 1000
+              runAsGroup: 568
+              runAsNonRoot: true
+          containers:
+            main:
+              securityContext:
+                runAsUser: 0
+                runAsNonRoot: false
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].securityContext
+          value:
+            runAsUser: 0
+            runAsGroup: 568
+            runAsNonRoot: false

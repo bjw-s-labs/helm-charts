@@ -61,3 +61,32 @@ tests:
             runAsGroup: 568
             fsGroup: 568
             fsGroupChangePolicy: OnRootMismatch
+
+  - it: defaultPodOption with merge strategy should pass
+    set:
+      defaultPodOptionsStrategy: merge
+      defaultPodOptions:
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 1000
+          fsGroup: 1000
+          fsGroupChangePolicy: OnRootMismatch
+          runAsNonRoot: true
+      controllers:
+        main:
+          pod:
+            securityContext:
+              runAsUser: 0
+              runAsNonRoot: false
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext
+          value:
+            runAsUser: 0
+            runAsGroup: 1000
+            fsGroup: 1000
+            fsGroupChangePolicy: OnRootMismatch
+            runAsNonRoot: false

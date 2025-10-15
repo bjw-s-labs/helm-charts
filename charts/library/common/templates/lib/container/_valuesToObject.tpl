@@ -22,8 +22,9 @@ Convert container values to an object
 
   {{- /* Merge default container options if required */ -}}
   {{- if (eq true $mergeDefaultContainerOptions) -}}
+    {{- $defaultContainerOptions := dig "defaultContainerOptions" dict $controllerObject -}}
     {{- if eq "overwrite" $defaultContainerOptionsStrategy -}}
-      {{- range $key, $defaultValue := (dig "defaultContainerOptions" dict $controllerObject) }}
+      {{- range $key, $defaultValue := $defaultContainerOptions }}
         {{- $specificValue := dig $key nil $objectValues -}}
         {{- if not (empty $specificValue) -}}
           {{- $_ := set $objectValues $key $specificValue -}}
@@ -32,7 +33,7 @@ Convert container values to an object
         {{- end -}}
       {{- end -}}
     {{- else if eq "merge" $defaultContainerOptionsStrategy -}}
-      {{- $objectValues = merge $objectValues (dig "defaultContainerOptions" dict $controllerObject) -}}
+      {{- $objectValues = mergeOverwrite $defaultContainerOptions $objectValues -}}
     {{- end -}}
   {{- end -}}
 
