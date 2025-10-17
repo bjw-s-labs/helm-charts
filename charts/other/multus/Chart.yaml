@@ -1,7 +1,7 @@
 ---
 apiVersion: v2
 description: A Helm chart for the Multus CNI CustomResourceDefinition
-name: multus-crd
+name: multus
 version: 1.0.0
 appVersion: 4.2.2
 maintainers:
@@ -9,11 +9,12 @@ maintainers:
     email: me@bjw-s.dev
 sources:
   - https://github.com/k8snetworkplumbingwg/multus-cni
+dependencies:
+  - name: common
+    repository: https://bjw-s-labs.github.io/helm-charts
+    version: 4.4.0
 annotations:
   artifacthub.io/changes: |-
     - kind: added
       description: |-
         Initial version
-      links:
-        - name: Original source
-          url: https://github.com/k8snetworkplumbingwg/multus-cni/blob/v4.2.2/deployments/multus-daemonset.yml#L10-L53
