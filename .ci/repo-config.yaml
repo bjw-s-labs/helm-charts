@@ -3,5 +3,6 @@ excluded-charts-lint: []
 
 excluded-charts-install:
   - other/app-template
+  - other/multus
 
 excluded-charts-release: []

@@ -3,11 +3,13 @@ cni-plugins:
   image:
     repository: ghcr.io/home-operations/cni-plugins
     tag: 1.8.0
+  resources: {}
 
 multus:
   image:
     repository: ghcr.io/k8snetworkplumbingwg/multus-cni
     tag: v4.2.2
+  resources: {}
 
 cni:
   netPath: /etc/cni/net.d

@@ -23,6 +23,7 @@ controllers:
         image:
           repository: {{ index .Values "cni-plugins" "image" "repository" }}
           tag: {{ index .Values "cni-plugins" "image" "tag" }}
+        resources: {{ index .Values "cni-plugins" "resources" | toYaml | nindent 10 }}
 
     containers:
       multus:
@@ -32,6 +33,7 @@ controllers:
         args:
           - --cleanup-config-on-exit
           - --multus-cni-conf-dir=/tmp
+        resources: {{ index .Values "multus" "resources" | toYaml | nindent 10 }}
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
