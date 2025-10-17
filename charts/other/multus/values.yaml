@@ -1,90 +1,14 @@
 ---
-controllers:
-  multus:
-    type: daemonset
-    pod:
-      hostNetwork: true
-      priorityClassName: system-node-critical
-      tolerations:
-        - key: CriticalAddonsOnly
-          operator: Exists
+cni-plugins:
+  image:
+    repository: ghcr.io/home-operations/cni-plugins
+    tag: 1.8.0
 
-    initContainers:
-      cni-plugins:
-        image:
-          repository: ghcr.io/home-operations/cni-plugins
-          tag: 1.8.0
+multus:
+  image:
+    repository: ghcr.io/k8snetworkplumbingwg/multus-cni
+    tag: v4.2.2
 
-    containers:
-      multus:
-        image:
-          repository: ghcr.io/k8snetworkplumbingwg/multus-cni
-          tag: v4.2.2
-        args:
-          - --cleanup-config-on-exit
-          - --multus-cni-conf-dir=/tmp
-        securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
-          capabilities:
-            add:
-              - NET_ADMIN
-            drop:
-              - ALL
-
-crds:
-  enabled: true
-
-persistence:
-  etc-cni-net-d:
-    type: hostPath
-    hostPath: /etc/cni/net.d
-    globalMounts:
-      - path: /host/etc/cni/net.d
-  opt-cni-bin:
-    type: hostPath
-    hostPath: /opt/cni/bin
-    globalMounts:
-      - path: /host/opt/cni/bin
-  tmp:
-    type: emptyDir
-
-rbac:
-  bindings:
-    multus:
-      type: ClusterRoleBinding
-      roleRef:
-        identifier: multus
-      subjects:
-        - identifier: multus
-
-  roles:
-    multus:
-      type: ClusterRole
-      rules:
-        - apiGroups:
-            - "k8s.cni.cncf.io"
-          resources:
-            - "*"
-          verbs:
-            - "*"
-        - apiGroups:
-            - ""
-          resources:
-            - "pods"
-            - "pods/status"
-          verbs:
-            - "get"
-            - "update"
-        - apiGroups:
-            - ""
-            - "events.k8s.io"
-          resources:
-            - "events"
-          verbs:
-            - "create"
-            - "patch"
-            - "update"
-
-serviceAccount:
-  multus: {}
+cni:
+  netPath: /etc/cni/net.d
+  binPath: /opt/cni/bin

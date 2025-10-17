@@ -7,6 +7,94 @@
 global:
   nameOverride: "{{ .Release.Name }}"
 {{ end }}
+
+controllers:
+  multus:
+    type: daemonset
+    pod:
+      hostNetwork: true
+      priorityClassName: system-node-critical
+      tolerations:
+        - key: CriticalAddonsOnly
+          operator: Exists
+
+    initContainers:
+      cni-plugins:
+        image:
+          repository: {{ index .Values "cni-plugins" "image" "repository" }}
+          tag: {{ index .Values "cni-plugins" "image" "tag" }}
+
+    containers:
+      multus:
+        image:
+          repository: {{ index .Values "multus" "image" "repository" }}
+          tag: {{ index .Values "multus" "image" "tag" }}
+        args:
+          - --cleanup-config-on-exit
+          - --multus-cni-conf-dir=/tmp
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            add:
+              - NET_ADMIN
+            drop:
+              - ALL
+
+persistence:
+  etc-cni-net-d:
+    type: hostPath
+    hostPath: {{ index .Values "cni" "netPath" }}
+    globalMounts:
+      - path: /host/etc/cni/net.d
+  opt-cni-bin:
+    type: hostPath
+    hostPath: {{ index .Values "cni" "binPath" }}
+    globalMounts:
+      - path: /host/opt/cni/bin
+  tmp:
+    type: emptyDir
+
+rbac:
+  bindings:
+    multus:
+      type: ClusterRoleBinding
+      roleRef:
+        identifier: multus
+      subjects:
+        - identifier: multus
+
+  roles:
+    multus:
+      type: ClusterRole
+      rules:
+        - apiGroups:
+            - "k8s.cni.cncf.io"
+          resources:
+            - "*"
+          verbs:
+            - "*"
+        - apiGroups:
+            - ""
+          resources:
+            - "pods"
+            - "pods/status"
+          verbs:
+            - "get"
+            - "update"
+        - apiGroups:
+            - ""
+            - "events.k8s.io"
+          resources:
+            - "events"
+          verbs:
+            - "create"
+            - "patch"
+            - "update"
+
+serviceAccount:
+  multus: {}
+
 {{- end -}}
 {{- $_ := mergeOverwrite .Values (include "multus.hardcodedValues" . | fromYaml) -}}
 
