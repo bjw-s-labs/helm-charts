@@ -201,7 +201,7 @@ jobs:
       # ----------------------------
       - name: Create tag
         if: ${{ inputs.createGithubRelease }}
-        uses: EndBug/latest-tag@c24a76ea69bf06f7f0e43a48b61c2b51b99d6c42 # latest
+        uses: EndBug/latest-tag@52ce15b2695f86a4ce47b72387dee54e47f6356c # latest
         with:
           ref: ${{ steps.chart-details.outputs.name }}-${{ steps.chart-details.outputs.version }}
           git-directory: src
