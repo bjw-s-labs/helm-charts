@@ -10,7 +10,7 @@ python.uv_venv_auto = true
 [tools]
 python = "3.14.0" # Required for documentation generation
 rust = "1.91.1" # Required for schematools
-"aqua:astral-sh/uv" = "0.9.9"
+"aqua:astral-sh/uv" = "0.9.10"
 "aqua:casey/just" = "1.43.1"
 "aqua:google/yamlfmt" = "0.20.0"
 "aqua:helm" = "3.19.2"
