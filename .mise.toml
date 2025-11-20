@@ -18,7 +18,7 @@ rust = "1.91.1" # Required for schematools
 "aqua:mikefarah/yq" = "4.48.2"
 "cargo:schematools-cli" = "0.22.0"
 "pipx:yamllint" = "1.37.1"
-"pipx:yamale" = "6.0.0"
+"pipx:yamale" = "6.1.0"
 
 [hooks]
 postinstall = "uv pip install --upgrade -r {{config_root}}/docs/requirements.txt"
