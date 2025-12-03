@@ -62,7 +62,10 @@ spec:
   {{- end }}
   rules:
   {{- range $routeObject.rules }}
-    - backendRefs:
+    - {{- if .name }}
+      name: {{ tpl .name $rootContext }}
+      {{- end }}
+      backendRefs:
       {{- if empty .backendRefs }}
         {{- printf " []" }}
       {{- else }}

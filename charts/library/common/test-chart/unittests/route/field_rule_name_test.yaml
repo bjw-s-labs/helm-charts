@@ -1,0 +1,26 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: route - fields - rule name
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+tests:
+  - it: rule name is rendered for HTTPRoute
+    set:
+      route.main:
+        parentRefs:
+          - name: parentName
+            namespace: parentNamespace
+        rules:
+          - name: rule-one
+            backendRefs:
+              - name: my-service
+                port: 8080
+    documentSelector:
+      path: $[?(@.kind == "HTTPRoute")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.rules[0].name
+          value: rule-one

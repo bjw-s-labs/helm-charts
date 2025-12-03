@@ -18,31 +18,4 @@ annotations:
   artifacthub.io/changes: |-
     - kind: added
       description: |-
-        Add support for schedulingGates in pod specification.
-    - kind: added
-      description: |-
-        Add support for explicit image digest. Enables use of `digestReflectionPolicy` in Flux CD.
-    - kind: added
-      description: |-
-        Allow image specification object in persistence.image field.
-    - kind: added
-      description: |-
-        Allow limiting configMap and Secret checksum annotations to specific controllers.
-    - kind: added
-      description: |-
-        Updated file selection logic to allow files nested in subfolders for configMapsFromFolder and the new secretsFromFolder.
-    - kind: added
-      description: |-
-        Add best-effort automatic detection of binary files for configMapsFromFolder and the new secretsFromFolder.
-    - kind: added
-      description: |-
-        Allow specifying isEnvFile for files loaded via configMapsFromFolder.
-    - kind: added
-      description: |-
-        Allow specifying secrets from files via secretsFromFolder.
-    - kind: fixed
-      description: |-
-        Fixed envFrom optional field being ignored.
-    - kind: fixed
-      description: |-
-        Fixed merge strategy for defaultPodOptions and defaultContainerOptions.
+        Add support for named route rules.

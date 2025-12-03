@@ -56,6 +56,10 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
+                "name": {
+                  "description": "Optional name of the route rule. This name must be unique within a Route if it is set.",
+                  "type": "string"
+                },
                 "backendRefs": {
                   "description": "Backend references.",
                   "type": "array",
