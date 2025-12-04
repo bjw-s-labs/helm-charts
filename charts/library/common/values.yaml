@@ -507,9 +507,6 @@ service:
   #   # -- Enables or disables the service
   #   enabled: true
 
-  #   # -- Override the name suffix that is used for this service
-  #   nameOverride: ""
-
   #   # -- Configure which controller this service should target
   #   controller: main
 
