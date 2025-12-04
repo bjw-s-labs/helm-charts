@@ -117,6 +117,18 @@
                 "type": "string"
               }
             }
+          },
+          "podDisruptionBudget": {
+            "description": "PodDisruptionBudget Policy for this controller.",
+            "type": "object",
+            "properties": {
+              "minAvailable": {
+                "type": ["integer", "string"]
+              },
+              "maxUnavailable": {
+                "type": ["integer", "string"]
+              }
+            }
           }
         },
         "allOf": [
