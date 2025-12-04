@@ -139,6 +139,15 @@ controllers: {}
 #       identifier:
 #       # -- Explicitly set the service account name
 #       name:
+
+#     # -- Pod Disruption Budget configuration for the Pods in this controller
+#     # -- [[ref]](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
+#     podDisruptionBudget:
+#       {}
+#       # minAvailable: 1
+#       # maxUnavailable: 1
+
+
 #     # -- CronJob configuration. Required only when using `controller.type: cronjob`.
 #     # @default -- See below
 #     cronjob:

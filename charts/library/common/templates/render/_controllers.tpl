@@ -38,5 +38,11 @@ Renders the controller objects required by the chart.
       {{- include "bjw-s.common.lib.job.validate" (dict "rootContext" $rootContext "object" $jobObject) -}}
       {{- include "bjw-s.common.class.job" (dict "rootContext" $rootContext "object" $jobObject) | nindent 0 -}}
     {{- end -}}
+
+    {{- if $controllerObject.podDisruptionBudget -}}
+      {{- $podDisruptionBudgetObject := (include "bjw-s.common.lib.valuesToObject" (dict "rootContext" $rootContext "id" $identifier "values" (merge (dict "controller" $identifier "forceRename" $controllerObject.name) $controllerObject.podDisruptionBudget))) | fromYaml -}}
+      {{- include "bjw-s.common.lib.podDisruptionBudget.validate" (dict "rootContext" $rootContext "object" $podDisruptionBudgetObject) -}}
+      {{- include "bjw-s.common.class.podDisruptionBudget" (dict "rootContext" $rootContext "object" $podDisruptionBudgetObject) | nindent 0 -}}
+    {{- end -}}
   {{- end -}}
 {{- end -}}

@@ -1,0 +1,91 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: controller - fields - podDisruptionBudget
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+
+tests:
+  - it: default should not exist
+    asserts:
+      - not: true
+        containsDocument:
+          apiVersion: policy/v1
+          kind: PodDisruptionBudget
+          name: release-name
+          any: true
+  - it: created if maxUnavailable specified
+    set:
+      controllers:
+        main:
+          podDisruptionBudget:
+            maxUnavailable: 10%
+    documentSelector:
+      path: $[?(@.kind == "PodDisruptionBudget")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.maxUnavailable
+          value: 10%
+      - notExists:
+          path: spec.minAvailable
+  - it: created if minAvailable specified
+    set:
+      controllers:
+        main:
+          podDisruptionBudget:
+            minAvailable: 1
+    documentSelector:
+      path: $[?(@.kind == "PodDisruptionBudget")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.minAvailable
+          value: 1
+      - notExists:
+          path: spec.maxAvailable
+  - it: multiple controllers with prefix and suffix
+    set:
+      controllers:
+        main:
+          podDisruptionBudget:
+            minAvailable: 1
+        second:
+          prefix: prefix
+          suffix: suffix
+          containers:
+            main:
+              image:
+                repository: ghcr.io/mendhak/http-https-echo
+                tag: 31
+          podDisruptionBudget:
+            minAvailable: 1
+    asserts:
+      - containsDocument:
+          apiVersion: policy/v1
+          kind: PodDisruptionBudget
+          name: release-name-main
+          any: true
+      - containsDocument:
+          apiVersion: policy/v1
+          kind: PodDisruptionBudget
+          name: prefix-release-name-second-suffix
+          any: true
+  - it: pdb targets the correct controller by default
+    set:
+      controllers:
+        main:
+          podDisruptionBudget:
+            minAvailable: 50%
+    documentSelector:
+      path: $[?(@.kind == "PodDisruptionBudget")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.selector
+          value:
+            matchLabels:
+              app.kubernetes.io/controller: main
+              app.kubernetes.io/instance: RELEASE-NAME
+              app.kubernetes.io/name: RELEASE-NAME

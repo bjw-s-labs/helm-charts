@@ -46,3 +46,6 @@ annotations:
     - kind: fixed
       description: |-
         Fixed merge strategy for defaultPodOptions and defaultContainerOptions.
+    - kind: added
+      description: |-
+        Allow creating PodDisruptionBudget Objects for controllers.
