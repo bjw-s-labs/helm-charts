@@ -711,7 +711,9 @@ route:
 
   #   # -- Configure rules for routing. Defaults to the primary service.
   #   rules:
-  #     - # -- Configure backends where matching requests should be sent.
+  #     - # -- Optional name of the route rule. This name must be unique within a Route if it is set.
+  #       name: ""
+  #       # -- Configure backends where matching requests should be sent.
   #       backendRefs: []
   #       ## Configure conditions used for matching incoming requests. Only for HTTPRoutes
   #       matches:
