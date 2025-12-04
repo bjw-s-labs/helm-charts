@@ -26,6 +26,13 @@ tests:
                     path:
                       type: ReplacePrefixMatch
                       replacePrefixMatch: ""
+                - type: CORS
+                  cors:
+                    allowOrigins:
+                      - "*"
+                - type: ExternalAuth
+                  externalAuth:
+                    protocol: HTTP
         grpc:
           kind: GRPCRoute
           parentRefs:
@@ -117,6 +124,13 @@ tests:
                 path:
                   type: ReplacePrefixMatch
                   replacePrefixMatch: ""
+            - cors:
+                allowOrigins:
+                  - '*'
+              type: CORS
+            - externalAuth:
+                protocol: HTTP
+              type: ExternalAuth
       - documentSelector:
           path: $[?(@.kind == "TCPRoute")].metadata.name
           value: release-name-tcp
