@@ -2,106 +2,106 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://bjw-s-labs.github.io/helm-charts/</loc>
-         <lastmod>2025-12-02</lastmod>
+         <lastmod>2025-12-05</lastmod>
     </url>
     <url>
          <loc>https://bjw-s-labs.github.io/helm-charts/app-template/</loc>
-         <lastmod>2025-12-02</lastmod>
+         <lastmod>2025-12-05</lastmod>
     </url>
     <url>
          <loc>https://bjw-s-labs.github.io/helm-charts/app-template/upgrade-instructions/</loc>
-         <lastmod>2025-12-02</lastmod>
+         <lastmod>2025-12-05</lastmod>
     </url>
     <url>
          <loc>https://bjw-s-labs.github.io/helm-charts/app-template/examples/</loc>
-         <lastmod>2025-12-02</lastmod>
+         <lastmod>2025-12-05</lastmod>
     </url>
     <url>
          <loc>https://bjw-s-labs.github.io/helm-charts/app-template/examples/home-assistant-codeserver/</loc>
-         <lastmod>2025-12-02</lastmod>
+         <lastmod>2025-12-05</lastmod>
     </url>
     <url>
          <loc>https://bjw-s-labs.github.io/helm-charts/app-template/examples/qbittorrent-gluetun/</loc>
-         <lastmod>2025-12-02</lastmod>
+         <lastmod>2025-12-05</lastmod>
     </url>
     <url>
          <loc>https://bjw-s-labs.github.io/helm-charts/app-template/howto/</loc>
-         <lastmod>2025-12-02</lastmod>
+         <lastmod>2025-12-05</lastmod>
     </url>
     <url>
          <loc>https://bjw-s-labs.github.io/helm-charts/app-template/howto/environment-variables/</loc>
-         <lastmod>2025-12-02</lastmod>
+         <lastmod>2025-12-05</lastmod>
     </url>
     <url>
          <loc>https://bjw-s-labs.github.io/helm-charts/app-template/howto/helm-templates/</loc>
-         <lastmod>2025-12-02</lastmod>
+         <lastmod>2025-12-05</lastmod>
     </url>
     <url>
          <loc>https://bjw-s-labs.github.io/helm-charts/app-template/howto/multiple-services/</loc>
-         <lastmod>2025-12-02</lastmod>
+         <lastmod>2025-12-05</lastmod>
     </url>
     <url>
          <loc>https://bjw-s-labs.github.io/helm-charts/app-template/howto/multiple-subpath/</loc>
-         <lastmod>2025-12-02</lastmod>
+         <lastmod>2025-12-05</lastmod>
     </url>
     <url>
          <loc>https://bjw-s-labs.github.io/helm-charts/common-library/</loc>
-         <lastmod>2025-12-02</lastmod>
+         <lastmod>2025-12-05</lastmod>
     </url>
     <url>
          <loc>https://bjw-s-labs.github.io/helm-charts/common-library/howto/</loc>
-         <lastmod>2025-12-02</lastmod>
+         <lastmod>2025-12-05</lastmod>
     </url>
     <url>
          <loc>https://bjw-s-labs.github.io/helm-charts/common-library/howto/default-container-options/</loc>
-         <lastmod>2025-12-02</lastmod>
+         <lastmod>2025-12-05</lastmod>
     </url>
     <url>
          <loc>https://bjw-s-labs.github.io/helm-charts/common-library/howto/default-pod-options/</loc>
-         <lastmod>2025-12-02</lastmod>
+         <lastmod>2025-12-05</lastmod>
     </url>
     <url>
          <loc>https://bjw-s-labs.github.io/helm-charts/common-library/resources/names/</loc>
-         <lastmod>2025-12-02</lastmod>
+         <lastmod>2025-12-05</lastmod>
     </url>
     <url>
          <loc>https://bjw-s-labs.github.io/helm-charts/common-library/storage/globalOptions/</loc>
-         <lastmod>2025-12-02</lastmod>
+         <lastmod>2025-12-05</lastmod>
     </url>
     <url>
          <loc>https://bjw-s-labs.github.io/helm-charts/common-library/storage/permissions/</loc>
-         <lastmod>2025-12-02</lastmod>
+         <lastmod>2025-12-05</lastmod>
     </url>
     <url>
          <loc>https://bjw-s-labs.github.io/helm-charts/common-library/storage/types/configmap/</loc>
-         <lastmod>2025-12-02</lastmod>
+         <lastmod>2025-12-05</lastmod>
     </url>
     <url>
          <loc>https://bjw-s-labs.github.io/helm-charts/common-library/storage/types/custom/</loc>
-         <lastmod>2025-12-02</lastmod>
+         <lastmod>2025-12-05</lastmod>
     </url>
     <url>
          <loc>https://bjw-s-labs.github.io/helm-charts/common-library/storage/types/emptyDir/</loc>
-         <lastmod>2025-12-02</lastmod>
+         <lastmod>2025-12-05</lastmod>
     </url>
     <url>
          <loc>https://bjw-s-labs.github.io/helm-charts/common-library/storage/types/hostPath/</loc>
-         <lastmod>2025-12-02</lastmod>
+         <lastmod>2025-12-05</lastmod>
     </url>
     <url>
          <loc>https://bjw-s-labs.github.io/helm-charts/common-library/storage/types/image/</loc>
-         <lastmod>2025-12-02</lastmod>
+         <lastmod>2025-12-05</lastmod>
     </url>
     <url>
          <loc>https://bjw-s-labs.github.io/helm-charts/common-library/storage/types/nfs-share/</loc>
-         <lastmod>2025-12-02</lastmod>
+         <lastmod>2025-12-05</lastmod>
     </url>
     <url>
          <loc>https://bjw-s-labs.github.io/helm-charts/common-library/storage/types/persistentVolumeClaim/</loc>
-         <lastmod>2025-12-02</lastmod>
+         <lastmod>2025-12-05</lastmod>
     </url>
     <url>
          <loc>https://bjw-s-labs.github.io/helm-charts/common-library/storage/types/secret/</loc>
-         <lastmod>2025-12-02</lastmod>
+         <lastmod>2025-12-05</lastmod>
     </url>
 </urlset>
