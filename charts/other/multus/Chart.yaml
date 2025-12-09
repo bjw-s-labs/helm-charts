@@ -2,7 +2,7 @@
 apiVersion: v2
 description: A Helm chart for the Multus CNI CustomResourceDefinition
 name: multus
-version: 1.0.2
+version: 1.1.0
 appVersion: 4.2.2
 maintainers:
   - name: bjw-s
@@ -17,4 +17,4 @@ annotations:
   artifacthub.io/changes: |-
     - kind: changed
       description: |-
-        Upgraded the common library to v4.5.0
+        Update cni-plugins to v1.9.0
