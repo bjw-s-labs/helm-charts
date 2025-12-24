@@ -77,7 +77,7 @@ tests:
             test: value 1
         test_default_enabled:
           data:
-            test: value 1
+            test: value {{ 1 }}
         test_not_in_checksum:
           includeInChecksum: false
           data:
@@ -135,7 +135,7 @@ tests:
       - equal:
           path: spec.template.metadata.annotations
           value:
-            checksum/configMaps: e006c1cf3e635b4c63df9c661401e8ad68a1e0a8c7ac9cc7d4ee8576970ce113
+            checksum/configMaps: 6d0f7cd171bef91ead07570fe9712f172da19e47058183b3b4d20b98792be453
 
   - it: secret checksum should be included in pod annotations by default
     set:
@@ -147,7 +147,7 @@ tests:
           includeChecksumInControllers:
             - main
           stringData:
-            test_1: value 1
+            test_1: value {{ 1 }}
             test_2: value 2
         test_not_in_checksum:
           includeInChecksum: false

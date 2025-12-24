@@ -19,3 +19,6 @@ annotations:
     - kind: added
       description: |-
         Add support for configuring supplementalGroupsPolicy in Pod SecurityContext.
+    - kind: fixed
+      description: |-
+        Fixed checksum annotation when templates are used in ConfigMaps and Secrets.
