@@ -736,7 +736,7 @@ persistence:
   #   enabled: false
 
   #   # -- Sets the persistence type
-  #   # Valid options are persistentVolumeClaim, emptyDir, nfs, hostPath, secret, configMap or custom
+  #   # Valid options are persistentVolumeClaim, emptyDir, nfs, iscsi, hostPath, secret, configMap or custom
   #   type: persistentVolumeClaim
 
   #   # -- Storage Class for the config volume.

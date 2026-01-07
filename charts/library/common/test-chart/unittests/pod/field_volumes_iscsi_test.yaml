@@ -1,0 +1,32 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: pod - fields - volumes (iscsi)
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+tests:
+  - it: iscsi persistence type should pass
+    set:
+      persistence:
+        iscsi:
+          type: iscsi
+          targetPortal: 10.10.0.8:3260
+          iqn: iqn.2003-01.org.linux-iscsi.bmn.x8664:sn.4b0a2d1426ac
+          lun: 0
+          fsType: ext4
+          readOnly: false
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[0]
+          value:
+            name: iscsi
+            iscsi:
+              targetPortal: 10.10.0.8:3260
+              iqn: iqn.2003-01.org.linux-iscsi.bmn.x8664:sn.4b0a2d1426ac
+              lun: 0
+              fsType: ext4
+              readOnly: false

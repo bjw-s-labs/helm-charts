@@ -129,6 +129,34 @@ Returns the value for volumes
       {{- $_ := set $volume.nfs "server" (required "server not set" $persistenceValues.server) -}}
       {{- $_ := set $volume.nfs "path" (required "path not set" $persistenceValues.path) -}}
 
+    {{- /* iscsi persistence type */ -}}
+    {{- else if eq $persistenceValues.type "iscsi" -}}
+      {{- $_ := set $volume "iscsi" dict -}}
+      {{- $_ := set $volume.iscsi "targetPortal" (required "targetPortal not set" $persistenceValues.targetPortal) -}}
+      {{- $_ := set $volume.iscsi "iqn" (required "iqn not set" $persistenceValues.iqn) -}}
+      {{- $_ := set $volume.iscsi "lun" (required "lun not set" $persistenceValues.lun) -}}
+      {{- with $persistenceValues.fsType -}}
+        {{- $_ := set $volume.iscsi "fsType" . -}}
+      {{- end -}}
+      {{- if hasKey $persistenceValues "readOnly" -}}
+        {{- $_ := set $volume.iscsi "readOnly" $persistenceValues.readOnly -}}
+      {{- end -}}
+      {{- if hasKey $persistenceValues "chapAuthDiscovery" -}}
+        {{- $_ := set $volume.iscsi "chapAuthDiscovery" $persistenceValues.chapAuthDiscovery -}}
+      {{- end -}}
+      {{- if hasKey $persistenceValues "chapAuthSession" -}}
+        {{- $_ := set $volume.iscsi "chapAuthSession" $persistenceValues.chapAuthSession -}}
+      {{- end -}}
+      {{- with $persistenceValues.secretRef -}}
+        {{- $_ := set $volume.iscsi "secretRef" . -}}
+      {{- end -}}
+      {{- with $persistenceValues.initiatorName -}}
+        {{- $_ := set $volume.iscsi "initiatorName" . -}}
+      {{- end -}}
+      {{- with $persistenceValues.portals -}}
+        {{- $_ := set $volume.iscsi "portals" . -}}
+      {{- end -}}
+
     {{- /* custom persistence type */ -}}
     {{- else if eq $persistenceValues.type "custom" -}}
       {{- $volume = $persistenceValues.volumeSpec -}}

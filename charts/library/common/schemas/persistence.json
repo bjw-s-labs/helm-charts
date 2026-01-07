@@ -6,6 +6,7 @@
       { "$ref": "#/configMapItem" },
       { "$ref": "#/secretItem" },
       { "$ref": "#/nfsItem" },
+      { "$ref": "#/iscsiItem" },
       { "$ref": "#/emptyDirItem" },
       { "$ref": "#/hostPathItem" },
       { "$ref": "#/imageItem" },
@@ -231,6 +232,69 @@
       "globalMounts": { "$ref": "#/globalMounts" }
     },
     "required": ["server", "path"]
+  },
+
+  "iscsiItem": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "type": {
+        "const": "iscsi"
+      },
+      "enabled": {
+        "type": "boolean",
+        "default": true
+      },
+      "targetPortal": {
+        "type": "string"
+      },
+      "iqn": {
+        "type": "string"
+      },
+      "lun": {
+        "type": "integer"
+      },
+      "fsType": {
+        "type": "string"
+      },
+      "readOnly": {
+        "type": "boolean"
+      },
+      "chapAuthDiscovery": {
+        "type": "boolean"
+      },
+      "chapAuthSession": {
+        "type": "boolean"
+      },
+      "secretRef": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "initiatorName": {
+        "type": "string"
+      },
+      "portals": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "advancedMounts": {
+        "$ref": "#/advancedMounts"
+      },
+      "globalMounts": {
+        "$ref": "#/globalMounts"
+      }
+    },
+    "required": [
+      "targetPortal",
+      "iqn",
+      "lun"
+    ]
   },
 
   "emptyDirItem": {
