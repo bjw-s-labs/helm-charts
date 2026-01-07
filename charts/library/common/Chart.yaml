@@ -19,6 +19,9 @@ annotations:
     - kind: added
       description: |-
         Add support for configuring supplementalGroupsPolicy in Pod SecurityContext.
+    - kind: added
+      description: |-
+        Add support for configuring jobLabel in serviceMonitor.
     - kind: fixed
       description: |-
         Fixed checksum annotation when templates are used in ConfigMaps and Secrets.
