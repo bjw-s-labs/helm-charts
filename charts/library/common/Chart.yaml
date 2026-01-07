@@ -3,7 +3,7 @@ apiVersion: v2
 name: common
 description: Function library for Helm charts
 type: library
-version: 4.5.0
+version: 4.6.0
 kubeVersion: ">=1.28.0-0"
 keywords:
   - common
@@ -16,6 +16,9 @@ sources:
   - https://github.com/bjw-s-labs/helm-charts
 annotations:
   artifacthub.io/changes: |-
+    - kind: added
+      description: |-
+        Add support for iSCSI persistence.
     - kind: added
       description: |-
         Add support for named route rules.
