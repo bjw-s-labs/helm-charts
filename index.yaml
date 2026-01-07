@@ -12,7 +12,7 @@ entries:
             - name: Detailed release notes
               url: https://github.com/bjw-s-labs/helm-charts/releases/tag/common-4.5.0
     apiVersion: v2
-    created: "2025-12-09T13:23:38.70973437Z"
+    created: "2026-01-07T15:42:21.164697761Z"
     dependencies:
     - name: common
       repository: https://bjw-s-labs.github.io/helm-charts
@@ -41,7 +41,7 @@ entries:
             - name: Detailed release notes
               url: https://github.com/bjw-s-labs/helm-charts/releases/tag/common-4.4.0
     apiVersion: v2
-    created: "2025-12-09T13:23:38.703877674Z"
+    created: "2026-01-07T15:42:21.159024775Z"
     dependencies:
     - name: common
       repository: https://bjw-s-labs.github.io/helm-charts
@@ -70,7 +70,7 @@ entries:
             - name: Detailed release notes
               url: https://github.com/bjw-s-labs/helm-charts/releases/tag/common-4.3.0
     apiVersion: v2
-    created: "2025-12-09T13:23:38.698593791Z"
+    created: "2026-01-07T15:42:21.153306428Z"
     dependencies:
     - name: common
       repository: https://bjw-s-labs.github.io/helm-charts
@@ -99,7 +99,7 @@ entries:
             - name: Detailed release notes
               url: https://github.com/bjw-s-labs/helm-charts/releases/tag/common-4.2.0
     apiVersion: v2
-    created: "2025-12-09T13:23:38.692789056Z"
+    created: "2026-01-07T15:42:21.147823674Z"
     dependencies:
     - name: common
       repository: https://bjw-s-labs.github.io/helm-charts
@@ -128,7 +128,7 @@ entries:
             - name: Detailed release notes
               url: https://github.com/bjw-s-labs/helm-charts/releases/tag/common-4.1.2
     apiVersion: v2
-    created: "2025-12-09T13:23:38.687561369Z"
+    created: "2026-01-07T15:42:21.142437519Z"
     dependencies:
     - name: common
       repository: https://bjw-s-labs.github.io/helm-charts
@@ -157,7 +157,7 @@ entries:
             - name: Detailed release notes
               url: https://github.com/bjw-s-labs/helm-charts/releases/tag/common-4.1.1
     apiVersion: v2
-    created: "2025-12-09T13:23:38.68264902Z"
+    created: "2026-01-07T15:42:21.137331283Z"
     dependencies:
     - name: common
       repository: https://bjw-s-labs.github.io/helm-charts
@@ -186,7 +186,7 @@ entries:
             - name: Detailed release notes
               url: https://github.com/bjw-s-labs/helm-charts/releases/tag/common-4.1.0
     apiVersion: v2
-    created: "2025-12-09T13:23:38.676982981Z"
+    created: "2026-01-07T15:42:21.132440959Z"
     dependencies:
     - name: common
       repository: https://bjw-s-labs.github.io/helm-charts
@@ -215,7 +215,7 @@ entries:
             - name: Detailed release notes
               url: https://github.com/bjw-s-labs/helm-charts/releases/tag/common-4.0.1
     apiVersion: v2
-    created: "2025-12-09T13:23:38.67085715Z"
+    created: "2026-01-07T15:42:21.127791304Z"
     dependencies:
     - name: common
       repository: https://bjw-s-labs.github.io/helm-charts
@@ -244,7 +244,7 @@ entries:
             - name: Detailed release notes
               url: https://github.com/bjw-s-labs/helm-charts/releases/tag/common-4.0.0
     apiVersion: v2
-    created: "2025-12-09T13:23:38.666462975Z"
+    created: "2026-01-07T15:42:21.12277073Z"
     dependencies:
     - name: common
       repository: https://bjw-s-labs.github.io/helm-charts
@@ -271,7 +271,7 @@ entries:
           description: |-
             Fixed incorrect default backendRefs values in HTTPRoute
     apiVersion: v2
-    created: "2025-12-09T13:23:38.66014769Z"
+    created: "2026-01-07T15:42:21.116091515Z"
     dependencies:
     - name: common
       repository: https://bjw-s-labs.github.io/helm-charts
@@ -298,7 +298,7 @@ entries:
           description: |-
             Fixed non-deterministic selection of primary service and port.
     apiVersion: v2
-    created: "2025-12-09T13:23:38.654615015Z"
+    created: "2026-01-07T15:42:21.11225648Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -332,7 +332,7 @@ entries:
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
       org.opencontainers.image.source: https://github.com/bjw-s/helm-charts
     apiVersion: v2
-    created: "2025-12-09T13:23:38.649716875Z"
+    created: "2026-01-07T15:42:21.107329886Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -359,7 +359,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.645560426Z"
+    created: "2026-01-07T15:42:21.102634196Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -386,7 +386,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.642063088Z"
+    created: "2026-01-07T15:42:21.099981956Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -413,7 +413,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.639485267Z"
+    created: "2026-01-07T15:42:21.097295711Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -440,7 +440,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.636886116Z"
+    created: "2026-01-07T15:42:21.093830633Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -467,7 +467,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.633533623Z"
+    created: "2026-01-07T15:42:21.091234118Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -494,7 +494,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.631020413Z"
+    created: "2026-01-07T15:42:21.087677786Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -521,7 +521,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.627484477Z"
+    created: "2026-01-07T15:42:21.085178444Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -548,7 +548,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.625126197Z"
+    created: "2026-01-07T15:42:21.082695624Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -575,7 +575,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.622713084Z"
+    created: "2026-01-07T15:42:21.079682635Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -602,7 +602,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.620291546Z"
+    created: "2026-01-07T15:42:21.077009104Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -629,7 +629,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.617090658Z"
+    created: "2026-01-07T15:42:21.07460349Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -656,7 +656,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.614748939Z"
+    created: "2026-01-07T15:42:21.071228499Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -683,7 +683,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.612382684Z"
+    created: "2026-01-07T15:42:21.068823226Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -710,7 +710,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.609219049Z"
+    created: "2026-01-07T15:42:21.066647465Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -737,7 +737,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.607060243Z"
+    created: "2026-01-07T15:42:21.063881544Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -764,7 +764,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.604852496Z"
+    created: "2026-01-07T15:42:21.061209102Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -791,7 +791,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.602654797Z"
+    created: "2026-01-07T15:42:21.058962799Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -818,7 +818,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.599641901Z"
+    created: "2026-01-07T15:42:21.056194539Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -845,7 +845,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.597697397Z"
+    created: "2026-01-07T15:42:21.052092105Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -872,7 +872,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.595717767Z"
+    created: "2026-01-07T15:42:21.048824162Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -899,7 +899,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.593658016Z"
+    created: "2026-01-07T15:42:21.044933662Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -926,7 +926,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.590724008Z"
+    created: "2026-01-07T15:42:21.040993549Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -953,7 +953,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.588752703Z"
+    created: "2026-01-07T15:42:21.036633353Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -980,7 +980,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.586837925Z"
+    created: "2026-01-07T15:42:21.032520964Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -1007,7 +1007,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.58483423Z"
+    created: "2026-01-07T15:42:21.028778595Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -1034,7 +1034,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.582174612Z"
+    created: "2026-01-07T15:42:21.025080068Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -1061,7 +1061,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.58030041Z"
+    created: "2026-01-07T15:42:21.021403072Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -1088,7 +1088,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.578433861Z"
+    created: "2026-01-07T15:42:21.017554096Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -1115,7 +1115,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.576609032Z"
+    created: "2026-01-07T15:42:21.015654097Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -1142,7 +1142,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.574712307Z"
+    created: "2026-01-07T15:42:21.013646294Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -1169,7 +1169,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.571726411Z"
+    created: "2026-01-07T15:42:21.010327956Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -1194,7 +1194,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.569700154Z"
+    created: "2026-01-07T15:42:21.008067015Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -1219,7 +1219,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.567836591Z"
+    created: "2026-01-07T15:42:21.006198014Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -1244,7 +1244,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.565183162Z"
+    created: "2026-01-07T15:42:21.004258129Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -1269,7 +1269,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.563391374Z"
+    created: "2026-01-07T15:42:21.001478912Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -1294,7 +1294,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.561538251Z"
+    created: "2026-01-07T15:42:20.999559557Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -1319,7 +1319,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.559624875Z"
+    created: "2026-01-07T15:42:20.997691298Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -1344,7 +1344,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.556963354Z"
+    created: "2026-01-07T15:42:20.99577087Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -1369,7 +1369,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.554973114Z"
+    created: "2026-01-07T15:42:20.992570942Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -1394,7 +1394,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.553115452Z"
+    created: "2026-01-07T15:42:20.990736266Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -1419,7 +1419,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.551271036Z"
+    created: "2026-01-07T15:42:20.988854962Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -1444,7 +1444,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.549329117Z"
+    created: "2026-01-07T15:42:20.986856437Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -1469,7 +1469,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.546482606Z"
+    created: "2026-01-07T15:42:20.983930675Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -1494,7 +1494,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.544687321Z"
+    created: "2026-01-07T15:42:20.982104706Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -1519,7 +1519,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.542825993Z"
+    created: "2026-01-07T15:42:20.980304375Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -1544,7 +1544,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.540976617Z"
+    created: "2026-01-07T15:42:20.978425826Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -1569,7 +1569,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.538293445Z"
+    created: "2026-01-07T15:42:20.975576689Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -1594,7 +1594,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.536509201Z"
+    created: "2026-01-07T15:42:20.973214176Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -1619,7 +1619,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.534716982Z"
+    created: "2026-01-07T15:42:20.97141652Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -1643,7 +1643,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.532899005Z"
+    created: "2026-01-07T15:42:20.969656756Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -1667,7 +1667,7 @@ entries:
             - name: Common library chart definition
               url: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/Chart.yaml
     apiVersion: v2
-    created: "2025-12-09T13:23:38.529971358Z"
+    created: "2026-01-07T15:42:20.966604791Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -1687,7 +1687,7 @@ entries:
         - kind: added
           description: Automatically set `global.nameOverride` to release name
     apiVersion: v2
-    created: "2025-12-09T13:23:38.528289116Z"
+    created: "2026-01-07T15:42:20.964769855Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -1707,7 +1707,7 @@ entries:
         - kind: changed
           description: Set `common` chart dependency to version 0.1.0
     apiVersion: v2
-    created: "2025-12-09T13:23:38.52658904Z"
+    created: "2026-01-07T15:42:20.962996966Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -1727,6 +1727,36 @@ entries:
       artifacthub.io/changes: |-
         - kind: added
           description: |-
+            Add support for configuring supplementalGroupsPolicy in Pod SecurityContext.
+        - kind: added
+          description: |-
+            Add support for configuring jobLabel in serviceMonitor.
+        - kind: fixed
+          description: |-
+            Fixed checksum annotation when templates are used in ConfigMaps and Secrets.
+    apiVersion: v2
+    created: "2026-01-07T15:42:20.959208319Z"
+    description: Function library for Helm charts
+    digest: ffd5e54b32d392d33141cac269ab130327e37985b30b5a034db5cd6b5189fcba
+    home: https://github.com/bjw-s-labs/helm-charts/tree/main/charts/library/common
+    keywords:
+    - common
+    - library
+    kubeVersion: '>=1.28.0-0'
+    maintainers:
+    - email: me@bjw-s.dev
+      name: bjw-s
+    name: common
+    sources:
+    - https://github.com/bjw-s-labs/helm-charts
+    type: library
+    urls:
+    - https://bjw-s-labs.github.io/helm-charts/library/common-4.6.0.tgz
+    version: 4.6.0
+  - annotations:
+      artifacthub.io/changes: |-
+        - kind: added
+          description: |-
             Add support for named route rules.
         - kind: added
           description: |-
@@ -1735,7 +1765,7 @@ entries:
           description: |-
             Allow defining experimental CORS and externalAuth filters in HTTPRoutes.
     apiVersion: v2
-    created: "2025-12-09T13:23:38.522157425Z"
+    created: "2026-01-07T15:42:20.955285251Z"
     description: Function library for Helm charts
     digest: 52929d41070b04017c0eae4c1e1ce605fdc105379b8cfc1a09797a37cc7a6dd4
     home: https://github.com/bjw-s-labs/helm-charts/tree/main/charts/library/common
@@ -1786,7 +1816,7 @@ entries:
           description: |-
             Fixed merge strategy for defaultPodOptions and defaultContainerOptions.
     apiVersion: v2
-    created: "2025-12-09T13:23:38.518569891Z"
+    created: "2026-01-07T15:42:20.952027216Z"
     description: Function library for Helm charts
     digest: 693db2dec6c2df82b84ec9ef81e3075a13943fe0e1696d2d3b868473dc7f9048
     home: https://github.com/bjw-s-labs/helm-charts/tree/main/charts/library/common
@@ -1828,7 +1858,7 @@ entries:
           description: |-
             Add support for configuring StatefulSet start ordinal in Kubernetes >=v1.31.
     apiVersion: v2
-    created: "2025-12-09T13:23:38.513355759Z"
+    created: "2026-01-07T15:42:20.947991092Z"
     description: Function library for Helm charts
     digest: f76e610628d775602718d0ef0036f08cdebe7fa96635aa391443618105fac274
     home: https://github.com/bjw-s-labs/helm-charts/tree/main/charts/library/common
@@ -1870,7 +1900,7 @@ entries:
           description: |-
             Allow probes to be configured when no services are enabled.
     apiVersion: v2
-    created: "2025-12-09T13:23:38.509651491Z"
+    created: "2026-01-07T15:42:20.944857342Z"
     description: Function library for Helm charts
     digest: 6693cb95b7db23e131ee2ab70fcb41d8ffe3eae302fb7af2bb231d7a35a325cd
     home: https://github.com/bjw-s-labs/helm-charts/tree/main/charts/library/common
@@ -1900,7 +1930,7 @@ entries:
           description: |-
             Fixed namespace validation when setting non-ServiceAccount subject in RoleBinding.
     apiVersion: v2
-    created: "2025-12-09T13:23:38.506810206Z"
+    created: "2026-01-07T15:42:20.940819106Z"
     description: Function library for Helm charts
     digest: 8a47c11268c68d24a36edf5330031b705ab11bbf3593b695a8331a0e4d2a007a
     home: https://github.com/bjw-s-labs/helm-charts/tree/main/charts/library/common
@@ -1927,7 +1957,7 @@ entries:
           description: |-
             Fixed Route automatic service detection if there are no rules defined.
     apiVersion: v2
-    created: "2025-12-09T13:23:38.503341863Z"
+    created: "2026-01-07T15:42:20.937006291Z"
     description: Function library for Helm charts
     digest: 185e49933c6360fde2fe3db645939cb87a8dfb1db57dc8c51cbb9ef93a48c65f
     home: https://github.com/bjw-s-labs/helm-charts/tree/main/charts/library/common
@@ -1972,7 +2002,7 @@ entries:
             - name: Updated documentation
               url: https://bjw-s-labs.github.io/helm-charts/docs/common-library/resources/names/
     apiVersion: v2
-    created: "2025-12-09T13:23:38.500426409Z"
+    created: "2026-01-07T15:42:20.934196854Z"
     description: Function library for Helm charts
     digest: 591b34118c413aa818fe591f1a8402648058c23d25a272808dead0db635ed1c3
     home: https://github.com/bjw-s-labs/helm-charts/tree/main/charts/library/common
@@ -2041,7 +2071,7 @@ entries:
           description: |-
             **Breaking**: Renamed the hardcoded app.kubernetes.io/component label to app.kubernetes.io/controller
     apiVersion: v2
-    created: "2025-12-09T13:23:38.496978848Z"
+    created: "2026-01-07T15:42:20.930361814Z"
     description: Function library for Helm charts
     digest: 2a456dfa13280f934ff9215c21470d82d30e62f6cdc09946107ccfa2e77a049e
     home: https://github.com/bjw-s-labs/helm-charts/tree/main/charts/library/common
@@ -2107,7 +2137,7 @@ entries:
           description: |-
             **Breaking**: Renamed the hardcoded app.kubernetes.io/component label to app.kubernetes.io/controller
     apiVersion: v2
-    created: "2025-12-09T13:23:38.493387918Z"
+    created: "2026-01-07T15:42:20.927059636Z"
     description: Function library for Helm charts
     digest: 894bcf84b72be07fef8b33deeb91da6eeda8963ee795d0e8ef8f9a112bb8a490
     home: https://github.com/bjw-s-labs/helm-charts/tree/main/charts/library/common
@@ -2134,7 +2164,7 @@ entries:
           description: |-
             Fixed incorrect default backendRefs values in HTTPRoute
     apiVersion: v2
-    created: "2025-12-09T13:23:38.490584134Z"
+    created: "2026-01-07T15:42:20.923968747Z"
     description: Function library for Helm charts
     digest: d5019c40d49e118e466b122a1f030117056cc2d0b8e44bdb7f6a97e8cc8c604d
     home: https://github.com/bjw-s-labs/helm-charts/tree/main/charts/library/common
@@ -2162,7 +2192,7 @@ entries:
             Fixed non-deterministic selection of primary service and port.
       org.opencontainers.image.source: https://github.com/bjw-s/helm-charts
     apiVersion: v2
-    created: "2025-12-09T13:23:38.487386995Z"
+    created: "2026-01-07T15:42:20.92050286Z"
     description: Function library for Helm charts
     digest: bb20d4e992daf895bac1c9510976aeec2639b5313e154dd3fad70440a87c1073
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -2189,7 +2219,7 @@ entries:
             Add explicit namespace declaration to templates using Release.Namespace
       org.opencontainers.image.source: https://github.com/bjw-s/helm-charts
     apiVersion: v2
-    created: "2025-12-09T13:23:38.484792684Z"
+    created: "2026-01-07T15:42:20.917620956Z"
     description: Function library for Helm charts
     digest: 78fd166c07f0741f38b78894fee7acd912b0544bbd2dadef7dd97bca7bbd70ce
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -2229,7 +2259,7 @@ entries:
           description: |-
             Add support for configuring gRPC probes
     apiVersion: v2
-    created: "2025-12-09T13:23:38.481570274Z"
+    created: "2026-01-07T15:42:20.915051612Z"
     description: Function library for Helm charts
     digest: 077f6fc273163c499a43ce9b0c02f433062e09aca4bc200bbe7c4948faad776c
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -2257,7 +2287,7 @@ entries:
           description: |-
             `defaultBackend` should be an object for Ingress resources
     apiVersion: v2
-    created: "2025-12-09T13:23:38.478338688Z"
+    created: "2026-01-07T15:42:20.911217392Z"
     description: Function library for Helm charts
     digest: a90086ba61bd214bfe6fb0122497382c04548eb60b76524c9ed2766720e16ef1
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -2282,7 +2312,7 @@ entries:
           description: |-
             Allow propagating global labels and annotations to Pod metadata
     apiVersion: v2
-    created: "2025-12-09T13:23:38.476292995Z"
+    created: "2026-01-07T15:42:20.909189611Z"
     description: Function library for Helm charts
     digest: 8ac569bacb1acfe03458b6ea2945fd3af9d4d325c2d8e928c9a5f609a5e1ac5c
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -2304,7 +2334,7 @@ entries:
           description: |-
             Add feature flag to override enforcing the creation of a default ServiceAccount
     apiVersion: v2
-    created: "2025-12-09T13:23:38.473409046Z"
+    created: "2026-01-07T15:42:20.906124478Z"
     description: Function library for Helm charts
     digest: e292e80b07621547f114a5a578c19ecdbf0836fb29842117c0227b1310c54e60
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -2335,7 +2365,7 @@ entries:
           description: |-
             Add support for multiple RBAC resources
     apiVersion: v2
-    created: "2025-12-09T13:23:38.471330781Z"
+    created: "2026-01-07T15:42:20.904122777Z"
     description: Function library for Helm charts
     digest: 7f963f841a90928596c46a9c14a22d25eceeae730c0e521805714919242e6b7f
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -2369,7 +2399,7 @@ entries:
           description: |-
             Fixed volume name reference when persistence key matches release name.
     apiVersion: v2
-    created: "2025-12-09T13:23:38.469333157Z"
+    created: "2026-01-07T15:42:20.902048278Z"
     description: Function library for Helm charts
     digest: 7477f2480150f259b1d74eeacc37a1439974e2247edcc9bf11f21b1a511a6a0d
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -2403,7 +2433,7 @@ entries:
           description: |-
             Always allow specifying `nodePort` field on service ports.
     apiVersion: v2
-    created: "2025-12-09T13:23:38.466236324Z"
+    created: "2026-01-07T15:42:20.900131858Z"
     description: Function library for Helm charts
     digest: 9fc101074bc3e7ad94d6b8a45d89f35711592bd377f3ba8ecc55ad350022d18d
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -2437,7 +2467,7 @@ entries:
           description: |-
             Always allow specifying `nodePort` field on service ports.
     apiVersion: v2
-    created: "2025-12-09T13:23:38.464370487Z"
+    created: "2026-01-07T15:42:20.897425999Z"
     description: Function library for Helm charts
     digest: 506a6b2a54ceeb7292caceb5b8de793eb3286041b048d9aed6d84460e17b202b
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -2471,7 +2501,7 @@ entries:
           description: |-
             Always allow specifying `nodePort` field on service ports.
     apiVersion: v2
-    created: "2025-12-09T13:23:38.46248854Z"
+    created: "2026-01-07T15:42:20.895514007Z"
     description: Function library for Helm charts
     digest: 6a11b4fd2eed711e541f394e9c832898fd103b7e73009fc806a2ac9028d054b3
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -2505,7 +2535,7 @@ entries:
           description: |-
             Fixed networkPolicies not rendering correctly
     apiVersion: v2
-    created: "2025-12-09T13:23:38.460552081Z"
+    created: "2026-01-07T15:42:20.893663893Z"
     description: Function library for Helm charts
     digest: 025aa297da3805f9b63840b74157b8427251e17ee5baf4e92084b9946e27b2b9
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -2539,7 +2569,7 @@ entries:
           description: |-
             Fixed networkPolicies not rendering correctly
     apiVersion: v2
-    created: "2025-12-09T13:23:38.458119656Z"
+    created: "2026-01-07T15:42:20.891806133Z"
     description: Function library for Helm charts
     digest: fa3b8de9802fbcbde849261ad3f3aac7e1e56d55ba8a333d7e31d12489673e5d
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -2567,7 +2597,7 @@ entries:
           description: |-
             Add jobLabel and namespaceSelector to serviceMonitor
     apiVersion: v2
-    created: "2025-12-09T13:23:38.456327137Z"
+    created: "2026-01-07T15:42:20.888987061Z"
     description: Function library for Helm charts
     digest: 5425004cbad7b612463aac125c2aec004ffcc840796f1a15da5a1d3c370c6049
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -2589,7 +2619,7 @@ entries:
           description: |-
             Improved fix for preventing potential incorrect controller references
     apiVersion: v2
-    created: "2025-12-09T13:23:38.454555486Z"
+    created: "2026-01-07T15:42:20.887201007Z"
     description: Function library for Helm charts
     digest: 66189cdf5623717de5094504c7caa17eb172dc9d6234d37ba38cf62cf0b47cf6
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -2614,7 +2644,7 @@ entries:
           description: |-
             Prevent potential incorrect controller references
     apiVersion: v2
-    created: "2025-12-09T13:23:38.452774328Z"
+    created: "2026-01-07T15:42:20.885421766Z"
     description: Function library for Helm charts
     digest: 66007da3e986d134acab1e6539571dc42f97767ee3c3e11cb2255cfa2b98d242
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -2657,7 +2687,7 @@ entries:
           description: |-
             Allow referencing secrets and configMaps by identifier in persistence section
     apiVersion: v2
-    created: "2025-12-09T13:23:38.450202789Z"
+    created: "2026-01-07T15:42:20.883598522Z"
     description: Function library for Helm charts
     digest: 3ed140f855e5099982ad0bd0bf14cc258d350f62390c5c6191b0b3c761eae833
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -2697,7 +2727,7 @@ entries:
           description: |-
             Allow referencing secrets and configMaps by identifier in persistence section
     apiVersion: v2
-    created: "2025-12-09T13:23:38.448419617Z"
+    created: "2026-01-07T15:42:20.880782021Z"
     description: Function library for Helm charts
     digest: 1bf93fc4197463112a0fc9e7fb6259828f894029d8b8bc90a73ac2771ea44e6b
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -2737,7 +2767,7 @@ entries:
           description: |-
             Allow referencing secrets and configMaps by identifier in persistence section
     apiVersion: v2
-    created: "2025-12-09T13:23:38.446659779Z"
+    created: "2026-01-07T15:42:20.878987942Z"
     description: Function library for Helm charts
     digest: 5adf100c668c485db4db165f8c91211a2ef4a4bf64193c140d2d7a35fcc12816
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -2771,7 +2801,7 @@ entries:
           description: |-
             Allow referencing secrets and configMaps by identifier in persistence section
     apiVersion: v2
-    created: "2025-12-09T13:23:38.444834929Z"
+    created: "2026-01-07T15:42:20.877184495Z"
     description: Function library for Helm charts
     digest: 54c0e16f35299f82207292d153cdccefc36b4d8cb0c3a57ee599027f013b1f3a
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -2802,7 +2832,7 @@ entries:
           description: |-
             Added json-schema to the chart
     apiVersion: v2
-    created: "2025-12-09T13:23:38.442341536Z"
+    created: "2026-01-07T15:42:20.875321126Z"
     description: Function library for Helm charts
     digest: 210e95df40649686f1be491dba43c42121ab47550f0e030755ee1d6496a99e68
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -2833,7 +2863,7 @@ entries:
           description: |-
             Added json-schema to the chart
     apiVersion: v2
-    created: "2025-12-09T13:23:38.44056136Z"
+    created: "2026-01-07T15:42:20.872598013Z"
     description: Function library for Helm charts
     digest: 678c1455041a2be72fb5710e79a5de92289ed5103821e9e87aeb758b6bf087e0
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -2864,7 +2894,7 @@ entries:
           description: |-
             Added json-schema to the chart
     apiVersion: v2
-    created: "2025-12-09T13:23:38.438778259Z"
+    created: "2026-01-07T15:42:20.87080179Z"
     description: Function library for Helm charts
     digest: a209a152b7d6a948d709dcfd0e035c5c446caa46013a8fb05f41061475aa5afd
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -2889,7 +2919,7 @@ entries:
           description: |-
             Add support for specifying parallelism in CronJobs and Jobs
     apiVersion: v2
-    created: "2025-12-09T13:23:38.436986711Z"
+    created: "2026-01-07T15:42:20.868985209Z"
     description: Function library for Helm charts
     digest: ea8284169d9c7d9ae88330845efd536b06b4b1087784225e65c0a0cf1f4a2cdd
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -2926,7 +2956,7 @@ entries:
           description: |-
             Support the `job` controller type to generate one-off jobs.
     apiVersion: v2
-    created: "2025-12-09T13:23:38.43436273Z"
+    created: "2026-01-07T15:42:20.867094708Z"
     description: Function library for Helm charts
     digest: 6581b7c2fc9569ec0f3aa6c76936e93047abb0d11f8e9f007d652e92f9338585
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -2974,7 +3004,7 @@ entries:
                   weight: 1
             ```
     apiVersion: v2
-    created: "2025-12-09T13:23:38.432455776Z"
+    created: "2026-01-07T15:42:20.864408706Z"
     description: Function library for Helm charts
     digest: e4eaebe5699d17854a07441baff4ebd57d79b896f99d25d97f8e515b2a875e75
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -3011,7 +3041,7 @@ entries:
           description: |-
             `valuefrom`-style environment variables can now use Helm templating again.
     apiVersion: v2
-    created: "2025-12-09T13:23:38.430677323Z"
+    created: "2026-01-07T15:42:20.862638001Z"
     description: Function library for Helm charts
     digest: 3b9b5b2eb2c9256b0fedab4ba901cf85a8ecc72ef213a0fe1cf4216026b0eaa5
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -3035,7 +3065,7 @@ entries:
             Note that using dependsOn completely disables the "order" field within the controller.
             The "order" field will be removed in v3.
     apiVersion: v2
-    created: "2025-12-09T13:23:38.428894492Z"
+    created: "2026-01-07T15:42:20.860829805Z"
     description: Function library for Helm charts
     digest: f4f19831ed441ba2b2c5074ffc2c55ca77ea54134dd7b369dfa0def24403aeab
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -3080,7 +3110,7 @@ entries:
           description: |-
             No longer quote numeric ports in probes
     apiVersion: v2
-    created: "2025-12-09T13:23:38.426348715Z"
+    created: "2026-01-07T15:42:20.85892143Z"
     description: Function library for Helm charts
     digest: 4c2eae2586ae45c6e2583ba975abdcd10df9a923ffdc9b2827ee21619b2e4042
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -3125,7 +3155,7 @@ entries:
           description: |-
             No longer quote numeric ports in probes
     apiVersion: v2
-    created: "2025-12-09T13:23:38.424077047Z"
+    created: "2026-01-07T15:42:20.856132407Z"
     description: Function library for Helm charts
     digest: 4e20bfdc3d3dbc6ea06dc2a3c570f3fedf95040b822bc26b6d2c60e58e09a697
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -3147,7 +3177,7 @@ entries:
           description: |-
             Volumes did not render correctly across multiple controllers
     apiVersion: v2
-    created: "2025-12-09T13:23:38.42233372Z"
+    created: "2026-01-07T15:42:20.854433047Z"
     description: Function library for Helm charts
     digest: 966853f521197dd7caf4fafda49c565a4823a1edfdfff506b17c84ba5783526b
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -3172,7 +3202,7 @@ entries:
           description: |-
             Controllers without a type did not default to Deployment
     apiVersion: v2
-    created: "2025-12-09T13:23:38.420677877Z"
+    created: "2026-01-07T15:42:20.852748194Z"
     description: Function library for Helm charts
     digest: 1b0937669e4524f949169021b29a269a031b43d2ad37042b8d15102a989e4126
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -3200,7 +3230,7 @@ entries:
           description: |-
             Validations for container images have been improved.
     apiVersion: v2
-    created: "2025-12-09T13:23:38.419014049Z"
+    created: "2026-01-07T15:42:20.85098829Z"
     description: Function library for Helm charts
     digest: e8b5e76ecfca335f65584a14adbca69bfc0095fb244fc0190ecb30f55728e32f
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -3231,7 +3261,7 @@ entries:
         - kind: changed
           description: Automatically detect `gateway.networking.k8s.io` API version
     apiVersion: v2
-    created: "2025-12-09T13:23:38.416495328Z"
+    created: "2026-01-07T15:42:20.848248725Z"
     description: Function library for Helm charts
     digest: 8a5743539fcd978d59a2768dc48e022257d1c2e35121b6cf61d9fb32df8f5235
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -3260,7 +3290,7 @@ entries:
         - kind: added
           description: Added support for creating Network Policies.
     apiVersion: v2
-    created: "2025-12-09T13:23:38.414062719Z"
+    created: "2026-01-07T15:42:20.846305524Z"
     description: Function library for Helm charts
     digest: 2d55548040a0389a06a7c226d0d714ab97d5b7bbec263ea17bf9586620e3fcc8
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -3288,7 +3318,7 @@ entries:
         - kind: added
           description: Added support for creating Network Policies.
     apiVersion: v2
-    created: "2025-12-09T13:23:38.412403109Z"
+    created: "2026-01-07T15:42:20.844617535Z"
     description: Function library for Helm charts
     digest: 1b300c8e57d286a9d7f81cfe735deda137f5add540f1d4cc868df240de5078d5
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -3309,7 +3339,7 @@ entries:
         - kind: changed
           description: Many things :P
     apiVersion: v2
-    created: "2025-12-09T13:23:38.410704927Z"
+    created: "2026-01-07T15:42:20.842886064Z"
     description: Function library for Helm charts
     digest: 4f30e41c98a11b9488275e41cf4cb202d5711ce3b98503bfafd99a5a78a0ad8c
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -3336,7 +3366,7 @@ entries:
         - kind: changed
           description: Updated gluetun image tag to v3.34.3
     apiVersion: v2
-    created: "2025-12-09T13:23:38.408431366Z"
+    created: "2026-01-07T15:42:20.840442034Z"
     description: Function library for Helm charts
     digest: f645172664e13ef2628d5e988612508b6b38dbcaa425de9669672cb73d6e3426
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -3367,7 +3397,7 @@ entries:
         - kind: changed
           description: Updated netshoot image tag to v0.10
     apiVersion: v2
-    created: "2025-12-09T13:23:38.406755275Z"
+    created: "2026-01-07T15:42:20.838672762Z"
     description: Function library for Helm charts
     digest: ef4e87b057ec4e6553755d08dec4b5328af2a69648d4cfdbfdbd0751a69e251e
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -3399,7 +3429,7 @@ entries:
             - name: GitHub Issue
               url: https://github.com/bjw-s/helm-charts/issues/128
     apiVersion: v2
-    created: "2025-12-09T13:23:38.405062282Z"
+    created: "2026-01-07T15:42:20.836923237Z"
     description: Function library for Helm charts
     digest: 81371987d296c9ea9eecb3118eeee884da2e41599224fe131a10b70b96192e02
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -3424,7 +3454,7 @@ entries:
         - kind: fixed
           description: Pod annotations were not indented enough when controller type was cronjob
     apiVersion: v2
-    created: "2025-12-09T13:23:38.403351065Z"
+    created: "2026-01-07T15:42:20.835202757Z"
     description: Function library for Helm charts
     digest: 1f9771fc84783a0289390c6b1794106c25c4e39895c184f3626e5a1eeca086eb
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -3445,7 +3475,7 @@ entries:
         - kind: fixed
           description: Probes were rendered incorrectly when primary service port was a string.
     apiVersion: v2
-    created: "2025-12-09T13:23:38.401666628Z"
+    created: "2026-01-07T15:42:20.832994293Z"
     description: Function library for Helm charts
     digest: 0ab3bfd3e309e930adbcc19ee7b79bed269ae8ad161cc35887b99f8528288d45
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -3471,7 +3501,7 @@ entries:
         - kind: changed
           description: Renamed `additionalContainers` to `sidecars`. The former will however still continue to work for the time being.
     apiVersion: v2
-    created: "2025-12-09T13:23:38.399515844Z"
+    created: "2026-01-07T15:42:20.830903573Z"
     description: Function library for Helm charts
     digest: 67b289b525002c10c4e9b20e85914ed7a36ceb361f27cd15321ceacbc391aced
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -3501,7 +3531,7 @@ entries:
         - kind: added
           description: Allow setting `ttlSecondsAfterFinished` for CronJobs
     apiVersion: v2
-    created: "2025-12-09T13:23:38.397554157Z"
+    created: "2026-01-07T15:42:20.829166001Z"
     description: Function library for Helm charts
     digest: 946bdf9a5e9968eeb715752e8aaddbd4d04e85bd8e480cfba202c72ca8eebe0c
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -3530,7 +3560,7 @@ entries:
         - kind: added
           description: Allow setting container restartPolicy
     apiVersion: v2
-    created: "2025-12-09T13:23:38.395882535Z"
+    created: "2026-01-07T15:42:20.827312379Z"
     description: Function library for Helm charts
     digest: 2b5a51644fde9ad03a55a7ecbf7273c456f065d09eb17c93afaa6f0b94298f82
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -3571,7 +3601,7 @@ entries:
         - kind: removed
           description: Removed promtail add-on
     apiVersion: v2
-    created: "2025-12-09T13:23:38.39424211Z"
+    created: "2026-01-07T15:42:20.825582962Z"
     description: Function library for Helm charts
     digest: 7af7789a17b26412ee5bdb18a320bf89c945cc1cb75b8ad2f74d9b05b4ffe916
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -3612,7 +3642,7 @@ entries:
         - kind: removed
           description: Removed promtail add-on
     apiVersion: v2
-    created: "2025-12-09T13:23:38.392578944Z"
+    created: "2026-01-07T15:42:20.822916278Z"
     description: Function library for Helm charts
     digest: 7b21185e975f9933d777fd39cfb4faea0112742e602efc2b6bd732d324b4e780
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -3653,7 +3683,7 @@ entries:
         - kind: removed
           description: Removed promtail add-on
     apiVersion: v2
-    created: "2025-12-09T13:23:38.390200937Z"
+    created: "2026-01-07T15:42:20.821149791Z"
     description: Function library for Helm charts
     digest: 60528b8fb074c3dcbe1c37663992fc1032caf085200bfca487658c7d91fcb23b
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -3694,7 +3724,7 @@ entries:
         - kind: removed
           description: Removed promtail add-on
     apiVersion: v2
-    created: "2025-12-09T13:23:38.388577825Z"
+    created: "2026-01-07T15:42:20.819466681Z"
     description: Function library for Helm charts
     digest: a06e247bcfd797b78a71bd474b1eadd9d22a86bdfe20099c049668af5b69b131
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -3737,7 +3767,7 @@ entries:
         - kind: fixed
           description: Fix NOTES always showing ingress protocol as http
     apiVersion: v2
-    created: "2025-12-09T13:23:38.38696386Z"
+    created: "2026-01-07T15:42:20.817752102Z"
     description: Function library for Helm charts
     digest: 50dd7dd027ee390285c9593fa9f059525310bbff364aa029bbc9f4607cbe4e23
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -3780,7 +3810,7 @@ entries:
         - kind: fixed
           description: Fix NOTES always showing ingress protocol as http
     apiVersion: v2
-    created: "2025-12-09T13:23:38.385352981Z"
+    created: "2026-01-07T15:42:20.815779353Z"
     description: Function library for Helm charts
     digest: 49207b5b10db6b0fafeb2e926160c666d719c6335a2f4b2aa0305a5ebe90affb
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -3803,7 +3833,7 @@ entries:
         - kind: changed
           description: Updated code-server image to v4.7.1
     apiVersion: v2
-    created: "2025-12-09T13:23:38.383721073Z"
+    created: "2026-01-07T15:42:20.813298479Z"
     description: Function library for Helm charts
     digest: f6291e195750b25c0d49ca611c9b61835bf683d61d3419e3a3cbc149dd5f11c0
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -3836,7 +3866,7 @@ entries:
         - kind: changed
           description: Updated code-server image to v4.7.0
     apiVersion: v2
-    created: "2025-12-09T13:23:38.38137197Z"
+    created: "2026-01-07T15:42:20.811752178Z"
     description: Function library for Helm charts
     digest: 12c4fc1776a5b296b09bfc55aad12e34212be4e72e85c92f3f4bf17395e41277
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -3867,7 +3897,7 @@ entries:
         - kind: changed
           description: Updated code-server image to v4.7.0
     apiVersion: v2
-    created: "2025-12-09T13:23:38.37981351Z"
+    created: "2026-01-07T15:42:20.810215225Z"
     description: Function library for Helm charts
     digest: 0c20278db20419482fa1e07d5e81a7c1043f6e5d0166668f4ad797e40fb77fbb
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -3888,7 +3918,7 @@ entries:
         - kind: changed
           description: Initial version
     apiVersion: v2
-    created: "2025-12-09T13:23:38.378299382Z"
+    created: "2026-01-07T15:42:20.808689132Z"
     description: Function library for Helm charts
     digest: f5a30aa881582b34727862cb71b3afe7cfd6ce4ee1bb4c750355cbb569b5e06f
     home: https://github.com/bjw-s/helm-charts/tree/main/charts/library/common
@@ -3910,7 +3940,7 @@ entries:
         - kind: changed
           description: Set `common` chart dependency to version 0.1.0
     apiVersion: v2
-    created: "2025-12-09T13:23:38.712038698Z"
+    created: "2026-01-07T15:42:21.166589896Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -3927,7 +3957,7 @@ entries:
     version: 0.1.0
   common-test:
   - apiVersion: v2
-    created: "2025-12-09T13:23:38.524851353Z"
+    created: "2026-01-07T15:42:20.961160927Z"
     dependencies:
     - name: common
       repository: file://../common
@@ -3953,7 +3983,7 @@ entries:
           url: "https://github.com/bjw-s/k8s-ycl"
     apiVersion: v2
     appVersion: v0.2.0
-    created: "2025-12-09T13:23:38.376727546Z"
+    created: "2026-01-07T15:42:20.807074321Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -3986,7 +4016,7 @@ entries:
           url: "https://github.com/bjw-s/k8s-ycl"
     apiVersion: v2
     appVersion: v0.2.0
-    created: "2025-12-09T13:23:38.374283566Z"
+    created: "2026-01-07T15:42:20.803558618Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -4019,7 +4049,7 @@ entries:
           url: "https://github.com/bjw-s/k8s-ycl"
     apiVersion: v2
     appVersion: v0.2.0
-    created: "2025-12-09T13:23:38.366672422Z"
+    created: "2026-01-07T15:42:20.801115733Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -4052,7 +4082,7 @@ entries:
           url: "https://github.com/bjw-s/k8s-ycl"
     apiVersion: v2
     appVersion: v0.2.0
-    created: "2025-12-09T13:23:38.36445642Z"
+    created: "2026-01-07T15:42:20.79876924Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -4085,7 +4115,7 @@ entries:
           url: "https://github.com/bjw-s/k8s-ycl"
     apiVersion: v2
     appVersion: v0.2.0
-    created: "2025-12-09T13:23:38.36133315Z"
+    created: "2026-01-07T15:42:20.795520486Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -4118,7 +4148,7 @@ entries:
           url: "https://github.com/bjw-s/k8s-ycl"
     apiVersion: v2
     appVersion: v0.2.0
-    created: "2025-12-09T13:23:38.359156551Z"
+    created: "2026-01-07T15:42:20.793284081Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -4151,7 +4181,7 @@ entries:
           url: "https://github.com/bjw-s/k8s-ycl"
     apiVersion: v2
     appVersion: v0.2.0
-    created: "2025-12-09T13:23:38.356940287Z"
+    created: "2026-01-07T15:42:20.790965832Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -4184,7 +4214,7 @@ entries:
           url: "https://github.com/bjw-s/k8s-ycl"
     apiVersion: v2
     appVersion: v0.2.0
-    created: "2025-12-09T13:23:38.353978326Z"
+    created: "2026-01-07T15:42:20.787797955Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -4217,7 +4247,7 @@ entries:
           url: "https://github.com/bjw-s/k8s-ycl"
     apiVersion: v2
     appVersion: v0.2.0
-    created: "2025-12-09T13:23:38.350999093Z"
+    created: "2026-01-07T15:42:20.785576228Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -4250,7 +4280,7 @@ entries:
           url: "https://github.com/bjw-s/k8s-ycl"
     apiVersion: v2
     appVersion: v0.2.0
-    created: "2025-12-09T13:23:38.346943152Z"
+    created: "2026-01-07T15:42:20.783292424Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -4283,7 +4313,7 @@ entries:
           url: "https://github.com/bjw-s/k8s-ycl"
     apiVersion: v2
     appVersion: v0.2.0
-    created: "2025-12-09T13:23:38.342235926Z"
+    created: "2026-01-07T15:42:20.779468453Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -4319,7 +4349,7 @@ entries:
           url: "https://github.com/bjw-s/k8s-ycl"
     apiVersion: v2
     appVersion: v0.2.0
-    created: "2025-12-09T13:23:38.34011941Z"
+    created: "2026-01-07T15:42:20.777277113Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -4352,7 +4382,7 @@ entries:
           url: "https://github.com/bjw-s/k8s-ycl"
     apiVersion: v2
     appVersion: v0.1.0
-    created: "2025-12-09T13:23:38.338092211Z"
+    created: "2026-01-07T15:42:20.775198417Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -4385,7 +4415,7 @@ entries:
           url: "https://github.com/bjw-s/k8s-ycl"
     apiVersion: v2
     appVersion: v0.1.0
-    created: "2025-12-09T13:23:38.336045785Z"
+    created: "2026-01-07T15:42:20.772432973Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -4418,7 +4448,7 @@ entries:
           url: "https://github.com/bjw-s/k8s-ycl"
     apiVersion: v2
     appVersion: v0.1.0
-    created: "2025-12-09T13:23:38.333181481Z"
+    created: "2026-01-07T15:42:20.770119603Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -4451,7 +4481,7 @@ entries:
           url: "https://github.com/bjw-s/k8s-ycl"
     apiVersion: v2
     appVersion: v0.1.0
-    created: "2025-12-09T13:23:38.331154863Z"
+    created: "2026-01-07T15:42:20.768136005Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -4484,7 +4514,7 @@ entries:
           url: "https://github.com/bjw-s/k8s-ycl"
     apiVersion: v2
     appVersion: v0.1.0
-    created: "2025-12-09T13:23:38.329245805Z"
+    created: "2026-01-07T15:42:20.766037621Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -4520,7 +4550,7 @@ entries:
           url: "https://github.com/bjw-s/k8s-ycl"
     apiVersion: v2
     appVersion: v0.1.0
-    created: "2025-12-09T13:23:38.326862449Z"
+    created: "2026-01-07T15:42:20.747172264Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -4553,7 +4583,7 @@ entries:
           url: "https://github.com/bjw-s/k8s-ycl"
     apiVersion: v2
     appVersion: v0.1.0
-    created: "2025-12-09T13:23:38.324545633Z"
+    created: "2026-01-07T15:42:20.744738106Z"
     dependencies:
     - name: common
       repository: https://bjw-s.github.io/helm-charts
@@ -4584,7 +4614,7 @@ entries:
             Update cni-plugins to v1.9.0
     apiVersion: v2
     appVersion: 4.2.2
-    created: "2025-12-09T13:23:38.728656505Z"
+    created: "2026-01-07T15:42:21.183537829Z"
     dependencies:
     - name: common
       repository: https://bjw-s-labs.github.io/helm-charts
@@ -4607,7 +4637,7 @@ entries:
             Upgraded the common library to v4.5.0
     apiVersion: v2
     appVersion: 4.2.2
-    created: "2025-12-09T13:23:38.725184708Z"
+    created: "2026-01-07T15:42:21.179072381Z"
     dependencies:
     - name: common
       repository: https://bjw-s-labs.github.io/helm-charts
@@ -4630,7 +4660,7 @@ entries:
             Update ghcr.io/k8snetworkplumbingwg/multus-cni ( v4.2.2 ➔ v4.2.3 )
     apiVersion: v2
     appVersion: 4.2.2
-    created: "2025-12-09T13:23:38.720289494Z"
+    created: "2026-01-07T15:42:21.17470859Z"
     dependencies:
     - name: common
       repository: https://bjw-s-labs.github.io/helm-charts
@@ -4653,7 +4683,7 @@ entries:
             Initial version
     apiVersion: v2
     appVersion: 4.2.2
-    created: "2025-12-09T13:23:38.71578024Z"
+    created: "2026-01-07T15:42:21.17121997Z"
     dependencies:
     - name: common
       repository: https://bjw-s-labs.github.io/helm-charts
@@ -4680,7 +4710,7 @@ entries:
               url: https://github.com/k8snetworkplumbingwg/multus-cni/blob/v4.2.2/deployments/multus-daemonset.yml#L10-L53
     apiVersion: v2
     appVersion: 4.2.2
-    created: "2025-12-09T13:23:38.728812838Z"
+    created: "2026-01-07T15:42:21.183699895Z"
     description: A Helm chart for the Multus CNI CustomResourceDefinition
     digest: 9fdf70a8a9e5acaa3789a42bc2648f7ff495c1f78d7a3faf565a8b787ac2f157
     maintainers:
@@ -4692,4 +4722,4 @@ entries:
     urls:
     - https://bjw-s-labs.github.io/helm-charts/other/multus-crd-1.0.0.tgz
     version: 1.0.0
-generated: "2025-12-09T13:23:38.322280969Z"
+generated: "2026-01-07T15:42:20.742054807Z"
