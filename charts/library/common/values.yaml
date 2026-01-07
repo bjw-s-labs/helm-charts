@@ -767,6 +767,19 @@ persistence:
   #   # -- Set to true to retain the PVC upon `helm uninstall`
   #   retain: false
 
+  #   # -- iSCSI configuration. Required only when using `type: iscsi`.
+  #   # targetPortal: 10.0.0.1:3260
+  #   # iqn: iqn.2001-04.com.example:storage.disk2.sys1.xyz
+  #   # lun: 0
+  #   # fsType: ext4
+  #   # readOnly: false
+  #   # chapAuthDiscovery: false
+  #   # chapAuthSession: false
+  #   # secretRef:
+  #   #   name: my-secret
+  #   # initiatorName: iqn.2001-04.com.example:client.disk2.sys1.xyz
+  #   # portals: []
+
   #   # -- Configure mounts to all controllers and containers. By default the persistence item
   #   # will be mounted to `/<name_of_the_peristence_item>`.
   #   # Example:
