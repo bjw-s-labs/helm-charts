@@ -1,6 +1,7 @@
 {{- define "bjw-s.common.class.serviceMonitor" -}}
   {{- $rootContext := .rootContext -}}
   {{- $serviceMonitorObject := .object -}}
+  {{- $ctx := dict "rootContext" $rootContext "serviceMonitorObject" $serviceMonitorObject -}}
   {{- $labels := merge
     ($serviceMonitorObject.labels | default dict)
     (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
@@ -41,7 +42,7 @@ metadata:
   {{- end }}
   namespace: {{ $rootContext.Release.Namespace }}
 spec:
-  jobLabel: "{{ $serviceMonitorObject.name }}"
+  jobLabel: {{ include "bjw-s.common.lib.serviceMonitor.field.jobLabel" (dict "ctx" $ctx) | trim }}
   namespaceSelector:
     matchNames:
       - {{ $rootContext.Release.Namespace }}

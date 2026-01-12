@@ -22,6 +22,7 @@ tests:
           runAsGroup: 1000
           fsGroup: 1000
           fsGroupChangePolicy: OnRootMismatch
+          supplementalGroupsPolicy: Merge
     documentSelector:
       path: $[?(@.kind == "Deployment")].metadata.name
       value: release-name
@@ -33,6 +34,7 @@ tests:
             runAsGroup: 1000
             fsGroup: 1000
             fsGroupChangePolicy: OnRootMismatch
+            supplementalGroupsPolicy: Merge
 
   - it: defaultPodOption with pod override should pass
     set:

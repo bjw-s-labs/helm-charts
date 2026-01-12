@@ -400,6 +400,11 @@
         },
         "type": "array"
       },
+      "supplementalGroupsPolicy": {
+        "description": "Defines how supplemental groups of the the first process in each container are calculated. Valid values are \"Merge\" and \"Strict\". If not specified, \"Merge\" is used. Note that this field cannot be set when spec.os.name is windows.",
+        "type": "string",
+        "enum": ["Merge", "Strict"]
+      },
       "sysctls": {
         "description": "Sysctls hold a list of namespaced sysctls used for the pod. Pods with unsupported sysctls (by the container runtime) might fail to launch. Note that this field cannot be set when spec.os.name is windows.",
         "items": {

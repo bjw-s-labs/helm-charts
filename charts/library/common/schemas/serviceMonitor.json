@@ -16,6 +16,10 @@
           },
           "annotations": { "$ref": "definitions.json#/annotations" },
           "labels": { "$ref": "definitions.json#/labels" },
+          "jobLabel": {
+            "description": "The label to use to retrieve the job name from the target service's metadata. Defaults to the ServiceMonitor's 'metadata.name'. Helm templates can be used.",
+            "type": "string"
+          },
           "endpoints": {
             "description": "Endpoints allowed as part of this ServiceMonitor.",
             "type": "array",

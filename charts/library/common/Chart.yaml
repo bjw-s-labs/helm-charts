@@ -3,7 +3,7 @@ apiVersion: v2
 name: common
 description: Function library for Helm charts
 type: library
-version: 4.5.0
+version: 4.6.0
 kubeVersion: ">=1.28.0-0"
 keywords:
   - common
@@ -18,10 +18,10 @@ annotations:
   artifacthub.io/changes: |-
     - kind: added
       description: |-
-        Add support for named route rules.
+        Add support for configuring supplementalGroupsPolicy in Pod SecurityContext.
     - kind: added
       description: |-
-        Allow creating PodDisruptionBudget Objects for controllers.
-    - kind: added
+        Add support for configuring jobLabel in serviceMonitor.
+    - kind: fixed
       description: |-
-        Allow defining experimental CORS and externalAuth filters in HTTPRoutes.
+        Fixed checksum annotation when templates are used in ConfigMaps and Secrets.

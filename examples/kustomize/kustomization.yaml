@@ -5,7 +5,7 @@ helmCharts:
   - name: app-template
     repo: https://bjw-s-labs.github.io/helm-charts/
     # this example is not automatically updated, so be sure to use the latest chart version
-    version: 4.5.0
+    version: 4.6.0
     releaseName: &releaseName vaultwarden
     namespace: &releaseNamespace default
     valuesFile: values.yaml

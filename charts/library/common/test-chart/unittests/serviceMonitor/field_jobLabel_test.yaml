@@ -1,0 +1,52 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: serviceMonitor - fields - jobLabel
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+set:
+  serviceMonitor:
+    main:
+      serviceName: "{{ .Release.Name }}"
+      endpoints:
+        - port: http
+          scheme: http
+          path: /metrics
+          interval: 1m
+          scrapeTimeout: 10s
+tests:
+  - it: jobLabel defaults to serviceMonitor metadata.name
+    documentSelector:
+      path: $[?(@.kind == "ServiceMonitor")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.jobLabel
+          value: release-name
+
+  - it: jobLabel can be configured
+    documentSelector:
+      path: $[?(@.kind == "ServiceMonitor")].metadata.name
+      value: release-name
+    set:
+      serviceMonitor:
+        main:
+          jobLabel: app.kubernetes.io/name
+    asserts:
+      - equal:
+          path: spec.jobLabel
+          value: app.kubernetes.io/name
+
+  - it: jobLabel can be configured with a template
+    documentSelector:
+      path: $[?(@.kind == "ServiceMonitor")].metadata.name
+      value: release-name
+    set:
+      serviceMonitor:
+        main:
+          jobLabel: "{{ .Release.Name | lower }}-test"
+    asserts:
+      - equal:
+          path: spec.jobLabel
+          value: release-name-test
