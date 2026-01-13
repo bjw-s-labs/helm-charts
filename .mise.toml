@@ -17,7 +17,7 @@ rust = "1.92.0" # Required for schematools
 "aqua:helm/chart-testing" = "3.14.0"
 "aqua:mikefarah/yq" = "4.50.1"
 "cargo:schematools-cli" = "0.22.0"
-"pipx:yamllint" = "1.37.1"
+"pipx:yamllint" = "1.38.0"
 "pipx:yamale" = "6.1.0"
 
 [hooks]
