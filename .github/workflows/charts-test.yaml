@@ -18,6 +18,7 @@ jobs:
   build-matrix:
     name: Build version matrix
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     if: ${{ inputs.charts != '[]' && inputs.charts != '' }}
     outputs:
       matrix: ${{ steps.build.outputs.matrix }}
@@ -85,6 +86,7 @@ jobs:
   install-chart:
     name: Install chart
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
     needs:
       - build-matrix
     if: ${{ needs.build-matrix.outputs.matrix != '[]' && needs.build-matrix.outputs.matrix != '' }}
@@ -183,6 +185,7 @@ jobs:
   unittest-chart:
     name: Unit-test chart
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
     if: ${{ inputs.charts != '[]' && inputs.charts != '' }}
     strategy:
       matrix:
