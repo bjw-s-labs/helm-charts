@@ -43,7 +43,7 @@ jobs:
             gh release list \
               --repo k3s-io/k3s \
               --limit 300 \
-              --json tagName,publishedAt,isDraft \
+              --json tagName,publishedAt,isDraft,isPrerelease \
             | jq -c \
                 --arg min_major "${MIN_MAJOR}" \
                 --arg min_minor "${MIN_MINOR}" \
@@ -52,6 +52,7 @@ jobs:
                     ($t | capture("^v?(?<maj>\\d+)\\.(?<min>\\d+)\\.(?<patch>\\d+)")?);
 
                   map(select(.isDraft == false))
+                  | map(select(.isPrerelease == false))
                   | map(. + (parsed(.tagName) // {}))
                   | map(select(has("maj")))
                   | map(select(
