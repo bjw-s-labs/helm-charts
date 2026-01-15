@@ -37,23 +37,28 @@ jobs:
 
       - name: Merge charts with versions
         id: merge
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
         env:
           CHARTS_JSON: ${{ inputs.charts }}
           VERSIONS_JSON: ${{ steps.build.outputs.versions }}
-        run: |
-          if [[ -z "${CHARTS_JSON}" || "${CHARTS_JSON}" == "null" ]]; then
-            CHARTS_JSON='[]'
-          fi
+        with:
+          script: |
+            const rawCharts = process.env.CHARTS_JSON;
+            const rawVersions = process.env.VERSIONS_JSON;
 
-          matrix_json="$(
-            jq -n \
-              --argjson charts "${CHARTS_JSON}" \
-              --argjson versions "${VERSIONS_JSON}" \
-              '[ $charts[] as $chart | $versions[] as $v | { chart: $chart, k8s_version: $v.k8s_version, k3s_tag: $v.k3s_tag } ]'
-          )"
+            const charts = rawCharts && rawCharts !== 'null' ? JSON.parse(rawCharts) : [];
+            const versions = rawVersions && rawVersions !== 'null' ? JSON.parse(rawVersions) : [];
 
-          echo "${matrix_json}"
-          echo "matrix=${matrix_json}" >> "${GITHUB_OUTPUT}"
+            const matrix = charts.flatMap((chart) =>
+              versions.map((version) => ({
+                chart,
+                k8s_version: version.k8s_version,
+                k3s_tag: version.k3s_tag,
+              }))
+            );
+
+            core.setOutput('matrix', JSON.stringify(matrix));
+            console.log(JSON.stringify(matrix));
 
   install-chart:
     name: Install chart
