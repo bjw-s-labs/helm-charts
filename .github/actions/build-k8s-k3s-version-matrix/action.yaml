@@ -18,9 +18,68 @@ runs:
   steps:
     - name: Build matrix
       id: build
-      shell: bash
+      uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
       env:
-        GH_TOKEN: ${{ inputs.github_token }}
         MIN_K8S_VERSION: ${{ inputs.min_k8s_version }}
-      run: |-
-        "${GITHUB_ACTION_PATH}/build-matrix.sh"
+      with:
+        github-token: ${{ inputs.github_token }}
+        script: |-
+          const semver = require('semver');
+
+          const minK8sVersion = process.env.MIN_K8S_VERSION ?? '';
+          const minVersion = semver.coerce(minK8sVersion);
+          if (!minVersion) {
+            throw new Error(`Invalid minimum version: ${minK8sVersion}`);
+          }
+
+          const releases = (await github.paginate(
+            github.rest.repos.listReleases,
+            {
+              owner: 'k3s-io',
+              repo: 'k3s',
+              per_page: 100,
+            }
+          )).slice(0, 300);
+
+          const candidates = releases
+            .filter((release) => release.draft === false)
+            .filter((release) => release.prerelease === false)
+            .map((release) => {
+              const tagName = release.tag_name || '';
+              const parsed = semver.parse(tagName, { loose: true });
+              if (!parsed) {
+                return null;
+              }
+
+              return {
+                release,
+                parsed,
+              };
+            })
+            .filter(Boolean)
+            .filter(({ parsed }) => semver.gte(parsed, minVersion));
+
+          const latestByMinor = new Map();
+          for (const item of candidates) {
+            const key = `${item.parsed.major}.${item.parsed.minor}`;
+            const publishedAt = new Date(item.release.published_at ?? 0).getTime();
+            const current = latestByMinor.get(key);
+            if (!current) {
+              latestByMinor.set(key, { ...item, publishedAt });
+              continue;
+            }
+
+            if (publishedAt >= current.publishedAt) {
+              latestByMinor.set(key, { ...item, publishedAt });
+            }
+          }
+
+          const versions = Array.from(latestByMinor.values())
+            .sort((a, b) => a.publishedAt - b.publishedAt)
+            .map((item) => ({
+              k8s_version: `v${item.parsed.major}.${item.parsed.minor}.${item.parsed.patch}`,
+              k3s_tag: (item.release.tag_name || '').replace(/\+/g, '-'),
+            }));
+
+          core.setOutput('versions', JSON.stringify(versions));
+          console.log(JSON.stringify(versions));
