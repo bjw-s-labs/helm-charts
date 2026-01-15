@@ -64,7 +64,7 @@ jobs:
                   | map(.[-1])
                   | map({
                       k8s_version: ("v" + .maj + "." + .min + "." + .patch),
-                      k3s_tag: .tagName
+                      k3s_tag: (.tagName | gsub("\\+"; "-"))
                     })
                 '
           )"
@@ -126,11 +126,6 @@ jobs:
           K3S_IMAGE: docker.io/rancher/k3s
           K3S_TAG: ${{ matrix.k3s_tag }}
         run: |
-          set -euo pipefail
-
-          K3S_TAG=${K3S_TAG//+/-}
-          echo "Using k3s tag: ${K3S_TAG}"
-
           k3d cluster create --image "${K3S_IMAGE}:${K3S_TAG}"
           echo "::group::Waiting for cluster readiness"
           while ! kubectl get serviceaccount default >/dev/null; do sleep 1; done
