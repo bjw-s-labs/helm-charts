@@ -1,0 +1,26 @@
+---
+name: Build Kubernetes/K3s versions
+description: Build a list of k8s/k3s versions from a minimum k8s version
+inputs:
+  min_k8s_version:
+    description: Minimum Kubernetes version
+    required: false
+    default: "1.28"
+  github_token:
+    description: GitHub token used for API requests
+    required: true
+outputs:
+  versions:
+    description: JSON encoded list of k8s/k3s versions
+    value: ${{ steps.build.outputs.versions }}
+runs:
+  using: "composite"
+  steps:
+    - name: Build matrix
+      id: build
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github_token }}
+        MIN_K8S_VERSION: ${{ inputs.min_k8s_version }}
+      run: |-
+        "${GITHUB_ACTION_PATH}/build-matrix.sh"
