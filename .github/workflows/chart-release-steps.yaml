@@ -59,6 +59,8 @@ jobs:
 
       - name: Install Mise and required tools
         uses: jdx/mise-action@146a28175021df8ca24f8ee1828cc2a60f980bd5 # v3.5.1
+        with:
+          cache_key: "mise-v1-{{file_hash}}"
 
       - name: Login to OCI Registry
         if: ${{ inputs.publishToOciRegistry }}

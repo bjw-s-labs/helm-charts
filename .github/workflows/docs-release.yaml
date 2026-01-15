@@ -32,7 +32,7 @@ jobs:
       - name: Install Mise and required tools
         uses: jdx/mise-action@146a28175021df8ca24f8ee1828cc2a60f980bd5 # v3.5.1
         with:
-          cache: false
+          cache_key: "mise-v1-{{file_hash}}"
 
       - name: Build and publish docs
         run: |

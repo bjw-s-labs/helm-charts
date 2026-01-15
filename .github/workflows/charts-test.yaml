@@ -90,6 +90,8 @@ jobs:
 
       - name: Install Mise and required tools
         uses: jdx/mise-action@146a28175021df8ca24f8ee1828cc2a60f980bd5 # v3.5.1
+        with:
+          cache_key: "mise-v1-{{file_hash}}"
 
       - name: Create a new k3s cluster
         env:
@@ -175,6 +177,8 @@ jobs:
 
       - name: Install Mise and required tools
         uses: jdx/mise-action@146a28175021df8ca24f8ee1828cc2a60f980bd5 # v3.5.1
+        with:
+          cache_key: "mise-v1-{{file_hash}}"
 
       - name: Dereference JSON schema
         uses: bjw-s-labs/helm-charts-actions/dereference-json-schema@b9c5f917efe45f857ed8735f0f396521c97c6d82
