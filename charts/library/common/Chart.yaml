@@ -3,7 +3,7 @@ apiVersion: v2
 name: common
 description: Function library for Helm charts
 type: library
-version: 4.6.0
+version: 4.6.1
 kubeVersion: ">=1.28.0-0"
 keywords:
   - common
@@ -16,12 +16,6 @@ sources:
   - https://github.com/bjw-s-labs/helm-charts
 annotations:
   artifacthub.io/changes: |-
-    - kind: added
-      description: |-
-        Add support for configuring supplementalGroupsPolicy in Pod SecurityContext.
-    - kind: added
-      description: |-
-        Add support for configuring jobLabel in serviceMonitor.
     - kind: fixed
       description: |-
-        Fixed checksum annotation when templates are used in ConfigMaps and Secrets.
+        Make port selection by identifier in backendRefs of HTTPRoute actually do something.

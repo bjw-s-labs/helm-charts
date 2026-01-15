@@ -72,7 +72,7 @@ spec:
         {{- range .backendRefs }}
           {{- $service := dict }}
           {{- $serviceName := "" }}
-          {{- $defaultServicePort := dict }}
+          {{- $servicePort := 0 }}
           {{- if .name }}
             {{- $serviceName = tpl .name $rootContext }}
           {{- else if .identifier }}
@@ -81,13 +81,29 @@ spec:
               {{- fail (printf "No enabled Service found with this identifier. (route: '%s', identifier: '%s')" $routeObject.identifier .identifier) }}
             {{- end }}
             {{- $serviceName = $service.name }}
-            {{- $defaultServicePort = include "bjw-s.common.lib.service.primaryPort" (dict "rootContext" $rootContext "serviceObject" $service) | fromYaml }}
+          {{- end }}
+          {{- if empty .port }}
+            {{/*- Default to the Service primary port if no port has been specified */}}
+            {{- if $service }}
+              {{- $defaultServicePort := include "bjw-s.common.lib.service.primaryPort" (dict "rootContext" $rootContext "serviceObject" $service) | fromYaml }}
+              {{- if $defaultServicePort }}
+                {{- $servicePort = $defaultServicePort.port }}
+              {{- end }}
+            {{- end }}
+          {{- else }}
+            {{/*- If a port number is given, use that */}}
+            {{- if kindIs "float64" .port }}
+              {{- $servicePort = .port }}
+            {{- else if kindIs "string" .port }}
+              {{/*- If a port name is given, try to resolve to a number */}}
+              {{- $servicePort = include "bjw-s.common.lib.service.getPortNumberByName" (dict "rootContext" $rootContext "serviceID" $service.identifier "portName" .port) }}
+            {{- end }}
           {{- end }}
       - group: {{ .group | default "" | quote}}
         kind: {{ .kind | default "Service" }}
         name: {{ $serviceName }}
         namespace: {{ .namespace | default $rootContext.Release.Namespace }}
-        port: {{ .port | default $defaultServicePort.port }}
+        port: {{ $servicePort }}
         weight: {{ include "bjw-s.common.lib.defaultKeepNonNullValue" (dict "value" .weight "default" 1) }}
         {{- end }}
       {{- end }}

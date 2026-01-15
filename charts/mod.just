@@ -21,12 +21,15 @@ test CHART GLOB="**/*_test.yaml":
     CHART_TEST_DIR="$CHART_DIR"
   fi
   [ -d "$CHART_TEST_DIR" ]
-  echo "Testing chart: $CHART_DIR (type=$CHART_TYPE) in $CHART_TEST_DIR"
+  just log info "Testing chart..." "chart" "$CHART_DIR" "type" "$CHART_TYPE"
+  just log debug "Dereferencing values schema"
   cp "$CHART_DIR/values.schema.json" "$CHART_DIR/values.schema.bak"
   trap 'mv "$CHART_DIR/values.schema.bak" "$CHART_DIR/values.schema.json"' EXIT
   schematools-cli process dereference "$CHART_DIR/values.schema.json" --to-file "$CHART_DIR/values.schema.json"
+  just log debug "Updating helm dependencies"
   ( cd "$CHART_TEST_DIR" && helm dep update )
-  ( cd "$CHART_TEST_DIR" && helm unittest --color -f "unittests/{{GLOB}}" . 2> >(grep -v 'found symbolic link' >&2))
+  just log debug "Running helm unit tests"
+  ( cd "$CHART_TEST_DIR" && helm unittest -f "unittests/{{GLOB}}" . 2> >(grep -v 'found symbolic link' >&2))
 
 [doc('Clean up chart dependency artifacts (Chart.lock files and nested charts/ dirs)')]
 cleanup:
