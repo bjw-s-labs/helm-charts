@@ -16,6 +16,29 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: Create package.json
+      shell: bash
+      run: |-
+        cat > package.json << 'EOF'
+        {
+          "dependencies": {
+            "semver": "^7.7.2"
+          }
+        }
+        EOF
+
+    - name: Setup Node
+      uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+      with:
+        cache: npm
+        cache-dependency-path: package.json
+        node-version: 24.x
+
+    - name: Setup Node Dependencies
+      shell: bash
+      run: |-
+        npm install
+
     - name: Build matrix
       id: build
       uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
