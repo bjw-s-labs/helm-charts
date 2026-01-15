@@ -154,7 +154,7 @@ jobs:
             exit 0
           fi
 
-          helm plugin install https://github.com/helm-unittest/helm-unittest.git
+          helm plugin install https://github.com/helm-unittest/helm-unittest.git --verify=false
           helm dep update
           helm unittest -f "unittests/**/*_test.yaml" . 2> >(grep -v 'found symbolic link' >&2)
 
