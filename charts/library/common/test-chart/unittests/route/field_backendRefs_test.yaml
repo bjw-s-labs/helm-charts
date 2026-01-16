@@ -72,6 +72,32 @@ tests:
             port: 8081
             weight: 1
 
+  - it: backendRefs can be configured without a port
+    values:
+      - ../_values/service_main_default.yaml
+    set:
+      route.main:
+        parentRefs:
+          - name: parentName
+            namespace: parentNamespace
+        rules:
+          - backendRefs:
+              - group: traefik.io
+                kind: TraefikService
+                name: noop@internal
+    documentSelector:
+      path: $[?(@.kind == "HTTPRoute")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.rules[0].backendRefs[0]
+          value:
+            group: traefik.io
+            kind: TraefikService
+            name: noop@internal
+            namespace: NAMESPACE
+            weight: 1
+
   - it: automatic service and port reference should pass
     values:
       - ../_values/service_main_default.yaml

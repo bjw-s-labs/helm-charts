@@ -3,7 +3,7 @@ apiVersion: v2
 name: common
 description: Function library for Helm charts
 type: library
-version: 4.6.1
+version: 4.6.2
 kubeVersion: ">=1.28.0-0"
 keywords:
   - common
@@ -19,3 +19,6 @@ annotations:
     - kind: fixed
       description: |-
         Make port selection by identifier in backendRefs of HTTPRoute actually do something.
+    - kind: fixed
+      description: |-
+        Route port was no longer optional while it should be.
