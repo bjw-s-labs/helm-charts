@@ -9,7 +9,7 @@ python.uv_venv_auto = true
 
 [tools]
 python = "3.14.3" # Required for documentation generation
-rust = "1.93.0" # Required for schematools
+rust = "1.93.1" # Required for schematools
 k3d = "5.8.3"
 "aqua:astral-sh/uv" = "0.10.2"
 "aqua:casey/just" = "1.46.0"
