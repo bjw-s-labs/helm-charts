@@ -16,6 +16,9 @@ sources:
   - https://github.com/bjw-s-labs/helm-charts
 annotations:
   artifacthub.io/changes: |-
+    - kind: added
+      description: |-
+        Allow creating HorizontalPodAutoscaler objects for controllers.
     - kind: fixed
       description: |-
         Make port selection by identifier in backendRefs of HTTPRoute actually do something.
