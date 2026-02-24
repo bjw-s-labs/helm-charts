@@ -129,6 +129,33 @@
                 "type": ["integer", "string"]
               }
             }
+          },
+          "horizontalPodAutoscaler": {
+            "description": "HorizontalPodAutoscaler configuration for this controller. Only supported for deployment and statefulset types.",
+            "type": "object",
+            "required": ["maxReplicas"],
+            "properties": {
+              "annotations": { "$ref": "definitions.json#/annotations" },
+              "labels": { "$ref": "definitions.json#/labels" },
+              "minReplicas": {
+                "description": "Minimum number of replicas.",
+                "type": "integer",
+                "minimum": 1
+              },
+              "maxReplicas": {
+                "description": "Maximum number of replicas.",
+                "type": "integer",
+                "minimum": 1
+              },
+              "metrics": {
+                "description": "Metrics to use for scaling. Passed through directly to the autoscaling/v2 HPA spec.",
+                "type": "array"
+              },
+              "behavior": {
+                "description": "Scaling behavior configuration. Passed through directly to the autoscaling/v2 HPA spec.",
+                "type": "object"
+              }
+            }
           }
         },
         "allOf": [
