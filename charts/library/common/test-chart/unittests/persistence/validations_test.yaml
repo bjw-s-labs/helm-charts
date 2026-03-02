@@ -14,7 +14,7 @@ tests:
           identifier: doesNotExist
     asserts:
       - failedTemplate:
-          errorMessage: "No configmap found with this identifier. (persistence item 'configmap', identifier 'doesNotExist')"
+          errorMessage: "Persistence 'configmap': No ConfigMap found with identifier 'doesNotExist'. Ensure a ConfigMap with this identifier exists and is enabled under 'configMaps.doesNotExist'."
 
   - it: secret persistence type with invalid identifier reference should fail
     set:
@@ -24,4 +24,4 @@ tests:
           identifier: doesNotExist
     asserts:
       - failedTemplate:
-          errorMessage: "No secret found with this identifier. (persistence item 'secret', identifier 'doesNotExist')"
+          errorMessage: "Persistence 'secret': No Secret found with identifier 'doesNotExist'. Ensure a Secret with this identifier exists and is enabled under 'secrets.doesNotExist'."

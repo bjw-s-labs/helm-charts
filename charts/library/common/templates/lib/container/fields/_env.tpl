@@ -40,7 +40,7 @@ Env field used by the container.
         {{- end -}}
       {{- end -}}
 
-      {{- $args := dict "graph" $graph "out" list -}}
+      {{- $args := dict "graph" $graph "out" list "contextType" "env" "contextId" $containerObject.identifier -}}
       {{- include "bjw-s.common.lib.kahn" $args -}}
 
       {{- range $name := $args.out -}}
@@ -48,7 +48,7 @@ Env field used by the container.
         {{- $envValue := get $envValues $name -}}
 
         {{- if kindIs "map" $envValue -}}
-          {{- $envItem := merge $envItem (omit $envValue "dependsOn") -}}
+          {{- $envItem = merge $envItem (omit $envValue "dependsOn") -}}
         {{- else -}}
           {{- $_ := set $envItem "value" $envValue -}}
         {{- end -}}

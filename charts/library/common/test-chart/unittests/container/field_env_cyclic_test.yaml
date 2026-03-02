@@ -1,0 +1,85 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: container - fields - env - cyclic dependencies
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+tests:
+  - it: simple cyclic dependency should fail
+    set:
+      controllers.main.containers.main.env:
+        VAR1:
+          value: value1
+          dependsOn: VAR2
+        VAR2:
+          value: value2
+          dependsOn: VAR1
+    asserts:
+      - failedTemplate:
+          errorPattern: ^Cyclic dependency detected in environment variable ordering
+
+  - it: complex cyclic dependency should fail
+    set:
+      controllers.main.containers.main.env:
+        VAR1:
+          value: value1
+          dependsOn: VAR3
+        VAR2:
+          value: value2
+          dependsOn: VAR1
+        VAR3:
+          value: value3
+          dependsOn: VAR2
+    asserts:
+      - failedTemplate:
+          errorPattern: ^Cyclic dependency detected in environment variable ordering
+
+  - it: self-referencing dependency should fail
+    set:
+      controllers.main.containers.main.env:
+        VAR1:
+          value: value1
+          dependsOn: VAR1
+    asserts:
+      - failedTemplate:
+          errorPattern: ^Cyclic dependency detected in environment variable ordering
+
+  - it: missing dependency should fail with clear error
+    set:
+      controllers.main.containers.main.env:
+        VAR1:
+          value: value1
+          dependsOn: NONEXISTENT
+    asserts:
+      - failedTemplate:
+          errorMessage: "Environment variable 'VAR1': References non-existent environment variable 'NONEXISTENT' in dependsOn for container 'main'. Available environment variables: [VAR1]"
+
+  - it: env var with complex map value should merge correctly
+    set:
+      controllers.main.containers.main.env:
+        VAR1:
+          valueFrom:
+            secretKeyRef:
+              name: my-secret
+              key: my-key
+          dependsOn: VAR2
+        VAR2:
+          value: value2
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[0]
+          value:
+            name: VAR2
+            value: value2
+      - equal:
+          path: spec.template.spec.containers[0].env[1]
+          value:
+            name: VAR1
+            valueFrom:
+              secretKeyRef:
+                name: my-secret
+                key: my-key

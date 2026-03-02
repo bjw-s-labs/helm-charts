@@ -51,7 +51,7 @@ volumeMounts used by the container.
 
     {{- /* Set the default mountPath to /<name_of_the_peristence_item> */ -}}
     {{- $mountPath := (printf "/%v" $identifier) -}}
-    {{- if eq "hostPath" (default "pvc" $persistenceValues.type) -}}
+    {{- if eq "hostPath" (default "persistentVolumeClaim" $persistenceValues.type) -}}
       {{- $mountPath = $persistenceValues.hostPath -}}
     {{- end -}}
 

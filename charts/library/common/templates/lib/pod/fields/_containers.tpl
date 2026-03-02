@@ -36,7 +36,7 @@ Returns the value for containers
   {{- end -}}
 
   {{- /* Process graph */ -}}
-  {{- $args := dict "graph" $graph "out" list -}}
+  {{- $args := dict "graph" $graph "out" list "contextType" "container" "contextId" $controllerObject.identifier -}}
   {{- include "bjw-s.common.lib.kahn" $args -}}
 
   {{- range $name := $args.out -}}

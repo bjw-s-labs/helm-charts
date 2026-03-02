@@ -1,0 +1,70 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: pod - fields - containers - cyclic dependencies
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+tests:
+  - it: simple cyclic dependency should fail
+    set:
+      controllers.main.containers:
+        container1:
+          dependsOn: container2
+          image:
+            repository: test
+            tag: test
+        container2:
+          dependsOn: container1
+          image:
+            repository: test
+            tag: test
+    asserts:
+      - failedTemplate:
+          errorPattern: ^Cyclic dependency detected in container ordering
+
+  - it: complex cyclic dependency should fail
+    set:
+      controllers.main.containers:
+        container1:
+          dependsOn: container3
+          image:
+            repository: test
+            tag: test
+        container2:
+          dependsOn: container1
+          image:
+            repository: test
+            tag: test
+        container3:
+          dependsOn: container2
+          image:
+            repository: test
+            tag: test
+    asserts:
+      - failedTemplate:
+          errorPattern: ^Cyclic dependency detected in container ordering
+
+  - it: self-referencing dependency should fail
+    set:
+      controllers.main.containers:
+        container1:
+          dependsOn: container1
+          image:
+            repository: test
+            tag: test
+    asserts:
+      - failedTemplate:
+          errorPattern: ^Cyclic dependency detected in container ordering
+
+  - it: missing dependency should fail with clear error
+    set:
+      controllers.main.containers:
+        container1:
+          dependsOn: nonexistent
+          image:
+            repository: test
+            tag: test
+    asserts:
+      - failedTemplate:
+          errorMessage: "Container 'container1': References non-existent container 'nonexistent' in dependsOn. Available containers: [container1, main]"

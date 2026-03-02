@@ -15,11 +15,11 @@ Validate serviceMonitor values
         (empty (dig "service" "name" nil $serviceMonitorObject))
         (empty (dig "service" "identifier" nil $serviceMonitorObject))
     -}}
-      {{- fail (printf "Either service.name or service.identifier is required because automatic Service detection is not possible. (serviceMonitor: %s)" $serviceMonitorObject.identifier ) -}}
+      {{- fail (printf "ServiceMonitor '%s': Either 'service.name' or 'service.identifier' is required because automatic Service detection is not possible (found %d enabled services). Specify the target service explicitly." $serviceMonitorObject.identifier (len $enabledServices)) -}}
     {{- end -}}
   {{- end -}}
 
   {{- if not $serviceMonitorObject.endpoints -}}
-    {{- fail (printf "endpoints are required for serviceMonitor with key \"%v\"" $serviceMonitorObject.identifier) -}}
+    {{- fail (printf "ServiceMonitor '%s': Endpoints are required. Define at least one endpoint under 'serviceMonitors.%s.endpoints'." $serviceMonitorObject.identifier $serviceMonitorObject.identifier) -}}
   {{- end -}}
 {{- end -}}
