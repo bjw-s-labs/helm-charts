@@ -190,20 +190,25 @@
   },
 
   "image": {
-    "allOf": [
-      { "$ref": "definitions.json#/imageSpecification" },
+    "oneOf": [
+      { "type": "string" },
       {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "pullPolicy": {
-            "type": "string",
-            "enum": ["Always", "IfNotPresent", "Never"]
-          },
-          "repository": {},
-          "tag": {},
-          "digest": {}
-        }
+        "allOf": [
+          { "$ref": "definitions.json#/imageSpecification" },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "pullPolicy": {
+                "type": "string",
+                "enum": ["Always", "IfNotPresent", "Never"]
+              },
+              "repository": {},
+              "tag": {},
+              "digest": {}
+            }
+          }
+        ]
       }
     ]
   },

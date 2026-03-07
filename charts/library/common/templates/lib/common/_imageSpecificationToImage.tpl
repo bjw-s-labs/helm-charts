@@ -6,16 +6,20 @@ Translate an imageSpecification to an image string.
   {{- $rootContext := .rootContext -}}
   {{- $imageSpec := .imageSpec -}}
 
-  {{- $imageRepo := tpl $imageSpec.repository $rootContext -}}
-  {{- $imageTag := tpl (default "" $imageSpec.tag) $rootContext -}}
-  {{- $imageDigest := tpl (default "" $imageSpec.digest) $rootContext -}}
+  {{- if kindIs "string" $imageSpec -}}
+    {{- tpl $imageSpec $rootContext -}}
+  {{- else -}}
+    {{- $imageRepo := tpl $imageSpec.repository $rootContext -}}
+    {{- $imageTag := tpl (default "" $imageSpec.tag) $rootContext -}}
+    {{- $imageDigest := tpl (default "" $imageSpec.digest) $rootContext -}}
 
-  {{- $image := $imageRepo -}}
-  {{- if $imageTag -}}
-    {{- $image = printf "%s:%s" $image $imageTag -}}
+    {{- $image := $imageRepo -}}
+    {{- if $imageTag -}}
+      {{- $image = printf "%s:%s" $image $imageTag -}}
+    {{- end -}}
+    {{- if $imageDigest -}}
+      {{- $image = printf "%s@%s" $image $imageDigest -}}
+    {{- end -}}
+    {{- $image -}}
   {{- end -}}
-  {{- if $imageDigest -}}
-    {{- $image = printf "%s@%s" $image $imageDigest -}}
-  {{- end -}}
-  {{- $image -}}
 {{- end -}}

@@ -116,3 +116,29 @@ tests:
       - equal:
           path: spec.template.spec.containers[0].image
           value: ghcr.io/mendhak/http-https-echo:latest@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+
+  - it: string image reference should pass
+    values:
+      - ../_values/controllers_main_default_container.yaml
+    set:
+      controllers.main.containers.main.image: ghcr.io/mendhak/http-https-echo:latest
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: ghcr.io/mendhak/http-https-echo:latest
+
+  - it: string image reference with digest should pass
+    values:
+      - ../_values/controllers_main_default_container.yaml
+    set:
+      controllers.main.containers.main.image: ghcr.io/mendhak/http-https-echo@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: ghcr.io/mendhak/http-https-echo@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
