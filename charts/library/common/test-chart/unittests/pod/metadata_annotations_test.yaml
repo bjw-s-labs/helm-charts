@@ -68,6 +68,19 @@ tests:
           content:
             globalAnnotation: test
 
+  - it: pod annotations with template functions should be rendered
+    set:
+      controllers.main.pod.annotations:
+        test_annotation: "{{ .Release.Name }}"
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - isSubset:
+          path: spec.template.metadata.annotations
+          content:
+            test_annotation: RELEASE-NAME
+
   - it: configMap checksum should be included in pod annotations
     set:
       configMaps:
