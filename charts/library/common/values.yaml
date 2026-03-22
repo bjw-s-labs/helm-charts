@@ -527,6 +527,10 @@ service:
   #   # -- Set the service type
   #   type: ClusterIP
 
+  #   # -- Specify the trafficDistribution for the service. Options: PreferSameZone, PreferSameNode
+  #   # -- [[ref](https://kubernetes.io/docs/concepts/services-networking/service/#traffic-distribution)]
+  #   trafficDistribution:
+
   #   # -- Specify the internalTrafficPolicy for the service. Options: Cluster, Local
   #   # -- [[ref](https://kubernetes.io/docs/concepts/services-networking/service-traffic-policy/)]
   #   internalTrafficPolicy:
