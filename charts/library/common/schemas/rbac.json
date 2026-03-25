@@ -1,123 +1,154 @@
 {
-  "role": {
-    "allOf": [
-      { "$ref": "definitions.json#/resourceIdentifier" },
-      {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "forceRename": {},
-          "prefix": {},
-          "suffix": {},
-          "enabled": {
-            "type": "boolean",
-            "default": true,
-            "description": "Set to false to disable the Role or ClusterRole."
-          },
-          "type": {
-            "type": "string",
-            "enum": ["Role", "ClusterRole"],
-            "default": "Role",
-            "description": "Set the type of RBAC resource. Supported values: Role, ClusterRole."
-          },
-          "annotations": {
-            "$ref": "definitions.json#/annotations"
-          },
-          "labels": {
-            "$ref": "definitions.json#/labels"
-          },
-          "rules": {
-            "type": "array",
-            "description": "Set the rules for the Role or ClusterRole."
-          }
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.0.0/charts/library/common/schemas/rbac.json",
+  "$defs": {
+    "role": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "definitions.json#/$defs/resourceIdentifier"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Set to false to disable the Role or ClusterRole."
         },
-        "required": ["type", "rules"]
-      }
-    ]
-  },
-
-  "roleBinding": {
-    "allOf": [
-      { "$ref": "definitions.json#/resourceIdentifier" },
-      {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "forceRename": {},
-          "prefix": {},
-          "suffix": {},
-          "enabled": {
-            "type": "boolean",
-            "default": true,
-            "description": "Set to false to disable the RoleBinding or ClusterRoleBinding."
+        "type": {
+          "type": "string",
+          "enum": [
+            "Role",
+            "ClusterRole"
+          ],
+          "default": "Role",
+          "description": "Set the type of RBAC resource. Supported values: Role, ClusterRole."
+        },
+        "annotations": {
+          "$ref": "definitions.json#/$defs/annotations"
+        },
+        "labels": {
+          "$ref": "definitions.json#/$defs/labels"
+        },
+        "rules": {
+          "type": "array",
+          "description": "Set the rules for the Role or ClusterRole."
+        }
+      },
+      "required": [
+        "type",
+        "rules"
+      ]
+    },
+    "roleBinding": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "definitions.json#/$defs/resourceIdentifier"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Set to false to disable the RoleBinding or ClusterRoleBinding."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "RoleBinding",
+            "ClusterRoleBinding"
+          ],
+          "default": "RoleBinding",
+          "description": "Set the type of RBAC binding. Supported values: RoleBinding, ClusterRoleBinding."
+        },
+        "annotations": {
+          "$ref": "definitions.json#/$defs/annotations"
+        },
+        "labels": {
+          "$ref": "definitions.json#/$defs/labels"
+        },
+        "roleRef": {
+          "type": "object",
+          "description": "Reference the Role or ClusterRole to bind to.",
+          "properties": {
+            "identifier": {
+              "type": "string",
+              "description": "Reference an Role or ClusterRole configured in this chart by its key."
+            },
+            "name": {
+              "type": "string",
+              "description": "Reference a Role or ClusterRole by its name. Helm template enabled."
+            },
+            "kind": {
+              "type": "string",
+              "description": "The kind of the referenced object. Supported values: Role, ClusterRole.",
+              "enum": [
+                "Role",
+                "ClusterRole"
+              ]
+            }
           },
-          "type": {
-            "type": "string",
-            "enum": ["RoleBinding", "ClusterRoleBinding"],
-            "default": "RoleBinding",
-            "description": "Set the type of RBAC binding. Supported values: RoleBinding, ClusterRoleBinding."
-          },
-          "annotations": {
-            "$ref": "definitions.json#/annotations"
-          },
-          "labels": {
-            "$ref": "definitions.json#/labels"
-          },
-          "roleRef": {
+          "oneOf": [
+            {
+              "required": [
+                "identifier"
+              ]
+            },
+            {
+              "required": [
+                "name",
+                "kind"
+              ]
+            }
+          ]
+        },
+        "subjects": {
+          "type": "array",
+          "description": "Set the subjects for the RoleBinding or ClusterRoleBinding.",
+          "items": {
             "type": "object",
-            "description": "Reference the Role or ClusterRole to bind to.",
             "properties": {
               "identifier": {
                 "type": "string",
-                "description": "Reference an Role or ClusterRole configured in this chart by its key."
+                "description": "Reference a serviceAccount configured in this chart by its key."
               },
               "name": {
                 "type": "string",
-                "description": "Reference a Role or ClusterRole by its name. Helm template enabled."
+                "description": "Reference an subject by its name."
               },
               "kind": {
                 "type": "string",
-                "description": "The kind of the referenced object. Supported values: Role, ClusterRole.",
-                "enum": ["Role", "ClusterRole"]
+                "description": "The kind of the referenced subject. Supported values: ServiceAccount, User, Group."
+              },
+              "namespace": {
+                "type": "string",
+                "description": "The namespace of the referenced subject. Do not define if kind is User or Group."
               }
             },
             "oneOf": [
-              { "required": ["identifier"] },
-              { "required": ["name", "kind"] }
-            ]
-          },
-          "subjects": {
-            "type": "array",
-            "description": "Set the subjects for the RoleBinding or ClusterRoleBinding.",
-            "items": {
-              "type": "object",
-              "properties": {
-                "identifier": {
-                  "type": "string",
-                  "description": "Reference a serviceAccount configured in this chart by its key."
-                },
-                "name": {
-                  "type": "string",
-                  "description": "Reference an subject by its name."
-                },
-                "kind": {
-                  "type": "string",
-                  "description": "The kind of the referenced subject. Supported values: ServiceAccount, User, Group."
-                },
-                "namespace": {
-                  "type": "string",
-                  "description": "The namespace of the referenced subject. Do not define if kind is User or Group."
-                }
+              {
+                "required": [
+                  "identifier"
+                ]
               },
-              "oneOf": [
-                { "required": ["identifier"] },
-                { "required": ["name", "kind"] }
-              ]
-            }
+              {
+                "required": [
+                  "name",
+                  "kind"
+                ]
+              }
+            ]
           }
-        },
-        "required": ["type", "roleRef", "subjects"]
-      }
-    ]
+        }
+      },
+      "required": [
+        "type",
+        "roleRef",
+        "subjects"
+      ]
+    }
   }
 }

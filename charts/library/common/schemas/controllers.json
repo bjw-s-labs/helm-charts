@@ -1,445 +1,517 @@
 {
-  "instance": {
-    "allOf": [
-      { "$ref": "definitions.json#/resourceIdentifier" },
-      {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "forceRename": {},
-          "prefix": {},
-          "suffix": {},
-          "enabled": {
-            "description": "Set to false to disable the controller.",
-            "type": "boolean",
-            "default": true
-          },
-          "type": {
-            "description": "Controller type. Supported values: deployment, daemonset, statefulset, cronjob, job.",
-            "type": "string",
-            "enum": [
-              "deployment",
-              "statefulset",
-              "daemonset",
-              "cronjob",
-              "job"
-            ],
-            "default": "deployment"
-          },
-          "annotations": { "$ref": "definitions.json#/annotations" },
-          "labels": { "$ref": "definitions.json#/labels" },
-          "pod": {
-            "description": "Pod-level options for this controller.",
-            "$ref": "pod.json#/options"
-          },
-          "replicas": {
-            "description": "Number of desired pods. Set to null when using a HorizontalPodAutoscaler.",
-            "type": ["integer", "null"],
-            "default": 1
-          },
-          "revisionHistoryLimit": {
-            "description": "ReplicaSet revision history limit.",
-            "type": "integer"
-          },
-          "rollingUpdate": {
-            "description": "Controller upgrade strategy options.",
-            "type": "object"
-          },
-          "strategy": {
-            "description": "Controller upgrade strategy.",
-            "type": "string"
-          },
-          "cronjob": {
-            "description": "CronJob-specific options. Required when type is cronjob.",
-            "$ref": "#/cronjob"
-          },
-          "job": {
-            "description": "Job-specific options. Required when type is job.",
-            "$ref": "#/job"
-          },
-          "statefulset": {
-            "description": "StatefulSet-specific options. Required when type is statefulset.",
-            "$ref": "#/statefulset"
-          },
-          "applyDefaultContainerOptionsToInitContainers": {
-            "description": "Apply defaultContainerOptions to initContainers.",
-            "type": "boolean",
-            "default": true
-          },
-          "defaultContainerOptionsStrategy": {
-            "description": "Strategy for default container options.\noverwrite: use container-level options if set.\nmerge: merge container-level options with defaults.",
-            "type": "string",
-            "default": "overwrite",
-            "enum": ["overwrite", "merge"]
-          },
-          "defaultContainerOptions": {
-            "description": "Default options for all (init)Containers. Each can be overridden on a container level.",
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "args": { "$ref": "containers.json#/args" },
-              "command": { "$ref": "containers.json#/command" },
-              "env": { "$ref": "containers.json#/env" },
-              "envFrom": { "$ref": "containers.json#/envFrom" },
-              "image": { "$ref": "containers.json#/image" },
-              "resources": {
-                "$ref": "k8s-api.json#/core.v1.ResourceRequirements"
-              },
-              "securityContext": {
-                "$ref": "k8s-api.json#/core.v1.ContainerSecurityContext"
-              }
-            }
-          },
-          "initContainers": {
-            "description": "InitContainers as dictionary items.",
-            "type": "object",
-            "additionalProperties": {
-              "$ref": "containers.json#/container"
-            }
-          },
-          "containers": {
-            "description": "Containers as dictionary items.",
-            "type": "object",
-            "additionalProperties": {
-              "$ref": "containers.json#/container"
-            }
-          },
-          "serviceAccount": {
-            "description": "ServiceAccount used by the controller.",
-            "type": "object",
-            "properties": {
-              "name": {
-                "description": "Reference a serviceAccount by its name. Helm templates are supported.",
-                "type": "string"
-              },
-              "identifier": {
-                "description": "Reference a serviceAccount configured in this chart by its key.",
-                "type": "string"
-              }
-            }
-          },
-          "podDisruptionBudget": {
-            "description": "PodDisruptionBudget Policy for this controller.",
-            "type": "object",
-            "properties": {
-              "minAvailable": {
-                "type": ["integer", "string"]
-              },
-              "maxUnavailable": {
-                "type": ["integer", "string"]
-              }
-            }
-          },
-          "horizontalPodAutoscaler": {
-            "description": "HorizontalPodAutoscaler configuration for this controller. Only supported for deployment and statefulset types.",
-            "type": "object",
-            "required": ["maxReplicas"],
-            "properties": {
-              "annotations": { "$ref": "definitions.json#/annotations" },
-              "labels": { "$ref": "definitions.json#/labels" },
-              "minReplicas": {
-                "description": "Minimum number of replicas.",
-                "type": "integer",
-                "minimum": 1
-              },
-              "maxReplicas": {
-                "description": "Maximum number of replicas.",
-                "type": "integer",
-                "minimum": 1
-              },
-              "metrics": {
-                "description": "Metrics to use for scaling. Passed through directly to the autoscaling/v2 HPA spec.",
-                "type": "array"
-              },
-              "behavior": {
-                "description": "Scaling behavior configuration. Passed through directly to the autoscaling/v2 HPA spec.",
-                "type": "object"
-              }
-            }
-          }
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.0.0/charts/library/common/schemas/controllers.json",
+  "$defs": {
+    "instance": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "definitions.json#/$defs/resourceIdentifier"
         },
-        "allOf": [
-          {
-            "if": {
-              "properties": {
-                "type": {
-                  "const": "deployment"
-                }
-              }
-            },
-            "then": {
-              "not": {
-                "anyOf": [
-                  {
-                    "required": ["statefulset"]
-                  },
-                  {
-                    "required": ["cronjob"]
-                  },
-                  {
-                    "required": ["job"]
-                  },
-                  {
-                    "required": ["daemonset"]
-                  }
-                ]
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "deployment"
               }
             }
           },
-          {
-            "if": {
-              "properties": {
-                "type": {
-                  "const": "statefulset"
-                }
-              },
-              "required": ["type"]
-            },
-            "then": {
-              "not": {
-                "anyOf": [
-                  {
-                    "required": ["cronjob"]
-                  },
-                  {
-                    "required": ["job"]
-                  },
-                  {
-                    "required": ["daemonset"]
-                  }
-                ]
-              }
-            }
-          },
-          {
-            "if": {
-              "properties": {
-                "type": {
-                  "const": "cronjob"
-                }
-              },
-              "required": ["type"]
-            },
-            "then": {
-              "allOf": [
+          "then": {
+            "not": {
+              "anyOf": [
                 {
-                  "not": {
-                    "anyOf": [
-                      {
-                        "required": ["statefulset"]
-                      },
-                      {
-                        "required": ["job"]
-                      },
-                      {
-                        "required": ["daemonset"]
-                      }
-                    ]
-                  }
+                  "required": [
+                    "statefulset"
+                  ]
                 },
                 {
-                  "required": ["cronjob"]
+                  "required": [
+                    "cronjob"
+                  ]
+                },
+                {
+                  "required": [
+                    "job"
+                  ]
+                },
+                {
+                  "required": [
+                    "daemonset"
+                  ]
                 }
               ]
             }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "statefulset"
+              }
+            },
+            "required": [
+              "type"
+            ]
           },
-          {
-            "if": {
-              "properties": {
-                "type": {
-                  "const": "job"
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "cronjob"
+                  ]
+                },
+                {
+                  "required": [
+                    "job"
+                  ]
+                },
+                {
+                  "required": [
+                    "daemonset"
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "cronjob"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "allOf": [
+              {
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "statefulset"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "job"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "daemonset"
+                      ]
+                    }
+                  ]
                 }
               },
-              "required": ["type"]
-            },
-            "then": {
-              "not": {
-                "anyOf": [
-                  {
-                    "required": ["statefulset"]
-                  },
-                  {
-                    "required": ["cronjob"]
-                  },
-                  {
-                    "required": ["daemonset"]
-                  }
+              {
+                "required": [
+                  "cronjob"
                 ]
               }
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "job"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "statefulset"
+                  ]
+                },
+                {
+                  "required": [
+                    "cronjob"
+                  ]
+                },
+                {
+                  "required": [
+                    "daemonset"
+                  ]
+                }
+              ]
             }
           }
-        ]
-      }
-    ]
-  },
-
-  "statefulset": {
-    "type": "object",
-    "additionalProperties": false,
-    "properties": {
-      "podManagementPolicy": {
-        "type": "string"
-      },
-      "persistentVolumeClaimRetentionPolicy": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "whenDeleted": {
-            "type": "string",
-            "enum": ["Delete", "Retain"],
-            "default": "Retain"
-          },
-          "whenScaled": {
-            "type": "string",
-            "enum": ["Delete", "Retain"],
-            "default": "Retain"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "properties": {
+        "enabled": {
+          "description": "Set to false to disable the controller.",
+          "type": "boolean",
+          "default": true
+        },
+        "type": {
+          "description": "Controller type. Supported values: deployment, daemonset, statefulset, cronjob, job.",
+          "type": "string",
+          "enum": [
+            "deployment",
+            "statefulset",
+            "daemonset",
+            "cronjob",
+            "job"
+          ],
+          "default": "deployment"
+        },
+        "annotations": {
+          "$ref": "definitions.json#/$defs/annotations"
+        },
+        "labels": {
+          "$ref": "definitions.json#/$defs/labels"
+        },
+        "pod": {
+          "description": "Pod-level options for this controller.",
+          "$ref": "pod.json#/$defs/options"
+        },
+        "replicas": {
+          "description": "Number of desired pods. Set to null when using a HorizontalPodAutoscaler.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "default": 1
+        },
+        "revisionHistoryLimit": {
+          "description": "ReplicaSet revision history limit.",
+          "type": "integer"
+        },
+        "rollingUpdate": {
+          "description": "Controller upgrade strategy options.",
+          "type": "object"
+        },
+        "strategy": {
+          "description": "Controller upgrade strategy.",
+          "type": "string"
+        },
+        "cronjob": {
+          "description": "CronJob-specific options. Required when type is cronjob.",
+          "$ref": "#/$defs/cronjob"
+        },
+        "job": {
+          "description": "Job-specific options. Required when type is job.",
+          "$ref": "#/$defs/job"
+        },
+        "statefulset": {
+          "description": "StatefulSet-specific options. Required when type is statefulset.",
+          "$ref": "#/$defs/statefulset"
+        },
+        "applyDefaultContainerOptionsToInitContainers": {
+          "description": "Apply defaultContainerOptions to initContainers.",
+          "type": "boolean",
+          "default": true
+        },
+        "defaultContainerOptionsStrategy": {
+          "description": "Strategy for default container options.\noverwrite: use container-level options if set.\nmerge: merge container-level options with defaults.",
+          "type": "string",
+          "default": "overwrite",
+          "enum": [
+            "overwrite",
+            "merge"
+          ]
+        },
+        "defaultContainerOptions": {
+          "description": "Default options for all (init)Containers. Each can be overridden on a container level.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "args": {
+              "$ref": "containers.json#/$defs/args"
+            },
+            "command": {
+              "$ref": "containers.json#/$defs/command"
+            },
+            "env": {
+              "$ref": "containers.json#/$defs/env"
+            },
+            "envFrom": {
+              "$ref": "containers.json#/$defs/envFrom"
+            },
+            "image": {
+              "$ref": "containers.json#/$defs/image"
+            },
+            "resources": {
+              "$ref": "k8s-api.json#/$defs/core.v1.ResourceRequirements"
+            },
+            "securityContext": {
+              "$ref": "k8s-api.json#/$defs/core.v1.ContainerSecurityContext"
+            }
+          }
+        },
+        "initContainers": {
+          "description": "InitContainers as dictionary items.",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "containers.json#/$defs/container"
+          }
+        },
+        "containers": {
+          "description": "Containers as dictionary items.",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "containers.json#/$defs/container"
+          }
+        },
+        "serviceAccount": {
+          "description": "ServiceAccount used by the controller.",
+          "type": "object",
+          "properties": {
+            "name": {
+              "description": "Reference a serviceAccount by its name. Helm templates are supported.",
+              "type": "string"
+            },
+            "identifier": {
+              "description": "Reference a serviceAccount configured in this chart by its key.",
+              "type": "string"
+            }
+          }
+        },
+        "podDisruptionBudget": {
+          "description": "PodDisruptionBudget Policy for this controller.",
+          "type": "object",
+          "properties": {
+            "minAvailable": {
+              "type": [
+                "integer",
+                "string"
+              ]
+            },
+            "maxUnavailable": {
+              "type": [
+                "integer",
+                "string"
+              ]
+            }
+          }
+        },
+        "horizontalPodAutoscaler": {
+          "description": "HorizontalPodAutoscaler configuration for this controller. Only supported for deployment and statefulset types.",
+          "type": "object",
+          "required": [
+            "maxReplicas"
+          ],
+          "properties": {
+            "annotations": {
+              "$ref": "definitions.json#/$defs/annotations"
+            },
+            "labels": {
+              "$ref": "definitions.json#/$defs/labels"
+            },
+            "minReplicas": {
+              "description": "Minimum number of replicas.",
+              "type": "integer",
+              "minimum": 1
+            },
+            "maxReplicas": {
+              "description": "Maximum number of replicas.",
+              "type": "integer",
+              "minimum": 1
+            },
+            "metrics": {
+              "description": "Metrics to use for scaling. Passed through directly to the autoscaling/v2 HPA spec.",
+              "type": "array"
+            },
+            "behavior": {
+              "description": "Scaling behavior configuration. Passed through directly to the autoscaling/v2 HPA spec.",
+              "type": "object"
+            }
           }
         }
-      },
-      "serviceName": {
-        "oneOf": [
-          {
-            "type": "string"
-          },
-          {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "identifier": {
-                "type": "string"
+      }
+    },
+    "statefulset": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "podManagementPolicy": {
+          "type": "string"
+        },
+        "persistentVolumeClaimRetentionPolicy": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "whenDeleted": {
+              "type": "string",
+              "enum": [
+                "Delete",
+                "Retain"
+              ],
+              "default": "Retain"
+            },
+            "whenScaled": {
+              "type": "string",
+              "enum": [
+                "Delete",
+                "Retain"
+              ],
+              "default": "Retain"
+            }
+          }
+        },
+        "serviceName": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "identifier": {
+                  "type": "string"
+                }
               }
             }
+          ]
+        },
+        "startOrdinal": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "volumeClaimTemplates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/statefulset.volumeClaimTemplate"
           }
-        ]
-      },
-      "startOrdinal": {
-        "type": "integer",
-        "minimum": 0,
-        "default": 0
-      },
-      "volumeClaimTemplates": {
-        "type": "array",
-        "items": {
-          "$ref": "#/statefulset.volumeClaimTemplate"
         }
       }
-    }
-  },
-
-  "statefulset.volumeClaimTemplate": {
-    "type": "object",
-    "additionalProperties": false,
-    "properties": {
-      "enabled": {
-        "type": "boolean",
-        "default": true
-      },
-      "accessMode": {
-        "type": "string"
-      },
-      "advancedMounts": {
-        "type": "object",
-        "additionalProperties": {
-          "$ref": "persistence.json#/mountPathCollection"
+    },
+    "statefulset.volumeClaimTemplate": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "accessMode": {
+          "type": "string"
+        },
+        "advancedMounts": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "persistence.json#/$defs/mountPathCollection"
+          }
+        },
+        "annotations": {
+          "$ref": "definitions.json#/$defs/annotations"
+        },
+        "dataSource": {
+          "$ref": "persistence.json#/$defs/dataSourceReference"
+        },
+        "dataSourceRef": {
+          "$ref": "persistence.json#/$defs/dataSourceReference"
+        },
+        "globalMounts": {
+          "$ref": "persistence.json#/$defs/globalMounts"
+        },
+        "labels": {
+          "$ref": "definitions.json#/$defs/labels"
+        },
+        "name": {
+          "type": "string"
+        },
+        "size": {
+          "type": "string"
+        },
+        "storageClass": {
+          "type": "string"
         }
       },
-      "annotations": {
-        "$ref": "definitions.json#/annotations"
-      },
-      "dataSource": {
-        "$ref": "persistence.json#/dataSourceReference"
-      },
-      "dataSourceRef": {
-        "$ref": "persistence.json#/dataSourceReference"
-      },
-      "globalMounts": {
-        "$ref": "persistence.json#/globalMounts"
-      },
-      "labels": {
-        "$ref": "definitions.json#/labels"
-      },
-      "name": {
-        "type": "string"
-      },
-      "size": {
-        "type": "string"
-      },
-      "storageClass": {
-        "type": "string"
-      }
+      "required": [
+        "name",
+        "size"
+      ]
     },
-    "required": ["name", "size"]
-  },
-
-  "cronjob": {
-    "type": "object",
-    "additionalProperties": false,
-    "properties": {
-      "backoffLimit": {
-        "type": "integer",
-        "default": 6
+    "cronjob": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "backoffLimit": {
+          "type": "integer",
+          "default": 6
+        },
+        "concurrencyPolicy": {
+          "type": "string",
+          "default": "Forbid"
+        },
+        "failedJobsHistory": {
+          "type": "integer",
+          "default": 1
+        },
+        "parallelism": {
+          "type": "integer"
+        },
+        "schedule": {
+          "type": "string"
+        },
+        "startingDeadlineSeconds": {
+          "type": "integer",
+          "default": 30
+        },
+        "successfulJobsHistory": {
+          "type": "integer",
+          "default": 1
+        },
+        "suspend": {
+          "type": "boolean",
+          "default": false
+        },
+        "timeZone": {
+          "type": "string"
+        },
+        "activeDeadlineSeconds": {
+          "type": "integer"
+        },
+        "ttlSecondsAfterFinished": {
+          "type": "integer"
+        }
       },
-      "concurrencyPolicy": {
-        "type": "string",
-        "default": "Forbid"
-      },
-      "failedJobsHistory": {
-        "type": "integer",
-        "default": 1
-      },
-      "parallelism": {
-        "type": "integer"
-      },
-      "schedule": {
-        "type": "string"
-      },
-      "startingDeadlineSeconds": {
-        "type": "integer",
-        "default": 30
-      },
-      "successfulJobsHistory": {
-        "type": "integer",
-        "default": 1
-      },
-      "suspend": {
-        "type": "boolean",
-        "default": false
-      },
-      "timeZone": {
-        "type": "string"
-      },
-      "activeDeadlineSeconds": {
-        "type": "integer"
-      },
-      "ttlSecondsAfterFinished": {
-        "type": "integer"
-      }
+      "required": [
+        "schedule"
+      ]
     },
-    "required": ["schedule"]
-  },
-
-  "job": {
-    "type": "object",
-    "additionalProperties": false,
-    "properties": {
-      "backoffLimit": {
-        "type": "integer",
-        "default": 6
-      },
-      "completions": {},
-      "completionMode": {},
-      "parallelism": {
-        "type": "integer"
-      },
-      "suspend": {
-        "type": "boolean",
-        "default": false
-      },
-      "activeDeadlineSeconds": {
-        "type": "integer"
-      },
-      "ttlSecondsAfterFinished": {
-        "type": "integer"
+    "job": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "backoffLimit": {
+          "type": "integer",
+          "default": 6
+        },
+        "completions": {},
+        "completionMode": {},
+        "parallelism": {
+          "type": "integer"
+        },
+        "suspend": {
+          "type": "boolean",
+          "default": false
+        },
+        "activeDeadlineSeconds": {
+          "type": "integer"
+        },
+        "ttlSecondsAfterFinished": {
+          "type": "integer"
+        }
       }
     }
   }

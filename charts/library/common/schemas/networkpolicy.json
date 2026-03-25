@@ -1,57 +1,64 @@
 {
-  "instance": {
-    "allOf": [
-      { "$ref": "definitions.json#/resourceIdentifier" },
-      {
-        "type": "object",
-        "additionalProperties": false,
-
-        "properties": {
-          "forceRename": {},
-          "prefix": {},
-          "suffix": {},
-          "enabled": {
-            "description": "Set to false to disable the NetworkPolicy.",
-            "type": "boolean",
-            "default": true
-          },
-          "annotations": { "$ref": "definitions.json#/annotations" },
-          "controller": {
-            "description": "Controller this NetworkPolicy should target.",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.0.0/charts/library/common/schemas/networkpolicy.json",
+  "$defs": {
+    "instance": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "definitions.json#/$defs/resourceIdentifier"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "properties": {
+        "enabled": {
+          "description": "Set to false to disable the NetworkPolicy.",
+          "type": "boolean",
+          "default": true
+        },
+        "annotations": {
+          "$ref": "definitions.json#/$defs/annotations"
+        },
+        "controller": {
+          "description": "Controller this NetworkPolicy should target.",
+          "type": "string"
+        },
+        "labels": {
+          "$ref": "definitions.json#/$defs/labels"
+        },
+        "podSelector": {
+          "description": "Custom podSelector for the NetworkPolicy. Takes precedence over targeting a controller."
+        },
+        "policyTypes": {
+          "description": "Policy types for the NetworkPolicy.",
+          "type": "array",
+          "items": {
             "type": "string"
-          },
-          "labels": { "$ref": "definitions.json#/labels" },
-          "podSelector": {
-            "description": "Custom podSelector for the NetworkPolicy. Takes precedence over targeting a controller."
-          },
-          "policyTypes": {
-            "description": "Policy types for the NetworkPolicy.",
-            "type": "array",
-            "items": { "type": "string" }
-          },
-          "rules": {
-            "description": "Ingress and egress rules for the NetworkPolicy.",
-            "type": "object",
-            "additionalProperties": false,
-
-            "properties": {
-              "ingress": {
-                "type": "array",
-                "items": {
-                  "$ref": "k8s-api.json#/networking.v1.NetworkPolicyIngressRule"
-                }
-              },
-              "egress": {
-                "type": "array",
-                "items": {
-                  "$ref": "k8s-api.json#/networking.v1.NetworkPolicyEgressRule"
-                }
+          }
+        },
+        "rules": {
+          "description": "Ingress and egress rules for the NetworkPolicy.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "ingress": {
+              "type": "array",
+              "items": {
+                "$ref": "k8s-api.json#/$defs/networking.v1.NetworkPolicyIngressRule"
+              }
+            },
+            "egress": {
+              "type": "array",
+              "items": {
+                "$ref": "k8s-api.json#/$defs/networking.v1.NetworkPolicyEgressRule"
               }
             }
           }
-        },
-        "required": ["rules"]
-      }
-    ]
+        }
+      },
+      "required": [
+        "rules"
+      ]
+    }
   }
 }
