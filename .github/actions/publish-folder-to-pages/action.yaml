@@ -49,13 +49,13 @@ runs:
 
     - name: Deploy to GitHub Pages
       id: deploy-gh-pages
-      uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
+      uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
       with:
         artifact_name: ${{ inputs.artifactName }}
 
     - name: Clean up artifact
       if: ${{ inputs.deleteArtifactAfterPublish == 'true' }}
-      uses: joernott/rm-artifact@6c16fd82af85b01724a4aca6fa4ed99de26679ee # v1.0.8
+      uses: joernott/rm-artifact@bc186430160dc60ccdbff8a38bf1e880606921b2 # v2.0.0
       with:
         name: ${{ inputs.artifactName }}
         useGlob: false

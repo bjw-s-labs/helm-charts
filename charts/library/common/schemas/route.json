@@ -1,129 +1,163 @@
 {
-  "instance": {
-    "allOf": [
-      { "$ref": "definitions.json#/resourceIdentifier" },
-      {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "forceRename": {},
-          "prefix": {},
-          "suffix": {},
-          "enabled": {
-            "description": "Set to false to disable the Route.",
-            "type": "boolean",
-            "default": true
-          },
-          "annotations": { "$ref": "definitions.json#/annotations" },
-          "labels": { "$ref": "definitions.json#/labels" },
-          "hostnames": {
-            "description": "Host addresses for the Route. Helm templates are supported.",
-            "type": "array",
-            "items": { "type": "string" }
-          },
-          "kind": {
-            "description": "Route kind. Supported values: GRPCRoute, HTTPRoute, TCPRoute, TLSRoute, UDPRoute.",
-            "type": "string",
-            "enum": [
-              "GRPCRoute",
-              "HTTPRoute",
-              "TCPRoute",
-              "TLSRoute",
-              "UDPRoute"
-            ]
-          },
-          "parentRefs": {
-            "description": "Resource the Route attaches to.",
-            "type": "array",
-            "items": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "group": { "type": "string" },
-                "kind": { "type": "string" },
-                "namespace": { "type": "string" },
-                "name": { "type": "string" },
-                "sectionName": { "type": "string" },
-                "port": { "type": "integer" }
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.0.0/charts/library/common/schemas/route.json",
+  "$defs": {
+    "instance": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "definitions.json#/$defs/resourceIdentifier"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "properties": {
+        "enabled": {
+          "description": "Set to false to disable the Route.",
+          "type": "boolean",
+          "default": true
+        },
+        "annotations": {
+          "$ref": "definitions.json#/$defs/annotations"
+        },
+        "labels": {
+          "$ref": "definitions.json#/$defs/labels"
+        },
+        "hostnames": {
+          "description": "Host addresses for the Route. Helm templates are supported.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "kind": {
+          "description": "Route kind. Supported values: GRPCRoute, HTTPRoute, TCPRoute, TLSRoute, UDPRoute.",
+          "type": "string",
+          "enum": [
+            "GRPCRoute",
+            "HTTPRoute",
+            "TCPRoute",
+            "TLSRoute",
+            "UDPRoute"
+          ]
+        },
+        "parentRefs": {
+          "description": "Resource the Route attaches to.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "group": {
+                "type": "string"
               },
-              "required": ["name"]
-            }
-          },
-          "rules": {
-            "description": "Rules for routing. Defaults to the primary service.",
-            "type": "array",
-            "items": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "name": {
-                  "description": "Optional name of the route rule. This name must be unique within a Route if it is set.",
-                  "type": "string"
-                },
-                "backendRefs": {
-                  "description": "Backend references.",
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "properties": {
-                      "group": { "type": "string" },
-                      "kind": { "type": "string" },
-                      "namespace": { "type": "string" },
-                      "name": {
-                        "description": "Reference to a backend Service name.",
-                        "type": "string"
-                      },
-                      "identifier": {
-                        "description": "Reference to a service identifier defined within the chart values.",
-                        "type": "string"
-                      },
-                      "port": { "type": ["string", "integer"] },
-                      "weight": { "type": "integer" }
+              "kind": {
+                "type": "string"
+              },
+              "namespace": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "sectionName": {
+                "type": "string"
+              },
+              "port": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "name"
+            ]
+          }
+        },
+        "rules": {
+          "description": "Rules for routing. Defaults to the primary service.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "description": "Optional name of the route rule. This name must be unique within a Route if it is set.",
+                "type": "string"
+              },
+              "backendRefs": {
+                "description": "Backend references.",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "group": {
+                      "type": "string"
+                    },
+                    "kind": {
+                      "type": "string"
+                    },
+                    "namespace": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "description": "Reference to a backend Service name.",
+                      "type": "string"
+                    },
+                    "identifier": {
+                      "description": "Reference to a service identifier defined within the chart values.",
+                      "type": "string"
+                    },
+                    "port": {
+                      "type": [
+                        "string",
+                        "integer"
+                      ]
+                    },
+                    "weight": {
+                      "type": "integer"
                     }
                   }
-                },
-                "matches": {
-                  "description": "Matches define conditions used for matching the rule against incoming requests. Each match is independent, i.e. this rule will be matched\nif **any** one of the matches is satisfied.",
-                  "type": "array",
-                  "items": {
-                    "anyOf": [
-                      {
-                        "$ref": "gw-api.json#/v1.grpcRouteMatch"
-                      },
-                      {
-                        "$ref": "gw-api.json#/v1.httpRouteMatch"
-                      }
-                    ]
-                  }
-                },
-                "filters": {
-                  "description": "Filters define processing steps that must be completed during the\nrequest or response lifecycle.",
-                  "type": "array",
-                  "items": {
-                    "anyOf": [
-                      {
-                        "$ref": "gw-api.json#/v1.grpcRouteFilter"
-                      },
-                      {
-                        "$ref": "gw-api.json#/v1.httpRouteFilter"
-                      }
-                    ]
-                  }
-                },
-                "sessionPersistence": {
-                  "description": "SessionPersistence defines the desired state of SessionPersistence.",
-                  "type": "object"
-                },
-                "timeouts": {
-                  "description": "Timeouts for the route.",
-                  "type": "object"
                 }
+              },
+              "matches": {
+                "description": "Matches define conditions used for matching the rule against incoming requests. Each match is independent, i.e. this rule will be matched\nif **any** one of the matches is satisfied.",
+                "type": "array",
+                "items": {
+                  "anyOf": [
+                    {
+                      "$ref": "gw-api.json#/$defs/v1.grpcRouteMatch"
+                    },
+                    {
+                      "$ref": "gw-api.json#/$defs/v1.httpRouteMatch"
+                    }
+                  ]
+                }
+              },
+              "filters": {
+                "description": "Filters define processing steps that must be completed during the\nrequest or response lifecycle.",
+                "type": "array",
+                "items": {
+                  "anyOf": [
+                    {
+                      "$ref": "gw-api.json#/$defs/v1.grpcRouteFilter"
+                    },
+                    {
+                      "$ref": "gw-api.json#/$defs/v1.httpRouteFilter"
+                    }
+                  ]
+                }
+              },
+              "sessionPersistence": {
+                "description": "SessionPersistence defines the desired state of SessionPersistence.",
+                "type": "object"
+              },
+              "timeouts": {
+                "description": "Timeouts for the route.",
+                "type": "object"
               }
             }
           }
         }
       }
-    ]
+    }
   }
 }

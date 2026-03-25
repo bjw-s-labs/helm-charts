@@ -1,106 +1,147 @@
 {
-  "instance": {
-    "allOf": [
-      { "$ref": "definitions.json#/resourceIdentifier" },
-      {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "forceRename": {},
-          "prefix": {},
-          "suffix": {},
-          "enabled": {
-            "description": "Set to false to disable the Ingress.",
-            "type": "boolean",
-            "default": true
-          },
-          "annotations": { "$ref": "definitions.json#/annotations" },
-          "labels": { "$ref": "definitions.json#/labels" },
-          "className": {
-            "description": "Set the ingressClass used for this Ingress.",
-            "type": "string"
-          },
-          "defaultBackend": {
-            "description": "Set the defaultBackend for this Ingress. This disables any other rules.",
-            "$ref": "k8s-api.json#/networking.v1.ingressBackend"
-          },
-          "hosts": {
-            "description": "Configure the hosts for the Ingress.",
-            "type": "array",
-            "items": { "$ref": "#/hostEntry" }
-          },
-          "tls": {
-            "description": "Configure TLS for the Ingress.",
-            "type": "array",
-            "items": { "$ref": "#/tlsEntry" }
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.0.0/charts/library/common/schemas/ingress.json",
+  "$defs": {
+    "instance": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "definitions.json#/$defs/resourceIdentifier"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "properties": {
+        "enabled": {
+          "description": "Set to false to disable the Ingress.",
+          "type": "boolean",
+          "default": true
+        },
+        "annotations": {
+          "$ref": "definitions.json#/$defs/annotations"
+        },
+        "labels": {
+          "$ref": "definitions.json#/$defs/labels"
+        },
+        "className": {
+          "description": "Set the ingressClass used for this Ingress.",
+          "type": "string"
+        },
+        "defaultBackend": {
+          "description": "Set the defaultBackend for this Ingress. This disables any other rules.",
+          "$ref": "k8s-api.json#/$defs/networking.v1.ingressBackend"
+        },
+        "hosts": {
+          "description": "Configure the hosts for the Ingress.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/hostEntry"
+          }
+        },
+        "tls": {
+          "description": "Configure TLS for the Ingress.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/tlsEntry"
           }
         }
       }
-    ]
-  },
-
-  "hostEntry": {
-    "additionalProperties": false,
-    "properties": {
-      "host": {
-        "description": "Set the host address. Helm templates are supported.",
-        "type": "string"
+    },
+    "hostEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "host": {
+          "description": "Set the host address. Helm templates are supported.",
+          "type": "string"
+        },
+        "paths": {
+          "description": "Configure the paths for the host.",
+          "type": "array",
+          "title": "paths",
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "pathType": {
+                "type": "string",
+                "default": "Prefix"
+              },
+              "service": {
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/serviceReferenceByName"
+                  },
+                  {
+                    "$ref": "#/$defs/serviceReferenceByIdentifier"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        }
       },
-      "paths": {
-        "description": "Configure the paths for the host.",
-        "type": "array",
-        "title": "paths",
-        "items": {
-          "additionalProperties": false,
-          "properties": {
-            "path": { "type": "string" },
-            "pathType": { "type": "string", "default": "Prefix" },
-            "service": {
-              "oneOf": [
-                { "$ref": "#/serviceReferenceByName" },
-                { "$ref": "#/serviceReferenceByIdentifier" }
-              ]
-            }
-          },
-          "required": ["path"]
+      "required": [
+        "host",
+        "paths"
+      ]
+    },
+    "tlsEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "hosts": {
+          "description": "Set the hosts for the TLS entry. Helm templates are supported.",
+          "type": "array",
+          "items": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "secretName": {
+          "description": "Set the secretName for the TLS entry. Helm templates are supported.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "hosts"
+      ]
+    },
+    "serviceReferenceByName": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "port": {
+          "type": [
+            "integer"
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "port"
+      ]
+    },
+    "serviceReferenceByIdentifier": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "identifier": {
+          "type": "string"
+        },
+        "port": {
+          "type": [
+            "string",
+            "integer"
+          ]
         }
       }
-    },
-    "required": ["host", "paths"]
-  },
-
-  "tlsEntry": {
-    "additionalProperties": false,
-    "properties": {
-      "hosts": {
-        "description": "Set the hosts for the TLS entry. Helm templates are supported.",
-        "type": "array",
-        "items": { "type": ["string"] }
-      },
-      "secretName": {
-        "description": "Set the secretName for the TLS entry. Helm templates are supported.",
-        "type": "string"
-      }
-    },
-    "required": ["hosts"]
-  },
-
-  "serviceReferenceByName": {
-    "type": "object",
-    "additionalProperties": false,
-    "properties": {
-      "name": { "type": "string" },
-      "port": { "type": ["integer"] }
-    },
-    "required": ["name", "port"]
-  },
-
-  "serviceReferenceByIdentifier": {
-    "type": "object",
-    "additionalProperties": false,
-    "properties": {
-      "identifier": { "type": "string" },
-      "port": { "type": ["string", "integer"] }
     }
   }
 }
