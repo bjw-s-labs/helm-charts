@@ -2,7 +2,7 @@
 cni-plugins:
   image:
     repository: ghcr.io/home-operations/cni-plugins
-    tag: 1.9.0
+    tag: 1.9.1
   resources: {}
 
 multus:

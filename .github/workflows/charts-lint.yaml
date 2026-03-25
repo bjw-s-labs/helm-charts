@@ -43,7 +43,7 @@ jobs:
 
       - name: Get chart details for PR
         id: chart-details-pr
-        uses: bjw-s-labs/helm-charts-actions/get-chart-details@29b11ff254a2b742d7256247c0816b34482e5680
+        uses: bjw-s-labs/helm-charts-actions/get-chart-details@d38f5892b72d43cbefbb9215a47adbf652f53909
         with:
           path: pull/charts/${{ matrix.chart }}
           validateChartYaml: true
@@ -51,7 +51,7 @@ jobs:
 
       - name: Get chart details for default branch
         id: chart-details-default
-        uses: bjw-s-labs/helm-charts-actions/get-chart-details@29b11ff254a2b742d7256247c0816b34482e5680
+        uses: bjw-s-labs/helm-charts-actions/get-chart-details@d38f5892b72d43cbefbb9215a47adbf652f53909
         with:
           path: default/charts/${{ matrix.chart }}
           allowChartToNotExist: true
@@ -103,12 +103,12 @@ jobs:
           persist-credentials: false
 
       - name: Install Mise and required tools
-        uses: jdx/mise-action@6d1e696aa24c1aa1bcc1adea0212707c71ab78a8 # v3.6.1
+        uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
         with:
           cache_key: "mise-v1-{{file_hash}}"
 
       - name: Dereference JSON schema
-        uses: bjw-s-labs/helm-charts-actions/dereference-json-schema@29b11ff254a2b742d7256247c0816b34482e5680
+        uses: bjw-s-labs/helm-charts-actions/dereference-json-schema@d38f5892b72d43cbefbb9215a47adbf652f53909
         with:
           schemaFile: "charts/${{ matrix.chart }}/values.schema.json"
           outputFile: "charts/${{ matrix.chart }}/values.schema.json"

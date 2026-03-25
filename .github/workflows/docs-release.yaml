@@ -30,7 +30,7 @@ jobs:
           persist-credentials: false
 
       - name: Install Mise and required tools
-        uses: jdx/mise-action@6d1e696aa24c1aa1bcc1adea0212707c71ab78a8 # v3.6.1
+        uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
         with:
           cache_key: "mise-v1-{{file_hash}}"
 
@@ -40,7 +40,7 @@ jobs:
           mkdocs build -f .ci/mkdocs/mkdocs.yml
 
       - name: Generate Token
-        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+        uses: actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859 # v3.0.0
         id: app-token
         with:
           app-id: ${{ secrets.LAB_ASSISTANT_APP_ID }}
