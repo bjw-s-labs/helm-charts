@@ -9,174 +9,13 @@
           "$ref": "definitions.json#/$defs/resourceIdentifier"
         },
         {
-          "if": {
-            "properties": {
-              "type": {
-                "const": "deployment"
-              }
-            }
-          },
-          "then": {
-            "not": {
-              "anyOf": [
-                {
-                  "required": [
-                    "statefulset"
-                  ]
-                },
-                {
-                  "required": [
-                    "cronjob"
-                  ]
-                },
-                {
-                  "required": [
-                    "job"
-                  ]
-                },
-                {
-                  "required": [
-                    "daemonset"
-                  ]
-                }
-              ]
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "type": {
-                "const": "statefulset"
-              }
-            },
-            "required": [
-              "type"
-            ]
-          },
-          "then": {
-            "not": {
-              "anyOf": [
-                {
-                  "required": [
-                    "cronjob"
-                  ]
-                },
-                {
-                  "required": [
-                    "job"
-                  ]
-                },
-                {
-                  "required": [
-                    "daemonset"
-                  ]
-                }
-              ]
-            }
-          },
-          "horizontalPodAutoscaler": {
-            "description": "HorizontalPodAutoscaler configuration for this controller. Only supported for deployment and statefulset types.",
-            "type": "object",
-            "required": ["maxReplicas"],
-            "properties": {
-              "annotations": { "$ref": "definitions.json#/annotations" },
-              "labels": { "$ref": "definitions.json#/labels" },
-              "minReplicas": {
-                "description": "Minimum number of replicas.",
-                "type": "integer",
-                "minimum": 1
-              },
-              "maxReplicas": {
-                "description": "Maximum number of replicas.",
-                "type": "integer",
-                "minimum": 1
-              },
-              "metrics": {
-                "description": "Metrics to use for scaling. Passed through directly to the autoscaling/v2 HPA spec.",
-                "type": "array"
-              },
-              "behavior": {
-                "description": "Scaling behavior configuration. Passed through directly to the autoscaling/v2 HPA spec.",
-                "type": "object"
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "type": {
-                "const": "cronjob"
-              }
-            },
-            "required": [
-              "type"
-            ]
-          },
-          "then": {
-            "allOf": [
-              {
-                "not": {
-                  "anyOf": [
-                    {
-                      "required": [
-                        "statefulset"
-                      ]
-                    },
-                    {
-                      "required": [
-                        "job"
-                      ]
-                    },
-                    {
-                      "required": [
-                        "daemonset"
-                      ]
-                    }
-                  ]
-                }
-              },
-              {
-                "required": [
-                  "cronjob"
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "type": {
-                "const": "job"
-              }
-            },
-            "required": [
-              "type"
-            ]
-          },
-          "then": {
-            "not": {
-              "anyOf": [
-                {
-                  "required": [
-                    "statefulset"
-                  ]
-                },
-                {
-                  "required": [
-                    "cronjob"
-                  ]
-                },
-                {
-                  "required": [
-                    "daemonset"
-                  ]
-                }
-              ]
-            }
-          }
+          "oneOf": [
+            { "$ref": "#/$defs/instance.type.deployment" },
+            { "$ref": "#/$defs/instance.type.statefulset" },
+            { "$ref": "#/$defs/instance.type.daemonset" },
+            { "$ref": "#/$defs/instance.type.cronjob" },
+            { "$ref": "#/$defs/instance.type.job" }
+          ]
         }
       ],
       "unevaluatedProperties": false,
@@ -227,18 +66,6 @@
         "strategy": {
           "description": "Controller upgrade strategy.",
           "type": "string"
-        },
-        "cronjob": {
-          "description": "CronJob-specific options. Required when type is cronjob.",
-          "$ref": "#/$defs/cronjob"
-        },
-        "job": {
-          "description": "Job-specific options. Required when type is job.",
-          "$ref": "#/$defs/job"
-        },
-        "statefulset": {
-          "description": "StatefulSet-specific options. Required when type is statefulset.",
-          "$ref": "#/$defs/statefulset"
         },
         "applyDefaultContainerOptionsToInitContainers": {
           "description": "Apply defaultContainerOptions to initContainers.",
@@ -327,103 +154,209 @@
               ]
             }
           }
-        },
-        "horizontalPodAutoscaler": {
-          "description": "HorizontalPodAutoscaler configuration for this controller. Only supported for deployment and statefulset types.",
-          "type": "object",
-          "required": [
-            "maxReplicas"
-          ],
-          "properties": {
-            "annotations": {
-              "$ref": "definitions.json#/$defs/annotations"
-            },
-            "labels": {
-              "$ref": "definitions.json#/$defs/labels"
-            },
-            "minReplicas": {
-              "description": "Minimum number of replicas.",
-              "type": "integer",
-              "minimum": 1
-            },
-            "maxReplicas": {
-              "description": "Maximum number of replicas.",
-              "type": "integer",
-              "minimum": 1
-            },
-            "metrics": {
-              "description": "Metrics to use for scaling. Passed through directly to the autoscaling/v2 HPA spec.",
-              "type": "array"
-            },
-            "behavior": {
-              "description": "Scaling behavior configuration. Passed through directly to the autoscaling/v2 HPA spec.",
-              "type": "object"
-            }
-          }
         }
       }
     },
-    "statefulset": {
-      "type": "object",
-      "additionalProperties": false,
+
+    "instance.type.deployment": {
+      "title": "Deployment controller",
       "properties": {
-        "podManagementPolicy": {
-          "type": "string"
-        },
-        "persistentVolumeClaimRetentionPolicy": {
+        "type": { "const": "deployment" },
+        "horizontalPodAutoscaler": { "$ref": "#/$defs/horizontalPodAutoscaler" }
+      }
+    },
+
+    "instance.type.statefulset": {
+      "title": "StatefulSet controller",
+      "required": ["type"],
+      "properties": {
+        "type": { "const": "statefulset" },
+        "horizontalPodAutoscaler": { "$ref": "#/$defs/horizontalPodAutoscaler" },
+        "statefulset": {
+          "description": "StatefulSet-specific options.",
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "whenDeleted": {
-              "type": "string",
-              "enum": [
-                "Delete",
-                "Retain"
-              ],
-              "default": "Retain"
-            },
-            "whenScaled": {
-              "type": "string",
-              "enum": [
-                "Delete",
-                "Retain"
-              ],
-              "default": "Retain"
-            }
-          }
-        },
-        "serviceName": {
-          "oneOf": [
-            {
+            "podManagementPolicy": {
               "type": "string"
             },
-            {
+            "persistentVolumeClaimRetentionPolicy": {
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "identifier": {
-                  "type": "string"
+                "whenDeleted": {
+                  "type": "string",
+                  "enum": ["Delete", "Retain"],
+                  "default": "Retain"
+                },
+                "whenScaled": {
+                  "type": "string",
+                  "enum": ["Delete", "Retain"],
+                  "default": "Retain"
                 }
               }
+            },
+            "serviceName": {
+              "oneOf": [
+                { "type": "string" },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "identifier": { "type": "string" }
+                  }
+                }
+              ]
+            },
+            "startOrdinal": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "volumeClaimTemplates": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/statefulset.volumeClaimTemplate"
+              }
             }
-          ]
-        },
-        "startOrdinal": {
-          "type": "integer",
-          "minimum": 0,
-          "default": 0
-        },
-        "volumeClaimTemplates": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/statefulset.volumeClaimTemplate"
           }
         }
       }
     },
+
+    "instance.type.daemonset": {
+      "title": "DaemonSet controller",
+      "required": ["type"],
+      "properties": {
+        "type": { "const": "daemonset" }
+      }
+    },
+
+    "instance.type.cronjob": {
+      "title": "CronJob controller",
+      "required": ["type", "cronjob"],
+      "properties": {
+        "type": { "const": "cronjob" },
+        "cronjob": {
+          "description": "CronJob-specific options.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["schedule"],
+          "properties": {
+            "backoffLimit": {
+              "type": "integer",
+              "default": 6
+            },
+            "concurrencyPolicy": {
+              "type": "string",
+              "default": "Forbid"
+            },
+            "failedJobsHistory": {
+              "type": "integer",
+              "default": 1
+            },
+            "parallelism": {
+              "type": "integer"
+            },
+            "schedule": {
+              "type": "string"
+            },
+            "startingDeadlineSeconds": {
+              "type": "integer",
+              "default": 30
+            },
+            "successfulJobsHistory": {
+              "type": "integer",
+              "default": 1
+            },
+            "suspend": {
+              "type": "boolean",
+              "default": false
+            },
+            "timeZone": {
+              "type": "string"
+            },
+            "activeDeadlineSeconds": {
+              "type": "integer"
+            },
+            "ttlSecondsAfterFinished": {
+              "type": "integer"
+            }
+          }
+        }
+      }
+    },
+
+    "instance.type.job": {
+      "title": "Job controller",
+      "required": ["type"],
+      "properties": {
+        "type": { "const": "job" },
+        "job": {
+          "description": "Job-specific options.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "backoffLimit": {
+              "type": "integer",
+              "default": 6
+            },
+            "completions": {},
+            "completionMode": {},
+            "parallelism": {
+              "type": "integer"
+            },
+            "suspend": {
+              "type": "boolean",
+              "default": false
+            },
+            "activeDeadlineSeconds": {
+              "type": "integer"
+            },
+            "ttlSecondsAfterFinished": {
+              "type": "integer"
+            }
+          }
+        }
+      }
+    },
+
+    "horizontalPodAutoscaler": {
+      "description": "HorizontalPodAutoscaler configuration for this controller. Only supported for deployment and statefulset types.",
+      "type": "object",
+      "required": ["maxReplicas"],
+      "properties": {
+        "annotations": {
+          "$ref": "definitions.json#/$defs/annotations"
+        },
+        "labels": {
+          "$ref": "definitions.json#/$defs/labels"
+        },
+        "minReplicas": {
+          "description": "Minimum number of replicas.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxReplicas": {
+          "description": "Maximum number of replicas.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "metrics": {
+          "description": "Metrics to use for scaling. Passed through directly to the autoscaling/v2 HPA spec.",
+          "type": "array"
+        },
+        "behavior": {
+          "description": "Scaling behavior configuration. Passed through directly to the autoscaling/v2 HPA spec.",
+          "type": "object"
+        }
+      }
+    },
+
     "statefulset.volumeClaimTemplate": {
       "type": "object",
       "additionalProperties": false,
+      "required": ["name", "size"],
       "properties": {
         "enabled": {
           "type": "boolean",
@@ -461,83 +394,6 @@
         },
         "storageClass": {
           "type": "string"
-        }
-      },
-      "required": [
-        "name",
-        "size"
-      ]
-    },
-    "cronjob": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "backoffLimit": {
-          "type": "integer",
-          "default": 6
-        },
-        "concurrencyPolicy": {
-          "type": "string",
-          "default": "Forbid"
-        },
-        "failedJobsHistory": {
-          "type": "integer",
-          "default": 1
-        },
-        "parallelism": {
-          "type": "integer"
-        },
-        "schedule": {
-          "type": "string"
-        },
-        "startingDeadlineSeconds": {
-          "type": "integer",
-          "default": 30
-        },
-        "successfulJobsHistory": {
-          "type": "integer",
-          "default": 1
-        },
-        "suspend": {
-          "type": "boolean",
-          "default": false
-        },
-        "timeZone": {
-          "type": "string"
-        },
-        "activeDeadlineSeconds": {
-          "type": "integer"
-        },
-        "ttlSecondsAfterFinished": {
-          "type": "integer"
-        }
-      },
-      "required": [
-        "schedule"
-      ]
-    },
-    "job": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "backoffLimit": {
-          "type": "integer",
-          "default": 6
-        },
-        "completions": {},
-        "completionMode": {},
-        "parallelism": {
-          "type": "integer"
-        },
-        "suspend": {
-          "type": "boolean",
-          "default": false
-        },
-        "activeDeadlineSeconds": {
-          "type": "integer"
-        },
-        "ttlSecondsAfterFinished": {
-          "type": "integer"
         }
       }
     }
