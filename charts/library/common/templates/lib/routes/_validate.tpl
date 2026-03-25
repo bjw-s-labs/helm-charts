@@ -18,7 +18,7 @@ Validate Route values
       {{- range $rule.backendRefs }}
         {{- $backendRef := . -}}
         {{- if and (empty (dig "name" nil $backendRef)) (empty (dig "identifier" nil $backendRef)) -}}
-          {{- fail (printf "Either name or identifier is required because automatic Service detection is not possible. (route: %s)" $routeObject.identifier) -}}
+          {{- fail (printf "Route '%s': Either 'name' or 'identifier' is required in backendRef because automatic Service detection is not possible (found %d enabled services). Specify the target service explicitly." $routeObject.identifier (len $enabledServices)) -}}
         {{- end -}}
       {{- end -}}
     {{- end -}}
@@ -35,7 +35,7 @@ Validate Route values
   {{- if and (.filters) (.backendRefs) }}
     {{- range .filters }}
       {{- if eq .type "RequestRedirect" }}
-        {{- fail (printf "backend refs and request redirect filters cannot co-exist.")}}
+        {{- fail (printf "Route '%s': RequestRedirect filter cannot be used together with backendRefs. Remove either the filter or the backendRefs." $routeObject.identifier) -}}
       {{- end }}
     {{- end }}
   {{- end }}

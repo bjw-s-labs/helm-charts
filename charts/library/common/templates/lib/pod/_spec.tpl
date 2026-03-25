@@ -27,13 +27,11 @@ hostname: {{ . | trim }}
 hostIPC: {{ include "bjw-s.common.lib.pod.getOption" (dict "ctx" $ctx "option" "hostIPC" "default" false) }}
 hostNetwork: {{ include "bjw-s.common.lib.pod.getOption" (dict "ctx" $ctx "option" "hostNetwork" "default" false) }}
 hostPID: {{ include "bjw-s.common.lib.pod.getOption" (dict "ctx" $ctx "option" "hostPID" "default" false) }}
-  {{- if ge ($rootContext.Capabilities.KubeVersion.Minor | int) 29 }}
-    {{- with (include "bjw-s.common.lib.pod.getOption" (dict "ctx" $ctx "option" "hostUsers")) }}
+  {{- with (include "bjw-s.common.lib.pod.getOption" (dict "ctx" $ctx "option" "hostUsers")) }}
 hostUsers: {{ . | trim }}
-    {{- end -}}
-    {{- with (include "bjw-s.common.lib.pod.getOption" (dict "ctx" $ctx "option" "shareProcessNamespace")) }}
+  {{- end -}}
+  {{- with (include "bjw-s.common.lib.pod.getOption" (dict "ctx" $ctx "option" "shareProcessNamespace")) }}
 shareProcessNamespace: {{ . | trim }}
-    {{- end -}}
   {{- end }}
 dnsPolicy: {{ include "bjw-s.common.lib.pod.field.dnsPolicy" (dict "ctx" $ctx) | trim }}
   {{- with (include "bjw-s.common.lib.pod.getOption" (dict "ctx" $ctx "option" "dnsConfig")) }}
@@ -70,10 +68,10 @@ topologySpreadConstraints: {{- tpl . $rootContext | nindent 2 }}
   {{- end -}}
   {{- with (include "bjw-s.common.lib.pod.getOption" (dict "ctx" $ctx "option" "tolerations")) }}
 tolerations: {{ . | nindent 2 }}
-  {{- end }}
+  {{- end -}}
   {{- with (include "bjw-s.common.lib.pod.getOption" (dict "ctx" $ctx "option" "schedulingGates")) }}
 schedulingGates: {{ . | nindent 2 }}
-  {{- end }}
+  {{- end -}}
   {{- with (include "bjw-s.common.lib.pod.field.initContainers" (dict "ctx" $ctx) | trim) }}
 initContainers: {{ . | nindent 2 }}
   {{- end -}}

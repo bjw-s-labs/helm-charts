@@ -45,3 +45,16 @@ tests:
           value:
             global_annotation: test
             test_annotation: test
+
+  - it: annotations with template functions should be rendered
+    set:
+      controllers.main.annotations:
+        test_annotation: "{{ .Release.Name }}"
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: metadata.annotations
+          value:
+            test_annotation: RELEASE-NAME

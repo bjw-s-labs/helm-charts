@@ -35,7 +35,7 @@ tests:
             rules: []
     asserts:
       - failedTemplate:
-          errorMessage: "Rules can't be empty"
+          errorMessage: "Role 'invalidRole': Rules cannot be empty. Define at least one rule under 'roles.invalidRole.rules'."
 
   - it: roleBinding requires roleRef
     set:

@@ -16,7 +16,7 @@ Validate global chart values
       {{- range $key, $advancedMount := $persistenceValues.advancedMounts -}}
           {{- $mountController := include "bjw-s.common.lib.controller.getByIdentifier" (dict "rootContext" $rootContext "id" $key) -}}
           {{- if empty $mountController -}}
-            {{- fail (printf "No enabled controller found with this identifier. (persistence item: '%s', controller: '%s')" $persistenceKey $key) -}}
+            {{- fail (printf "Persistence '%s': No enabled controller found with identifier '%s'. Ensure a controller with this identifier exists and is enabled under 'controllers.%s'." $persistenceKey $key $key) -}}
           {{- end -}}
       {{- end -}}
     {{- end -}}

@@ -17,7 +17,7 @@ tests:
                 tag: "test"
     asserts:
       - failedTemplate:
-          errorMessage: "No image repository specified for container. (controller main, container test)"
+          errorMessage: "Container 'test': Image repository is required. Specify the repository under 'controllers.main.containers.test.image.repository'."
 
   - it: image tag is required
     set:
@@ -30,4 +30,4 @@ tests:
                 tag: ""
     asserts:
       - failedTemplate:
-          errorMessage: "No image tag or digest specified for container. (controller main, container test)"
+          errorMessage: "Container 'test': Either image tag or digest is required. Specify a tag or digest under 'controllers.main.containers.test.image'."

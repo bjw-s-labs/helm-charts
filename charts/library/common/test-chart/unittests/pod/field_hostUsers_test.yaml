@@ -5,14 +5,8 @@ templates:
   - common.yaml
 values:
   - ../_values/controllers_main_default_container.yaml
-capabilities:
-  majorVersion: 1
-  minorVersion: 29
 tests:
-  - it: should not be present by default for kubernetes < 1.28
-    capabilities:
-      majorVersion: 1
-      minorVersion: 28
+  - it: should not be present by default
     documentSelector:
       path: $[?(@.kind == "Deployment")].metadata.name
       value: release-name
@@ -20,29 +14,7 @@ tests:
       - notExists:
           path: spec.template.spec.hostUsers
 
-  - it: should not be present even if specified for kubernetes < 1.28
-    capabilities:
-      majorVersion: 1
-      minorVersion: 28
-    set:
-      defaultPodOptions:
-        hostUsers: false
-    documentSelector:
-      path: $[?(@.kind == "Deployment")].metadata.name
-      value: release-name
-    asserts:
-      - notExists:
-          path: spec.template.spec.hostUsers
-
-  - it: should not be present by default for kubernetes >= 1.29
-    documentSelector:
-      path: $[?(@.kind == "Deployment")].metadata.name
-      value: release-name
-    asserts:
-      - notExists:
-          path: spec.template.spec.hostUsers
-
-  - it: hostUsers disabled should set for kubernetes >= 1.29
+  - it: hostUsers disabled can be configured
     set:
       defaultPodOptions:
         hostUsers: false
@@ -54,7 +26,7 @@ tests:
           path: spec.template.spec.hostUsers
           value: false
 
-  - it: hostUsers enabled should be set for kubernetes >= 1.29
+  - it: hostUsers enabled can be configured
     set:
       defaultPodOptions:
         hostUsers: true

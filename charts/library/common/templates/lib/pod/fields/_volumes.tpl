@@ -59,7 +59,7 @@ Returns the value for volumes
       {{- else if $persistenceValues.identifier -}}
         {{- $object := (include "bjw-s.common.lib.configMap.getByIdentifier" (dict "rootContext" $rootContext "id" $persistenceValues.identifier) | fromYaml ) -}}
         {{- if not $object -}}
-          {{fail (printf "No configmap found with this identifier. (persistence item '%s', identifier '%s')" $identifier $persistenceValues.identifier)}}
+          {{- fail (printf "Persistence '%s': No ConfigMap found with identifier '%s'. Ensure a ConfigMap with this identifier exists and is enabled under 'configMaps.%s'." $identifier $persistenceValues.identifier $persistenceValues.identifier) -}}
         {{- end -}}
         {{- $objectName = $object.name -}}
       {{- end -}}
@@ -80,7 +80,7 @@ Returns the value for volumes
       {{- else if $persistenceValues.identifier -}}
         {{- $object := (include "bjw-s.common.lib.secret.getByIdentifier" (dict "rootContext" $rootContext "id" $persistenceValues.identifier) | fromYaml ) -}}
         {{- if not $object -}}
-          {{fail (printf "No secret found with this identifier. (persistence item '%s', identifier '%s')" $identifier $persistenceValues.identifier)}}
+          {{- fail (printf "Persistence '%s': No Secret found with identifier '%s'. Ensure a Secret with this identifier exists and is enabled under 'secrets.%s'." $identifier $persistenceValues.identifier $persistenceValues.identifier) -}}
         {{- end -}}
         {{- $objectName = $object.name -}}
       {{- end -}}

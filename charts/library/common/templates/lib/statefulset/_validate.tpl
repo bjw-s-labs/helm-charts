@@ -6,17 +6,17 @@ Validate StatefulSet values
   {{- $statefulsetValues := .object -}}
 
   {{- if and (ne $statefulsetValues.strategy "OnDelete") (ne $statefulsetValues.strategy "RollingUpdate") -}}
-    {{- fail (printf "Not a valid strategy type for StatefulSet. (controller: %s, strategy: %s)" $statefulsetValues.identifier $statefulsetValues.strategy) -}}
+    {{- fail (printf "StatefulSet '%s': Invalid strategy type '%s'. Valid options are 'OnDelete' or 'RollingUpdate'. Specify a valid strategy under 'controllers.%s.strategy'." $statefulsetValues.identifier $statefulsetValues.strategy $statefulsetValues.identifier) -}}
   {{- end -}}
 
   {{- if not (empty (dig "statefulset" "volumeClaimTemplates" "" $statefulsetValues)) -}}
     {{- range $index, $volumeClaimTemplate := $statefulsetValues.statefulset.volumeClaimTemplates -}}
       {{- if empty (get . "size") -}}
-        {{- fail (printf "size is required for volumeClaimTemplate. (controller: %s, volumeClaimTemplate: %s)" $statefulsetValues.identifier $volumeClaimTemplate.name) -}}
+        {{- fail (printf "StatefulSet '%s': VolumeClaimTemplate '%s' requires a 'size' field. Define the size under 'controllers.%s.statefulset.volumeClaimTemplates.%s.size'." $statefulsetValues.identifier $volumeClaimTemplate.name $statefulsetValues.identifier $volumeClaimTemplate.name) -}}
       {{- end -}}
 
       {{- if empty (get . "accessMode") -}}
-        {{- fail (printf "accessMode is required for volumeClaimTemplate. (controller: %s, volumeClaimTemplate: %s)" $statefulsetValues.identifier $volumeClaimTemplate.name) -}}
+        {{- fail (printf "StatefulSet '%s': VolumeClaimTemplate '%s' requires an 'accessMode' field. Define the accessMode under 'controllers.%s.statefulset.volumeClaimTemplates.%s.accessMode'." $statefulsetValues.identifier $volumeClaimTemplate.name $statefulsetValues.identifier $volumeClaimTemplate.name) -}}
       {{- end -}}
     {{- end -}}
   {{- end -}}

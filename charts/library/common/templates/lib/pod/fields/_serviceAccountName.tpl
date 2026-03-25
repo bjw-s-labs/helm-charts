@@ -17,7 +17,7 @@ Returns the value for serviceAccountName
       {{- $subject := (include "bjw-s.common.lib.serviceAccount.getByIdentifier" (dict "rootContext" $rootContext "id" $controllerObject.serviceAccount.identifier) | fromYaml) -}}
 
       {{- if not $subject }}
-        {{- fail (printf "No enabled ServiceAccount found with this identifier. (controller: '%s', identifier: '%s')" $controllerObject.identifier $controllerObject.serviceAccount.identifier) -}}
+        {{- fail (printf "Controller '%s': No enabled ServiceAccount found with identifier '%s'. Ensure a ServiceAccount with this identifier exists and is enabled under 'serviceAccounts.%s'." $controllerObject.identifier $controllerObject.serviceAccount.identifier $controllerObject.serviceAccount.identifier) -}}
       {{- end -}}
 
       {{- $serviceAccountName = get $subject "name" -}}

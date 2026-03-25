@@ -43,11 +43,9 @@ spec:
     rollingUpdate:
       partition: {{ $statefulsetObject.rollingUpdate.partition }}
     {{- end }}
-  {{- if and (ge ($rootContext.Capabilities.KubeVersion.Minor | int) 31) }}
-    {{- with (dig "statefulset" "startOrdinal" nil $statefulsetObject) }}
+  {{- with (dig "statefulset" "startOrdinal" nil $statefulsetObject) }}
   ordinals:
     start: {{ . }}
-    {{- end }}
   {{- end }}
   selector:
     matchLabels:

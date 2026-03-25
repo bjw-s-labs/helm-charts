@@ -13,4 +13,4 @@ tests:
         mySA2: {}
     asserts:
       - failedTemplate:
-          errorMessage: "serviceAccount field is required because automatic Service Account detection is not possible. (controller: main)"
+          errorMessage: "Controller 'main': serviceAccount field is required because automatic Service Account detection is not possible (found 2 service accounts: mySA, mySA2). Specify which service account to use under 'controllers.main.serviceAccount'."

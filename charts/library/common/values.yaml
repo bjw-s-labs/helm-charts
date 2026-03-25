@@ -113,7 +113,9 @@ controllers: {}
 #     annotations: {}
 #     # -- Set labels on the deployment/statefulset/daemonset/cronjob/job
 #     labels: {}
-#     # -- Number of desired pods. When using a HorizontalPodAutoscaler, set this to `null`.
+#     # -- Number of desired pods.
+#     # -- When using a HorizontalPodAutoscaler, `replicas` is automatically suppressed
+#     # -- on the controller and propagated to HPA `minReplicas` (if not explicitly set).
 #     replicas: 1
 #     # -- Set the controller upgrade strategy
 #     # For Deployments, valid values are Recreate (default) and RollingUpdate.
@@ -146,6 +148,25 @@ controllers: {}
 #       {}
 #       # minAvailable: 1
 #       # maxUnavailable: 1
+
+#     # -- HorizontalPodAutoscaler configuration for the Pods in this controller.
+#     # -- Only supported for `deployment` and `statefulset` controller types.
+#     # -- [[ref]](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)
+#     horizontalPodAutoscaler:
+#       # -- Minimum number of replicas. Optional. Auto-set from `replicas` if not specified.
+#       minReplicas: 1
+#       # -- Maximum number of replicas. Required.
+#       maxReplicas: 10
+#       # -- Metrics to use for scaling. Passed through directly to the autoscaling/v2 HPA spec.
+#       # metrics:
+#       #   - type: Resource
+#       #     resource:
+#       #       name: cpu
+#       #       target:
+#       #         type: Utilization
+#       #         averageUtilization: 80
+#       # -- Scaling behavior configuration. Passed through directly to the autoscaling/v2 HPA spec.
+#       # behavior: {}
 
 
 #     # -- CronJob configuration. Required only when using `controller.type: cronjob`.

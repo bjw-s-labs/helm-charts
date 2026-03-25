@@ -18,15 +18,15 @@ Validate RoleBinding values
           {{- fail (printf "Invalid subject kind '%s' in RoleBinding '%s'. Valid kinds are: %s" .kind $roleBindingValues.identifier (join ", " $subjectTypes)) -}}
         {{- end -}}
       {{- else -}}
-        {{- fail (printf "Subject kind is required in RoleBinding '%s'" $roleBindingValues.identifier) -}}
+        {{- fail (printf "RoleBinding '%s': Subject kind is required. Specify a kind (User, Group, or ServiceAccount) for each subject under 'roleBindings.%s.subjects'." $roleBindingValues.identifier $roleBindingValues.identifier) -}}
       {{- end -}}
     {{- end -}}
 
     {{- if eq $subjectTypeCount 0 -}}
-      {{- fail (printf "At least one subject with a valid kind is required in RoleBinding '%s'" $roleBindingValues.identifier) -}}
+      {{- fail (printf "RoleBinding '%s': At least one subject with a valid kind is required. Add subjects under 'roleBindings.%s.subjects'." $roleBindingValues.identifier $roleBindingValues.identifier) -}}
     {{- end -}}
 
   {{- else -}}
-    {{- fail (printf "subjects and roleRef are required for RoleBinding with key \"%v\"" $roleBindingValues.identifier) -}}
+    {{- fail (printf "RoleBinding '%s': Both 'subjects' and 'roleRef' are required. Define subjects and roleRef under 'roleBindings.%s'." $roleBindingValues.identifier $roleBindingValues.identifier) -}}
   {{- end -}}
 {{- end -}}
