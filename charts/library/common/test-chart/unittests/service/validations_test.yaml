@@ -54,3 +54,55 @@ tests:
     asserts:
       - failedTemplate:
           errorMessage: "Service 'main': No ports are enabled. At least one port must be enabled for service type 'ClusterIP'. Add ports under 'services.main.ports' in your values."
+
+  - it: duplicate port number and protocol should fail
+    values:
+      - ../_values/service_main_default.yaml
+    set:
+      service:
+        main:
+          ports:
+            http:
+              port: 8080
+            metrics:
+              port: 8080
+    asserts:
+      - failedTemplate:
+          errorMessage: "Duplicate port 8080/TCP found in Service. (service: 'main', ports: 'http' and 'metrics')"
+
+  - it: same port number with different protocols should pass
+    values:
+      - ../_values/service_main_default.yaml
+    set:
+      service:
+        main:
+          ports:
+            http:
+              port: 8080
+            udp:
+              port: 8080
+              protocol: UDP
+    documentSelector:
+      path: $[?(@.kind == "Service")].metadata.name
+      value: release-name
+    asserts:
+      - isKind:
+          of: Service
+
+  - it: non-overlapping ports should pass
+    values:
+      - ../_values/service_main_default.yaml
+    set:
+      service:
+        main:
+          ports:
+            http:
+              port: 8080
+            metrics:
+              port: 9090
+    documentSelector:
+      path: $[?(@.kind == "Service")].metadata.name
+      value: release-name
+    asserts:
+      - isKind:
+          of: Service

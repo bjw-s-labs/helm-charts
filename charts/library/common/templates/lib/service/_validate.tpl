@@ -46,5 +46,21 @@ Validate Service values
       {{- $serviceType := $serviceObject.type | default "ClusterIP" -}}
       {{- fail (printf "Service '%s': No ports are enabled. At least one port must be enabled for service type '%s'. Add ports under 'services.%s.ports' in your values." $serviceObject.identifier $serviceType $serviceObject.identifier) -}}
     {{- end -}}
+
+    {{- /* Validate no duplicate port number+protocol combinations */ -}}
+    {{- $seenPorts := dict -}}
+    {{- range $name, $port := $enabledPorts -}}
+      {{- if $port.port -}}
+        {{- $portProtocol := $port.protocol | default "TCP" -}}
+        {{- if has $portProtocol (list "HTTP" "HTTPS") -}}
+          {{- $portProtocol = "TCP" -}}
+        {{- end -}}
+        {{- $portKey := printf "%v/%s" $port.port $portProtocol -}}
+        {{- if hasKey $seenPorts $portKey -}}
+          {{- fail (printf "Duplicate port %v/%s found in Service. (service: '%s', ports: '%s' and '%s')" $port.port $portProtocol $serviceObject.identifier (get $seenPorts $portKey) $name) -}}
+        {{- end -}}
+        {{- $_ := set $seenPorts $portKey $name -}}
+      {{- end -}}
+    {{- end -}}
   {{- end -}}
 {{- end -}}
