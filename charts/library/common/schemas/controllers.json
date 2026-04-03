@@ -129,6 +129,41 @@
                 "type": ["integer", "string"]
               }
             }
+          },
+          "horizontalPodAutoscaler": {
+            "description": "HorizontalPodAutoscaler configuration for this controller. Only supported for deployment and statefulset types.",
+            "type": "object",
+            "required": ["maxReplicas"],
+            "properties": {
+              "minReplicas": {
+                "description": "Minimum number of replicas.",
+                "type": "integer",
+                "minimum": 1,
+                "default": 1
+              },
+              "maxReplicas": {
+                "description": "Maximum number of replicas.",
+                "type": "integer",
+                "minimum": 1
+              },
+              "annotations": { "$ref": "definitions.json#/annotations" },
+              "labels": { "$ref": "definitions.json#/labels" },
+              "metrics": {
+                "description": "Metrics to use for scaling decisions.",
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "behavior": {
+                "description": "Scaling behavior configuration.",
+                "type": "object",
+                "properties": {
+                  "scaleDown": { "type": "object" },
+                  "scaleUp": { "type": "object" }
+                }
+              }
+            }
           }
         },
         "allOf": [

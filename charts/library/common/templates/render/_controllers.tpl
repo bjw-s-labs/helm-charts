@@ -44,5 +44,21 @@ Renders the controller objects required by the chart.
       {{- include "bjw-s.common.lib.podDisruptionBudget.validate" (dict "rootContext" $rootContext "object" $podDisruptionBudgetObject) -}}
       {{- include "bjw-s.common.class.podDisruptionBudget" (dict "rootContext" $rootContext "object" $podDisruptionBudgetObject) | nindent 0 -}}
     {{- end -}}
+
+    {{- if $controllerObject.horizontalPodAutoscaler -}}
+      {{- /* Resolve the target kind and apiVersion from the controller type */ -}}
+      {{- $targetKind := "" -}}
+      {{- $targetApiVersion := "apps/v1" -}}
+      {{- if eq $controllerObject.type "deployment" -}}
+        {{- $targetKind = "Deployment" -}}
+      {{- else if eq $controllerObject.type "statefulset" -}}
+        {{- $targetKind = "StatefulSet" -}}
+      {{- else -}}
+        {{- fail (printf "horizontalPodAutoscaler is only supported for deployment and statefulset controller types. (controller: %s, type: %s)" $identifier $controllerObject.type) -}}
+      {{- end -}}
+      {{- $horizontalPodAutoscalerObject := (include "bjw-s.common.lib.valuesToObject" (dict "rootContext" $rootContext "id" $identifier "values" (merge (dict "controller" $identifier "forceRename" $controllerObject.name "targetKind" $targetKind "targetApiVersion" $targetApiVersion "targetName" $controllerObject.name) $controllerObject.horizontalPodAutoscaler))) | fromYaml -}}
+      {{- include "bjw-s.common.lib.horizontalPodAutoscaler.validate" (dict "rootContext" $rootContext "object" $horizontalPodAutoscalerObject) -}}
+      {{- include "bjw-s.common.class.horizontalPodAutoscaler" (dict "rootContext" $rootContext "object" $horizontalPodAutoscalerObject) | nindent 0 -}}
+    {{- end -}}
   {{- end -}}
 {{- end -}}

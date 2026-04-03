@@ -1,0 +1,214 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: controller - fields - horizontalPodAutoscaler
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+
+tests:
+  - it: default should not exist
+    asserts:
+      - not: true
+        containsDocument:
+          apiVersion: autoscaling/v2
+          kind: HorizontalPodAutoscaler
+          name: release-name
+          any: true
+
+  - it: created with maxReplicas
+    set:
+      controllers:
+        main:
+          replicas: null
+          horizontalPodAutoscaler:
+            maxReplicas: 10
+    documentSelector:
+      path: $[?(@.kind == "HorizontalPodAutoscaler")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.maxReplicas
+          value: 10
+      - equal:
+          path: spec.minReplicas
+          value: 1
+      - equal:
+          path: spec.scaleTargetRef
+          value:
+            apiVersion: apps/v1
+            kind: Deployment
+            name: release-name
+
+  - it: created with minReplicas and maxReplicas
+    set:
+      controllers:
+        main:
+          replicas: null
+          horizontalPodAutoscaler:
+            minReplicas: 3
+            maxReplicas: 10
+    documentSelector:
+      path: $[?(@.kind == "HorizontalPodAutoscaler")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.minReplicas
+          value: 3
+      - equal:
+          path: spec.maxReplicas
+          value: 10
+
+  - it: created with metrics
+    set:
+      controllers:
+        main:
+          replicas: null
+          horizontalPodAutoscaler:
+            maxReplicas: 10
+            metrics:
+              - type: Resource
+                resource:
+                  name: cpu
+                  target:
+                    type: Utilization
+                    averageUtilization: 80
+    documentSelector:
+      path: $[?(@.kind == "HorizontalPodAutoscaler")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.metrics
+          value:
+            - type: Resource
+              resource:
+                name: cpu
+                target:
+                  type: Utilization
+                  averageUtilization: 80
+
+  - it: created with behavior
+    set:
+      controllers:
+        main:
+          replicas: null
+          horizontalPodAutoscaler:
+            maxReplicas: 10
+            behavior:
+              scaleDown:
+                stabilizationWindowSeconds: 300
+    documentSelector:
+      path: $[?(@.kind == "HorizontalPodAutoscaler")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.behavior
+          value:
+            scaleDown:
+              stabilizationWindowSeconds: 300
+
+  - it: targets StatefulSet correctly
+    set:
+      controllers:
+        main:
+          type: statefulset
+          replicas: null
+          horizontalPodAutoscaler:
+            maxReplicas: 5
+    documentSelector:
+      path: $[?(@.kind == "HorizontalPodAutoscaler")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.scaleTargetRef
+          value:
+            apiVersion: apps/v1
+            kind: StatefulSet
+            name: release-name
+
+  - it: fails for daemonset controller type
+    set:
+      controllers:
+        main:
+          type: daemonset
+          horizontalPodAutoscaler:
+            maxReplicas: 5
+    asserts:
+      - failedTemplate:
+          errorMessage: "horizontalPodAutoscaler is only supported for deployment and statefulset controller types. (controller: main, type: daemonset)"
+
+  - it: fails when maxReplicas is missing
+    set:
+      controllers:
+        main:
+          horizontalPodAutoscaler:
+            minReplicas: 1
+    asserts:
+      - failedTemplate: {}
+
+  - it: multiple controllers with prefix and suffix
+    set:
+      controllers:
+        main:
+          replicas: null
+          horizontalPodAutoscaler:
+            maxReplicas: 10
+        second:
+          prefix: prefix
+          suffix: suffix
+          replicas: null
+          containers:
+            main:
+              image:
+                repository: ghcr.io/mendhak/http-https-echo
+                tag: 31
+          horizontalPodAutoscaler:
+            maxReplicas: 5
+    asserts:
+      - containsDocument:
+          apiVersion: autoscaling/v2
+          kind: HorizontalPodAutoscaler
+          name: release-name-main
+          any: true
+      - containsDocument:
+          apiVersion: autoscaling/v2
+          kind: HorizontalPodAutoscaler
+          name: prefix-release-name-second-suffix
+          any: true
+
+  - it: hpa targets the correct controller by default
+    set:
+      controllers:
+        main:
+          replicas: null
+          horizontalPodAutoscaler:
+            maxReplicas: 10
+    documentSelector:
+      path: $[?(@.kind == "HorizontalPodAutoscaler")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/controller"]
+          value: main
+
+  - it: created with custom annotations and labels
+    set:
+      controllers:
+        main:
+          replicas: null
+          horizontalPodAutoscaler:
+            maxReplicas: 10
+            annotations:
+              custom-annotation: custom-value
+            labels:
+              custom-label: custom-value
+    documentSelector:
+      path: $[?(@.kind == "HorizontalPodAutoscaler")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: metadata.annotations.custom-annotation
+          value: custom-value
+      - equal:
+          path: metadata.labels.custom-label
+          value: custom-value

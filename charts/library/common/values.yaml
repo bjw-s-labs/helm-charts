@@ -147,6 +147,44 @@ controllers: {}
 #       # minAvailable: 1
 #       # maxUnavailable: 1
 
+#     # -- Horizontal Pod Autoscaler configuration for this controller.
+#     # Only supported for deployment and statefulset controller types.
+#     # -- [[ref]](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)
+#     horizontalPodAutoscaler:
+#       {}
+#       # -- Maximum number of replicas (required)
+#       # maxReplicas: 10
+#       # -- Minimum number of replicas
+#       # minReplicas: 1
+#       # -- Provide additional annotations which may be required.
+#       # annotations: {}
+#       # -- Provide additional labels which may be required.
+#       # labels: {}
+#       # -- Metrics to use for scaling decisions.
+#       # -- [[ref]](https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/horizontal-pod-autoscaler-v2/#HorizontalPodAutoscalerSpec)
+#       # metrics:
+#       #   - type: Resource
+#       #     resource:
+#       #       name: cpu
+#       #       target:
+#       #         type: Utilization
+#       #         averageUtilization: 80
+#       # -- Scaling behavior configuration.
+#       # -- [[ref]](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#configurable-scaling-behavior)
+#       # behavior:
+#       #   scaleDown:
+#       #     stabilizationWindowSeconds: 300
+#       #     policies:
+#       #       - type: Percent
+#       #         value: 10
+#       #         periodSeconds: 60
+#       #   scaleUp:
+#       #     stabilizationWindowSeconds: 0
+#       #     policies:
+#       #       - type: Percent
+#       #         value: 100
+#       #         periodSeconds: 15
+
 
 #     # -- CronJob configuration. Required only when using `controller.type: cronjob`.
 #     # @default -- See below
