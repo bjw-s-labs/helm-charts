@@ -1,0 +1,27 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: podMonitor - fields - selector
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+tests:
+  - it: a podMonitor can be configured with a custom selector
+    set:
+      podMonitor:
+        main:
+          selector:
+            matchLabels:
+              app: my-app
+          podMetricsEndpoints:
+            - port: http
+              path: /metrics
+    documentSelector:
+      path: $[?(@.kind == "PodMonitor")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.selector
+          value:
+            matchLabels:
+              app: my-app
