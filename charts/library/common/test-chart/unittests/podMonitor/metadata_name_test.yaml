@@ -1,0 +1,50 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: podMonitor - metadata - name
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+tests:
+  - it: single podMonitor should not have identifier suffix
+    set:
+      podMonitor:
+        main:
+          controller:
+            identifier: main
+          podMetricsEndpoints:
+            - port: http
+              path: /metrics
+    asserts:
+      - containsDocument:
+          kind: PodMonitor
+          apiVersion: monitoring.coreos.com/v1
+          name: release-name
+          any: true
+
+  - it: multiple podMonitors should have identifier suffix
+    set:
+      podMonitor:
+        main:
+          controller:
+            identifier: main
+          podMetricsEndpoints:
+            - port: http
+              path: /metrics
+        second:
+          controller:
+            identifier: main
+          podMetricsEndpoints:
+            - port: metrics
+              path: /metrics
+    asserts:
+      - containsDocument:
+          kind: PodMonitor
+          apiVersion: monitoring.coreos.com/v1
+          name: release-name-main
+          any: true
+      - containsDocument:
+          kind: PodMonitor
+          apiVersion: monitoring.coreos.com/v1
+          name: release-name-second
+          any: true

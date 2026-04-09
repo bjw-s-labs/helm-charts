@@ -19,6 +19,9 @@ annotations:
     - kind: added
       description: |-
         Allow creating HorizontalPodAutoscaler objects for controllers.
+    - kind: added
+      description: |-
+        Add support for creating PodMonitors in addition to ServiceMonitors
     - kind: changed
       description: |-
         Minimum required Kubernetes version has been increased to 1.31

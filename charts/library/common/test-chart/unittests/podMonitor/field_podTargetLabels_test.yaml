@@ -1,0 +1,45 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: podMonitor - fields - podTargetLabels
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+tests:
+  - it: a podMonitor can be configured with podTargetLabels
+    set:
+      podMonitor:
+        main:
+          controller:
+            identifier: main
+          podMetricsEndpoints:
+            - port: http
+              path: /metrics
+          podTargetLabels:
+            - app.kubernetes.io/name
+            - app.kubernetes.io/instance
+    documentSelector:
+      path: $[?(@.kind == "PodMonitor")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.podTargetLabels
+          value:
+            - app.kubernetes.io/name
+            - app.kubernetes.io/instance
+
+  - it: podTargetLabels is not rendered when empty
+    set:
+      podMonitor:
+        main:
+          controller:
+            identifier: main
+          podMetricsEndpoints:
+            - port: http
+              path: /metrics
+    documentSelector:
+      path: $[?(@.kind == "PodMonitor")].metadata.name
+      value: release-name
+    asserts:
+      - notExists:
+          path: spec.podTargetLabels

@@ -1,0 +1,31 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: podMonitor - presence
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+tests:
+  - it: a podMonitor is not created by default
+    asserts:
+      - not: true
+        containsDocument:
+          kind: PodMonitor
+          apiVersion: monitoring.coreos.com/v1
+          name: RELEASE-NAME
+          any: true
+
+  - it: a podMonitor is not created when disabled
+    set:
+      podMonitor:
+        main:
+          enabled: false
+          controller:
+            identifier: main
+    asserts:
+      - not: true
+        containsDocument:
+          kind: PodMonitor
+          apiVersion: monitoring.coreos.com/v1
+          name: RELEASE-NAME
+          any: true

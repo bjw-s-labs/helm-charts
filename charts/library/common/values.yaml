@@ -695,6 +695,48 @@ serviceMonitor:
   #   # [[ref]](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#servicemonitorspec/)
   #   targetLabels: []
 
+# -- Configure the PodMonitors for the chart here.
+# Additional PodMonitors can be added by adding a dictionary key similar to the 'main' PodMonitor.
+# @default -- See below
+podMonitor:
+  {}
+  # main:
+  #   # -- Enables or disables the podMonitor.
+  #   enabled: false
+
+  #   # -- Override the name suffix that is used for this podMonitor.
+  #   nameOverride: ""
+
+  #   # -- Provide additional annotations which may be required.
+  #   annotations: {}
+
+  #   # -- Provide additional labels which may be required.
+  #   labels: {}
+
+  #   # -- Configures a custom selector for the podMonitor, this takes precedence over
+  #   # specifying a controller.
+  #   # Helm templates can be used.
+  #   selector: {}
+
+  #   # -- Configures the target controller for the podMonitor.
+  #   controller:
+  #     # -- Reference a controller identifier from this values.yaml
+  #     identifier: main
+
+  #   # -- Configures the podMetricsEndpoints for the podMonitor.
+  #   # @default -- See values.yaml
+  #   podMetricsEndpoints:
+  #     - port: http
+  #       scheme: http
+  #       path: /metrics
+  #       interval: 1m
+  #       scrapeTimeout: 10s
+
+  #   # -- Configures custom podTargetLabels for the podMonitor. (All collected
+  #   # metrics will have these labels, taking the value from the target pod)
+  #   # [[ref]](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#podmonitorspec)
+  #   podTargetLabels: []
+
 # -- Configure the gateway routes for the chart here.
 # Additional routes can be added by adding a dictionary key similar to the 'main' route.
 # [[ref]](https://gateway-api.sigs.k8s.io/references/spec/)
