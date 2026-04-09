@@ -87,7 +87,7 @@ jobs:
           fi
 
       - name: Install kubectl matching k8s version
-        uses: yokawasa/action-setup-kube-tools@4710caf20bc62368b8edab32f7c9cc7dc3a2ac31 # v0.13.3
+        uses: yokawasa/action-setup-kube-tools@5778123f7b071387e9c8e522492d8f39427dc6c7 # v0.13.4
         with:
           setup-tools: |
             kubectl
@@ -115,7 +115,7 @@ jobs:
           kubectl taint --all=true nodes node.cloudprovider.kubernetes.io/uninitialized- || true
 
       - name: Dereference JSON schema
-        uses: bjw-s-labs/helm-charts-actions/dereference-json-schema@d38f5892b72d43cbefbb9215a47adbf652f53909
+        uses: bjw-s-labs/helm-charts-actions/dereference-json-schema@12a3eab9fffe251606af4454176d08bec10bb5af
         with:
           schemaFile: "charts/${{ matrix.chart }}/values.schema.json"
           outputFile: "charts/${{ matrix.chart }}/values.schema.json"
@@ -186,7 +186,7 @@ jobs:
           cache_key: "mise-v1-{{file_hash}}"
 
       - name: Dereference JSON schema
-        uses: bjw-s-labs/helm-charts-actions/dereference-json-schema@d38f5892b72d43cbefbb9215a47adbf652f53909
+        uses: bjw-s-labs/helm-charts-actions/dereference-json-schema@12a3eab9fffe251606af4454176d08bec10bb5af
         with:
           schemaFile: "charts/${{ matrix.chart }}/values.schema.json"
           outputFile: "charts/${{ matrix.chart }}/values.schema.json"

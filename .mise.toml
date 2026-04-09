@@ -9,14 +9,14 @@ python.uv_venv_auto = true
 
 [tools]
 python = "3.14.3" # Required for documentation generation
-rust = "1.94.0" # Required for schematools
+rust = "1.94.1" # Required for schematools
 k3d = "5.8.3"
-"aqua:astral-sh/uv" = "0.11.1"
-"aqua:casey/just" = "1.48.0"
+"aqua:astral-sh/uv" = "0.11.2"
+"aqua:casey/just" = "1.48.1"
 "aqua:google/yamlfmt" = "0.21.0"
 "aqua:helm" = "4.1.3"
 "aqua:helm/chart-testing" = "3.14.0"
-"aqua:mikefarah/yq" = "4.52.4"
+"aqua:mikefarah/yq" = "4.52.5"
 "cargo:schematools-cli" = "0.22.0"
 "pipx:yamllint" = "1.38.0"
 "pipx:yamale" = "6.1.0"
