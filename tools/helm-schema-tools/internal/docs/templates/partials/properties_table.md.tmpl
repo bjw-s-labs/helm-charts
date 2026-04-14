@@ -1,0 +1,7 @@
+{{- define "properties_table" }}
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+{{- range . }}
+| {{ if .HasSubPage }}[`{{ .Key }}`](./{{ lower .Key }}/){{ else }}`{{ .Key }}`{{ end }} | `{{ typeString .Schema }}` | {{ if .Required }}**Yes**{{ else }}No{{ end }} | {{ defaultVal .Schema }} | {{ descWithExtras .Schema 60 }} |
+{{- end }}
+{{- end }}

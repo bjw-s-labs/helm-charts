@@ -37,17 +37,19 @@
           }
         },
         "rules": {
-          "description": "Ingress and egress rules for the NetworkPolicy.",
+          "description": "Ingress and egress rules for the NetworkPolicy. See https://kubernetes.io/docs/concepts/services-networking/network-policies/#networkpolicy-resource for details. Use `- {}` as an item to allow all traffic for that direction.",
           "type": "object",
           "additionalProperties": false,
           "properties": {
             "ingress": {
+              "description": "Ingress rules for this networkPolicy. An entry of `{}` allows all ingress traffic.",
               "type": "array",
               "items": {
                 "$ref": "k8s-api.json#/$defs/networking.v1.NetworkPolicyIngressRule"
               }
             },
             "egress": {
+              "description": "Egress rules for this networkPolicy. An entry of `{}` allows all egress traffic.",
               "type": "array",
               "items": {
                 "$ref": "k8s-api.json#/$defs/networking.v1.NetworkPolicyEgressRule"

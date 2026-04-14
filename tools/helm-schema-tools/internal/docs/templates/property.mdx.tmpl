@@ -1,0 +1,149 @@
+---
+title: "{{ .Name }}"
+{{- if .Description }}
+description: {{ printf "%q" (truncate .Description 100) }}
+{{- end }}
+sidebar:
+  label: "{{ .Name }}"
+---
+{{- if .Variants }}
+
+import { Tabs, TabItem, Badge } from '@astrojs/starlight/components';
+{{- end }}
+{{- if .Description }}
+
+{{ .Description }}
+{{- end }}
+
+## Type
+
+`{{ typeString .Schema }}`
+{{- with enumValues .Schema }}
+
+**Allowed values:** {{ range $i, $v := . }}{{ if $i }}, {{ end }}{{ $v }}{{ end }}
+{{- end }}
+{{- if .Schema.Default }}
+
+## Default
+
+```yaml
+{{ .Schema.Default }}
+```
+{{- end }}
+{{- if and .IsMap .ParentName }}
+
+## Usage
+
+Keys are identifiers for `{{ .ParentName }}` instances.
+
+```yaml
+{{ .ParentName }}:
+  main:
+    enabled: true
+    # ... configuration
+
+  secondary:
+    enabled: true
+    # ... configuration
+```
+{{- end }}
+{{- with allExamples .Schema }}
+{{- $examples := . }}
+
+## Examples
+{{ range $i, $ex := $examples }}{{- if lt $i 2 }}
+```yaml
+{{ $ex }}
+```
+{{ end }}{{- end }}
+{{- if gt (len $examples) 2 }}
+<details>
+<summary>More examples ({{ sub (len $examples) 2 }})</summary>
+{{ range $i, $ex := $examples }}{{- if ge $i 2 }}
+```yaml
+{{ $ex }}
+```
+{{ end }}{{- end }}
+</details>
+{{- end }}
+{{- end }}
+{{- if .Variants }}
+
+## Type Variants
+
+<Tabs>
+{{- range .Variants }}
+  <TabItem label="{{ .TypeValue }}">
+
+{{ if .Description }}{{ .Description }}{{ end }}
+
+{{ if .Example }}
+```yaml
+{{ .Example }}
+```
+{{ end }}
+
+{{ if .Properties }}
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+{{- range .Properties }}
+| `{{ .Key }}` | `{{ typeString .Schema }}` | {{ if .Required }}**Yes**{{ else }}No{{ end }} | {{ defaultVal .Schema }} | {{ descWithExtras .Schema 60 }} |
+{{- end }}
+{{- end }}
+
+  </TabItem>
+{{- end }}
+</Tabs>
+{{- end }}
+{{- if .Properties }}
+{{- if .IsMap }}
+
+## Instance Properties
+
+{{- if .Variants }}
+Common properties:
+{{- else }}
+Available properties:
+{{- end }}
+{{- else }}
+
+## Properties
+{{- end }}
+
+{{ template "properties_table" .Properties }}
+{{- $props := .Properties }}
+{{- $hasDetails := false }}
+{{- range $props }}
+{{- if and (not .HasSubPage) (or (gt (len (description .Schema)) 60) .SubProperties) }}
+{{- if not $hasDetails }}
+{{- $hasDetails = true }}
+
+### Property Details
+{{- end }}
+
+#### {{ .Key }}
+
+{{ description .Schema }}
+{{- with enumValues .Schema }}
+
+**Allowed values:** {{ range $i, $v := . }}{{ if $i }}, {{ end }}{{ $v }}{{ end }}
+{{- end }}
+{{- if .SubProperties }}
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+{{- range .SubProperties }}
+| `{{ .Key }}` | `{{ typeString .Schema }}` | {{ if .Required }}**Yes**{{ else }}No{{ end }} | {{ defaultVal .Schema }} | {{ descWithExtras .Schema 60 }} |
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- if .ChildPages }}
+
+## Related Pages
+
+{{ range .ChildPages }}
+- [`{{ . }}`](./{{ lower . }}/)
+{{- end }}
+{{- end }}

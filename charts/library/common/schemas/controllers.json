@@ -48,7 +48,7 @@
           "$ref": "pod.json#/$defs/options"
         },
         "replicas": {
-          "description": "Number of desired pods. Set to null when using a HorizontalPodAutoscaler.",
+          "description": "Number of desired pods. When a HorizontalPodAutoscaler is configured, `replicas` is automatically suppressed on the controller and propagated to HPA `minReplicas` if not explicitly set.",
           "type": [
             "integer",
             "null"
@@ -64,7 +64,7 @@
           "type": "object"
         },
         "strategy": {
-          "description": "Controller upgrade strategy.",
+          "description": "Controller upgrade strategy. For Deployments: `Recreate` or `RollingUpdate`. For StatefulSets: `OnDelete` or `RollingUpdate`. DaemonSets, CronJobs and Jobs ignore this field.",
           "type": "string"
         },
         "applyDefaultContainerOptionsToInitContainers": {
@@ -124,7 +124,7 @@
           }
         },
         "serviceAccount": {
-          "description": "ServiceAccount used by the controller.",
+          "description": "ServiceAccount used by the controller. Only use one of `name` or `identifier`. When both are specified, `identifier` takes priority.",
           "type": "object",
           "properties": {
             "name": {
@@ -178,6 +178,7 @@
           "additionalProperties": false,
           "properties": {
             "podManagementPolicy": {
+              "description": "Pod management policy. Valid values are Parallel and OrderedReady (default).",
               "type": "string"
             },
             "persistentVolumeClaimRetentionPolicy": {
@@ -214,6 +215,7 @@
               "default": 0
             },
             "volumeClaimTemplates": {
+              "description": "Volume claim templates for the StatefulSet. Each entry creates a PVC per pod.",
               "type": "array",
               "items": {
                 "$ref": "#/$defs/statefulset.volumeClaimTemplate"
@@ -244,42 +246,52 @@
           "required": ["schedule"],
           "properties": {
             "backoffLimit": {
+              "description": "Number of retries before marking the job as failed.",
               "type": "integer",
               "default": 6
             },
             "concurrencyPolicy": {
+              "description": "Valid values are Allow, Forbid or Replace.",
               "type": "string",
               "default": "Forbid"
             },
             "failedJobsHistory": {
+              "description": "Number of failed finished jobs to retain.",
               "type": "integer",
               "default": 1
             },
             "parallelism": {
+              "description": "Maximum number of pods running at any given time.",
               "type": "integer"
             },
             "schedule": {
+              "description": "Cron schedule expression (e.g. '*/20 * * * *').",
               "type": "string"
             },
             "startingDeadlineSeconds": {
+              "description": "Deadline in seconds for starting the job if it misses its scheduled time.",
               "type": "integer",
               "default": 30
             },
             "successfulJobsHistory": {
+              "description": "Number of successful finished jobs to retain.",
               "type": "integer",
               "default": 1
             },
             "suspend": {
+              "description": "Suspend execution of the CronJob. See https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#schedule-suspend for details.",
               "type": "boolean",
               "default": false
             },
             "timeZone": {
+              "description": "IANA time zone name for CronJob schedule (e.g. 'Etc/UTC'). Only works in Kubernetes >= 1.27.",
               "type": "string"
             },
             "activeDeadlineSeconds": {
               "type": "integer"
             },
             "ttlSecondsAfterFinished": {
+              "description": "Time in seconds after which a finished Job is eligible for automatic deletion.",
               "type": "integer"
             }
           }
@@ -298,15 +310,22 @@
           "additionalProperties": false,
           "properties": {
             "backoffLimit": {
+              "description": "Number of retries before marking the job as failed.",
               "type": "integer",
               "default": 6
             },
-            "completions": {},
-            "completionMode": {},
+            "completions": {
+              "description": "Number of completions needed before the job is done."
+            },
+            "completionMode": {
+              "description": "Completion mode for the Job."
+            },
             "parallelism": {
+              "description": "Maximum number of pods running at any given time.",
               "type": "integer"
             },
             "suspend": {
+              "description": "Suspend execution of the Job. See https://kubernetes.io/docs/concepts/workloads/controllers/job/#suspending-a-job for details.",
               "type": "boolean",
               "default": false
             },
@@ -314,6 +333,7 @@
               "type": "integer"
             },
             "ttlSecondsAfterFinished": {
+              "description": "Time in seconds after which a finished Job is eligible for automatic deletion.",
               "type": "integer"
             }
           }
@@ -322,7 +342,7 @@
     },
 
     "horizontalPodAutoscaler": {
-      "description": "HorizontalPodAutoscaler configuration for this controller. Only supported for deployment and statefulset types.",
+      "description": "HorizontalPodAutoscaler configuration for this controller. Only supported for deployment and statefulset types. See https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/ for details.",
       "type": "object",
       "required": ["maxReplicas"],
       "properties": {

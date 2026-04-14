@@ -1,0 +1,121 @@
+---
+title: "qBittorrent with Gluetun VPN"
+description: "How to deploy qBittorrent with a gluetun VPN sidecar"
+sidebar:
+  label: "qBittorrent + Gluetun"
+---
+
+How to deploy qBittorrent with a gluetun VPN sidecar.
+
+```yaml
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/app-template-4.6.2/charts/other/app-template/values.schema.json
+
+# Configure options applied to all pods
+defaultPodOptions:
+  automountServiceAccountToken: false
+
+controllers:
+  # Configure the main controller
+  main:
+    annotations:
+      reloader.stakater.com/auto: "true"
+
+    # Configure the pod-specific securityContext
+    pod:
+      securityContext:
+        fsGroup: 568
+        fsGroupChangePolicy: "OnRootMismatch"
+
+    containers:
+      # Configure the main application container
+      main:
+        image:
+          # -- image repository
+          repository: ghcr.io/onedr0p/qbittorrent
+          # -- image tag
+          # this example is not automatically updated, so be sure to use the latest image
+          tag: 4.6.2
+        # Configure the container-specific securityContext
+        securityContext:
+          runAsUser: 568
+          runAsGroup: 568
+
+      # Configure the gluetun sidecar
+      gluetun:
+        dependsOn: main
+        image:
+          # -- image repository
+          repository: ghcr.io/qdm12/gluetun
+          # -- image tag
+          # this example is not automatically updated, so be sure to use the latest image
+          tag: latest
+        # -- environment variables.
+        # See [image docs](https://github.com/qdm12/gluetun-wiki) for more details on how to configure
+        # your VPN and how to set up port-forwarding.
+        env:
+          VPN_TYPE: wireguard
+          VPN_INTERFACE: wg0
+        # Configure the container-specific securityContext
+        securityContext:
+          capabilities:
+            add:
+              - NET_ADMIN
+
+      port-forward:
+        dependsOn: gluetun
+        image:
+          repository: docker.io/snoringdragon/gluetun-qbittorrent-port-manager
+          tag: "1.0"
+        env:
+          - name: QBITTORRENT_SERVER
+            value: localhost
+          - name: QBITTORRENT_PORT
+            value: "8080"
+          - name: PORT_FORWARDED
+            value: "/tmp/gluetun/forwarded_port"
+
+service:
+  # Configure a service for the main application
+  main:
+    controller: main
+    type: ClusterIP
+    ports:
+      http:
+        port: 8080
+
+ingress:
+  # Configure an Ingress for the main application
+  main:
+    className: "external-nginx"
+    hosts:
+      - host: &host "qb.example.local"
+        paths:
+          - path: /
+            pathType: Prefix
+            service:
+              identifier: main
+              port: http
+    tls:
+      - hosts:
+          - *host
+
+persistence:
+  # Configure the main configuration storage location
+  config:
+    existingClaim: qbittorrent-config
+    advancedMounts:
+      main:
+        main:
+          - path: /config
+  # Configure an emptyDir to share the port-forwarding location between containers
+  gluetun-data:
+    type: emptyDir
+    advancedMounts:
+      main:
+        gluetun:
+          - path: /tmp/gluetun
+        port-forward:
+          - path: /tmp/gluetun
+            readOnly: true
+```

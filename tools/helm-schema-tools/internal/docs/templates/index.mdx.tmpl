@@ -1,0 +1,19 @@
+---
+title: Values Reference
+description: Complete reference for all chart values
+sidebar:
+  order: 1
+  label: Overview
+---
+{{- if .Description }}
+
+{{ .Description }}
+{{- end }}
+
+## All Keys
+
+| Key | Type | Description |
+|-----|------|-------------|
+{{- range .Properties }}
+| [`{{ .Key }}`](./{{ lower .Key }}/) | `{{ typeString .Schema }}` | {{ truncate (description .Schema) 80 }} |
+{{- end }}

@@ -17,7 +17,17 @@ repos:
       - id: check-case-conflict
 
   - repo: https://github.com/Lucas-C/pre-commit-hooks
-    rev: v1.1.10
+    rev: v1.5.6
     hooks:
       - id: remove-crlf
       - id: remove-tabs
+        exclude: \.go$|go\.mod$|go\.sum$
+
+  - repo: local
+    hooks:
+      - id: check-values-yaml
+        name: Check values.yaml is up-to-date
+        language: system
+        entry: just chart::check-values library/common
+        files: ^(charts/library/common/(values\.schema\.json|schemas/)|tools/helm-schema-tools/)
+        pass_filenames: false
