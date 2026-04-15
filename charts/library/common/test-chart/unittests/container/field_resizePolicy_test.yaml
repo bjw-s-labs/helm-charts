@@ -1,0 +1,69 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: container - fields - resizePolicy
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+capabilities:
+  majorVersion: 1
+  minorVersion: 35
+tests:
+  - it: should not be present by default for kubernetes < 1.35
+    capabilities:
+      majorVersion: 1
+      minorVersion: 34
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].resizePolicy
+
+  - it: should not be present by default for kubernetes >= 1.35
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].resizePolicy
+
+  - it: custom resizePolicy are ignored for kubernetes < 1.35
+    capabilities:
+      majorVersion: 1
+      minorVersion: 34
+    set:
+      controllers.main.containers:
+        main:
+          resizePolicy:
+            - resourceName: cpu
+              restartPolicy: NotRequired
+            - resourceName: memory
+              restartPolicy: RestartContainer
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].resizePolicy
+
+  - it: custom resizePolicy can be configured for kubernetes >= 1.35
+    set:
+      controllers.main.containers:
+        main:
+          resizePolicy:
+            - resourceName: cpu
+              restartPolicy: NotRequired
+            - resourceName: memory
+              restartPolicy: RestartContainer
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resizePolicy
+          value:
+            - resourceName: cpu
+              restartPolicy: NotRequired
+            - resourceName: memory
+              restartPolicy: RestartContainer

@@ -83,6 +83,13 @@
           "description": "Resource requests and limits for the container.",
           "$ref": "k8s-api.json#/$defs/core.v1.ResourceRequirements"
         },
+        "resizePolicy": {
+          "description": "Configure whether the container should be restarted when resizing. This allows fine-grained control based on resource type (CPU or memory).",
+          "items": {
+            "$ref": "k8s-api.json#/$defs/core.v1.ContainerResizePolicy"
+          },
+          "type": "array"
+        },
         "restartPolicy": {
           "description": "Restart policy for the container.",
           "type": "string"

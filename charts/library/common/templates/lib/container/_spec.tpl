@@ -48,6 +48,11 @@ ports: {{ toYaml . | trim | nindent 2 }}
   {{- with $containerObject.resources }}
 resources: {{ toYaml . | trim | nindent 2 }}
   {{- end -}}
+  {{- if ge ($rootContext.Capabilities.KubeVersion.Minor | int) 35 }}
+    {{- with $containerObject.resizePolicy }}
+resizePolicy: {{ . | toYaml | nindent 2 }}
+    {{- end -}}
+  {{- end -}}
   {{- with $containerObject.restartPolicy }}
 restartPolicy: {{ . | trim }}
   {{- end -}}

@@ -907,6 +907,24 @@
       },
       "type": "object"
     },
+    "core.v1.ContainerResizePolicy": {
+      "description": "ContainerResizePolicy represents resource resize policy for the container.",
+      "properties": {
+        "resourceName": {
+          "description": "Name of the resource to which this resource resize policy applies. Supported values: cpu, memory.",
+          "type": "string"
+        },
+        "restartPolicy": {
+          "description": "Restart policy to apply when specified resource is resized. If not specified, it defaults to NotRequired.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "resourceName",
+        "restartPolicy"
+      ],
+      "type": "object"
+    },
     "core.v1.ContainerSecurityContext": {
       "description": "SecurityContext holds security configuration that will be applied to a container. Some fields are present in both SecurityContext and PodSecurityContext.  When both are set, the values in SecurityContext take precedence.",
       "type": "object",

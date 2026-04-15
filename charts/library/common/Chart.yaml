@@ -25,6 +25,9 @@ annotations:
     - kind: added
       description: |-
         Add support for creating PodMonitors in addition to ServiceMonitors
+    - kind: added
+      description: |-
+        Add support for setting container resizePolicy in Kubernetes versions >= 1.35
     - kind: changed
       description: |-
         Minimum required Kubernetes version has been increased to 1.31
