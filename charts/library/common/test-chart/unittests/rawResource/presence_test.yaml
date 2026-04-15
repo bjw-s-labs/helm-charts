@@ -60,3 +60,25 @@ tests:
       - equal:
           path: spec.subsets[0].ports[0].name
           value: RELEASE-NAME
+
+  - it: user-provided identifier in manifest is preserved (not stripped)
+    set:
+      rawResources.endpoint:
+        manifest:
+          apiVersion: v1
+          kind: Endpoint
+          identifier: my-custom-identifier
+          spec:
+            subsets:
+              - addresses:
+                  - ip: 127.0.0.1
+                ports:
+                  - port: 443
+                    protocol: TCP
+    documentSelector:
+      path: $[?(@.kind == "Endpoint")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: identifier
+          value: my-custom-identifier

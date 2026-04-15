@@ -11,9 +11,7 @@ Convert RawResource values to an object
 
   {{- $manifest := $objectValues.manifest -}}
 
-  {{- /* Set computed metadata on the manifest */ -}}
-  {{- $_ := set $manifest "name" $objectName -}}
-  {{- $_ := set $manifest "identifier" $identifier -}}
+  {{- $internalData := dict "identifier" $identifier "name" $objectName -}}
 
-  {{- $manifest | toYaml -}}
+  {{- dict "manifest" $manifest "_internal" $internalData | toYaml -}}
 {{- end -}}

@@ -4,7 +4,8 @@ within the common library.
 */}}
 {{- define "bjw-s.common.class.rawResource" -}}
   {{- $rootContext := .rootContext -}}
-  {{- $manifest := .object -}}
+  {{- $manifest := .object.manifest -}}
+  {{- $internalData := .object._internal -}}
 
   {{- $userLabels := dict -}}
   {{- $userAnnotations := dict -}}
@@ -20,12 +21,12 @@ within the common library.
     (include "bjw-s.common.lib.metadata.globalAnnotations" $rootContext | fromYaml)
     $userAnnotations
   -}}
-  {{- $manifestWithoutMetadata := omit $manifest "metadata" "apiVersion" "kind" "name" "identifier" -}}
+  {{- $manifestWithoutMetadata := omit $manifest "metadata" "apiVersion" "kind" -}}
 ---
 apiVersion: {{ $manifest.apiVersion }}
 kind: {{ $manifest.kind }}
 metadata:
-  name: {{ $manifest.name }}
+  name: {{ $internalData.name }}
   {{- with $labels }}
   labels:
     {{- toYaml . | nindent 4 }}
