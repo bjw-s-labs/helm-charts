@@ -23,8 +23,8 @@ controllers:
 
       a-container:
         dependsOn:
-        - main
-        - third-container
+          - main
+          - third-container
         image:
           repository: ghcr.io/mendhak/http-https-echo
           tag: 31
@@ -60,15 +60,15 @@ service:
 ingress:
   main:
     hosts:
-    - host: "test.local"
-      paths:
-      - path: /
-        service:
-          identifier: main
-          port: http
+      - host: "test.local"
+        paths:
+          - path: /
+            service:
+              identifier: main
+              port: http
     tls:
-    - hosts:
-      - "test.local"
+      - hosts:
+          - "test.local"
 
 configMaps:
   config:
@@ -83,29 +83,31 @@ persistence:
       main:
         # the controller with the "main" identifier
         main:
-        # the container with the "main" identifier
-        - path: /data/config.yaml
-          readOnly: false
-          subPath: config.yaml
+          # the container with the "main" identifier
+          - path: /data/config.yaml
+            readOnly: false
+            subPath: config.yaml
         second-container:
-        # the container with the "second-container" identifier
-        - path: /appdata/config
-          readOnly: true
+          # the container with the "second-container" identifier
+          - path: /appdata/config
+            readOnly: true
       second-controller:
         # the controller with the "second-controller" identifier
         main:
-        # the container with the "main" identifier
-        - path: /data/config.yaml
-          readOnly: false
-          subPath: config.yaml
+          # the container with the "main" identifier
+          - path: /data/config.yaml
+            readOnly: false
+            subPath: config.yaml
 
 rawResources:
   unsupportedPDB:
     enabled: true
     forceRename: pdb
-    apiVersion: policy/v1
-    kind: PodDisruptionBudget
-    spec:
+    manifest:
+      apiVersion: policy/v1
+      kind: PodDisruptionBudget
+      metadata:
+        name: ""
       spec:
         minAvailable: 1
         selector:
