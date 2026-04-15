@@ -168,7 +168,6 @@ controllers: {}
 #       # -- Scaling behavior configuration. Passed through directly to the autoscaling/v2 HPA spec.
 #       # behavior: {}
 
-
 #     # -- CronJob configuration. Required only when using `controller.type: cronjob`.
 #     # @default -- See below
 #     cronjob:
@@ -448,47 +447,44 @@ controllers: {}
 #     # Each initContainer should have its own key
 #     initContainers: {}
 
-serviceAccount:
-  {}
-  # default:
-  #   enabled: false
-  #   annotations: {}
-  #   labels: {}
+serviceAccount: {}
+# default:
+#   enabled: false
+#   annotations: {}
+#   labels: {}
 
 # -- Use this to populate secrets with the values you specify.
 # Be aware that these values are not encrypted by default, and could therefore visible
 # to anybody with access to the values.yaml file.
 # Additional Secrets can be added by adding a dictionary key similar to the 'secret' object.
 # @default -- See below
-secrets:
-  {}
-  # secret:
-  #   # -- Enables or disables the Secret
-  #   enabled: false
-  #   # -- Labels to add to the Secret
-  #   labels: {}
-  #   # -- Annotations to add to the Secret
-  #   annotations: {}
-  #   # -- Secret stringData content. Helm template enabled.
-  #   stringData:
-  #     {}
-  #     # foo: bar
+secrets: {}
+# secret:
+#   # -- Enables or disables the Secret
+#   enabled: false
+#   # -- Labels to add to the Secret
+#   labels: {}
+#   # -- Annotations to add to the Secret
+#   annotations: {}
+#   # -- Secret stringData content. Helm template enabled.
+#   stringData:
+#     {}
+#     # foo: bar
 
 # -- Configure configMaps for the chart here.
 # Additional configMaps can be added by adding a dictionary key similar to the 'config' object.
 # @default -- See below
-configMaps:
-  {}
-  # config:
-  #   # -- Enables or disables the configMap
-  #   enabled: true
-  #   # -- Labels to add to the configMap
-  #   labels: {}
-  #   # -- Annotations to add to the configMap
-  #   annotations: {}
-  #   # -- configMap data content. Helm template enabled.
-  #   data:
-  #     foo: bar
+configMaps: {}
+# config:
+#   # -- Enables or disables the configMap
+#   enabled: true
+#   # -- Labels to add to the configMap
+#   labels: {}
+#   # -- Annotations to add to the configMap
+#   annotations: {}
+#   # -- configMap data content. Helm template enabled.
+#   data:
+#     foo: bar
 
 # -- Generate ConfigMaps from a folder in the Helm chart's filesystem
 # Your files will need to be two levels deep from the base path.
@@ -531,421 +527,420 @@ configMapsFromFolder:
 # -- Configure the services for the chart here.
 # Additional services can be added by adding a dictionary key similar to the 'main' service.
 # @default -- See below
-service:
-  {}
-  # main:
-  #   # -- Enables or disables the service
-  #   enabled: true
+service: {}
+# main:
+#   # -- Enables or disables the service
+#   enabled: true
 
-  #   # -- Configure which controller this service should target
-  #   controller: main
+#   # -- Configure which controller this service should target
+#   controller: main
 
-  #   # -- Make this the primary service for this controller (used in probes, notes, etc...).
-  #   # If there is more than 1 service targeting the controller, make sure that only 1 service is
-  #   # marked as primary.
-  #   primary: true
+#   # -- Make this the primary service for this controller (used in probes, notes, etc...).
+#   # If there is more than 1 service targeting the controller, make sure that only 1 service is
+#   # marked as primary.
+#   primary: true
 
-  #   # -- Set the service type
-  #   type: ClusterIP
+#   # -- Set the service type
+#   type: ClusterIP
 
-  #   # -- Specify the trafficDistribution for the service. Options: PreferSameZone, PreferSameNode
-  #   # -- [[ref](https://kubernetes.io/docs/concepts/services-networking/service/#traffic-distribution)]
-  #   trafficDistribution:
+#   # -- Specify the trafficDistribution for the service. Options: PreferSameZone, PreferSameNode
+#   # -- [[ref](https://kubernetes.io/docs/concepts/services-networking/service/#traffic-distribution)]
+#   trafficDistribution:
 
-  #   # -- Specify the internalTrafficPolicy for the service. Options: Cluster, Local
-  #   # -- [[ref](https://kubernetes.io/docs/concepts/services-networking/service-traffic-policy/)]
-  #   internalTrafficPolicy:
+#   # -- Specify the internalTrafficPolicy for the service. Options: Cluster, Local
+#   # -- [[ref](https://kubernetes.io/docs/concepts/services-networking/service-traffic-policy/)]
+#   internalTrafficPolicy:
 
-  #   # -- Specify the externalTrafficPolicy for the service. Options: Cluster, Local
-  #   # -- [[ref](https://kubernetes.io/docs/tutorials/services/source-ip/)]
-  #   externalTrafficPolicy:
+#   # -- Specify the externalTrafficPolicy for the service. Options: Cluster, Local
+#   # -- [[ref](https://kubernetes.io/docs/tutorials/services/source-ip/)]
+#   externalTrafficPolicy:
 
-  #   # -- Specify the ip policy. Options: SingleStack, PreferDualStack, RequireDualStack
-  #   ipFamilyPolicy:
-  #   # -- The ip families that should be used. Options: IPv4, IPv6
-  #   ipFamilies: []
+#   # -- Specify the ip policy. Options: SingleStack, PreferDualStack, RequireDualStack
+#   ipFamilyPolicy:
+#   # -- The ip families that should be used. Options: IPv4, IPv6
+#   ipFamilies: []
 
-  #   # -- Provide additional annotations which may be required.
-  #   annotations: {}
+#   # -- Provide additional annotations which may be required.
+#   annotations: {}
 
-  #   # -- Provide additional labels which may be required.
-  #   labels: {}
+#   # -- Provide additional labels which may be required.
+#   labels: {}
 
-  #   # -- Allow adding additional match labels
-  #   extraSelectorLabels: {}
+#   # -- Allow adding additional match labels
+#   extraSelectorLabels: {}
 
-  #   # -- Configure the Service port information here.
-  #   # Additional ports can be added by adding a dictionary key similar to the 'http' service.
-  #   # @default -- See below
-  #   ports:
-  #     http:
-  #       # -- Enables or disables the port
-  #       enabled: true
+#   # -- Configure the Service port information here.
+#   # Additional ports can be added by adding a dictionary key similar to the 'http' service.
+#   # @default -- See below
+#   ports:
+#     http:
+#       # -- Enables or disables the port
+#       enabled: true
 
-  #       # -- Make this the primary port (used in probes, notes, etc...)
-  #       # If there is more than 1 service, make sure that only 1 port is marked as primary.
-  #       primary: true
+#       # -- Make this the primary port (used in probes, notes, etc...)
+#       # If there is more than 1 service, make sure that only 1 port is marked as primary.
+#       primary: true
 
-  #       # -- The port number
-  #       port:
+#       # -- The port number
+#       port:
 
-  #       # -- Port protocol.
-  #       # Support values are `HTTP`, `HTTPS`, `TCP` and `UDP`.
-  #       # HTTP and HTTPS spawn a TCP service and get used for internal URL and name generation
-  #       protocol: HTTP
+#       # -- Port protocol.
+#       # Support values are `HTTP`, `HTTPS`, `TCP` and `UDP`.
+#       # HTTP and HTTPS spawn a TCP service and get used for internal URL and name generation
+#       protocol: HTTP
 
-  #       # -- Specify a service targetPort if you wish to differ the service port from the application port.
-  #       # If `targetPort` is specified, this port number is used in the container definition instead of
-  #       # the `port` value. Therefore named ports are not supported for this field.
-  #       targetPort:
+#       # -- Specify a service targetPort if you wish to differ the service port from the application port.
+#       # If `targetPort` is specified, this port number is used in the container definition instead of
+#       # the `port` value. Therefore named ports are not supported for this field.
+#       targetPort:
 
-  #       # -- Specify the nodePort value for the LoadBalancer and NodePort service types.
-  #       # [[ref]](https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport)
-  #       nodePort:
+#       # -- Specify the nodePort value for the LoadBalancer and NodePort service types.
+#       # [[ref]](https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport)
+#       nodePort:
 
-  #       # -- Specify the appProtocol value for the Service.
-  #       # [[ref]](https://kubernetes.io/docs/concepts/services-networking/service/#application-protocol)
-  #       appProtocol:
+#       # -- Specify the appProtocol value for the Service.
+#       # [[ref]](https://kubernetes.io/docs/concepts/services-networking/service/#application-protocol)
+#       appProtocol:
 
 # -- Configure the ingresses for the chart here.
-ingress:
-  {}
+ingress: {}
 
-  # -- An example is shown below
-  # main:
-  #   # -- Enables or disables the ingress
-  #   enabled: true
+# -- An example is shown below
+# main:
+#   # -- Enables or disables the ingress
+#   enabled: true
 
-  #   # -- Override the name suffix that is used for this ingress.
-  #   nameOverride:
+#   # -- Override the name suffix that is used for this ingress.
+#   nameOverride:
 
-  #   # -- Provide additional annotations which may be required. Helm templates can be used.
-  #   annotations: {}
+#   # -- Provide additional annotations which may be required. Helm templates can be used.
+#   annotations: {}
 
-  #   # -- Provide additional labels which may be required. Helm templates can be used.
-  #   labels: {}
+#   # -- Provide additional labels which may be required. Helm templates can be used.
+#   labels: {}
 
-  #   # -- Set the ingressClass that is used for this ingress.
-  #   className:
+#   # -- Set the ingressClass that is used for this ingress.
+#   className:
 
-  #   # -- Configure the defaultBackend for this ingress. This will disable any other rules for the ingress.
-  #   defaultBackend:
+#   # -- Configure the defaultBackend for this ingress. This will disable any other rules for the ingress.
+#   defaultBackend:
 
-  #   ## Configure the hosts for the ingress
-  #   hosts:
-  #     - # -- Host address. Helm template can be passed.
-  #       host: chart-example.local
-  #       ## Configure the paths for the host
-  #       paths:
-  #         - # -- Path.  Helm template can be passed.
-  #           path: /
-  #           pathType: Prefix
-  #           service:
-  #             # -- Overrides the service name reference for this path
-  #             # The service name to reference.
-  #             name: main
-  #             # -- Reference a service identifier from this values.yaml
-  #             identifier: main
-  #             # -- Overrides the service port number reference for this path
-  #             port:
+#   ## Configure the hosts for the ingress
+#   hosts:
+#     - # -- Host address. Helm template can be passed.
+#       host: chart-example.local
+#       ## Configure the paths for the host
+#       paths:
+#         - # -- Path.  Helm template can be passed.
+#           path: /
+#           pathType: Prefix
+#           service:
+#             # -- Overrides the service name reference for this path
+#             # The service name to reference.
+#             name: main
+#             # -- Reference a service identifier from this values.yaml
+#             identifier: main
+#             # -- Overrides the service port number reference for this path
+#             port:
 
-  #   # -- Configure TLS for the ingress. Both secretName and hosts can process a Helm template.
-  #   tls: []
-  #   #  - secretName: chart-example-tls
-  #   #    hosts:
-  #   #      - chart-example.local
+#   # -- Configure TLS for the ingress. Both secretName and hosts can process a Helm template.
+#   tls: []
+#   #  - secretName: chart-example-tls
+#   #    hosts:
+#   #      - chart-example.local
 
 # -- Configure the ServiceMonitors for the chart here.
 # Additional ServiceMonitors can be added by adding a dictionary key similar to the 'main' ServiceMonitors.
 # @default -- See below
-serviceMonitor:
-  {}
-  # main:
-  #   # -- Enables or disables the serviceMonitor.
-  #   enabled: false
+serviceMonitor: {}
+# main:
+#   # -- Enables or disables the serviceMonitor.
+#   enabled: false
 
-  #   # -- Override the name suffix that is used for this serviceMonitor.
-  #   nameOverride: ""
+#   # -- Override the name suffix that is used for this serviceMonitor.
+#   nameOverride: ""
 
-  #   # -- Provide additional annotations which may be required.
-  #   annotations: {}
+#   # -- Provide additional annotations which may be required.
+#   annotations: {}
 
-  #   # -- Provide additional labels which may be required.
-  #   labels: {}
+#   # -- Provide additional labels which may be required.
+#   labels: {}
 
-  #   # -- Configures a custom selector for the serviceMonitor, this takes precedence over
-  #   # specifying a service name.
-  #   # Helm templates can be used.
-  #   selector: {}
+#   # -- Configures a custom selector for the serviceMonitor, this takes precedence over
+#   # specifying a service name.
+#   # Helm templates can be used.
+#   selector: {}
 
-  #   # -- Configures the target Service for the serviceMonitor. Helm templates can be used.
-  #   serviceName: '{{ include "bjw-s.common.lib.chart.names.fullname" $ }}'
+#   # -- Configures the target Service for the serviceMonitor. Helm templates can be used.
+#   serviceName: '{{ include "bjw-s.common.lib.chart.names.fullname" $ }}'
 
-  #   # -- Configures the endpoints for the serviceMonitor. Helm templates can be used.
-  #   # @default -- See values.yaml
-  #   endpoints:
-  #     - port: http
-  #       scheme: http
-  #       path: /metrics
-  #       interval: 1m
-  #       scrapeTimeout: 10s
+#   # -- Configures the endpoints for the serviceMonitor. Helm templates can be used.
+#   # @default -- See values.yaml
+#   endpoints:
+#     - port: http
+#       scheme: http
+#       path: /metrics
+#       interval: 1m
+#       scrapeTimeout: 10s
 
-  #   # -- Configures custom targetLabels for the serviceMonitor. (All collected
-  #   # meterics will have these labels, taking the value from the target service)
-  #   # [[ref]](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#servicemonitorspec/)
-  #   targetLabels: []
+#   # -- Configures custom targetLabels for the serviceMonitor. (All collected
+#   # meterics will have these labels, taking the value from the target service)
+#   # [[ref]](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#servicemonitorspec/)
+#   targetLabels: []
 
 # -- Configure the PodMonitors for the chart here.
 # Additional PodMonitors can be added by adding a dictionary key similar to the 'main' PodMonitor.
 # @default -- See below
-podMonitor:
-  {}
-  # main:
-  #   # -- Enables or disables the podMonitor.
-  #   enabled: false
+podMonitor: {}
+# main:
+#   # -- Enables or disables the podMonitor.
+#   enabled: false
 
-  #   # -- Override the name suffix that is used for this podMonitor.
-  #   nameOverride: ""
+#   # -- Override the name suffix that is used for this podMonitor.
+#   nameOverride: ""
 
-  #   # -- Provide additional annotations which may be required.
-  #   annotations: {}
+#   # -- Provide additional annotations which may be required.
+#   annotations: {}
 
-  #   # -- Provide additional labels which may be required.
-  #   labels: {}
+#   # -- Provide additional labels which may be required.
+#   labels: {}
 
-  #   # -- Configures a custom selector for the podMonitor, this takes precedence over
-  #   # specifying a controller.
-  #   # Helm templates can be used.
-  #   selector: {}
+#   # -- Configures a custom selector for the podMonitor, this takes precedence over
+#   # specifying a controller.
+#   # Helm templates can be used.
+#   selector: {}
 
-  #   # -- Configures the target controller for the podMonitor.
-  #   controller:
-  #     # -- Reference a controller identifier from this values.yaml
-  #     identifier: main
+#   # -- Configures the target controller for the podMonitor.
+#   controller:
+#     # -- Reference a controller identifier from this values.yaml
+#     identifier: main
 
-  #   # -- Configures the podMetricsEndpoints for the podMonitor.
-  #   # @default -- See values.yaml
-  #   podMetricsEndpoints:
-  #     - port: http
-  #       scheme: http
-  #       path: /metrics
-  #       interval: 1m
-  #       scrapeTimeout: 10s
+#   # -- Configures the podMetricsEndpoints for the podMonitor.
+#   # @default -- See values.yaml
+#   podMetricsEndpoints:
+#     - port: http
+#       scheme: http
+#       path: /metrics
+#       interval: 1m
+#       scrapeTimeout: 10s
 
-  #   # -- Configures custom podTargetLabels for the podMonitor. (All collected
-  #   # metrics will have these labels, taking the value from the target pod)
-  #   # [[ref]](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#podmonitorspec)
-  #   podTargetLabels: []
+#   # -- Configures custom podTargetLabels for the podMonitor. (All collected
+#   # metrics will have these labels, taking the value from the target pod)
+#   # [[ref]](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#podmonitorspec)
+#   podTargetLabels: []
 
 # -- Configure the gateway routes for the chart here.
 # Additional routes can be added by adding a dictionary key similar to the 'main' route.
 # [[ref]](https://gateway-api.sigs.k8s.io/references/spec/)
 # @default -- See below
-route:
-  {}
-  # main:
-  #   # -- Enables or disables the route
-  #   enabled: false
+route: {}
+# main:
+#   # -- Enables or disables the route
+#   enabled: false
 
-  #   # -- Set the route kind
-  #   # Valid options are GRPCRoute, HTTPRoute, TCPRoute, TLSRoute, UDPRoute
-  #   kind: HTTPRoute
+#   # -- Set the route kind
+#   # Valid options are GRPCRoute, HTTPRoute, TCPRoute, TLSRoute, UDPRoute
+#   kind: HTTPRoute
 
-  #   # -- Override the name suffix that is used for this route.
-  #   nameOverride: ""
+#   # -- Override the name suffix that is used for this route.
+#   nameOverride: ""
 
-  #   # -- Provide additional annotations which may be required.
-  #   annotations: {}
+#   # -- Provide additional annotations which may be required.
+#   annotations: {}
 
-  #   # -- Provide additional labels which may be required.
-  #   labels: {}
+#   # -- Provide additional labels which may be required.
+#   labels: {}
 
-  #   # -- Configure the resource the route attaches to.
-  #   parentRefs:
-  #     - # Group of the referent resource.
-  #       group: gateway.networking.k8s.io
-  #       # Kind of the referent resource.
-  #       kind: Gateway
-  #       # Name of the referent resource
-  #       name:
-  #       # Namespace of the referent resource
-  #       namespace:
-  #       # Name of the section within the target resource.
-  #       sectionName:
+#   # -- Configure the resource the route attaches to.
+#   parentRefs:
+#     - # Group of the referent resource.
+#       group: gateway.networking.k8s.io
+#       # Kind of the referent resource.
+#       kind: Gateway
+#       # Name of the referent resource
+#       name:
+#       # Namespace of the referent resource
+#       namespace:
+#       # Name of the section within the target resource.
+#       sectionName:
 
-  #   # -- Host addresses. Helm template can be passed.
-  #   hostnames: []
+#   # -- Host addresses. Helm template can be passed.
+#   hostnames: []
 
-  #   # -- Configure rules for routing. Defaults to the primary service.
-  #   rules:
-  #     - # -- Optional name of the route rule. This name must be unique within a Route if it is set.
-  #       name: ""
-  #       # -- Configure backends where matching requests should be sent.
-  #       backendRefs: []
-  #       ## Configure conditions used for matching incoming requests. Only for HTTPRoutes
-  #       matches:
-  #         - path:
-  #             type: PathPrefix
-  #             value: /
-  #       ## Request filters that are applied to the rules.
-  #       filters: []
-  #       ## Request timeout that are applied to the rules.
-  #       timeouts: {}
+#   # -- Configure rules for routing. Defaults to the primary service.
+#   rules:
+#     - # -- Optional name of the route rule. This name must be unique within a Route if it is set.
+#       name: ""
+#       # -- Configure backends where matching requests should be sent.
+#       backendRefs: []
+#       ## Configure conditions used for matching incoming requests. Only for HTTPRoutes
+#       matches:
+#         - path:
+#             type: PathPrefix
+#             value: /
+#       ## Request filters that are applied to the rules.
+#       filters: []
+#       ## Request timeout that are applied to the rules.
+#       timeouts: {}
 
 # -- Configure persistence for the chart here.
 # Additional items can be added by adding a dictionary key similar to the 'config' key.
 # [[ref]](https://bjw-s-labs.github.io/helm-charts/docs/common-library/common-library-storage)
 # @default -- See below
-persistence:
-  {}
-  # config:
-  #   # -- Enables or disables the persistence item. Defaults to true
-  #   enabled: false
+persistence: {}
+# config:
+#   # -- Enables or disables the persistence item. Defaults to true
+#   enabled: false
 
-  #   # -- Sets the persistence type
-  #   # Valid options are persistentVolumeClaim, emptyDir, nfs, hostPath, secret, configMap or custom
-  #   type: persistentVolumeClaim
+#   # -- Sets the persistence type
+#   # Valid options are persistentVolumeClaim, emptyDir, nfs, hostPath, secret, configMap or custom
+#   type: persistentVolumeClaim
 
-  #   # -- Storage Class for the config volume.
-  #   # If set to `-`, dynamic provisioning is disabled.
-  #   # If set to something else, the given storageClass is used.
-  #   # If undefined (the default) or set to null, no storageClassName spec is set, choosing the default provisioner.
-  #   storageClass: # "-"
+#   # -- Storage Class for the config volume.
+#   # If set to `-`, dynamic provisioning is disabled.
+#   # If set to something else, the given storageClass is used.
+#   # If undefined (the default) or set to null, no storageClassName spec is set, choosing the default provisioner.
+#   storageClass: # "-"
 
-  #   # -- If you want to reuse an existing claim, the name of the existing PVC can be passed here.
-  #   existingClaim: # your-claim
+#   # -- If you want to reuse an existing claim, the name of the existing PVC can be passed here.
+#   existingClaim: # your-claim
 
-  #   # -- The optional data source for the persistentVolumeClaim.
-  #   # [[ref]](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#volume-populators-and-data-sources)
-  #   dataSource: {}
+#   # -- The optional data source for the persistentVolumeClaim.
+#   # [[ref]](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#volume-populators-and-data-sources)
+#   dataSource: {}
 
-  #   # -- The optional volume populator for the persistentVolumeClaim.
-  #   # [[ref]](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#volume-populators-and-data-sources)
-  #   dataSourceRef: {}
+#   # -- The optional volume populator for the persistentVolumeClaim.
+#   # [[ref]](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#volume-populators-and-data-sources)
+#   dataSourceRef: {}
 
-  #   # -- AccessMode for the persistent volume.
-  #   # Make sure to select an access mode that is supported by your storage provider!
-  #   # [[ref]](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes)
-  #   accessMode: ReadWriteOnce
+#   # -- AccessMode for the persistent volume.
+#   # Make sure to select an access mode that is supported by your storage provider!
+#   # [[ref]](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes)
+#   accessMode: ReadWriteOnce
 
-  #   # -- The amount of storage that is requested for the persistent volume.
-  #   size: 1Gi
+#   # -- The amount of storage that is requested for the persistent volume.
+#   size: 1Gi
 
-  #   # -- Set to true to retain the PVC upon `helm uninstall`
-  #   retain: false
+#   # -- Set to true to retain the PVC upon `helm uninstall`
+#   retain: false
 
-  #   # -- Configure mounts to all controllers and containers. By default the persistence item
-  #   # will be mounted to `/<name_of_the_peristence_item>`.
-  #   # Example:
-  #   # globalMounts:
-  #   #   - path: /config
-  #   #     readOnly: false
-  #   globalMounts: []
+#   # -- Configure mounts to all controllers and containers. By default the persistence item
+#   # will be mounted to `/<name_of_the_peristence_item>`.
+#   # Example:
+#   # globalMounts:
+#   #   - path: /config
+#   #     readOnly: false
+#   globalMounts: []
 
-  #   # -- Explicitly configure mounts for specific controllers and containers.
-  #   # Example:
-  #   # advancedMounts:
-  #   #   main: # the controller with the "main" identifier
-  #   #     main: # the container with the "main" identifier
-  #   #       - path: /data/config.yaml
-  #   #         readOnly: true
-  #   #         mountPropagation: None
-  #   #         subPath: config.yaml
-  #   #     second-container: # the container with the "second-container" identifier
-  #   #       - path: /appdata/config
-  #   #         readOnly: true
-  #   #   second-controller: # the controller with the "second-controller" identifier
-  #   #     main: # the container with the "main" identifier
-  #   #       - path: /data/config.yaml
-  #   #         readOnly: false
-  #   #         subPath: config.yaml
-  #   advancedMounts: {}
+#   # -- Explicitly configure mounts for specific controllers and containers.
+#   # Example:
+#   # advancedMounts:
+#   #   main: # the controller with the "main" identifier
+#   #     main: # the container with the "main" identifier
+#   #       - path: /data/config.yaml
+#   #         readOnly: true
+#   #         mountPropagation: None
+#   #         subPath: config.yaml
+#   #     second-container: # the container with the "second-container" identifier
+#   #       - path: /appdata/config
+#   #         readOnly: true
+#   #   second-controller: # the controller with the "second-controller" identifier
+#   #     main: # the container with the "main" identifier
+#   #       - path: /data/config.yaml
+#   #         readOnly: false
+#   #         subPath: config.yaml
+#   advancedMounts: {}
 
 # -- Configure the networkPolicies for the chart here.
 # Additional networkPolicies can be added by adding a dictionary key similar to the 'main' networkPolicy.
 # @default -- See below
-networkpolicies:
-  {}
-  # main:
-  #   # -- Enables or disables the networkPolicy item. Defaults to true
-  #   enabled: false
+networkpolicies: {}
+# main:
+#   # -- Enables or disables the networkPolicy item. Defaults to true
+#   enabled: false
 
-  #   # -- Configure which controller this networkPolicy should target
-  #   controller: main
+#   # -- Configure which controller this networkPolicy should target
+#   controller: main
 
-  #   # -- Define a custom podSelector for the networkPolicy. This takes precedence over targeting a controller.
-  #   # podSelector: {}
+#   # -- Define a custom podSelector for the networkPolicy. This takes precedence over targeting a controller.
+#   # podSelector: {}
 
-  #   # -- The policyTypes for this networkPolicy
-  #   policyTypes:
-  #     - Ingress
-  #     - Egress
+#   # -- The policyTypes for this networkPolicy
+#   policyTypes:
+#     - Ingress
+#     - Egress
 
-  #   # -- The rulesets for this networkPolicy
-  #   # [[ref]](https://kubernetes.io/docs/concepts/services-networking/network-policies/#networkpolicy-resource)
-  #   rules:
-  #     # -- The ingress rules for this networkPolicy. Allows all ingress traffic by default.
-  #     ingress:
-  #       - {}
-  #     # -- The egress rules for this networkPolicy. Allows all egress traffic by default.
-  #     egress:
-  #       - {}
+#   # -- The rulesets for this networkPolicy
+#   # [[ref]](https://kubernetes.io/docs/concepts/services-networking/network-policies/#networkpolicy-resource)
+#   rules:
+#     # -- The ingress rules for this networkPolicy. Allows all ingress traffic by default.
+#     ingress:
+#       - {}
+#     # -- The egress rules for this networkPolicy. Allows all egress traffic by default.
+#     egress:
+#       - {}
 
 # -- Configure any unsupported raw resources here.
 # @default -- See below
-rawResources:
-  {}
-  # example:
-  #   # -- Enables or disables the resource. Defaults to true
-  #   enabled: false
-  #   # -- Specify the apiVersion of the resource.
-  #   apiVersion: v1
-  #   # -- Specify the kind of the resource.
-  #   kind: Endpoint
-  #   # -- Override the name suffix that is used for this resource.
-  #   nameOverride: ""
-  #   # -- Provide additional annotations which may be required.
-  #   annotations: {}
-  #   # -- Provide additional labels which may be required.
-  #   labels: {}
-  #   # -- Configure the contents of the resource that is to be rendered.
-  #   spec:
+rawResources: {}
+# example:
+#   # -- Enables or disables the resource. Defaults to true
+#   enabled: false
+#   # -- Force replace the name of the object.
+#   forceRename:
+#   # -- Prefix to prepend to the resource name.
+#   prefix:
+#   # -- Suffix to append to the resource name.
+#   suffix:
+#   # -- The raw K8s resource manifest to be rendered.
+#   manifest:
+#     # -- apiVersion of the resource.
+#     apiVersion: v1
+#     # -- Kind of the resource.
+#     kind: Endpoints
+#     # -- Metadata for the resource.
+#     metadata:
+#       # -- Provide additional annotations which may be required.
+#       annotations: {}
+#       # -- Provide additional labels which may be required.
+#       labels: {}
+#     # -- Additional manifest content (e.g. spec, status, etc.)
+#     spec:
 
 # -- Configure the Roles and Role Bindings for the chart here.
-rbac:
-  {}
-  # roles:
-  #   role1:
-  #     # -- Force replace the name of the object.
-  #     forceRename: <force name>
-  #     # -- Enables or disables the Role. Can be templated.
-  #     enabled: true
-  #     # -- Set to Role,ClusterRole
-  #     type: Role
-  #     rules:
-  #       - apiGroups: ["*"]
-  #         resources: ["*"]
-  #         verbs: ["get", "list", "watch"]
-  # bindings:
-  #   binding1:
-  #     # -- Force replace the name of the object.
-  #     forceRename: <force name>
-  #     # -- Enables or disables the Role. Can be templated.
-  #     enabled: true
-  #     # -- Set to RoleBinding,ClusterRoleBinding
-  #     type: RoleBinding
-  #     # -- Can be an identifier of rbac.roles or a custom name and kind
-  #     roleRef:
-  #       name: test-role
-  #       kind: Role
-  #       identifier: test
-  #     # -- If using an identifier it will be automatically filled, otherwise every key will need to be explicitly declared
-  #     subjects:
-  #       - identifier: default
-  #       - kind: ServiceAccount
-  #         name: test
-  #         namespace: "{{ .Release.Namespace }}"
-  #       - kind: Group
-  #         name: oidc:/test-user
-  #       - kind: User
-  #         name: username
+rbac: {}
+# roles:
+#   role1:
+#     # -- Force replace the name of the object.
+#     forceRename: <force name>
+#     # -- Enables or disables the Role. Can be templated.
+#     enabled: true
+#     # -- Set to Role,ClusterRole
+#     type: Role
+#     rules:
+#       - apiGroups: ["*"]
+#         resources: ["*"]
+#         verbs: ["get", "list", "watch"]
+# bindings:
+#   binding1:
+#     # -- Force replace the name of the object.
+#     forceRename: <force name>
+#     # -- Enables or disables the Role. Can be templated.
+#     enabled: true
+#     # -- Set to RoleBinding,ClusterRoleBinding
+#     type: RoleBinding
+#     # -- Can be an identifier of rbac.roles or a custom name and kind
+#     roleRef:
+#       name: test-role
+#       kind: Role
+#       identifier: test
+#     # -- If using an identifier it will be automatically filled, otherwise every key will need to be explicitly declared
+#     subjects:
+#       - identifier: default
+#       - kind: ServiceAccount
+#         name: test
+#         namespace: "{{ .Release.Namespace }}"
+#       - kind: Group
+#         name: oidc:/test-user
+#       - kind: User
+#         name: username

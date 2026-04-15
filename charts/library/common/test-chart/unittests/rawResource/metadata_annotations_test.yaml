@@ -8,10 +8,11 @@ values:
 set:
   rawResources:
     config:
-      apiVersion: v1
-      kind: Endpoint
-      spec:
-        test: test
+      manifest:
+        apiVersion: v1
+        kind: Endpoint
+        spec:
+          test: test
 tests:
   - it: no annotations are set by default
     documentSelector:
@@ -23,7 +24,7 @@ tests:
 
   - it: custom annotations
     set:
-      rawResources.config.annotations:
+      rawResources.config.manifest.metadata.annotations:
         test_annotation: test
     documentSelector:
       path: $[?(@.kind == "Endpoint")].metadata.name
@@ -38,7 +39,7 @@ tests:
     set:
       global.annotations:
         global_annotation: test
-      rawResources.config.annotations:
+      rawResources.config.manifest.metadata.annotations:
         test_annotation: test
     documentSelector:
       path: $[?(@.kind == "Endpoint")].metadata.name

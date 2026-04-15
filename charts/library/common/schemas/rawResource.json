@@ -16,28 +16,28 @@
           "type": "boolean",
           "default": true
         },
-        "apiVersion": {
-          "description": "apiVersion of the resource.",
-          "type": "string"
-        },
-        "kind": {
-          "description": "Kind of the resource.",
-          "type": "string"
-        },
-        "annotations": {
-          "$ref": "definitions.json#/$defs/annotations"
-        },
-        "labels": {
-          "$ref": "definitions.json#/$defs/labels"
-        },
-        "spec": {
-          "description": "Contents of the raw resource to be rendered."
+        "manifest": {
+          "description": "The raw K8s resource manifest to be rendered. apiVersion and kind are required.",
+          "type": "object",
+          "properties": {
+            "apiVersion": {
+              "description": "apiVersion of the resource.",
+              "type": "string"
+            },
+            "kind": {
+              "description": "Kind of the resource.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "apiVersion",
+            "kind"
+          ],
+          "additionalProperties": true
         }
       },
       "required": [
-        "apiVersion",
-        "kind",
-        "spec"
+        "manifest"
       ]
     }
   }

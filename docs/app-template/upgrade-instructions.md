@@ -1,5 +1,57 @@
 # Upgrade instructions
 
+## From 4.x.x to 5.0.x
+
+Migrating from v4.x to v5.x introduces a number of breaking changes. Additionally, the minimum required Kubernetes version has been increased to version **1.31.x**.
+
+#### Raw Resources
+
+The `rawResources` section has been restructured to provide a cleaner syntax. Previously, the K8s manifest content was placed under a `spec` key, which caused confusion when the resource itself contained a `spec` field (e.g., `rawResources.$identifier.spec.spec`).
+
+##### Old syntax
+
+```yaml
+rawResources:
+  my-endpoint:
+    enabled: true
+    apiVersion: v1
+    kind: Endpoints
+    metadata:
+      name: my-endpoint
+      labels: {}
+      annotations: {}
+    spec: # <-- This was confusing when the resource also has a `spec` field
+      subsets:
+        - addresses:
+            - ip: 192.168.1.1
+```
+
+##### New syntax
+
+```yaml
+rawResources:
+  my-endpoint:
+    manifest:
+      apiVersion: v1
+      kind: Endpoints
+      metadata:
+        name: my-endpoint
+        labels: {}
+        annotations: {}
+      spec: # <-- Now properly nested under `manifest`
+        subsets:
+          - addresses:
+              - ip: 192.168.1.1
+```
+
+##### Key changes
+
+- The K8s manifest (apiVersion, kind, metadata, spec, etc.) is now wrapped in a `manifest` key
+- Helm templates (e.g., `{{ .Release.Name }}`) within the manifest are now properly rendered
+- The `labels` and `annotations` fields at the raw resource level have been removed; use `metadata.labels` and `metadata.annotations` instead
+- Global chart labels and annotations are automatically merged with any user-provided labels/annotations in `metadata`
+- The `metadata.name` field is **overwritten** by the chart's computed name (based on `forceRename`, `prefix`, `suffix`, and identifier). Use `forceRename` if you need a specific name.
+
 ## From 3.x.x to 4.0.x
 
 Migrating from v3.x to v4.x introduces a number of breaking changes. Additionally, the minimum required Kubernetes version has been increased to version **1.28.x**.
@@ -9,12 +61,12 @@ Migrating from v3.x to v4.x introduces a number of breaking changes. Additionall
 A new and consistent resource naming scheme has been implemented throughout the chart.
 
 !!! info
-    See **[here](../common-library/resources/names.md)** for more information on how the new naming scheme works.
+See **[here](../common-library/resources/names.md)** for more information on how the new naming scheme works.
 
 This change may lead to generated resources getting new names, causing resources with the old naming scheme to be removed.
 
 !!! warning
-    **IMPORTANT** As with any major software version upgrade, please verify that you have a working backup of your data.
+**IMPORTANT** As with any major software version upgrade, please verify that you have a working backup of your data.
 
 #### serviceAccounts
 
@@ -47,7 +99,7 @@ controllers:
 The hardcoded `app.kubernetes.io/component` label that is used to target specific controllers has been renamed to `app.kubernetes.io/controller`.
 
 !!! info
-    Because controller labels are considered immutable by Kubernetes existing Deployments / StatefulSets / etc will have to be recreated.
+Because controller labels are considered immutable by Kubernetes existing Deployments / StatefulSets / etc will have to be recreated.
 
 ## From 2.x.x to 3.0.x
 
