@@ -1,14 +1,11 @@
 [env]
-_.python.venv = { path = ".venv", create = true }
 JUST_UNSTABLE = "1"
 
 [settings]
 experimental = true
 pipx.uvx = true
-python.uv_venv_auto = true
 
 [tools]
-python = "3.14.3"                    # Required for documentation generation
 rust = "1.94.1"                      # Required for schematools
 go = "1.26.2"                       # Required for helm-schema-tools
 bun = "latest"                      # Required for docs site
@@ -23,6 +20,3 @@ k3d = "5.8.3"
 "cargo:schematools-cli" = "0.22.0"
 "pipx:yamllint" = "1.38.0"
 "pipx:yamale" = "6.1.0"
-
-[hooks]
-postinstall = "uv pip install --upgrade -r {{config_root}}/docs/requirements.txt"

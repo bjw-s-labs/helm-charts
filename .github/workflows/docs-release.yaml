@@ -8,7 +8,7 @@ on:
       - main
     paths:
       - ".github/workflows/docs-release.yaml"
-      - "docs-new/**"
+      - "docs/**"
       - "charts/library/common/schemas/**"
       - "charts/library/common/values.schema.json"
       - "tools/helm-schema-tools/**"
@@ -59,7 +59,7 @@ jobs:
         if: ${{ github.ref == 'refs/heads/main' }}
         with:
           github_token: ${{ steps.app-token.outputs.token }}
-          publish_dir: ./docs-new/dist
+          publish_dir: ./docs/dist
           destination_dir: docs
 
   publish-docs:

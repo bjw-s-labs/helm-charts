@@ -4,7 +4,7 @@ set quiet := true
 set shell := ['bash', '-euo', 'pipefail', '-c']
 
 mod chart "charts"
-mod docs "docs-new"
+mod docs "docs"
 
 [private]
 default:
