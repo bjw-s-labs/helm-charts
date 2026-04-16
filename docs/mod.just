@@ -9,15 +9,15 @@ install:
     cd {{ DOCS_DIR }} && bun install
 
 [doc('Start dev server')]
-serve: install
+serve: install generate
     cd {{ DOCS_DIR }} && bun run dev
 
 [doc('Build static site')]
-build: install
+build: install generate
     cd {{ DOCS_DIR }} && bun run build
 
 [doc('Preview production build')]
-preview: build
+preview: build generate
     cd {{ DOCS_DIR }} && bun run preview
 
 [doc('Generate reference docs and schema from JSON schema')]
@@ -42,7 +42,7 @@ generate CHART="library/common":
     "$TOOL" generate docs \
       --schema "$CHART_DIR/values.schema.json" \
       --output "$REFERENCE_DIR" \
-      --max-depth 3
+      --max-depth 0
 
     # Generate llms.txt
     echo "Generating llms.txt..."
