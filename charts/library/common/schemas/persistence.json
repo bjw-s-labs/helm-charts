@@ -11,11 +11,11 @@
         },
         "globalMounts": {
           "$ref": "#/$defs/globalMounts",
-          "description": "Configure mounts to all controllers and containers.\nBy default the persistence item will be mounted to /<name_of_the_peristence_item>.\nSee https://bjw-s-labs.github.io/helm-charts/docs/common-library/storage/globalOptions/#globalmounts"
+          "description": "Configure mounts to all controllers and containers.\nBy default the persistence item will be mounted to /<name_of_the_persistence_item>.\nEach entry supports: path, readOnly, subPath, subPathExpr, and mountPropagation."
         },
         "advancedMounts": {
           "$ref": "#/$defs/advancedMounts",
-          "description": "Explicitly configure mounts for specific controllers and containers.\nSee https://bjw-s-labs.github.io/helm-charts/docs/common-library/storage/globalOptions/#advancedmounts"
+          "description": "Explicitly configure mounts for specific controllers and containers.\nStructure: advancedMounts.<controller_name>.<container_name>[].path\nUse this instead of globalMounts when different controllers need different mount configurations."
         }
       },
       "unevaluatedProperties": false,
@@ -34,6 +34,11 @@
 
     "item.type.persistentVolumeClaim": {
       "type": "object",
+      "description": "Dynamically provision a PersistentVolumeClaim. This is the default persistence type and will be used when no type is specified.",
+      "examples": [
+        "persistence:\n  config:\n    type: persistentVolumeClaim\n    accessMode: ReadWriteOnce\n    size: 1Gi",
+        "persistence:\n  config:\n    type: persistentVolumeClaim\n    accessMode: ReadWriteOnce\n    size: 10Gi\n    storageClass: fast-ssd\n    retain: true\n    globalMounts:\n      - path: /config"
+      ],
       "allOf": [
         { "$ref": "definitions.json#/$defs/resourceIdentifier" }
       ],
@@ -80,6 +85,10 @@
 
     "item.type.persistentVolumeClaimExisting": {
       "type": "object",
+      "description": "Attach an existing PersistentVolumeClaim instead of creating a new one.",
+      "examples": [
+        "persistence:\n  config:\n    type: persistentVolumeClaim\n    existingClaim: my-app-data"
+      ],
       "required": ["existingClaim"],
       "properties": {
         "type": {
@@ -94,6 +103,12 @@
 
     "item.type.configMap": {
       "type": "object",
+      "description": "Mount a ConfigMap as a volume. Use 'name' for external ConfigMaps, or 'identifier' to reference one managed by this chart.",
+      "examples": [
+        "persistence:\n  config:\n    type: configMap\n    name: my-configmap",
+        "persistence:\n  config:\n    type: configMap\n    identifier: my-chart-configmap\n    globalMounts:\n      - path: /etc/app/config\n        readOnly: true",
+        "persistence:\n  config:\n    type: configMap\n    name: my-configmap\n    items:\n      - key: settings.yaml\n        path: settings.yaml"
+      ],
       "required": ["type"],
       "$comment": "oneOf enforces that at least one of name/identifier is present. dependentSchemas enforces mutual exclusion with a targeted error when both are set. Both are needed — do not simplify to oneOf alone.",
       "oneOf": [
@@ -134,6 +149,11 @@
 
     "item.type.secret": {
       "type": "object",
+      "description": "Mount a Secret as a volume. Use 'name' for external Secrets, or 'identifier' to reference one managed by this chart.",
+      "examples": [
+        "persistence:\n  credentials:\n    type: secret\n    name: my-secret",
+        "persistence:\n  tls:\n    type: secret\n    name: app-tls-cert\n    globalMounts:\n      - path: /etc/ssl/certs\n        readOnly: true"
+      ],
       "required": ["type"],
       "$comment": "oneOf enforces that at least one of name/identifier is present. dependentSchemas enforces mutual exclusion with a targeted error when both are set. Both are needed — do not simplify to oneOf alone.",
       "oneOf": [
@@ -174,54 +194,80 @@
 
     "item.type.nfs": {
       "type": "object",
+      "description": "Mount an NFS share as a volume.",
+      "examples": [
+        "persistence:\n  media:\n    type: nfs\n    server: 192.168.1.100\n    path: /mnt/share/media",
+        "persistence:\n  backups:\n    type: nfs\n    server: nas.example.lan\n    path: /volume/Backups/k8s/app\n    globalMounts:\n      - path: /backups"
+      ],
       "required": ["type", "server", "path"],
       "properties": {
         "type": {
           "const": "nfs"
         },
         "path": {
-          "type": "string"
+          "type": "string",
+          "description": "The NFS export path on the server."
         },
         "server": {
-          "type": "string"
+          "type": "string",
+          "description": "The NFS server hostname or IP address."
         }
       }
     },
 
     "item.type.emptyDir": {
       "type": "object",
+      "description": "Use an emptyDir volume for scratch space or sharing data between containers in the same pod. Data is lost when the pod is removed.",
+      "examples": [
+        "persistence:\n  tmp:\n    type: emptyDir",
+        "persistence:\n  cache:\n    type: emptyDir\n    medium: Memory\n    sizeLimit: 256Mi"
+      ],
       "required": ["type"],
       "properties": {
         "type": {
           "const": "emptyDir"
         },
         "medium": {
-          "type": "string"
+          "type": "string",
+          "description": "Storage medium. Set to 'Memory' for tmpfs (RAM-backed). Leave empty for node disk."
         },
         "sizeLimit": {
-          "type": "string"
+          "type": "string",
+          "description": "Maximum size of the volume (e.g. '1Gi'). Only enforced for tmpfs."
         }
       }
     },
 
     "item.type.hostPath": {
       "type": "object",
+      "description": "Mount a path from the host node into the pod. Use with caution as it ties the pod to a specific node.",
+      "examples": [
+        "persistence:\n  dev-tun:\n    type: hostPath\n    hostPath: /dev/net/tun\n    hostPathType: CharDevice",
+        "persistence:\n  data:\n    type: hostPath\n    hostPath: /mnt/local-data\n    hostPathType: DirectoryOrCreate"
+      ],
       "required": ["type"],
       "properties": {
         "type": {
           "const": "hostPath"
         },
         "hostPath": {
-          "type": "string"
+          "type": "string",
+          "description": "Path on the host node to mount."
         },
         "hostPathType": {
-          "type": "string"
+          "type": "string",
+          "description": "Type of the host path. Values: DirectoryOrCreate, Directory, FileOrCreate, File, Socket, CharDevice, BlockDevice."
         }
       }
     },
 
     "item.type.image": {
       "type": "object",
+      "description": "Mount OCI image or artifact contents as a read-only volume. Requires Kubernetes 1.31+ with the ImageVolume feature gate.",
+      "examples": [
+        "persistence:\n  static-assets:\n    type: image\n    image: registry.example.com/assets:v1.0",
+        "persistence:\n  tools:\n    type: image\n    image:\n      repository: registry.example.com/tools\n      tag: latest\n    pullPolicy: Always"
+      ],
       "required": ["type", "image"],
       "properties": {
         "type": {
@@ -244,13 +290,19 @@
 
     "item.type.custom": {
       "type": "object",
+      "description": "Specify a custom volume type not covered by the built-in types. The volumeSpec is passed through directly to the pod spec.",
+      "examples": [
+        "persistence:\n  ceph:\n    type: custom\n    volumeSpec:\n      cephfs:\n        monitors:\n          - 10.0.0.1:6789\n        user: admin\n        secretRef:\n          name: ceph-secret",
+        "persistence:\n  projected:\n    type: custom\n    volumeSpec:\n      projected:\n        sources:\n          - secret:\n              name: my-secret\n          - configMap:\n              name: my-config"
+      ],
       "required": ["type", "volumeSpec"],
       "properties": {
         "type": {
           "const": "custom"
         },
         "volumeSpec": {
-          "type": "object"
+          "type": "object",
+          "description": "Raw Kubernetes volume specification. Passed through directly to the pod spec volumes list."
         }
       }
     },
@@ -273,13 +325,22 @@
     },
 
     "globalMounts": {
+      "description": "Mount the volume to all controllers and containers. Each entry specifies a mount point.",
       "type": "array",
+      "examples": [
+        "globalMounts:\n  - path: /config",
+        "globalMounts:\n  - path: /data\n    readOnly: true\n  - path: /data/subdir\n    subPath: subdir"
+      ],
       "items": {
         "$ref": "#/$defs/mountPath"
       }
     },
 
     "advancedMounts": {
+      "description": "Mount the volume to specific controllers and containers. Use when different containers need different mount configurations.",
+      "examples": [
+        "advancedMounts:\n  main:\n    main:\n      - path: /config\n    sidecar:\n      - path: /shared\n        readOnly: true"
+      ],
       "additionalProperties": {
         "type": "object",
         "additionalProperties": {

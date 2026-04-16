@@ -106,7 +106,7 @@
           "deprecated": true
         },
         "targetLabels": {
-          "description": "Transfers labels from the Kubernetes Service onto the created metrics.",
+          "description": "Transfers labels from the Kubernetes Service onto the created metrics. See https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api-reference/api.md#servicemonitorspec for details.",
           "type": "array"
         }
       },

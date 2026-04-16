@@ -1,0 +1,120 @@
+---
+title: "Home Assistant with code-server"
+description: "How to deploy Home Assistant with a code-server sidecar"
+sidebar:
+  label: "Home Assistant + code-server"
+---
+
+How to deploy Home-Assistant with a code-server sidecar.
+
+```yaml
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/app-template-4.6.2/charts/other/app-template/values.schema.json
+
+# Configure options applied to all pods
+defaultPodOptions:
+  automountServiceAccountToken: false
+  securityContext:
+    runAsUser: 568
+    runAsGroup: 568
+    fsGroup: 568
+    fsGroupChangePolicy: "OnRootMismatch"
+
+controllers:
+  # Configure the main controller
+  main:
+    type: statefulset
+    annotations:
+      reloader.stakater.com/auto: "true"
+
+    containers:
+      # Configure the main application container
+      main:
+        image:
+          # -- image repository
+          repository: ghcr.io/onedr0p/home-assistant
+          # -- image tag
+          # this example is not automatically updated, so be sure to use the latest image
+          tag: 2023.11.2
+
+      # Configure the code-server sidecar
+      code:
+        dependsOn: main
+        image:
+          # -- image repository
+          repository: ghcr.io/coder/code-server
+          # -- image tag
+          # this example is not automatically updated, so be sure to use the latest image
+          tag: 4.19.0
+        args:
+          - --auth
+          - "none"
+          - --user-data-dir
+          - "/config/.vscode"
+          - --extensions-dir
+          - "/config/.vscode"
+          - --port
+          - "8081"
+          - "/config"
+
+service:
+  # Configure a service for the main application
+  main:
+    controller: main
+    type: ClusterIP
+    ports:
+      http:
+        port: 8123
+  # Configure a service for the code-server sidecar
+  code:
+    type: ClusterIP
+    controller: main
+    ports:
+      http:
+        port: 8081
+
+ingress:
+  # Configure an Ingress for the main application
+  main:
+    className: "external-nginx"
+    hosts:
+      - host: &host "hass.example.local"
+        paths:
+          - path: /
+            pathType: Prefix
+            service:
+              identifier: main
+              port: http
+    tls:
+      - hosts:
+          - *host
+  # Configure an Ingress for the code-server sidecar
+  code:
+    className: "internal-nginx"
+    hosts:
+      - host: &host-code "hass-code.example.local"
+        paths:
+          - path: /
+            pathType: Prefix
+            service:
+              identifier: code
+              port: http
+    tls:
+      - hosts:
+          - *host-code
+
+persistence:
+  # Configure the main configuration storage location
+  config:
+    existingClaim: home-assistant-config
+    globalMounts:
+      - path: /config
+
+  # Configure an NFS mount to store backups on
+  backup:
+    type: nfs
+    server: nas.example.lan
+    path: /volume/Backups/k8s/hass
+    globalMounts:
+      - path: /config/backups
+```

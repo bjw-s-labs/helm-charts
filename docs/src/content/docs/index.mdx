@@ -1,0 +1,41 @@
+---
+title: Helm Charts
+description: Reusable Helm chart library and templates for Kubernetes
+template: splash
+hero:
+  tagline: A library chart providing reusable Helm template functions, and an app-template chart to deploy any application.
+  actions:
+    - text: Getting Started
+      link: /helm-charts/guides/getting-started/
+      icon: right-arrow
+    - text: Values Reference
+      link: /helm-charts/reference/
+      variant: minimal
+      icon: open-book
+---
+
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+## What's in the box?
+
+<CardGrid>
+  <Card title="Common Library" icon="puzzle">
+    A **library chart** that provides reusable template functions for Deployments, Services, ConfigMaps, Ingress, and more.
+  </Card>
+  <Card title="App Template" icon="rocket">
+    An **application chart** built on the common library. Deploy any app by just providing values — no custom templates needed.
+  </Card>
+  <Card title="Schema-Driven" icon="approve-check-circle">
+    Full JSON Schema validation with IDE autocompletion. Catch misconfiguration before `helm install`.
+  </Card>
+  <Card title="Auto-Generated Docs" icon="document">
+    Reference documentation generated directly from schemas — always in sync, always complete.
+  </Card>
+</CardGrid>
+
+## Explore
+
+<CardGrid>
+  <LinkCard title="Getting Started" href="/helm-charts/guides/getting-started/" description="Deploy your first app in minutes." />
+  <LinkCard title="Values Reference" href="/helm-charts/reference/" description="Every configuration option, documented." />
+</CardGrid>

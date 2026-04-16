@@ -27,7 +27,7 @@
           "type": "string"
         },
         "podMetricsEndpoints": {
-          "description": "Pod metrics endpoints allowed as part of this PodMonitor.",
+          "description": "Pod metrics endpoints allowed as part of this PodMonitor. Typical fields per endpoint include `port`, `scheme`, `path`, `interval`, `scrapeTimeout`. See https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api-reference/api.md#podmetricsendpoint for the full schema.",
           "type": "array",
           "items": {
             "type": "object"
@@ -84,7 +84,7 @@
           ]
         },
         "podTargetLabels": {
-          "description": "Transfers labels from the Kubernetes Pod onto the created metrics.",
+          "description": "Transfers labels from the Kubernetes Pod onto the created metrics. See https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api-reference/api.md#podmonitorspec for details.",
           "type": "array"
         }
       },

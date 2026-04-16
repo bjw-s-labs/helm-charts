@@ -34,11 +34,11 @@
           ]
         },
         "env": {
-          "description": "Environment variables for the container.",
+          "description": "Environment variables for the container. Supports multiple syntax styles: simple map (key: value), list of K8s v1.EnvVar entries, and valueFrom references (configMapKeyRef, secretKeyRef, fieldRef, resourceFieldRef). Helm templates can be used in values. See the Environment Variables howto for detailed patterns and examples.",
           "$ref": "#/$defs/env"
         },
         "envFrom": {
-          "description": "Secrets and/or ConfigMaps to load as environment variables.",
+          "description": "Secrets and/or ConfigMaps to load as environment variables in bulk. Each entry references either a ConfigMap (via `configMap` name or `configMapRef.identifier`) or a Secret (via `secret` name or `secretRef.identifier`), with optional `prefix`. See the Environment Variables howto for detailed patterns.",
           "$ref": "#/$defs/envFrom"
         },
         "image": {
@@ -46,7 +46,7 @@
           "$ref": "#/$defs/image"
         },
         "lifecycle": {
-          "description": "Lifecycle event hooks for the container.",
+          "description": "Lifecycle event hooks (postStart, preStop) for the container. See https://kubernetes.io/docs/tasks/configure-pod-container/attach-handler-lifecycle-event/ and https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#lifecycle for details.",
           "$ref": "k8s-api.json#/$defs/core.v1.Lifecycle"
         },
         "nameOverride": {
@@ -61,7 +61,7 @@
           }
         },
         "probes": {
-          "description": "Probe settings for the container.",
+          "description": "Probe settings for the container. See https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/ for details.",
           "type": "object",
           "additionalProperties": false,
           "properties": {
@@ -104,11 +104,11 @@
           "default": false
         },
         "terminationMessagePath": {
-          "description": "Path for the container's termination message file.",
+          "description": "Path at which the file to which the container's termination message will be written is mounted into the container's filesystem. See https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#lifecycle for details.",
           "type": "string"
         },
         "terminationMessagePolicy": {
-          "description": "How the container's termination message should be populated. Supported values: 'File', 'FallbackToLogsOnError'.",
+          "description": "How the container's termination message should be populated. `File` will read the termination message from terminationMessagePath. `FallbackToLogsOnError` uses the last chunk of container log output if the termination message file is empty or the container errored. See https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#lifecycle for details.",
           "type": "string",
           "enum": [
             "File",
@@ -283,29 +283,36 @@
       "additionalProperties": false,
       "properties": {
         "enabled": {
+          "description": "Enable/disable this probe.",
           "type": "boolean",
           "default": false
         },
         "custom": {
+          "description": "Set to `true` to use the raw `spec` object as-is instead of deriving probe details from `type`/`path`/`port`.",
           "type": "boolean",
           "default": false
         },
         "path": {
+          "description": "HTTP path for HTTP/HTTPS probes.",
           "type": "string"
         },
         "port": {
+          "description": "Port for the probe. Can be a port number or a named port.",
           "type": [
             "number",
             "string"
           ]
         },
         "service": {
+          "description": "Identifier of a container port or service to probe. When unset, the probe uses the container's primary port.",
           "type": "string"
         },
         "spec": {
+          "description": "Raw probe spec. When `custom: true`, this is used as-is. Otherwise merged with values derived from `type`/`path`/`port`. Typical fields include `initialDelaySeconds`, `periodSeconds`, `timeoutSeconds`, `failureThreshold`.",
           "$ref": "k8s-api.json#/$defs/core.v1.Probe"
         },
         "type": {
+          "description": "Probe type. Defaults to `TCP` for liveness, readiness and startup probes. `AUTO` attempts to infer the probe type from the container's ports.",
           "type": "string",
           "enum": [
             "TCP",

@@ -1,3 +1,0 @@
-# How to...
-
-Here you can find information on how to accomplish specific scenario's.

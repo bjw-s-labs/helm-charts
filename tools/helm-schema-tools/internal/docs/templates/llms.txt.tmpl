@@ -1,0 +1,26 @@
+# bjw-s Helm Charts
+
+> Reusable Helm library chart and app-template for deploying applications on Kubernetes. Configuration is driven by a JSON Schema with full IDE autocompletion support.
+
+The common library chart provides template functions for Deployments, StatefulSets, DaemonSets, CronJobs, Services, Ingress, PersistentVolumeClaims, ConfigMaps, Secrets, and more. The app-template chart wraps the library so you can deploy any application by providing values only.
+
+## Guides
+
+- [Getting Started]({{ .BaseURL }}/guides/getting-started/): Install the chart and deploy your first application
+- [Environment Variables]({{ .BaseURL }}/app-template/howto/environment-variables/): Configure env vars using multiple syntax styles
+- [Multiple Services]({{ .BaseURL }}/app-template/howto/multiple-services/): Expose multiple ports and services from a single chart
+- [Helm Templates]({{ .BaseURL }}/app-template/howto/helm-templates/): Use Go templates in values for dynamic configuration
+- [Upgrade Instructions]({{ .BaseURL }}/app-template/upgrade-instructions/): Breaking changes and migration guides between major versions
+
+## Values Reference
+{{- range .Properties }}
+- [{{ .Name }}]({{ $.BaseURL }}/reference/{{ lower .Name }}/): {{ .Description }}
+{{- end }}
+
+## Optional
+
+- [App Template Overview]({{ .BaseURL }}/app-template/): Background and basic usage of the app-template chart
+- [Multiple Subpath]({{ .BaseURL }}/app-template/howto/multiple-subpath/): Route subpaths to different containers
+- [Deployment Examples]({{ .BaseURL }}/app-template/examples/): Real-world example values.yaml files
+- [Values Explorer]({{ .BaseURL }}/reference/explorer/): Interactive schema browser (requires JavaScript)
+- [JSON Schema]({{ .BaseURL }}/schemas/values.schema.json): Raw JSON Schema for IDE autocompletion and validation
