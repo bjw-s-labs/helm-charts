@@ -36,8 +36,17 @@ cleanup:
     @find charts/ -mindepth 1 -type f -name 'Chart.lock' -print0 | xargs -0 rm -f
     @find charts/ -mindepth 1 -type d -name charts -print0 | xargs -0 rm -rf
 
+[doc('Build the helm-schema-tools binary')]
+build-tools:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  TOOL_DIR="{{ justfile_dir() }}/tools/helm-schema-tools"
+  just log info "Building helm-schema-tools..."
+  cd "$TOOL_DIR"
+  go build -o helm-schema-tools ./cmd/helm-schema-tools
+
 [doc('Generate values.yaml from JSON schema')]
-generate-values CHART="library/common":
+generate-values CHART="library/common": build-tools
   #!/usr/bin/env bash
   set -euo pipefail
   REPO_ROOT="{{ justfile_dir() }}"
@@ -51,14 +60,13 @@ generate-values CHART="library/common":
     --max-depth 0
 
 [doc('Check that committed values.yaml is up-to-date with the schema')]
-check-values CHART="library/common":
+check-values CHART="library/common": build-tools
   #!/usr/bin/env bash
   set -euo pipefail
   REPO_ROOT="{{ justfile_dir() }}"
   CHART_DIR="$REPO_ROOT/charts/{{CHART}}"
   TOOL="$REPO_ROOT/tools/helm-schema-tools/helm-schema-tools"
   [ -d "$CHART_DIR" ] || { echo "Chart directory not found: $CHART_DIR"; exit 1; }
-  [ -x "$TOOL" ] || { echo "Build the Go tool first"; exit 1; }
 
   TMPFILE=$(mktemp)
   trap 'rm -f "$TMPFILE"' EXIT
