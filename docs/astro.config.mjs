@@ -60,8 +60,7 @@ export default defineConfig({
         },
       ],
       editLink: {
-        baseUrl:
-          "https://github.com/bjw-s-labs/helm-charts/edit/main/docs-new/",
+        baseUrl: "https://github.com/bjw-s-labs/helm-charts/edit/main/docs/",
       },
       lastUpdated: true,
       expressiveCode: {
