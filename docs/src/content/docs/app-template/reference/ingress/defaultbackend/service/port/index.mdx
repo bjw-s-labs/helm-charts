@@ -1,0 +1,30 @@
+---
+title: "port"
+description: "port of the referenced service. A port name or port number is required for a IngressServiceBackend."
+sidebar:
+  label: "port"
+---
+
+port of the referenced service. A port name or port number is required for a IngressServiceBackend.
+
+## Type
+
+`object`
+
+## Properties
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `name` | `string` | No | - | name is the name of the port on the Service. This is a mu... |
+| `number` | `integer` | No | - | number is the numerical port number (e.g. 80) on the Serv... |
+
+### Property Details
+
+#### name
+
+name is the name of the port on the Service. This is a mutually exclusive setting with &#34;Number&#34;.
+
+#### number
+
+number is the numerical port number (e.g. 80) on the Service. This is a mutually exclusive setting with &#34;Name&#34;.

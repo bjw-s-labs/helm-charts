@@ -1,0 +1,40 @@
+---
+title: "overrides"
+sidebar:
+  label: "overrides"
+---
+
+## Type
+
+`object`
+
+## Usage
+
+Keys are identifiers for `overrides` instances.
+
+```yaml
+overrides:
+  main:
+    enabled: true
+    # ... configuration
+
+  secondary:
+    enabled: true
+    # ... configuration
+```
+
+## Instance Properties
+Available properties:
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `annotations` | `object / null` | No | - | Annotations to set on the item. |
+| [`fileAttributeOverrides`](./fileattributeoverrides/) | `object` | No | - |  |
+| `forceRename` | `string / null` | No | - |  |
+| `labels` | `object / null` | No | - | Labels to set on the item. |
+
+## Related Pages
+
+
+- [`fileAttributeOverrides`](./fileattributeoverrides/)

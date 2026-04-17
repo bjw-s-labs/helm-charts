@@ -1,0 +1,39 @@
+---
+title: "resources"
+description: "Resource requests and limits for the container."
+sidebar:
+  label: "resources"
+---
+
+Resource requests and limits for the container.
+
+## Type
+
+`object`
+
+## Properties
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `claims` | `array / null` | No | - | Claims lists the names of resources, defined in spec.reso... |
+| `limits` | `object / null` | No | - | Limits describes the maximum amount of compute resources ... |
+| `requests` | `object / null` | No | - | Requests describes the minimum amount of compute resource... |
+
+### Property Details
+
+#### claims
+
+Claims lists the names of resources, defined in spec.resourceClaims, that are used by this container.
+
+This is an alpha field and requires enabling the DynamicResourceAllocation feature gate.
+
+This field is immutable. It can only be set for containers.
+
+#### limits
+
+Limits describes the maximum amount of compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+
+#### requests
+
+Requests describes the minimum amount of compute resources required. If Requests is omitted for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined value. Requests cannot exceed Limits. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/

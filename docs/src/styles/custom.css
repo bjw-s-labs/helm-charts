@@ -1,13 +1,20 @@
-:root {
-  --sl-color-accent-low: #1a1f36;
-  --sl-color-accent: #3b82f6;
-  --sl-color-accent-high: #bfdbfe;
+@layer starlight.base {
+  :root {
+    --sl-color-accent-low: #1a1f36;
+    --sl-color-accent: #3b82f6;
+    --sl-color-accent-high: #bfdbfe;
+  }
+
+  :root[data-theme="light"] {
+    --sl-color-accent-low: #dbeafe;
+    --sl-color-accent: #2563eb;
+    --sl-color-accent-high: #1e3a5f;
+  }
 }
 
-:root[data-theme="light"] {
-  --sl-color-accent-low: #dbeafe;
-  --sl-color-accent: #2563eb;
-  --sl-color-accent-high: #1e3a5f;
+.sl-markdown-content .sl-heading-wrapper {
+  margin-bottom: 1rem !important;
+  margin-top: 1rem !important;
 }
 
 .sl-markdown-content table {

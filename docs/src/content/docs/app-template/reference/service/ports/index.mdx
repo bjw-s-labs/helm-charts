@@ -1,0 +1,76 @@
+---
+title: "ports"
+description: "Service port(s) configuration."
+sidebar:
+  label: "ports"
+---
+
+Service port(s) configuration.
+
+## Type
+
+`object`
+
+## Usage
+
+Keys are identifiers for `ports` instances.
+
+```yaml
+ports:
+  main:
+    enabled: true
+    # ... configuration
+
+  secondary:
+    enabled: true
+    # ... configuration
+```
+
+## Instance Properties
+Available properties:
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `appProtocol` | `string` | No | - | appProtocol value for the port. See https://kubernetes.io... |
+| `enabled` | `boolean` | No | `true` | Set to false to disable the port. |
+| `nodePort` | `string / integer` | No | - | nodePort value for LoadBalancer and NodePort Service type... |
+| `port` | `string / integer` | **Yes** | - | Port name / number. |
+| [`portRange`](./portrange/) | `object` | No | - | A range of ports to include in the Service. |
+| `primary` | `boolean` | No | `false` | Set to true to make this the primary port (used in probes... |
+| `protocol` | `string` | No | - | Port protocol. Supported values: HTTP, HTTPS, TCP, UDP. H... |
+| `targetPort` | `string / integer` | No | - | Set the targetPort if you want the Service port to differ... |
+
+### Property Details
+
+#### appProtocol
+
+appProtocol value for the port.
+See https://kubernetes.io/docs/concepts/services-networking/service/#application-protocol
+
+#### nodePort
+
+nodePort value for LoadBalancer and NodePort Service types.
+See https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport
+
+#### primary
+
+Set to true to make this the primary port (used in probes, notes, etc).
+Only one port can be marked as primary.
+
+#### protocol
+
+Port protocol. Supported values: HTTP, HTTPS, TCP, UDP.
+HTTP and HTTPS spawn a TCP service and are used for internal URL and name generation.
+
+**Allowed values:** `HTTP`, `HTTPS`, `TCP`, `UDP`
+
+#### targetPort
+
+Set the targetPort if you want the Service port to differ from the application port. If set, this value is used in the container definition instead of &#39;port&#39;.
+Named ports are not supported for this field.
+
+## Related Pages
+
+
+- [`portRange`](./portrange/)

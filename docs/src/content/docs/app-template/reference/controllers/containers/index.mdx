@@ -1,0 +1,87 @@
+---
+title: "containers"
+description: "Containers as dictionary items."
+sidebar:
+  label: "containers"
+---
+
+Containers as dictionary items.
+
+## Type
+
+`object`
+
+## Usage
+
+Keys are identifiers for `containers` instances.
+
+```yaml
+containers:
+  main:
+    enabled: true
+    # ... configuration
+
+  secondary:
+    enabled: true
+    # ... configuration
+```
+
+## Instance Properties
+Available properties:
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `args` | `array / string` | No | - | Arguments for the container entrypoint. |
+| `command` | `array / string` | No | - | Command for the container entrypoint. |
+| `dependsOn` | `array / string` | No | - | Specify container dependencies to determine render order. |
+| `enabled` | `boolean` | No | `true` | Set to false to disable the container. |
+| `env` | `array / object` | No | - | Environment variables for the container. Supports multipl... |
+| `envFrom` | `array` | No | - | Secrets and/or ConfigMaps to load as environment variable... |
+| [`image`](./image/) | `object` | No | - | Image configuration for the container. |
+| [`lifecycle`](./lifecycle/) | `object` | No | - | Lifecycle event hooks (postStart, preStop) for the contai... |
+| `nameOverride` | `string` | No | - | Override the container name. |
+| `ports` | `array` | No | - | Ports to expose from the container. |
+| [`probes`](./probes/) | `object` | No | - | Probe settings for the container. See https://kubernetes.... |
+| `resizePolicy` | `array` | No | - | Configure whether the container should be restarted when ... |
+| [`resources`](./resources/) | `object` | No | - | Resource requests and limits for the container. |
+| `restartPolicy` | `string` | No | - | Restart policy for the container. |
+| [`securityContext`](./securitycontext/) | `object` | No | - | Security context for the container. |
+| `stdin` | `boolean` | No | `false` | Keep the standard input open on the container. |
+| `terminationMessagePath` | `string` | No | - | Path at which the file to which the container&#39;s termi... |
+| `terminationMessagePolicy` | `string` | No | - | How the container&#39;s termination message should be pop... |
+| `tty` | `boolean` | No | `false` | Allocate a TTY for the container. |
+| `workingDir` | `string` | No | - | Working directory for the container. |
+
+### Property Details
+
+#### env
+
+Environment variables for the container. Supports multiple syntax styles: simple map (key: value), list of K8s v1.EnvVar entries, and valueFrom references (configMapKeyRef, secretKeyRef, fieldRef, resourceFieldRef). Helm templates can be used in values. See the Environment Variables howto for detailed patterns and examples.
+
+#### envFrom
+
+Secrets and/or ConfigMaps to load as environment variables in bulk. Each entry references either a ConfigMap (via `configMap` name or `configMapRef.identifier`) or a Secret (via `secret` name or `secretRef.identifier`), with optional `prefix`. See the Environment Variables howto for detailed patterns.
+
+#### resizePolicy
+
+Configure whether the container should be restarted when resizing. This allows fine-grained control based on resource type (CPU or memory).
+
+#### terminationMessagePath
+
+Path at which the file to which the container&#39;s termination message will be written is mounted into the container&#39;s filesystem. See https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#lifecycle for details.
+
+#### terminationMessagePolicy
+
+How the container&#39;s termination message should be populated. `File` will read the termination message from terminationMessagePath. `FallbackToLogsOnError` uses the last chunk of container log output if the termination message file is empty or the container errored. See https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#lifecycle for details.
+
+**Allowed values:** `File`, `FallbackToLogsOnError`
+
+## Related Pages
+
+
+- [`image`](./image/)
+- [`lifecycle`](./lifecycle/)
+- [`probes`](./probes/)
+- [`resources`](./resources/)
+- [`securityContext`](./securitycontext/)

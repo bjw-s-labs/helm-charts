@@ -1,0 +1,37 @@
+---
+title: "roleRef"
+description: "Reference the Role or ClusterRole to bind to."
+sidebar:
+  label: "roleRef"
+---
+
+Reference the Role or ClusterRole to bind to.
+
+## Type
+
+`object`
+
+## Properties
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `identifier` | `string` | **Yes** | - | Reference an Role or ClusterRole configured in this chart... |
+| `kind` | `string` | No | - | The kind of the referenced object. Supported values: Role... |
+| `name` | `string` | No | - | Reference a Role or ClusterRole by its name. Helm templat... |
+
+### Property Details
+
+#### identifier
+
+Reference an Role or ClusterRole configured in this chart by its key.
+
+#### kind
+
+The kind of the referenced object. Supported values: Role, ClusterRole.
+
+**Allowed values:** `Role`, `ClusterRole`
+
+#### name
+
+Reference a Role or ClusterRole by its name. Helm template enabled.

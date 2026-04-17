@@ -1,0 +1,28 @@
+---
+title: "probes"
+description: "Probe settings for the container. See https://kubernetes.io/docs/tasks/configure-pod-container/co..."
+sidebar:
+  label: "probes"
+---
+
+Probe settings for the container. See https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/ for details.
+
+## Type
+
+`object`
+
+## Properties
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| [`liveness`](./liveness/) | `object` | No | - | Liveness probe configuration. |
+| [`readiness`](./readiness/) | `object` | No | - | Readiness probe configuration. |
+| [`startup`](./startup/) | `object` | No | - | Startup probe configuration. |
+
+## Related Pages
+
+
+- [`liveness`](./liveness/)
+- [`readiness`](./readiness/)
+- [`startup`](./startup/)

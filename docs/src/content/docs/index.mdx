@@ -1,41 +1,30 @@
 ---
 title: Helm Charts
-description: Reusable Helm chart library and templates for Kubernetes
+description: Reusable Helm charts for Kubernetes
 template: splash
 hero:
-  tagline: A library chart providing reusable Helm template functions, and an app-template chart to deploy any application.
+  tagline: A collection of Helm charts for deploying applications in Kubernetes.
   actions:
-    - text: Getting Started
-      link: /helm-charts/guides/getting-started/
-      icon: right-arrow
-    - text: Values Reference
-      link: /helm-charts/reference/
-      variant: minimal
+    - text: Go to App Template documentation
+      link: /helm-charts/app-template/
       icon: open-book
 ---
 
-import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+import { Card, CardGrid } from "@astrojs/starlight/components";
 
-## What's in the box?
+## Available Charts
 
 <CardGrid>
-  <Card title="Common Library" icon="puzzle">
-    A **library chart** that provides reusable template functions for Deployments, Services, ConfigMaps, Ingress, and more.
-  </Card>
   <Card title="App Template" icon="rocket">
-    An **application chart** built on the common library. Deploy any app by just providing values — no custom templates needed.
+    An application chart built on the Common Library. Deploy any application by
+    providing Kubernetes resource definitions in your values.yaml.
   </Card>
-  <Card title="Schema-Driven" icon="approve-check-circle">
-    Full JSON Schema validation with IDE autocompletion. Catch misconfiguration before `helm install`.
+  <Card title="Multus CNI" icon="pencil">
+    A chart for deploying Multus CNI in your Kubernetes cluster, enabling
+    multiple network interfaces per pod.
   </Card>
-  <Card title="Auto-Generated Docs" icon="document">
-    Reference documentation generated directly from schemas — always in sync, always complete.
+  <Card title="Common Library" icon="puzzle">
+    A library chart providing reusable template functions for Deployments,
+    Services, ConfigMaps, Ingress, and more.
   </Card>
-</CardGrid>
-
-## Explore
-
-<CardGrid>
-  <LinkCard title="Getting Started" href="/helm-charts/guides/getting-started/" description="Deploy your first app in minutes." />
-  <LinkCard title="Values Reference" href="/helm-charts/reference/" description="Every configuration option, documented." />
 </CardGrid>

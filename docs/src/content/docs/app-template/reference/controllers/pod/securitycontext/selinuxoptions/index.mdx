@@ -1,0 +1,22 @@
+---
+title: "seLinuxOptions"
+description: "The SELinux context to be applied to all containers. If unspecified, the container runtime will a..."
+sidebar:
+  label: "seLinuxOptions"
+---
+
+The SELinux context to be applied to all containers. If unspecified, the container runtime will allocate a random SELinux context for each container.  May also be set in SecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence for that container. Note that this field cannot be set when spec.os.name is windows.
+
+## Type
+
+`object`
+
+## Properties
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `level` | `string` | No | - | Level is SELinux level label that applies to the container. |
+| `role` | `string` | No | - | Role is a SELinux role label that applies to the container. |
+| `type` | `string` | No | - | Type is a SELinux type label that applies to the container. |
+| `user` | `string` | No | - | User is a SELinux user label that applies to the container. |

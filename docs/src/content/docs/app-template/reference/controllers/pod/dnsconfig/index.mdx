@@ -1,0 +1,35 @@
+---
+title: "dnsConfig"
+description: "Specifies the DNS parameters of a pod. Parameters specified here will be merged to the generated ..."
+sidebar:
+  label: "dnsConfig"
+---
+
+Specifies the DNS parameters of a pod. Parameters specified here will be merged to the generated DNS configuration based on DNSPolicy. Configuring the `ndots` option may resolve nslookup issues on some Kubernetes setups.
+
+## Type
+
+`object`
+
+## Properties
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `nameservers` | `array` | No | - | A list of DNS name server IP addresses. This will be appe... |
+| `options` | `array` | No | - | A list of DNS resolver options. This will be merged with ... |
+| `searches` | `array` | No | - | A list of DNS search domains for host-name lookup. This w... |
+
+### Property Details
+
+#### nameservers
+
+A list of DNS name server IP addresses. This will be appended to the base nameservers generated from DNSPolicy. Duplicated nameservers will be removed.
+
+#### options
+
+A list of DNS resolver options. This will be merged with the base options generated from DNSPolicy. Duplicated entries will be removed. Resolution options given in Options will override those that appear in the base DNSPolicy.
+
+#### searches
+
+A list of DNS search domains for host-name lookup. This will be appended to the base search paths generated from DNSPolicy. Duplicated search paths will be removed.

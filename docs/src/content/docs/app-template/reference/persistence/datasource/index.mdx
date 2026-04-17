@@ -1,0 +1,22 @@
+---
+title: "dataSource"
+description: "The optional data source for the persistentVolumeClaim. See https://kubernetes.io/docs/concepts/s..."
+sidebar:
+  label: "dataSource"
+---
+
+The optional data source for the persistentVolumeClaim.
+See https://kubernetes.io/docs/concepts/storage/persistent-volumes/#volume-populators-and-data-sources
+
+## Type
+
+`object`
+
+## Properties
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `apiGroup` | `string` | No | - |  |
+| `kind` | `string` | **Yes** | - |  |
+| `name` | `string` | **Yes** | - |  |

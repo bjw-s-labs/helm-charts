@@ -1,0 +1,30 @@
+---
+title: "serviceAccount"
+description: "ServiceAccount used by the controller. Only use one of `name` or `identifier`. When both are spec..."
+sidebar:
+  label: "serviceAccount"
+---
+
+ServiceAccount used by the controller. Only use one of `name` or `identifier`. When both are specified, `identifier` takes priority.
+
+## Type
+
+`object`
+
+## Properties
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `identifier` | `string` | No | - | Reference a serviceAccount configured in this chart by it... |
+| `name` | `string` | No | - | Reference a serviceAccount by its name. Helm templates ar... |
+
+### Property Details
+
+#### identifier
+
+Reference a serviceAccount configured in this chart by its key.
+
+#### name
+
+Reference a serviceAccount by its name. Helm templates are supported.

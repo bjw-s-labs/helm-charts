@@ -26,7 +26,7 @@ generate CHART="library/common":
     set -euo pipefail
     REPO_ROOT="{{ REPO_ROOT }}"
     CHART_DIR="$REPO_ROOT/charts/{{ CHART }}"
-    REFERENCE_DIR="{{ DOCS_DIR }}/src/content/docs/reference"
+    REFERENCE_DIR="{{ DOCS_DIR }}/src/content/docs/app-template/reference"
     SCHEMA_DIR="{{ DOCS_DIR }}/public/schemas"
     TOOL="$REPO_ROOT/tools/helm-schema-tools/helm-schema-tools"
 

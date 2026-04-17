@@ -24,29 +24,30 @@ export default defineConfig({
         }),
         starlightSidebarTopics([
           {
-            label: "Guides",
-            link: "/guides/getting-started/",
+            label: "App Template",
+            link: "/app-template/",
             icon: "open-book",
             items: [
+              { slug: "app-template/getting-started" },
               {
-                label: "Getting Started",
-                items: [{ slug: "guides/getting-started" }],
-              },
-              {
-                label: "App Template",
-                autogenerate: { directory: "app-template" },
-              },
-            ],
-          },
-          {
-            label: "Reference",
-            link: "/reference/",
-            icon: "information",
-            items: [
-              {
-                label: "Values Reference",
+                label: "Values reference",
                 collapsed: true,
-                autogenerate: { directory: "reference", collapsed: true },
+                autogenerate: {
+                  directory: "app-template/reference",
+                  collapsed: true,
+                },
+              },
+              {
+                label: "How to...",
+                autogenerate: { directory: "app-template/howto" },
+              },
+              {
+                label: "Examples",
+                autogenerate: { directory: "app-template/examples" },
+              },
+              {
+                label: "Upgrade instructions",
+                autogenerate: { directory: "app-template/upgrades" },
               },
             ],
           },
@@ -63,6 +64,7 @@ export default defineConfig({
         baseUrl: "https://github.com/bjw-s-labs/helm-charts/edit/main/docs/",
       },
       lastUpdated: true,
+      pagination: false,
       expressiveCode: {
         themes: ["github-dark", "github-light"],
         styleOverrides: {

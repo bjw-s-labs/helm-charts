@@ -1,0 +1,26 @@
+---
+title: "defaultBackend"
+description: "Set the defaultBackend for this Ingress. This disables any other rules."
+sidebar:
+  label: "defaultBackend"
+---
+
+Set the defaultBackend for this Ingress. This disables any other rules.
+
+## Type
+
+`object`
+
+## Properties
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| [`resource`](./resource/) | `object` | No | - | resource is an ObjectRef to another Kubernetes resource i... |
+| [`service`](./service/) | `object` | No | - | service references a service as a backend. This is a mutu... |
+
+## Related Pages
+
+
+- [`resource`](./resource/)
+- [`service`](./service/)

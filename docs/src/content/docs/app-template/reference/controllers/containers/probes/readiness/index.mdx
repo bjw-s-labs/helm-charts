@@ -1,0 +1,46 @@
+---
+title: "readiness"
+description: "Readiness probe configuration."
+sidebar:
+  label: "readiness"
+---
+
+Readiness probe configuration.
+
+## Type
+
+`object`
+
+## Properties
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `custom` | `boolean` | No | `false` | Set to `true` to use the raw `spec` object as-is instead ... |
+| `enabled` | `boolean` | No | `false` | Enable/disable this probe. |
+| `path` | `string` | No | - | HTTP path for HTTP/HTTPS probes. |
+| `port` | `number / string` | No | - | Port for the probe. Can be a port number or a named port. |
+| `service` | `string` | No | - | Identifier of a container port or service to probe. When ... |
+| [`spec`](./spec/) | `object` | No | - | Raw probe spec. When `custom: true`, this is used as-is. ... |
+| `type` | `string` | No | - | Probe type. Defaults to `TCP` for liveness, readiness and... |
+
+### Property Details
+
+#### custom
+
+Set to `true` to use the raw `spec` object as-is instead of deriving probe details from `type`/`path`/`port`.
+
+#### service
+
+Identifier of a container port or service to probe. When unset, the probe uses the container&#39;s primary port.
+
+#### type
+
+Probe type. Defaults to `TCP` for liveness, readiness and startup probes. `AUTO` attempts to infer the probe type from the container&#39;s ports.
+
+**Allowed values:** `TCP`, `HTTP`, `HTTPS`, `GRPC`, `AUTO`
+
+## Related Pages
+
+
+- [`spec`](./spec/)
