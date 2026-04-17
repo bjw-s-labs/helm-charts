@@ -3,6 +3,7 @@
     --sl-color-accent-low: #1a1f36;
     --sl-color-accent: #3b82f6;
     --sl-color-accent-high: #bfdbfe;
+    --sl-sidebar-width: 19rem;
   }
 
   :root[data-theme="light"] {
@@ -34,6 +35,20 @@
 }
 .sl-markdown-content table td:first-child {
   font-weight: 500;
+}
+
+.sidebar-content ul ul {
+  --sl-sidebar-item-padding-inline: 0.3rem;
+}
+.sidebar-content ul ul ul ul a {
+  font-size: 0.8125rem;
+}
+.sidebar-content li + li {
+  margin-top: 0.25rem;
+}
+.sidebar-content a,
+.sidebar-content summary {
+  padding-block: 0.4em;
 }
 
 .yv-root {
@@ -87,10 +102,16 @@
 
 /* Reset Starlight content gap inside variant tabs and the explorer */
 @layer starlight.content {
-  .sl-markdown-content [role="tabpanel"] :not(a, strong, em, del, span, input, code, br) + :not(a, strong, em, del, span, input, code, br, :where(.not-content *)) {
+  .sl-markdown-content
+    [role="tabpanel"]
+    :not(a, strong, em, del, span, input, code, br)
+    + :not(a, strong, em, del, span, input, code, br, :where(.not-content *)) {
     margin-top: 0;
   }
-  .sl-markdown-content .yv-root :not(a, strong, em, del, span, input, code, br) + :not(a, strong, em, del, span, input, code, br, :where(.not-content *)) {
+  .sl-markdown-content
+    .yv-root
+    :not(a, strong, em, del, span, input, code, br)
+    + :not(a, strong, em, del, span, input, code, br, :where(.not-content *)) {
     margin-top: 0;
   }
 }
