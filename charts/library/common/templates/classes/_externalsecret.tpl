@@ -6,6 +6,13 @@ within the common library.
   {{- $rootContext := .rootContext -}}
   {{- $externalsecretObject := .object -}}
 
+  {{- $apiVersion := "external-secrets.io/v1" -}}
+  {{- if $rootContext.Capabilities.APIVersions.Has "external-secrets.io/v1beta1" -}}
+    {{- $apiVersion = "external-secrets.io/v1beta1" -}}
+  {{- end -}}
+  {{- if $rootContext.Capabilities.APIVersions.Has "external-secrets.io/v1" -}}
+    {{- $apiVersion = "external-secrets.io/v1" -}}
+  {{- end -}}
   {{- $labels := merge
     ($externalsecretObject.labels | default dict)
     (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
@@ -16,7 +23,7 @@ within the common library.
   -}}
 
 ---
-apiVersion: external-secrets.io/v1beta1
+apiVersion: {{ $apiVersion }}
 kind: ExternalSecret
 metadata:
   name: {{ $externalsecretObject.name }}
