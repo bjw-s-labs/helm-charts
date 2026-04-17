@@ -12,6 +12,7 @@ import (
 
 	schemautil "github.com/bjw-s-labs/helm-charts/tools/helm-schema-tools/internal/schema"
 	"github.com/kaptinlin/jsonschema"
+	"gopkg.in/yaml.v3"
 )
 
 //go:embed templates/values.yaml.tmpl
@@ -25,12 +26,6 @@ const (
 	typeString  = "string"
 	typeInteger = "integer"
 	typeNumber  = "number"
-)
-
-// YAML scalar literals emitted in generated values.yaml.
-const (
-	yamlTrue  = "true"
-	yamlFalse = "false"
 )
 
 // fieldCtx carries per-field context that varies as the generator recurses.
@@ -50,7 +45,6 @@ type rootContext struct {
 
 // Generator generates commented YAML from JSON Schema.
 type Generator struct {
-	MaxDepth   int
 	SchemaPath string
 
 	// order preserves the schema's declared property order so generated
@@ -64,29 +58,28 @@ func NewGenerator() *Generator {
 	tmpl := template.Must(
 		template.New("").Funcs(funcMap()).ParseFS(templateFS, "templates/values.yaml.tmpl"),
 	)
-	return &Generator{
-		MaxDepth: 2,
-		tmpl:     tmpl,
-	}
+	return &Generator{tmpl: tmpl}
 }
 
 // Generate produces commented YAML from a compiled JSON Schema.
 func (g *Generator) Generate(schemaBytes []byte) ([]byte, error) {
-	compiler := jsonschema.NewCompiler()
-	schema, err := compiler.Compile(schemaBytes)
+	schema, err := schemautil.Compile(schemaBytes)
 	if err != nil {
-		return nil, fmt.Errorf("failed to compile schema: %w", err)
+		return nil, err
 	}
 
-	g.order, _ = NewOrderedSchema(schemaBytes)
-	if g.order == nil {
-		g.order = &OrderedSchema{}
+	g.order, err = NewOrderedSchema(schemaBytes)
+	if err != nil {
+		return nil, err
 	}
 
 	var entries []*Entry
 	if schema.Properties != nil {
 		requiredSet := schemautil.MakeSet(schema.Required)
-		entries = g.buildEntries(*schema.Properties, requiredSet, "", 0)
+		entries, err = g.buildEntries(*schema.Properties, requiredSet, "", 0)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	ctx := rootContext{SchemaPath: g.SchemaPath, Entries: entries}
@@ -97,13 +90,12 @@ func (g *Generator) Generate(schemaBytes []byte) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-// buildEntries iterates over props in declared order and returns one Entry per property.
 func (g *Generator) buildEntries(
 	props map[string]*jsonschema.Schema,
 	requiredSet map[string]bool,
 	schemaPath string,
 	depth int,
-) []*Entry {
+) ([]*Entry, error) {
 	keys := g.order.OrderKeys(schemaPath+"/properties", slices.Collect(maps.Keys(props)))
 	entries := make([]*Entry, 0, len(keys))
 	for _, key := range keys {
@@ -113,26 +105,31 @@ func (g *Generator) buildEntries(
 			depth:    depth,
 			required: requiredSet[key],
 		}
-		e := g.buildEntry(key, prop, fc)
+		e, err := g.buildEntry(key, prop, fc)
+		if err != nil {
+			return nil, err
+		}
 		if e != nil {
 			entries = append(entries, e)
 		}
 	}
-	return entries
+	return entries, nil
 }
 
-// buildEntry constructs a single Entry for a schema property, or returns nil
-// if the property cannot be safely represented in values.yaml (e.g. an optional
-// object whose oneOf/anyOf constraints would be violated by dummy values).
-func (g *Generator) buildEntry(key string, prop *jsonschema.Schema, fc fieldCtx) *Entry {
+// buildEntry returns nil when the property cannot be safely represented (e.g.
+// an optional object whose oneOf/anyOf constraints would be violated by dummy
+// values).
+func (g *Generator) buildEntry(key string, prop *jsonschema.Schema, fc fieldCtx) (*Entry, error) {
 	e := &Entry{Key: key}
 
-	// Resolve value/children first so the comment can check CommentOut.
-	if !g.fillValue(e, prop, fc) {
-		return nil
+	keep, err := g.fillValue(e, prop, fc)
+	if err != nil {
+		return nil, err
+	}
+	if !keep {
+		return nil, nil
 	}
 
-	// Comment: description + optional type hint.
 	typeHint := ""
 	if e.CommentOut || e.Value == "null" {
 		typeHint = helmDocsTypeHint(prop)
@@ -147,44 +144,21 @@ func (g *Generator) buildEntry(key string, prop *jsonschema.Schema, fc fieldCtx)
 		e.Comment = "@default -- See below"
 	}
 
-	// Examples (string-only; up to 3).
 	if exs := schemautil.CollectExamples(prop); len(exs) > 0 {
-		limit := min(3, len(exs))
-		e.Examples = exs[:limit]
+		e.Examples = exs[:min(3, len(exs))]
 	}
 
-	return e
+	return e, nil
 }
 
-// fillValue populates e.Value, e.CommentOut, and e.Children based on the schema
-// type. It returns false when the entry should be dropped entirely (e.g. an
-// optional object with required fields that can't be safely filled with dummy
-// values at this depth).
-func (g *Generator) fillValue(e *Entry, prop *jsonschema.Schema, fc fieldCtx) bool {
-	// Pure const (no explicit type) — emit the const value directly.
+// fillValue returns keep=false when the entry should be dropped entirely.
+func (g *Generator) fillValue(e *Entry, prop *jsonschema.Schema, fc fieldCtx) (bool, error) {
 	if prop.Const != nil && prop.Const.IsSet && len(prop.Type) == 0 {
 		e.Value = constValue(prop)
-		return true
+		return true, nil
 	}
 
 	propType := getSchemaType(prop)
-
-	// At max depth, emit shallow placeholders.
-	if g.MaxDepth > 0 && fc.depth >= g.MaxDepth {
-		switch propType {
-		case typeObject:
-			if len(prop.Required) > 0 {
-				// Object has required fields but we can't expand — drop the entry.
-				return false
-			}
-			e.Value = "{}"
-		case typeArray:
-			e.Value = "[]"
-		default:
-			g.fillScalar(e, prop, propType, fc)
-		}
-		return true
-	}
 
 	switch propType {
 	case typeObject:
@@ -194,15 +168,12 @@ func (g *Generator) fillValue(e *Entry, prop *jsonschema.Schema, fc fieldCtx) bo
 	default:
 		g.fillScalar(e, prop, propType, fc)
 	}
-	return true
+	return true, nil
 }
 
-// fillObject populates an Entry for an object-typed schema. It returns false
-// when the entry should be dropped (optional object whose required fields
-// would require dummy values that could violate oneOf/anyOf constraints).
-func (g *Generator) fillObject(e *Entry, prop *jsonschema.Schema, fc fieldCtx) bool {
+func (g *Generator) fillObject(e *Entry, prop *jsonschema.Schema, fc fieldCtx) (bool, error) {
 	if !fc.required && prop.Default == nil && hasUnsafeRequiredFields(prop) {
-		return false
+		return false, nil
 	}
 
 	// Map type: additionalProperties without direct properties. Emit `{}` as
@@ -212,17 +183,24 @@ func (g *Generator) fillObject(e *Entry, prop *jsonschema.Schema, fc fieldCtx) b
 	// convention used in hand-maintained values.yaml files.
 	if prop.AdditionalProperties != nil && prop.Properties == nil {
 		e.Value = "{}"
-		if schemautil.HasAnyProperties(prop.AdditionalProperties) && (g.MaxDepth == 0 || fc.depth < g.MaxDepth) {
-			example := g.buildMapExample(prop.AdditionalProperties, fc.path+"/additionalProperties", fc.depth)
-			e.ExampleBlock = g.renderEntriesAsComments(example, fc.depth+1)
+		if schemautil.HasAnyProperties(prop.AdditionalProperties) {
+			example, err := g.buildMapExample(prop.AdditionalProperties, fc.path+"/additionalProperties", fc.depth)
+			if err != nil {
+				return false, err
+			}
+			block, err := g.renderEntriesAsComments(example, fc.depth+1)
+			if err != nil {
+				return false, err
+			}
+			e.ExampleBlock = block
 		}
-		return true
+		return true, nil
 	}
 
 	allProps := schemautil.CollectAllProperties(prop)
 	if len(allProps) == 0 {
 		e.Value = "{}"
-		return true
+		return true, nil
 	}
 
 	// Optional nested objects without a default collapse to `{}` plus a
@@ -233,48 +211,53 @@ func (g *Generator) fillObject(e *Entry, prop *jsonschema.Schema, fc fieldCtx) b
 	// surfaces scalar defaults like nameOverride or replicas.
 	if fc.depth >= 1 && !fc.required && prop.Default == nil {
 		e.Value = "{}"
-		if g.MaxDepth == 0 || fc.depth < g.MaxDepth {
-			requiredSet := schemautil.MakeSet(schemautil.CollectAllRequired(prop))
-			children := g.buildEntries(allProps, requiredSet, fc.path, fc.depth+1)
-			e.ExampleBlock = g.renderEntriesAsComments(children, fc.depth+1)
+		requiredSet := schemautil.MakeSet(schemautil.CollectAllRequired(prop))
+		children, err := g.buildEntries(allProps, requiredSet, fc.path, fc.depth+1)
+		if err != nil {
+			return false, err
 		}
-		return true
+		block, err := g.renderEntriesAsComments(children, fc.depth+1)
+		if err != nil {
+			return false, err
+		}
+		e.ExampleBlock = block
+		return true, nil
 	}
 
 	requiredSet := schemautil.MakeSet(schemautil.CollectAllRequired(prop))
-	e.Children = g.buildEntries(allProps, requiredSet, fc.path, fc.depth+1)
-	return true
+	children, err := g.buildEntries(allProps, requiredSet, fc.path, fc.depth+1)
+	if err != nil {
+		return false, err
+	}
+	e.Children = children
+	return true, nil
 }
 
-// buildMapExample builds the synthetic [main: ...] children for a map-typed schema.
-func (g *Generator) buildMapExample(itemSchema *jsonschema.Schema, itemSchemaPath string, depth int) []*Entry {
+func (g *Generator) buildMapExample(itemSchema *jsonschema.Schema, itemSchemaPath string, depth int) ([]*Entry, error) {
 	allProps := schemautil.CollectAllProperties(itemSchema)
 	requiredSet := schemautil.MakeSet(schemautil.CollectAllRequired(itemSchema))
-	children := g.buildEntries(allProps, requiredSet, itemSchemaPath, depth+1)
-
-	mainEntry := &Entry{
+	children, err := g.buildEntries(allProps, requiredSet, itemSchemaPath, depth+1)
+	if err != nil {
+		return nil, err
+	}
+	return []*Entry{{
 		Key:      "main",
 		Comment:  "Example entry - rename as needed",
 		Children: children,
-	}
-	return []*Entry{mainEntry}
+	}}, nil
 }
 
-// renderEntriesAsComments runs the `entries` template for the given entries at
-// the requested indentation depth and prefixes every non-blank line with `# `.
-func (g *Generator) renderEntriesAsComments(entries []*Entry, depth int) string {
+func (g *Generator) renderEntriesAsComments(entries []*Entry, depth int) (string, error) {
 	if len(entries) == 0 {
-		return ""
+		return "", nil
 	}
 	indent := strings.Repeat("  ", depth)
 	var buf bytes.Buffer
 	data := map[string]any{"Indent": indent, "Entries": entries, "Top": false}
 	if err := g.tmpl.ExecuteTemplate(&buf, "entries", data); err != nil {
-		// ExampleBlock is best-effort documentation; swallow errors so a
-		// template bug never breaks the whole values.yaml generation.
-		return ""
+		return "", fmt.Errorf("render example block: %w", err)
 	}
-	return commentifyYAML(buf.String())
+	return commentifyYAML(buf.String()), nil
 }
 
 // commentifyYAML prefixes every non-blank, non-comment line in yaml with `# `
@@ -325,17 +308,13 @@ func (g *Generator) fillString(e *Entry, prop *jsonschema.Schema, fc fieldCtx) {
 	}
 	if prop.Default != nil {
 		if s, ok := prop.Default.(string); ok {
-			if s == "" {
-				e.Value = `""`
-			} else {
-				e.Value = s
-			}
+			e.Value = yamlQuoteString(s)
 			return
 		}
 	}
 	if prop.Const != nil && prop.Const.IsSet {
 		if s, ok := prop.Const.Value.(string); ok {
-			e.Value = s
+			e.Value = yamlQuoteString(s)
 			return
 		}
 	}
@@ -346,11 +325,7 @@ func (g *Generator) fillString(e *Entry, prop *jsonschema.Schema, fc fieldCtx) {
 		}
 	}
 	if fc.required {
-		if dummy == "" {
-			e.Value = `""`
-		} else {
-			e.Value = dummy
-		}
+		e.Value = yamlQuoteString(dummy)
 		return
 	}
 	e.CommentOut = true
@@ -382,15 +357,13 @@ func (g *Generator) fillBool(e *Entry, prop *jsonschema.Schema, fc fieldCtx) {
 		return
 	}
 	if prop.Default != nil {
-		if b, ok := prop.Default.(bool); ok && b {
-			e.Value = yamlTrue
-		} else {
-			e.Value = yamlFalse
+		if b, ok := prop.Default.(bool); ok {
+			e.Value = boolYAML(b)
+			return
 		}
-		return
 	}
 	if fc.required {
-		e.Value = yamlFalse
+		e.Value = "false"
 		return
 	}
 	e.CommentOut = true
@@ -400,15 +373,31 @@ func (g *Generator) fillBool(e *Entry, prop *jsonschema.Schema, fc fieldCtx) {
 func constValue(prop *jsonschema.Schema) string {
 	switch v := prop.Const.Value.(type) {
 	case string:
-		return v
+		return yamlQuoteString(v)
 	case bool:
-		if v {
-			return yamlTrue
-		}
-		return yamlFalse
+		return boolYAML(v)
 	default:
 		return fmt.Sprintf("%v", v)
 	}
+}
+
+func boolYAML(b bool) string {
+	if b {
+		return "true"
+	}
+	return "false"
+}
+
+// yamlQuoteString wraps a string in YAML quotes only when the bare form would
+// parse as a different type (bool, null, number) or contain structural
+// characters. yaml.v3's Marshal does exactly this disambiguation, so we
+// delegate to it rather than reimplementing the rules.
+func yamlQuoteString(s string) string {
+	b, err := yaml.Marshal(s)
+	if err != nil {
+		return fmt.Sprintf("%q", s)
+	}
+	return strings.TrimRight(string(b), "\n")
 }
 
 // helmDocsTypeHint returns a helm-docs-compatible type hint for a schema
@@ -599,21 +588,18 @@ func wrapText(text string, width int) []string {
 // funcMap returns template helpers.
 func funcMap() template.FuncMap {
 	return template.FuncMap{
-		"indent":          func(s string) string { return s + "  " },
+		"deeper":          func(s string) string { return s + "  " },
 		"splitLines":      func(s string) []string { return strings.Split(s, "\n") },
 		"allCommentedOut": allCommentedOut,
 		"dict":            templateDict,
 	}
 }
 
-// templateDict builds a map from alternating key/value arguments.
 func templateDict(pairs ...any) (map[string]any, error) {
 	if len(pairs)%2 != 0 {
 		return nil, fmt.Errorf("dict: odd number of arguments (%d)", len(pairs))
 	}
 	m := make(map[string]any, len(pairs)/2)
-	// Step through pairs two at a time; len(pairs) is guaranteed even above,
-	// so i+1 is always < len(pairs).
 	for i := 0; i+1 < len(pairs); i += 2 {
 		key, ok := pairs[i].(string)
 		if !ok {

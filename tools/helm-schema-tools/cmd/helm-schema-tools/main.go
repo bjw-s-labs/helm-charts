@@ -86,7 +86,6 @@ func generateDocsCmd() *cobra.Command {
 	var (
 		schemaPath string
 		outputDir  string
-		maxDepth   int
 	)
 
 	cmd := &cobra.Command{
@@ -100,16 +99,14 @@ with tables showing nested properties, types, and descriptions.
 Example:
   helm-schema-tools generate docs \
     --schema charts/library/common/values.schema.json \
-    --output docs/src/content/docs/reference/ \
-    --max-depth 3`,
+    --output docs/src/content/docs/reference/`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runGenerateDocs(schemaPath, outputDir, maxDepth)
+			return runGenerateDocs(schemaPath, outputDir)
 		},
 	}
 
 	cmd.Flags().StringVarP(&schemaPath, "schema", "s", "", "Path to the JSON schema file (required)")
 	cmd.Flags().StringVarP(&outputDir, "output", "o", "", "Output directory for documentation (required)")
-	cmd.Flags().IntVarP(&maxDepth, "max-depth", "d", 0, "Maximum nesting depth for sub-pages (0 = unlimited)")
 
 	_ = cmd.MarkFlagRequired("schema")
 	_ = cmd.MarkFlagRequired("output")
@@ -117,7 +114,7 @@ Example:
 	return cmd
 }
 
-func runGenerateDocs(schemaPath, outputDir string, maxDepth int) error {
+func runGenerateDocs(schemaPath, outputDir string) error {
 	fmt.Printf("Dereferencing schema: %s\n", schemaPath)
 
 	schemaBytes, err := schema.DereferenceSchema(schemaPath)
@@ -126,12 +123,8 @@ func runGenerateDocs(schemaPath, outputDir string, maxDepth int) error {
 	}
 
 	fmt.Printf("Generating documentation to: %s\n", outputDir)
-	if maxDepth > 0 {
-		fmt.Printf("  max-depth=%d\n", maxDepth)
-	}
 
 	gen := docs.NewGenerator(outputDir)
-	gen.MaxDepth = maxDepth
 	if err := gen.Generate(schemaBytes); err != nil {
 		return fmt.Errorf("failed to generate docs: %w", err)
 	}
@@ -144,7 +137,6 @@ func generateValuesCmd() *cobra.Command {
 	var (
 		schemaPath string
 		outputPath string
-		maxDepth   int
 		schemaRef  string
 	)
 
@@ -160,16 +152,14 @@ Example:
   helm-schema-tools generate values \
     --schema charts/library/common/values.schema.json \
     --output charts/library/common/values.yaml \
-    --max-depth 2 \
     --schema-ref values.schema.json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runGenerateValues(schemaPath, outputPath, maxDepth, schemaRef)
+			return runGenerateValues(schemaPath, outputPath, schemaRef)
 		},
 	}
 
 	cmd.Flags().StringVarP(&schemaPath, "schema", "s", "", "Path to the JSON schema file (required)")
 	cmd.Flags().StringVarP(&outputPath, "output", "o", "", "Output path for values.yaml (required)")
-	cmd.Flags().IntVarP(&maxDepth, "max-depth", "d", 2, "Maximum depth to expand nested objects")
 	cmd.Flags().StringVar(&schemaRef, "schema-ref", "",
 		"Schema reference path in the YAML header (defaults to schema path)")
 
@@ -179,7 +169,7 @@ Example:
 	return cmd
 }
 
-func runGenerateValues(schemaPath, outputPath string, maxDepth int, schemaRef string) error {
+func runGenerateValues(schemaPath, outputPath, schemaRef string) error {
 	fmt.Printf("Dereferencing schema: %s\n", schemaPath)
 
 	schemaBytes, err := schema.DereferenceSchema(schemaPath)
@@ -191,10 +181,9 @@ func runGenerateValues(schemaPath, outputPath string, maxDepth int, schemaRef st
 		schemaRef = schemaPath
 	}
 
-	fmt.Printf("Generating values.yaml with max-depth=%d\n", maxDepth)
+	fmt.Println("Generating values.yaml")
 
 	gen := values.NewGenerator()
-	gen.MaxDepth = maxDepth
 	gen.SchemaPath = schemaRef
 
 	yamlBytes, err := gen.Generate(schemaBytes)

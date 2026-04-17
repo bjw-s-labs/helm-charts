@@ -17,14 +17,14 @@ import (
 //go:embed templates/*.tmpl templates/partials/*.tmpl
 var templateFS embed.FS
 
-// maxFlattenDepth caps recursion in flattenProperties so pathological schemas
-// (self-referential or extremely deep) can't exhaust the stack.
-const maxFlattenDepth = 10
+// maxRecursionDepth caps recursion across all schema walks (page generation
+// and property flattening) so cyclic or pathological schemas can't exhaust
+// the stack.
+const maxRecursionDepth = 32
 
 // Generator generates markdown documentation from JSON Schema.
 type Generator struct {
 	OutputDir string
-	MaxDepth  int // max nesting depth for sub-pages (0 = unlimited)
 	tmpl      *template.Template
 }
 
@@ -42,10 +42,12 @@ func NewGenerator(outputDir string) *Generator {
 
 // Generate produces markdown documentation from a JSON Schema.
 func (g *Generator) Generate(schemaBytes []byte) error {
-	compiler := jsonschema.NewCompiler()
-	schema, err := compiler.Compile(schemaBytes)
+	if g.OutputDir == "" {
+		return fmt.Errorf("output directory is empty")
+	}
+	schema, err := schemautil.Compile(schemaBytes)
 	if err != nil {
-		return fmt.Errorf("failed to compile schema: %w", err)
+		return err
 	}
 
 	if err := os.MkdirAll(g.OutputDir, 0o750); err != nil {
@@ -71,10 +73,9 @@ func (g *Generator) Generate(schemaBytes []byte) error {
 
 // GenerateLlmsTxt produces an llms.txt file listing all documentation pages.
 func (g *Generator) GenerateLlmsTxt(schemaBytes []byte, outputPath, baseURL string) error {
-	compiler := jsonschema.NewCompiler()
-	schema, err := compiler.Compile(schemaBytes)
+	schema, err := schemautil.Compile(schemaBytes)
 	if err != nil {
-		return fmt.Errorf("failed to compile schema: %w", err)
+		return err
 	}
 
 	ctx := LlmsTxtContext{BaseURL: baseURL}
@@ -85,7 +86,6 @@ func (g *Generator) GenerateLlmsTxt(schemaBytes []byte, outputPath, baseURL stri
 			desc := ""
 			if prop.Description != nil {
 				d := *prop.Description
-				// Use first line only.
 				if i := strings.Index(d, "\n"); i > 0 {
 					d = d[:i]
 				}
@@ -119,14 +119,14 @@ func (g *Generator) generateIndex(schema *jsonschema.Schema) error {
 	return g.renderToFile(filepath.Join(g.OutputDir, "index.mdx"), "index.mdx.tmpl", ctx)
 }
 
-// shouldRecurse returns true if sub-pages should be generated at this depth.
-func (g *Generator) shouldRecurse(depth int) bool {
-	return g.MaxDepth == 0 || depth < g.MaxDepth
-}
-
 // generatePropertyPageRecursive walks the schema tree, generating a page for
-// each property and recursing into nested objects up to MaxDepth.
+// each property and recursing into nested objects. Depth is capped at
+// maxRecursionDepth as a safety net against cyclic schemas.
 func (g *Generator) generatePropertyPageRecursive(name string, prop *jsonschema.Schema, parentPath string, depth int) error {
+	if depth > maxRecursionDepth {
+		return nil
+	}
+
 	// Use lowercase directory names to match Starlight's slug normalization.
 	dirName := strings.ToLower(name)
 	currentPath := dirName
@@ -134,13 +134,7 @@ func (g *Generator) generatePropertyPageRecursive(name string, prop *jsonschema.
 		currentPath = parentPath + "/" + dirName
 	}
 
-	canRecurse := g.shouldRecurse(depth)
-
-	var childPages []string
-	if canRecurse {
-		childPages = collectChildPages(prop)
-	}
-
+	childPages := collectChildPages(prop)
 	ctx := g.buildPageContext(name, prop, childPages)
 	outDir := filepath.Join(g.OutputDir, currentPath)
 
@@ -156,11 +150,6 @@ func (g *Generator) generatePropertyPageRecursive(name string, prop *jsonschema.
 		return err
 	}
 
-	if !canRecurse {
-		return nil
-	}
-
-	// Recurse into nested object properties.
 	if prop.Properties != nil {
 		subKeys := schemautil.SortedKeys(*prop.Properties)
 		for _, subName := range subKeys {
@@ -173,7 +162,6 @@ func (g *Generator) generatePropertyPageRecursive(name string, prop *jsonschema.
 		}
 	}
 
-	// Recurse into additionalProperties.
 	if prop.AdditionalProperties != nil {
 		allProps := schemautil.CollectAllProperties(prop.AdditionalProperties)
 		subKeys := schemautil.SortedKeys(allProps)
@@ -237,7 +225,6 @@ func extractTypeVariant(branch *jsonschema.Schema) *TypeVariant {
 		desc = mdxSafe(*branch.Description)
 	}
 
-	// Use first example if available.
 	example := ""
 	if len(branch.Examples) > 0 {
 		if s, ok := branch.Examples[0].(string); ok {
@@ -245,7 +232,6 @@ func extractTypeVariant(branch *jsonschema.Schema) *TypeVariant {
 		}
 	}
 
-	// Collect properties (excluding the type field itself).
 	allProps := schemautil.CollectAllProperties(branch)
 	allRequired := schemautil.CollectAllRequired(branch)
 	requiredSet := schemautil.MakeSet(allRequired)
@@ -280,12 +266,9 @@ func (g *Generator) buildPageContext(name string, prop *jsonschema.Schema, child
 		ChildPages:  childPages,
 	}
 
-	// Map type (additionalProperties without direct properties).
 	if prop.AdditionalProperties != nil && prop.Properties == nil {
 		ctx.IsMap = true
 		ctx.ParentName = name
-
-		// Collect variants from oneOf branches with const type fields.
 		ctx.Variants = g.collectVariants(prop.AdditionalProperties)
 
 		allProps := schemautil.CollectAllProperties(prop.AdditionalProperties)
@@ -308,11 +291,9 @@ func (g *Generator) buildPageContext(name string, prop *jsonschema.Schema, child
 		return ctx
 	}
 
-	// Regular object with defined properties.
 	if prop.Properties != nil {
 		props := *prop.Properties
 		keys := schemautil.SortedKeys(props)
-		// Use CollectAllRequired so required fields from allOf branches are included.
 		requiredSet := schemautil.MakeSet(schemautil.CollectAllRequired(prop))
 		for _, key := range keys {
 			hasPage := len(childPages) > 0 && slices.Contains(childPages, key)
@@ -341,7 +322,7 @@ func collectSubProperties(schema *jsonschema.Schema) []*NamedProperty {
 }
 
 func flattenProperties(schema *jsonschema.Schema, prefix string, depth int) []*NamedProperty {
-	if depth > maxFlattenDepth {
+	if depth > maxRecursionDepth {
 		return nil
 	}
 	allProps := schemautil.CollectAllProperties(schema)
@@ -404,9 +385,11 @@ func (g *Generator) renderToFile(path, tmplName string, data any) error {
 	return os.WriteFile(path, buf.Bytes(), 0o600)
 }
 
-// isSubPath returns true if child is rooted under parent after cleaning.
+// isSubPath returns true if child is rooted under parent.
 func isSubPath(parent, child string) bool {
-	p := filepath.Clean(parent) + string(os.PathSeparator)
-	c := filepath.Clean(child) + string(os.PathSeparator)
-	return strings.HasPrefix(c, p)
+	rel, err := filepath.Rel(parent, child)
+	if err != nil {
+		return false
+	}
+	return rel != ".." && !strings.HasPrefix(rel, ".."+string(os.PathSeparator))
 }

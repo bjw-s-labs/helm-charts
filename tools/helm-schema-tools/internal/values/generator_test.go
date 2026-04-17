@@ -32,7 +32,6 @@ func TestGenerator_Generate_SimpleSchema(t *testing.T) {
 	}`)
 
 	gen := NewGenerator()
-	gen.MaxDepth = 2
 	gen.SchemaPath = "test.schema.json"
 
 	result, err := gen.Generate(schema)
@@ -84,7 +83,6 @@ func TestGenerator_Generate_NestedObject(t *testing.T) {
 	}`)
 
 	gen := NewGenerator()
-	gen.MaxDepth = 2
 
 	result, err := gen.Generate(schema)
 	if err != nil {
@@ -99,46 +97,6 @@ func TestGenerator_Generate_NestedObject(t *testing.T) {
 	}
 	if !strings.Contains(yaml, "debug: false") {
 		t.Error("Missing nested debug property")
-	}
-}
-
-func TestGenerator_Generate_MaxDepth(t *testing.T) {
-	schema := []byte(`{
-		"$schema": "https://json-schema.org/draft/2020-12/schema",
-		"type": "object",
-		"properties": {
-			"level1": {
-				"type": "object",
-				"properties": {
-					"level2": {
-						"type": "object",
-						"properties": {
-							"level3": {
-								"type": "object",
-								"properties": {
-									"value": {"type": "string", "default": "deep"}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}`)
-
-	gen := NewGenerator()
-	gen.MaxDepth = 2
-
-	result, err := gen.Generate(schema)
-	if err != nil {
-		t.Fatalf("Generate failed: %v", err)
-	}
-
-	yaml := string(result)
-
-	// At depth 2, level3 should be empty {}
-	if strings.Contains(yaml, "value: deep") {
-		t.Error("MaxDepth not respected - level3 value should not be expanded")
 	}
 }
 
@@ -161,7 +119,6 @@ func TestGenerator_Generate_AdditionalProperties(t *testing.T) {
 	}`)
 
 	gen := NewGenerator()
-	gen.MaxDepth = 3
 
 	result, err := gen.Generate(schema)
 	if err != nil {
@@ -184,7 +141,7 @@ func TestGenerator_Generate_AdditionalProperties(t *testing.T) {
 	}
 }
 
-func TestGenerator_Generate_RequiredFieldsAtMaxDepth(t *testing.T) {
+func TestGenerator_Generate_RequiredFieldsExpanded(t *testing.T) {
 	schema := []byte(`{
 		"$schema": "https://json-schema.org/draft/2020-12/schema",
 		"type": "object",
@@ -200,7 +157,6 @@ func TestGenerator_Generate_RequiredFieldsAtMaxDepth(t *testing.T) {
 	}`)
 
 	gen := NewGenerator()
-	gen.MaxDepth = 1
 
 	result, err := gen.Generate(schema)
 	if err != nil {
@@ -245,7 +201,6 @@ func TestGenerator_Generate_OptionalObjectWithOneOfAndRequiredString(t *testing.
 	}`)
 
 	gen := NewGenerator()
-	gen.MaxDepth = 2
 
 	result, err := gen.Generate(schema)
 	if err != nil {
@@ -319,7 +274,6 @@ func TestGenerator_Generate_ArrayType(t *testing.T) {
 	}`)
 
 	gen := NewGenerator()
-	gen.MaxDepth = 2
 
 	result, err := gen.Generate(schema)
 	if err != nil {
@@ -354,7 +308,6 @@ func TestGenerator_Generate_OptionalStringsCommentedOut(t *testing.T) {
 	}`)
 
 	gen := NewGenerator()
-	gen.MaxDepth = 2
 
 	result, err := gen.Generate(schema)
 	if err != nil {
@@ -395,7 +348,6 @@ func TestGenerator_Generate_NullableTypes(t *testing.T) {
 	}`)
 
 	gen := NewGenerator()
-	gen.MaxDepth = 2
 
 	result, err := gen.Generate(schema)
 	if err != nil {
@@ -428,7 +380,6 @@ func TestGenerator_Generate_RequiredNullableUsesDefault(t *testing.T) {
 	}`)
 
 	gen := NewGenerator()
-	gen.MaxDepth = 2
 
 	result, err := gen.Generate(schema)
 	if err != nil {
@@ -455,7 +406,6 @@ func TestGenerator_Generate_InferredObjectType(t *testing.T) {
 	}`)
 
 	gen := NewGenerator()
-	gen.MaxDepth = 3
 
 	result, err := gen.Generate(schema)
 	if err != nil {
@@ -486,7 +436,6 @@ func TestGenerator_Generate_InferredArrayType(t *testing.T) {
 	}`)
 
 	gen := NewGenerator()
-	gen.MaxDepth = 2
 
 	result, err := gen.Generate(schema)
 	if err != nil {
@@ -515,7 +464,6 @@ func TestGenerator_Generate_NumberWithFloatDefault(t *testing.T) {
 	}`)
 
 	gen := NewGenerator()
-	gen.MaxDepth = 2
 
 	result, err := gen.Generate(schema)
 	if err != nil {
@@ -547,7 +495,6 @@ func TestGenerator_Generate_BooleanWithoutDefault(t *testing.T) {
 	}`)
 
 	gen := NewGenerator()
-	gen.MaxDepth = 2
 
 	result, err := gen.Generate(schema)
 	if err != nil {
@@ -588,7 +535,6 @@ func TestGenerator_Generate_EmptySchema(t *testing.T) {
 	}`)
 
 	gen := NewGenerator()
-	gen.MaxDepth = 2
 
 	result, err := gen.Generate(schema)
 	if err != nil {
@@ -661,9 +607,6 @@ func TestWrapText(t *testing.T) {
 func TestNewGenerator_Defaults(t *testing.T) {
 	gen := NewGenerator()
 
-	if gen.MaxDepth != 2 {
-		t.Errorf("Default MaxDepth should be 2, got %d", gen.MaxDepth)
-	}
 	if gen.SchemaPath != "" {
 		t.Errorf("Default SchemaPath should be empty, got %q", gen.SchemaPath)
 	}
@@ -682,7 +625,6 @@ func TestGenerator_Generate_NullType(t *testing.T) {
 	}`)
 
 	gen := NewGenerator()
-	gen.MaxDepth = 2
 
 	result, err := gen.Generate(schema)
 	if err != nil {
@@ -710,7 +652,6 @@ func TestGenerator_Generate_UnknownType(t *testing.T) {
 	}`)
 
 	gen := NewGenerator()
-	gen.MaxDepth = 2
 
 	result, err := gen.Generate(schema)
 	if err != nil {
@@ -738,7 +679,6 @@ func TestGenerator_Generate_OnlyNullTypes(t *testing.T) {
 	}`)
 
 	gen := NewGenerator()
-	gen.MaxDepth = 2
 
 	result, err := gen.Generate(schema)
 	if err != nil {
@@ -768,7 +708,6 @@ func TestGenerator_Generate_NumberWithoutDefault(t *testing.T) {
 	}`)
 
 	gen := NewGenerator()
-	gen.MaxDepth = 2
 
 	result, err := gen.Generate(schema)
 	if err != nil {
@@ -782,7 +721,7 @@ func TestGenerator_Generate_NumberWithoutDefault(t *testing.T) {
 	}
 }
 
-func TestGenerator_Generate_ArrayAtMaxDepth(t *testing.T) {
+func TestGenerator_Generate_NestedArrayEmpty(t *testing.T) {
 	schema := []byte(`{
 		"$schema": "https://json-schema.org/draft/2020-12/schema",
 		"type": "object",
@@ -805,7 +744,6 @@ func TestGenerator_Generate_ArrayAtMaxDepth(t *testing.T) {
 	}`)
 
 	gen := NewGenerator()
-	gen.MaxDepth = 2
 
 	result, err := gen.Generate(schema)
 	if err != nil {
@@ -814,8 +752,7 @@ func TestGenerator_Generate_ArrayAtMaxDepth(t *testing.T) {
 
 	yaml := string(result)
 
-	// At max depth, array should be []
 	if !strings.Contains(yaml, "items: []") {
-		t.Error("Array at max depth should be []")
+		t.Error("Nested array should render as []")
 	}
 }

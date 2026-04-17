@@ -64,16 +64,23 @@ func collectProps(schema *jsonschema.Schema, depth int) map[string]*jsonschema.S
 // allOf branch plus the first oneOf/anyOf branch). This keeps the required
 // set consistent with the properties visible at the same schema node.
 func CollectAllRequired(schema *jsonschema.Schema) []string {
+	return collectRequired(schema, 0)
+}
+
+func collectRequired(schema *jsonschema.Schema, depth int) []string {
+	if depth >= maxCollectDepth {
+		return nil
+	}
 	required := make([]string, 0, len(schema.Required))
 	required = append(required, schema.Required...)
 	for _, sub := range schema.AllOf {
-		required = append(required, CollectAllRequired(sub)...)
+		required = append(required, collectRequired(sub, depth+1)...)
 	}
 	if len(schema.OneOf) > 0 {
-		required = append(required, CollectAllRequired(schema.OneOf[0])...)
+		required = append(required, collectRequired(schema.OneOf[0], depth+1)...)
 	}
 	if len(schema.AnyOf) > 0 {
-		required = append(required, CollectAllRequired(schema.AnyOf[0])...)
+		required = append(required, collectRequired(schema.AnyOf[0], depth+1)...)
 	}
 	return required
 }
@@ -142,6 +149,15 @@ func CollectExamples(schema *jsonschema.Schema) []string {
 		out = append(out, CollectExamples(schema.AdditionalProperties)...)
 	}
 	return out
+}
+
+// Compile compiles raw JSON Schema bytes into a jsonschema.Schema.
+func Compile(schemaBytes []byte) (*jsonschema.Schema, error) {
+	s, err := jsonschema.NewCompiler().Compile(schemaBytes)
+	if err != nil {
+		return nil, fmt.Errorf("failed to compile schema: %w", err)
+	}
+	return s, nil
 }
 
 // schematoolsBinary is the external CLI that resolves $ref entries in a schema.
