@@ -17,6 +17,14 @@
   margin-top: 1rem !important;
 }
 
+.sl-markdown-content :is(h2, .sl-heading-wrapper.level-h2) {
+  font-size: 1.75rem !important;
+}
+
+.sl-markdown-content :is(h3, .sl-heading-wrapper.level-h3) {
+  font-size: 1.25rem !important;
+}
+
 .sl-markdown-content table {
   font-size: 0.875rem;
 }
