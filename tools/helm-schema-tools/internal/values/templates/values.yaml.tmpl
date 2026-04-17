@@ -56,7 +56,7 @@
 {{ $indent }}# {{ .Key }}:
 {{- end -}}
 {{- else -}}
-{{ $indent }}{{ .Key }}:{{- template "entries" dict "Indent" (indent $indent) "Entries" .Children "Top" false }}
+{{ $indent }}{{ .Key }}:{{- template "entries" dict "Indent" (deeper $indent) "Entries" .Children "Top" false }}
 {{- end -}}
 {{- else -}}
 {{ $indent }}{{ .Key }}: {{ .Value }}
