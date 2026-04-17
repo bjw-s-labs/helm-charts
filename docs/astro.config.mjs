@@ -47,7 +47,12 @@ export default defineConfig({
               },
               {
                 label: "Upgrade instructions",
-                autogenerate: { directory: "app-template/upgrades" },
+                items: [
+                  { slug: "app-template/upgrades/4-to-5" },
+                  { slug: "app-template/upgrades/3-to-4" },
+                  { slug: "app-template/upgrades/2-to-3" },
+                  { slug: "app-template/upgrades/1-to-2" },
+                ],
               },
             ],
           },
