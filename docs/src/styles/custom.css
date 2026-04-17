@@ -22,7 +22,7 @@
 }
 .sl-markdown-content table code {
   font-size: 0.8125rem;
-  white-space: nowrap;
+  word-break: break-word;
 }
 .sl-markdown-content table td:first-child {
   font-weight: 500;
@@ -32,7 +32,6 @@
   --yv-bg: #1e1e2e;
   --yv-bg-hover: rgba(255, 255, 255, 0.05);
   --yv-border: #45475a;
-  --yv-guide: #313244;
   --yv-key: #89b4fa;
   --yv-str: #a6e3a1;
   --yv-num: #fab387;
@@ -55,7 +54,6 @@
   --yv-bg: #f8f9fc;
   --yv-bg-hover: rgba(0, 0, 0, 0.04);
   --yv-border: #d4d4d8;
-  --yv-guide: #e4e4e7;
   --yv-key: #1d4ed8;
   --yv-str: #15803d;
   --yv-num: #c2410c;
@@ -102,7 +100,7 @@
   display: block;
   width: 100%;
   padding: 8px 12px;
-  margin-bottom: 8px !important;
+  margin-bottom: 8px;
   border-radius: 6px;
   border: 1px solid var(--yv-border);
   background: var(--yv-bg);
@@ -138,7 +136,6 @@
   display: flex;
   align-items: baseline;
   padding: 1px 12px;
-  line-height: var(--yv-lh);
 }
 
 .yv-line:hover {
@@ -190,7 +187,6 @@
 }
 
 .yv-arrow {
-  display: inline-block;
   width: 14px;
   font-size: 10px;
   text-align: center;
@@ -204,7 +200,6 @@
 }
 
 .yv-badge {
-  display: inline-block;
   font-size: 0.7em;
   padding: 0 5px;
   border-radius: 3px;
@@ -234,7 +229,6 @@
   background: none;
   padding: 0;
   font-family: var(--yv-font);
-  line-height: var(--yv-lh);
 }
 
 .yv-link:hover {
@@ -282,7 +276,6 @@
 
 .yv-code .shiki code {
   all: unset;
-  font: inherit;
 }
 
 :root:not([data-theme="light"]) .yv-root .shiki span[style] {
@@ -342,5 +335,4 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
   padding: 6px 0 2px;
-  display: inline-block;
 }
