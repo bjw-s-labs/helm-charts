@@ -41,8 +41,7 @@ generate CHART="library/common":
     echo "Generating reference docs..."
     "$TOOL" generate docs \
       --schema "$CHART_DIR/values.schema.json" \
-      --output "$REFERENCE_DIR" \
-      --max-depth 0
+      --output "$REFERENCE_DIR"
 
     # Generate llms.txt
     echo "Generating llms.txt..."

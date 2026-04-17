@@ -40,7 +40,7 @@ func TestRunGenerateValues_Success(t *testing.T) {
 		t.Fatalf("Failed to write schema: %v", err)
 	}
 
-	err := runGenerateValues(schemaPath, outputPath, 2, "")
+	err := runGenerateValues(schemaPath, outputPath, "")
 	if err != nil {
 		t.Fatalf("runGenerateValues failed: %v", err)
 	}
@@ -71,7 +71,7 @@ func TestRunGenerateValues_InvalidSchema(t *testing.T) {
 		t.Fatalf("Failed to write schema: %v", err)
 	}
 
-	err := runGenerateValues(schemaPath, outputPath, 2, "")
+	err := runGenerateValues(schemaPath, outputPath, "")
 	if err == nil {
 		t.Error("Expected error for invalid schema")
 	}
@@ -81,7 +81,7 @@ func TestRunGenerateValues_MissingSchema(t *testing.T) {
 	tmpDir := t.TempDir()
 	outputPath := filepath.Join(tmpDir, "values.yaml")
 
-	err := runGenerateValues("/nonexistent/schema.json", outputPath, 2, "")
+	err := runGenerateValues("/nonexistent/schema.json", outputPath, "")
 	if err == nil {
 		t.Error("Expected error for missing schema file")
 	}
@@ -108,7 +108,7 @@ func TestRunGenerateDocs_Success(t *testing.T) {
 		t.Fatalf("Failed to write schema: %v", err)
 	}
 
-	err := runGenerateDocs(schemaPath, outputDir, 0)
+	err := runGenerateDocs(schemaPath, outputDir)
 	if err != nil {
 		t.Fatalf("runGenerateDocs failed: %v", err)
 	}
@@ -129,7 +129,7 @@ func TestRunGenerateDocs_InvalidSchema(t *testing.T) {
 		t.Fatalf("Failed to write schema: %v", err)
 	}
 
-	err := runGenerateDocs(schemaPath, outputDir, 0)
+	err := runGenerateDocs(schemaPath, outputDir)
 	if err == nil {
 		t.Error("Expected error for invalid schema")
 	}
@@ -139,7 +139,7 @@ func TestRunGenerateDocs_MissingSchema(t *testing.T) {
 	tmpDir := t.TempDir()
 	outputDir := filepath.Join(tmpDir, "docs")
 
-	err := runGenerateDocs("/nonexistent/schema.json", outputDir, 0)
+	err := runGenerateDocs("/nonexistent/schema.json", outputDir)
 	if err == nil {
 		t.Error("Expected error for missing schema file")
 	}

@@ -17,14 +17,14 @@ import (
 //go:embed templates/*.tmpl templates/partials/*.tmpl
 var templateFS embed.FS
 
-// maxFlattenDepth caps recursion in flattenProperties so pathological schemas
-// (self-referential or extremely deep) can't exhaust the stack.
-const maxFlattenDepth = 10
+// maxRecursionDepth caps recursion across all schema walks (page generation
+// and property flattening) so cyclic or pathological schemas can't exhaust
+// the stack.
+const maxRecursionDepth = 32
 
 // Generator generates markdown documentation from JSON Schema.
 type Generator struct {
 	OutputDir string
-	MaxDepth  int // max nesting depth for sub-pages (0 = unlimited)
 	tmpl      *template.Template
 }
 
@@ -119,14 +119,14 @@ func (g *Generator) generateIndex(schema *jsonschema.Schema) error {
 	return g.renderToFile(filepath.Join(g.OutputDir, "index.mdx"), "index.mdx.tmpl", ctx)
 }
 
-// shouldRecurse returns true if sub-pages should be generated at this depth.
-func (g *Generator) shouldRecurse(depth int) bool {
-	return g.MaxDepth == 0 || depth < g.MaxDepth
-}
-
 // generatePropertyPageRecursive walks the schema tree, generating a page for
-// each property and recursing into nested objects up to MaxDepth.
+// each property and recursing into nested objects. Depth is capped at
+// maxRecursionDepth as a safety net against cyclic schemas.
 func (g *Generator) generatePropertyPageRecursive(name string, prop *jsonschema.Schema, parentPath string, depth int) error {
+	if depth > maxRecursionDepth {
+		return nil
+	}
+
 	// Use lowercase directory names to match Starlight's slug normalization.
 	dirName := strings.ToLower(name)
 	currentPath := dirName
@@ -134,13 +134,7 @@ func (g *Generator) generatePropertyPageRecursive(name string, prop *jsonschema.
 		currentPath = parentPath + "/" + dirName
 	}
 
-	canRecurse := g.shouldRecurse(depth)
-
-	var childPages []string
-	if canRecurse {
-		childPages = collectChildPages(prop)
-	}
-
+	childPages := collectChildPages(prop)
 	ctx := g.buildPageContext(name, prop, childPages)
 	outDir := filepath.Join(g.OutputDir, currentPath)
 
@@ -154,10 +148,6 @@ func (g *Generator) generatePropertyPageRecursive(name string, prop *jsonschema.
 	}
 	if err := g.renderToFile(filepath.Join(outDir, "index.mdx"), "property.mdx.tmpl", ctx); err != nil {
 		return err
-	}
-
-	if !canRecurse {
-		return nil
 	}
 
 	// Recurse into nested object properties.
@@ -341,7 +331,7 @@ func collectSubProperties(schema *jsonschema.Schema) []*NamedProperty {
 }
 
 func flattenProperties(schema *jsonschema.Schema, prefix string, depth int) []*NamedProperty {
-	if depth > maxFlattenDepth {
+	if depth > maxRecursionDepth {
 		return nil
 	}
 	allProps := schemautil.CollectAllProperties(schema)

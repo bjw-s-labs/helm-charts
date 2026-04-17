@@ -50,7 +50,6 @@ type rootContext struct {
 
 // Generator generates commented YAML from JSON Schema.
 type Generator struct {
-	MaxDepth   int
 	SchemaPath string
 
 	// order preserves the schema's declared property order so generated
@@ -64,10 +63,7 @@ func NewGenerator() *Generator {
 	tmpl := template.Must(
 		template.New("").Funcs(funcMap()).ParseFS(templateFS, "templates/values.yaml.tmpl"),
 	)
-	return &Generator{
-		MaxDepth: 2,
-		tmpl:     tmpl,
-	}
+	return &Generator{tmpl: tmpl}
 }
 
 // Generate produces commented YAML from a compiled JSON Schema.
@@ -169,23 +165,6 @@ func (g *Generator) fillValue(e *Entry, prop *jsonschema.Schema, fc fieldCtx) bo
 
 	propType := getSchemaType(prop)
 
-	// At max depth, emit shallow placeholders.
-	if g.MaxDepth > 0 && fc.depth >= g.MaxDepth {
-		switch propType {
-		case typeObject:
-			if len(prop.Required) > 0 {
-				// Object has required fields but we can't expand — drop the entry.
-				return false
-			}
-			e.Value = "{}"
-		case typeArray:
-			e.Value = "[]"
-		default:
-			g.fillScalar(e, prop, propType, fc)
-		}
-		return true
-	}
-
 	switch propType {
 	case typeObject:
 		return g.fillObject(e, prop, fc)
@@ -212,7 +191,7 @@ func (g *Generator) fillObject(e *Entry, prop *jsonschema.Schema, fc fieldCtx) b
 	// convention used in hand-maintained values.yaml files.
 	if prop.AdditionalProperties != nil && prop.Properties == nil {
 		e.Value = "{}"
-		if schemautil.HasAnyProperties(prop.AdditionalProperties) && (g.MaxDepth == 0 || fc.depth < g.MaxDepth) {
+		if schemautil.HasAnyProperties(prop.AdditionalProperties) {
 			example := g.buildMapExample(prop.AdditionalProperties, fc.path+"/additionalProperties", fc.depth)
 			e.ExampleBlock = g.renderEntriesAsComments(example, fc.depth+1)
 		}
@@ -233,11 +212,9 @@ func (g *Generator) fillObject(e *Entry, prop *jsonschema.Schema, fc fieldCtx) b
 	// surfaces scalar defaults like nameOverride or replicas.
 	if fc.depth >= 1 && !fc.required && prop.Default == nil {
 		e.Value = "{}"
-		if g.MaxDepth == 0 || fc.depth < g.MaxDepth {
-			requiredSet := schemautil.MakeSet(schemautil.CollectAllRequired(prop))
-			children := g.buildEntries(allProps, requiredSet, fc.path, fc.depth+1)
-			e.ExampleBlock = g.renderEntriesAsComments(children, fc.depth+1)
-		}
+		requiredSet := schemautil.MakeSet(schemautil.CollectAllRequired(prop))
+		children := g.buildEntries(allProps, requiredSet, fc.path, fc.depth+1)
+		e.ExampleBlock = g.renderEntriesAsComments(children, fc.depth+1)
 		return true
 	}
 

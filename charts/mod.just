@@ -56,8 +56,7 @@ generate-values CHART="library/common": build-tools
   cd "$CHART_DIR"
   "$REPO_ROOT/tools/helm-schema-tools/helm-schema-tools" generate values \
     --schema values.schema.json \
-    --output values.yaml \
-    --max-depth 0
+    --output values.yaml
 
 [doc('Check that committed values.yaml is up-to-date with the schema')]
 check-values CHART="library/common": build-tools
@@ -71,7 +70,7 @@ check-values CHART="library/common": build-tools
   TMPFILE=$(mktemp)
   trap 'rm -f "$TMPFILE"' EXIT
   cd "$CHART_DIR"
-  "$TOOL" generate values --schema values.schema.json --output "$TMPFILE" --max-depth 0
+  "$TOOL" generate values --schema values.schema.json --output "$TMPFILE"
   if ! diff -q values.yaml "$TMPFILE" > /dev/null 2>&1; then
     echo "values.yaml is out of date. Run: just chart::generate-values {{CHART}}"
     diff --color values.yaml "$TMPFILE" || true
