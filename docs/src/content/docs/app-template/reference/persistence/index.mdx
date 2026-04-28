@@ -53,7 +53,7 @@ persistence:
 ```
 
 <details>
-<summary>More examples (17)</summary>
+<summary>More examples (19)</summary>
 
 ```yaml
 persistence:
@@ -148,6 +148,21 @@ persistence:
     type: emptyDir
     medium: Memory
     sizeLimit: 256Mi
+```
+
+```yaml
+persistence:
+  cache:
+    type: ephemeral
+```
+
+```yaml
+persistence:
+  cache:
+    type: ephemeral
+    accessMode: ReadWriteOnce
+    storageClass: fast-ssd
+    size: 10Gi
 ```
 
 ```yaml
@@ -346,6 +361,26 @@ persistence:
 |----------|------|----------|---------|-------------|
 | `medium` | `string` | No | - | Storage medium. Set to &#39;Memory&#39; for tmpfs (RAM-ba... |
 | `sizeLimit` | `string` | No | - | Maximum size of the volume (e.g. &#39;1Gi&#39;). Only enf... |
+
+  </TabItem>
+  <TabItem label="ephemeral">
+
+Use a generic ephemeral volume for scratch space or sharing data between containers. The volume is created and deleted with the pod.
+
+
+```yaml
+persistence:
+  cache:
+    type: ephemeral
+```
+
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `accessMode` | `string` | No | - | AccessMode for the ephemeral volume. Make sure to select ... |
+| `size` | `string` | No | - | The amount of storage that is requested for the ephemeral... |
+| `storageClass` | `string` | No | - | Storage Class for the ephemeral volume. If set to &#39;-&... |
 
   </TabItem>
   <TabItem label="hostPath">

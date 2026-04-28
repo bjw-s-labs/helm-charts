@@ -103,6 +103,22 @@ Returns the value for volumes
         {{- $_ := set $volume.emptyDir "sizeLimit" . -}}
       {{- end -}}
 
+    {{- /* ephemeral persistence type */ -}}
+    {{- else if eq $persistenceValues.type "ephemeral" -}}
+      {{- $_ := set $volume "ephemeral" dict -}}
+      {{- $vct := dict -}}
+      {{- $_ := set $vct "spec" dict -}}
+      {{- with $persistenceValues.accessMode -}}
+        {{- $_ := set $vct.spec "accessModes" (list .) -}}
+      {{- end -}}
+      {{- with $persistenceValues.storageClass -}}
+        {{- $_ := set $vct.spec "storageClassName" . -}}
+      {{- end -}}
+      {{- with $persistenceValues.size -}}
+        {{- $_ := set $vct.spec "resources" (dict "requests" (dict "storage" .)) -}}
+      {{- end -}}
+      {{- $_ := set $volume.ephemeral "volumeClaimTemplate" $vct -}}
+
     {{- /* hostPath persistence type */ -}}
     {{- else if eq $persistenceValues.type "hostPath" -}}
       {{- $_ := set $volume "hostPath" dict -}}

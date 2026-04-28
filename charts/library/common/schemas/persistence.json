@@ -20,18 +20,38 @@
       },
       "unevaluatedProperties": false,
       "oneOf": [
-        { "$ref": "#/$defs/item.type.persistentVolumeClaim" },
-        { "$ref": "#/$defs/item.type.persistentVolumeClaimExisting" },
-        { "$ref": "#/$defs/item.type.configMap" },
-        { "$ref": "#/$defs/item.type.secret" },
-        { "$ref": "#/$defs/item.type.nfs" },
-        { "$ref": "#/$defs/item.type.emptyDir" },
-        { "$ref": "#/$defs/item.type.hostPath" },
-        { "$ref": "#/$defs/item.type.image" },
-        { "$ref": "#/$defs/item.type.custom" }
+        {
+          "$ref": "#/$defs/item.type.persistentVolumeClaim"
+        },
+        {
+          "$ref": "#/$defs/item.type.persistentVolumeClaimExisting"
+        },
+        {
+          "$ref": "#/$defs/item.type.configMap"
+        },
+        {
+          "$ref": "#/$defs/item.type.secret"
+        },
+        {
+          "$ref": "#/$defs/item.type.nfs"
+        },
+        {
+          "$ref": "#/$defs/item.type.emptyDir"
+        },
+        {
+          "$ref": "#/$defs/item.type.ephemeral"
+        },
+        {
+          "$ref": "#/$defs/item.type.hostPath"
+        },
+        {
+          "$ref": "#/$defs/item.type.image"
+        },
+        {
+          "$ref": "#/$defs/item.type.custom"
+        }
       ]
     },
-
     "item.type.persistentVolumeClaim": {
       "type": "object",
       "description": "Dynamically provision a PersistentVolumeClaim. This is the default persistence type and will be used when no type is specified.",
@@ -40,9 +60,14 @@
         "persistence:\n  config:\n    type: persistentVolumeClaim\n    accessMode: ReadWriteOnce\n    size: 10Gi\n    storageClass: fast-ssd\n    retain: true\n    globalMounts:\n      - path: /config"
       ],
       "allOf": [
-        { "$ref": "definitions.json#/$defs/resourceIdentifier" }
+        {
+          "$ref": "definitions.json#/$defs/resourceIdentifier"
+        }
       ],
-      "required": ["accessMode", "size"],
+      "required": [
+        "accessMode",
+        "size"
+      ],
       "properties": {
         "type": {
           "const": "persistentVolumeClaim"
@@ -82,14 +107,15 @@
         }
       }
     },
-
     "item.type.persistentVolumeClaimExisting": {
       "type": "object",
       "description": "Attach an existing PersistentVolumeClaim instead of creating a new one.",
       "examples": [
         "persistence:\n  config:\n    type: persistentVolumeClaim\n    existingClaim: my-app-data"
       ],
-      "required": ["existingClaim"],
+      "required": [
+        "existingClaim"
+      ],
       "properties": {
         "type": {
           "const": "persistentVolumeClaim"
@@ -100,7 +126,6 @@
         }
       }
     },
-
     "item.type.configMap": {
       "type": "object",
       "description": "Mount a ConfigMap as a volume. Use 'name' for external ConfigMaps, or 'identifier' to reference one managed by this chart.",
@@ -109,15 +134,37 @@
         "persistence:\n  config:\n    type: configMap\n    identifier: my-chart-configmap\n    globalMounts:\n      - path: /etc/app/config\n        readOnly: true",
         "persistence:\n  config:\n    type: configMap\n    name: my-configmap\n    items:\n      - key: settings.yaml\n        path: settings.yaml"
       ],
-      "required": ["type"],
+      "required": [
+        "type"
+      ],
       "$comment": "oneOf enforces that at least one of name/identifier is present. dependentSchemas enforces mutual exclusion with a targeted error when both are set. Both are needed — do not simplify to oneOf alone.",
       "oneOf": [
-        { "required": ["name"] },
-        { "required": ["identifier"] }
+        {
+          "required": [
+            "name"
+          ]
+        },
+        {
+          "required": [
+            "identifier"
+          ]
+        }
       ],
       "dependentSchemas": {
-        "name": { "not": { "required": ["identifier"] } },
-        "identifier": { "not": { "required": ["name"] } }
+        "name": {
+          "not": {
+            "required": [
+              "identifier"
+            ]
+          }
+        },
+        "identifier": {
+          "not": {
+            "required": [
+              "name"
+            ]
+          }
+        }
       },
       "properties": {
         "type": {
@@ -138,15 +185,21 @@
           "items": {
             "type": "object",
             "properties": {
-              "key": { "type": "string" },
-              "mode": { "format": "int32", "type": "integer" },
-              "path": { "type": "string" }
+              "key": {
+                "type": "string"
+              },
+              "mode": {
+                "format": "int32",
+                "type": "integer"
+              },
+              "path": {
+                "type": "string"
+              }
             }
           }
         }
       }
     },
-
     "item.type.secret": {
       "type": "object",
       "description": "Mount a Secret as a volume. Use 'name' for external Secrets, or 'identifier' to reference one managed by this chart.",
@@ -154,15 +207,37 @@
         "persistence:\n  credentials:\n    type: secret\n    name: my-secret",
         "persistence:\n  tls:\n    type: secret\n    name: app-tls-cert\n    globalMounts:\n      - path: /etc/ssl/certs\n        readOnly: true"
       ],
-      "required": ["type"],
+      "required": [
+        "type"
+      ],
       "$comment": "oneOf enforces that at least one of name/identifier is present. dependentSchemas enforces mutual exclusion with a targeted error when both are set. Both are needed — do not simplify to oneOf alone.",
       "oneOf": [
-        { "required": ["name"] },
-        { "required": ["identifier"] }
+        {
+          "required": [
+            "name"
+          ]
+        },
+        {
+          "required": [
+            "identifier"
+          ]
+        }
       ],
       "dependentSchemas": {
-        "name": { "not": { "required": ["identifier"] } },
-        "identifier": { "not": { "required": ["name"] } }
+        "name": {
+          "not": {
+            "required": [
+              "identifier"
+            ]
+          }
+        },
+        "identifier": {
+          "not": {
+            "required": [
+              "name"
+            ]
+          }
+        }
       },
       "properties": {
         "type": {
@@ -183,15 +258,21 @@
           "items": {
             "type": "object",
             "properties": {
-              "key": { "type": "string" },
-              "mode": { "format": "int32", "type": "integer" },
-              "path": { "type": "string" }
+              "key": {
+                "type": "string"
+              },
+              "mode": {
+                "format": "int32",
+                "type": "integer"
+              },
+              "path": {
+                "type": "string"
+              }
             }
           }
         }
       }
     },
-
     "item.type.nfs": {
       "type": "object",
       "description": "Mount an NFS share as a volume.",
@@ -199,7 +280,11 @@
         "persistence:\n  media:\n    type: nfs\n    server: 192.168.1.100\n    path: /mnt/share/media",
         "persistence:\n  backups:\n    type: nfs\n    server: nas.example.lan\n    path: /volume/Backups/k8s/app\n    globalMounts:\n      - path: /backups"
       ],
-      "required": ["type", "server", "path"],
+      "required": [
+        "type",
+        "server",
+        "path"
+      ],
       "properties": {
         "type": {
           "const": "nfs"
@@ -214,7 +299,6 @@
         }
       }
     },
-
     "item.type.emptyDir": {
       "type": "object",
       "description": "Use an emptyDir volume for scratch space or sharing data between containers in the same pod. Data is lost when the pod is removed.",
@@ -222,7 +306,9 @@
         "persistence:\n  tmp:\n    type: emptyDir",
         "persistence:\n  cache:\n    type: emptyDir\n    medium: Memory\n    sizeLimit: 256Mi"
       ],
-      "required": ["type"],
+      "required": [
+        "type"
+      ],
       "properties": {
         "type": {
           "const": "emptyDir"
@@ -237,7 +323,34 @@
         }
       }
     },
-
+    "item.type.ephemeral": {
+      "type": "object",
+      "description": "Use a generic ephemeral volume for scratch space or sharing data between containers. The volume is created and deleted with the pod.",
+      "examples": [
+        "persistence:\n  cache:\n    type: ephemeral",
+        "persistence:\n  cache:\n    type: ephemeral\n    accessMode: ReadWriteOnce\n    storageClass: fast-ssd\n    size: 10Gi"
+      ],
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "const": "ephemeral"
+        },
+        "accessMode": {
+          "type": "string",
+          "description": "AccessMode for the ephemeral volume. Make sure to select an access mode that is supported by your storage provider!\nSee https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes"
+        },
+        "storageClass": {
+          "type": "string",
+          "description": "Storage Class for the ephemeral volume.\nIf set to '-', dynamic provisioning is disabled.\nIf set to something else, the given storageClass is used.\nIf undefined (the default) or set to null, no storageClassName spec is set, choosing the default provisioner."
+        },
+        "size": {
+          "type": "string",
+          "description": "The amount of storage that is requested for the ephemeral volume."
+        }
+      }
+    },
     "item.type.hostPath": {
       "type": "object",
       "description": "Mount a path from the host node into the pod. Use with caution as it ties the pod to a specific node.",
@@ -245,7 +358,9 @@
         "persistence:\n  dev-tun:\n    type: hostPath\n    hostPath: /dev/net/tun\n    hostPathType: CharDevice",
         "persistence:\n  data:\n    type: hostPath\n    hostPath: /mnt/local-data\n    hostPathType: DirectoryOrCreate"
       ],
-      "required": ["type"],
+      "required": [
+        "type"
+      ],
       "properties": {
         "type": {
           "const": "hostPath"
@@ -260,7 +375,6 @@
         }
       }
     },
-
     "item.type.image": {
       "type": "object",
       "description": "Mount OCI image or artifact contents as a read-only volume. Requires Kubernetes 1.31+ with the ImageVolume feature gate.",
@@ -268,7 +382,10 @@
         "persistence:\n  static-assets:\n    type: image\n    image: registry.example.com/assets:v1.0",
         "persistence:\n  tools:\n    type: image\n    image:\n      repository: registry.example.com/tools\n      tag: latest\n    pullPolicy: Always"
       ],
-      "required": ["type", "image"],
+      "required": [
+        "type",
+        "image"
+      ],
       "properties": {
         "type": {
           "const": "image"
@@ -276,18 +393,25 @@
         "image": {
           "description": "OCI artifact reference to be used.",
           "oneOf": [
-            { "type": "string" },
-            { "$ref": "definitions.json#/$defs/imageSpecification" }
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "definitions.json#/$defs/imageSpecification"
+            }
           ]
         },
         "pullPolicy": {
           "description": "The image pull policy for the image persistence item.",
           "type": "string",
-          "enum": ["Always", "Never", "IfNotPresent"]
+          "enum": [
+            "Always",
+            "Never",
+            "IfNotPresent"
+          ]
         }
       }
     },
-
     "item.type.custom": {
       "type": "object",
       "description": "Specify a custom volume type not covered by the built-in types. The volumeSpec is passed through directly to the pod spec.",
@@ -295,7 +419,10 @@
         "persistence:\n  ceph:\n    type: custom\n    volumeSpec:\n      cephfs:\n        monitors:\n          - 10.0.0.1:6789\n        user: admin\n        secretRef:\n          name: ceph-secret",
         "persistence:\n  projected:\n    type: custom\n    volumeSpec:\n      projected:\n        sources:\n          - secret:\n              name: my-secret\n          - configMap:\n              name: my-config"
       ],
-      "required": ["type", "volumeSpec"],
+      "required": [
+        "type",
+        "volumeSpec"
+      ],
       "properties": {
         "type": {
           "const": "custom"
@@ -306,11 +433,13 @@
         }
       }
     },
-
     "dataSourceReference": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "name"],
+      "required": [
+        "kind",
+        "name"
+      ],
       "properties": {
         "apiGroup": {
           "type": "string"
@@ -323,7 +452,6 @@
         }
       }
     },
-
     "globalMounts": {
       "description": "Mount the volume to all controllers and containers. Each entry specifies a mount point.",
       "type": "array",
@@ -335,7 +463,6 @@
         "$ref": "#/$defs/mountPath"
       }
     },
-
     "advancedMounts": {
       "description": "Mount the volume to specific controllers and containers. Use when different containers need different mount configurations.",
       "examples": [
@@ -348,14 +475,12 @@
         }
       }
     },
-
     "mountPathCollection": {
       "type": "array",
       "items": {
         "$ref": "#/$defs/mountPath"
       }
     },
-
     "mountPath": {
       "additionalProperties": false,
       "properties": {
