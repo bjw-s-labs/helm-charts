@@ -1781,8 +1781,9 @@ controllers: {}
     # -- Metrics to use for scaling. Passed through directly to the autoscaling/v2
     # HPA spec.
     # metrics: []
-    # -- (int) Minimum number of replicas.
-    # minReplicas:
+    # -- (int) Minimum number of replicas. Set to 0 to enable scale-to-zero when the
+    # HPAScaleToZero feature gate is enabled.
+    # minReplicas: null
     # -- Prefix to prepend to the resource name. Mutually exclusive with
     # forceRename.
     # prefix: ""

@@ -21,7 +21,7 @@ HorizontalPodAutoscaler configuration for this controller. Only supported for de
 | `labels` | `object / null` | No | - | Labels to set on the item. |
 | `maxReplicas` | `integer` | **Yes** | - | Maximum number of replicas. |
 | `metrics` | `array` | No | - | Metrics to use for scaling. Passed through directly to th... |
-| `minReplicas` | `integer` | No | - | Minimum number of replicas. |
+| `minReplicas` | `integer / null` | No | - | Minimum number of replicas. Set to 0 to enable scale-to-z... |
 
 ### Property Details
 
@@ -32,3 +32,7 @@ Scaling behavior configuration. Passed through directly to the autoscaling/v2 HP
 #### metrics
 
 Metrics to use for scaling. Passed through directly to the autoscaling/v2 HPA spec.
+
+#### minReplicas
+
+Minimum number of replicas. Set to 0 to enable scale-to-zero when the HPAScaleToZero feature gate is enabled.
