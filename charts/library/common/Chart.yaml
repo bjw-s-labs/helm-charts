@@ -25,6 +25,9 @@ annotations:
     - kind: changed
       description: |-
         **Breaking**: Create an unprivileged serviceAccount by default. Can be disabled by setting `global.createDefaultServiceAccount` to false.
+    - kind: changed
+      description: |-
+        **Breaking**: ServiceMonitor and PodMonitor `jobLabel` fields now default to `app.kubernetes.io/name`.
     - kind: added
       description: |-
         Allow creating HorizontalPodAutoscaler objects for controllers.

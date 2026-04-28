@@ -31,7 +31,7 @@ tests:
               - NAMESPACE
       - equal:
           path: spec.jobLabel
-          value: release-name
+          value: app.kubernetes.io/name
       - equal:
           path: spec.selector.matchLabels
           value:

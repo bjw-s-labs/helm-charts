@@ -2154,10 +2154,9 @@ serviceMonitor: {}
     # annotations: {}
     # -- Labels to set on the item.
     # labels: {}
-    # -- (string) The label to use to retrieve the job name from the target
-    # service's metadata. Defaults to the ServiceMonitor's 'metadata.name'. Helm
-    # templates can be used.
-    # jobLabel:
+    # -- The label to use to retrieve the job name from the target service's
+    # metadata. Defaults to 'app.kubernetes.io/name'. Helm templates can be used.
+    # jobLabel: app.kubernetes.io/name
     # -- Endpoints allowed as part of this ServiceMonitor.
     # endpoints: []
     # -- Selector to select Endpoints objects.
@@ -2197,10 +2196,9 @@ podMonitor: {}
     # annotations: {}
     # -- Labels to set on the item.
     # labels: {}
-    # -- (string) The label to use to retrieve the job name from the target pod's
-    # metadata. Defaults to the PodMonitor's 'metadata.name'. Helm templates can be
-    # used.
-    # jobLabel:
+    # -- The label to use to retrieve the job name from the target pod's metadata.
+    # Defaults to 'app.kubernetes.io/name'. Helm templates can be used.
+    # jobLabel: app.kubernetes.io/name
     # -- Pod metrics endpoints allowed as part of this PodMonitor. Typical fields
     # per endpoint include `port`, `scheme`, `path`, `interval`, `scrapeTimeout`.
     # See

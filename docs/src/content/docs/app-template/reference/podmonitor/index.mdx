@@ -36,7 +36,7 @@ Available properties:
 | [`controller`](./controller/) | `object` | No | - | Controller whose pods to monitor. |
 | `enabled` | `boolean` | No | `true` | Set to false to disable the PodMonitor. |
 | `forceRename` | `string` | No | - | Override the default resource name. Mutually exclusive wi... |
-| `jobLabel` | `string` | No | - | The label to use to retrieve the job name from the target... |
+| `jobLabel` | `string` | No | `app.kubernetes.io/name` | The label to use to retrieve the job name from the target... |
 | `labels` | `object / null` | No | - | Labels to set on the item. |
 | `podMetricsEndpoints` | `array` | No | - | Pod metrics endpoints allowed as part of this PodMonitor.... |
 | `podTargetLabels` | `array` | No | - | Transfers labels from the Kubernetes Pod onto the created... |
@@ -52,7 +52,7 @@ Override the default resource name. Mutually exclusive with prefix and suffix.
 
 #### jobLabel
 
-The label to use to retrieve the job name from the target pod&#39;s metadata. Defaults to the PodMonitor&#39;s &#39;metadata.name&#39;. Helm templates can be used.
+The label to use to retrieve the job name from the target pod&#39;s metadata. Defaults to &#39;app.kubernetes.io/name&#39;. Helm templates can be used.
 
 #### podMetricsEndpoints
 

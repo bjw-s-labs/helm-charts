@@ -1,15 +1,16 @@
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
-suite: serviceMonitor - fields - jobLabel
+suite: podMonitor - fields - jobLabel
 templates:
   - common.yaml
 values:
   - ../_values/controllers_main_default_container.yaml
 set:
-  serviceMonitor:
+  podMonitor:
     main:
-      serviceName: "{{ .Release.Name }}"
-      endpoints:
+      controller:
+        identifier: main
+      podMetricsEndpoints:
         - port: http
           scheme: http
           path: /metrics
@@ -18,7 +19,7 @@ set:
 tests:
   - it: jobLabel defaults to "app.kubernetes.io/name"
     documentSelector:
-      path: $[?(@.kind == "ServiceMonitor")].metadata.name
+      path: $[?(@.kind == "PodMonitor")].metadata.name
       value: release-name
     asserts:
       - equal:
@@ -27,10 +28,10 @@ tests:
 
   - it: jobLabel can be configured
     documentSelector:
-      path: $[?(@.kind == "ServiceMonitor")].metadata.name
+      path: $[?(@.kind == "PodMonitor")].metadata.name
       value: release-name
     set:
-      serviceMonitor:
+      podMonitor:
         main:
           jobLabel: testLabel
     asserts:
@@ -40,10 +41,10 @@ tests:
 
   - it: jobLabel can be configured with a template
     documentSelector:
-      path: $[?(@.kind == "ServiceMonitor")].metadata.name
+      path: $[?(@.kind == "PodMonitor")].metadata.name
       value: release-name
     set:
-      serviceMonitor:
+      podMonitor:
         main:
           jobLabel: "{{ .Release.Name | lower }}-test"
     asserts:

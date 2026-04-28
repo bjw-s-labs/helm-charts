@@ -23,7 +23,8 @@
           "$ref": "definitions.json#/$defs/labels"
         },
         "jobLabel": {
-          "description": "The label to use to retrieve the job name from the target service's metadata. Defaults to the ServiceMonitor's 'metadata.name'. Helm templates can be used.",
+          "description": "The label to use to retrieve the job name from the target service's metadata. Defaults to 'app.kubernetes.io/name'. Helm templates can be used.",
+          "default": "app.kubernetes.io/name",
           "type": "string"
         },
         "endpoints": {

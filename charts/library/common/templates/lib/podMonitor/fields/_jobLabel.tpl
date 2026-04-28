@@ -9,6 +9,6 @@ Returns the value for podMonitor jobLabel
   {{- if $podMonitorObject.jobLabel -}}
     {{- tpl $podMonitorObject.jobLabel $rootContext -}}
   {{- else -}}
-    {{- $podMonitorObject.name -}}
+    app.kubernetes.io/name
   {{- end -}}
 {{- end -}}
