@@ -22,6 +22,9 @@ annotations:
     - kind: changed
       description: |-
         **Breaking**: automountServiceAccountToken now defaults to false to improve security posture.
+    - kind: changed
+      description: |-
+        **Breaking**: Create an unprivileged serviceAccount by default. Can be disabled by setting `global.createDefaultServiceAccount` to false.
     - kind: added
       description: |-
         Allow creating HorizontalPodAutoscaler objects for controllers.

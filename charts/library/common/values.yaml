@@ -15,6 +15,10 @@ global:
   labels: {}
   # -- Set additional global annotations. Helm templates can be used.
   annotations: {}
+  # -- When true (default), automatically create a dedicated 'main' ServiceAccount
+  # if no serviceAccount is explicitly configured. Disable this if you want to use
+  # the namespace default ServiceAccount.
+  createDefaultServiceAccount: true
 
 # -- Set the strategy for the default pod options. Defaults to overwrite.
 # overwrite: If pod-level options are set, use those instead of the defaults.

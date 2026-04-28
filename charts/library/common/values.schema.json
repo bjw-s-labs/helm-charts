@@ -38,6 +38,11 @@
         "annotations": {
           "description": "Set additional global annotations. Helm templates can be used.",
           "$ref": "schemas/definitions.json#/$defs/annotations"
+        },
+        "createDefaultServiceAccount": {
+          "description": "When true (default), automatically create a dedicated 'main' ServiceAccount if no serviceAccount is explicitly configured. Disable this if you want to use the namespace default ServiceAccount.",
+          "type": "boolean",
+          "default": true
         }
       }
     },
