@@ -18,6 +18,7 @@ Allows for configuring chart-wide settings
 |----------|------|----------|---------|-------------|
 | `alwaysAppendIdentifierToResourceName` | `boolean` | No | `false` | Always append identifier slugs to resource names, regardl... |
 | `annotations` | `object / null` | No | - | Set additional global annotations. Helm templates can be ... |
+| `createDefaultServiceAccount` | `boolean` | No | `true` | When true (default), automatically create a dedicated Ser... |
 | `fullnameOverride` | `string / null` | No | - | Set the chart fullname definition |
 | `labels` | `object / null` | No | - | Set additional global labels. Helm templates can be used. |
 | `nameOverride` | `string / null` | No | - | Set the chart name |
@@ -32,3 +33,7 @@ Always append identifier slugs to resource names, regardless of the enabled reso
 #### annotations
 
 Set additional global annotations. Helm templates can be used.
+
+#### createDefaultServiceAccount
+
+When true (default), automatically create a dedicated ServiceAccount using the release name as the identifier if no serviceAccount is explicitly configured. If any serviceAccount entries are present, the default is not created and user configuration takes precedence.
