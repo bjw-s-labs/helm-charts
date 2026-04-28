@@ -53,6 +53,11 @@ resources: {{ . | nindent 2 }}
     {{- with (include "bjw-s.common.lib.pod.getOption" (dict "ctx" $ctx "option" "resourceClaims")) }}
 resourceClaims: {{ . | nindent 2 }}
     {{- end -}}
+    {{- if ge ($rootContext.Capabilities.KubeVersion.Minor | int) 36 }}
+      {{- with (include "bjw-s.common.lib.pod.getOption" (dict "ctx" $ctx "option" "resizePolicy")) }}
+resizePolicy: {{ . | nindent 4 }}
+      {{- end -}}
+    {{- end -}}
   {{- end -}}
   {{- with (include "bjw-s.common.lib.pod.getOption" (dict "ctx" $ctx "option" "restartPolicy")) }}
 restartPolicy: {{ . | trim }}

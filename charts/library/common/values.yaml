@@ -170,6 +170,10 @@ defaultPodOptions:
   # those containers which consume them by name. (Requires Kubernetes 1.32 or
   # newer)
   resourceClaims: []
+  # -- Pod-level resize policy for controlling container restart on resource
+  # resize. (Requires Kubernetes 1.36 or newer with
+  # InPlacePodLevelResourcesVerticalScaling enabled)
+  resizePolicy: []
   # -- (string) Set container restart policy. Defaults to 'Always'. When
   # controller.type is 'cronjob' it defaults to 'Never'.
   # restartPolicy:
@@ -444,6 +448,10 @@ controllers: {}
     # those containers which consume them by name. (Requires Kubernetes 1.32 or
     # newer)
     # resourceClaims: []
+    # -- Pod-level resize policy for controlling container restart on resource
+    # resize. (Requires Kubernetes 1.36 or newer with
+    # InPlacePodLevelResourcesVerticalScaling enabled)
+    # resizePolicy: []
     # -- (string) Set container restart policy. Defaults to 'Always'. When
     # controller.type is 'cronjob' it defaults to 'Never'.
     # restartPolicy:

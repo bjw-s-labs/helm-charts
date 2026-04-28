@@ -98,6 +98,13 @@
             "$ref": "k8s-api.json#/$defs/core.v1.PodResourceClaim"
           }
         },
+        "resizePolicy": {
+          "description": "Pod-level resize policy for controlling container restart on resource resize. (Requires Kubernetes 1.36 or newer with InPlacePodLevelResourcesVerticalScaling enabled)",
+          "type": "array",
+          "items": {
+            "$ref": "k8s-api.json#/$defs/core.v1.ContainerResizePolicy"
+          }
+        },
         "restartPolicy": {
           "type": "string",
           "description": "Set container restart policy. Defaults to 'Always'. When controller.type is 'cronjob' it defaults to 'Never'."

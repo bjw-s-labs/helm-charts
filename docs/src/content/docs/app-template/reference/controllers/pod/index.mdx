@@ -32,6 +32,7 @@ Pod-level options for this controller.
 | `labels` | `object / null` | No | - | Annotations to set on the item. |
 | `nodeSelector` | `object` | No | - | Node selection constraint. See https://kubernetes.io/docs... |
 | `priorityClassName` | `string` | No | - | Custom priority class for different treatment by the sche... |
+| `resizePolicy` | `array` | No | - | Pod-level resize policy for controlling container restart... |
 | `resourceClaims` | `array` | No | - | ResourceClaims defines which ResourceClaims must be alloc... |
 | [`resources`](./resources/) | `object` | No | - | Set the resource requests / limits for the Pod. (Requires... |
 | `restartPolicy` | `string` | No | - | Set container restart policy. Defaults to &#39;Always&#39... |
@@ -80,6 +81,10 @@ See https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nod
 #### priorityClassName
 
 Custom priority class for different treatment by the scheduler.
+
+#### resizePolicy
+
+Pod-level resize policy for controlling container restart on resource resize. (Requires Kubernetes 1.36 or newer with InPlacePodLevelResourcesVerticalScaling enabled)
 
 #### resourceClaims
 
