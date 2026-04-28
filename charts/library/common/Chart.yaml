@@ -46,6 +46,9 @@ annotations:
     - kind: changed
       description: |-
         Minimum required Kubernetes version has been increased to 1.31
+    - kind: changed
+      description: |-
+        Minimum required Helm version has been increased to 3.18
     - kind: fixed
       description: |-
         Improve error messages
