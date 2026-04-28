@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.0.0/charts/library/common/schemas/listenerset.json",
+  "$defs": {
+    "instance": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "definitions.json#/$defs/resourceIdentifier"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "properties": {
+        "enabled": {
+          "description": "Set to false to disable the ListenerSet.",
+          "type": "boolean",
+          "default": true
+        },
+        "annotations": {
+          "$ref": "definitions.json#/$defs/annotations"
+        },
+        "labels": {
+          "$ref": "definitions.json#/$defs/labels"
+        },
+        "parentRef": {
+          "description": "Gateway this ListenerSet attaches to.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name"],
+          "properties": {
+            "group": {
+              "type": "string",
+              "default": "gateway.networking.k8s.io"
+            },
+            "kind": {
+              "type": "string",
+              "default": "Gateway"
+            },
+            "name": {
+              "type": "string"
+            },
+            "namespace": {
+              "type": "string"
+            }
+          }
+        },
+        "listeners": {
+          "description": "Listeners to attach to the parent Gateway.",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "port", "protocol"],
+            "properties": {
+              "name": {
+                "description": "Unique name of the listener within the ListenerSet.",
+                "type": "string"
+              },
+              "hostname": {
+                "description": "Hostname to match for protocols that support it. Wildcards are supported.",
+                "type": "string"
+              },
+              "port": {
+                "description": "Network port the listener binds to.",
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 65535
+              },
+              "protocol": {
+                "description": "Protocol the listener expects. Supported values: HTTP, HTTPS, TLS, TCP, UDP.",
+                "type": "string",
+                "enum": ["HTTP", "HTTPS", "TLS", "TCP", "UDP"]
+              },
+              "tls": {
+                "description": "TLS configuration. Required for HTTPS and TLS protocols.",
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "enum": ["Terminate", "Passthrough"]
+                  },
+                  "certificateRefs": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": ["name"],
+                      "properties": {
+                        "group": {
+                          "type": "string"
+                        },
+                        "kind": {
+                          "type": "string",
+                          "default": "Secret"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "namespace": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "options": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "allowedRoutes": {
+                "description": "Routes that are allowed to attach to this listener.",
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "namespaces": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "from": {
+                        "type": "string",
+                        "enum": ["All", "Same", "Selector"]
+                      },
+                      "selector": {
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "kinds": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "group": {
+                          "type": "string"
+                        },
+                        "kind": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

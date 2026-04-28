@@ -1,0 +1,73 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: listenerSet - presence
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+tests:
+  - it: a ListenerSet is not created by default
+    asserts:
+      - not: true
+        containsDocument:
+          kind: ListenerSet
+          apiVersion: gateway.networking.k8s.io/v1alpha2
+          any: true
+
+  - it: a ListenerSet is not created when disabled
+    set:
+      listenerSet.main.enabled: false
+    asserts:
+      - not: true
+        containsDocument:
+          kind: ListenerSet
+          apiVersion: gateway.networking.k8s.io/v1alpha2
+          any: true
+
+  - it: a ListenerSet is created when explicitly enabled
+    set:
+      listenerSet.main:
+        parentRef:
+          name: my-gateway
+          namespace: gateway-ns
+        listeners:
+          - name: tls
+            port: 443
+            protocol: HTTPS
+    asserts:
+      - containsDocument:
+          kind: ListenerSet
+          apiVersion: gateway.networking.k8s.io/v1alpha2
+          name: release-name
+          any: true
+
+  - it: multiple ListenerSets are created when configured
+    set:
+      listenerSet:
+        main:
+          parentRef:
+            name: gateway-a
+            namespace: infra
+          listeners:
+            - name: tls
+              port: 443
+              protocol: HTTPS
+        second:
+          parentRef:
+            name: gateway-b
+            namespace: infra
+          listeners:
+            - name: http
+              port: 80
+              protocol: HTTP
+    asserts:
+      - containsDocument:
+          kind: ListenerSet
+          apiVersion: gateway.networking.k8s.io/v1alpha2
+          name: release-name-main
+          any: true
+      - containsDocument:
+          kind: ListenerSet
+          apiVersion: gateway.networking.k8s.io/v1alpha2
+          name: release-name-second
+          any: true

@@ -1,0 +1,50 @@
+---
+# yaml-language-server: $schema=../../../common/values.schema.json
+controllers:
+  main:
+    containers:
+      main:
+        image:
+          repository: ghcr.io/mendhak/http-https-echo
+          tag: 31
+          pullPolicy: IfNotPresent
+
+        probes:
+          liveness:
+            enabled: true
+          readiness:
+            enabled: true
+          startup:
+            enabled: true
+
+service:
+  main:
+    ports:
+      http:
+        port: 8080
+
+listenerSet:
+  main:
+    parentRef:
+      name: shared-gateway
+      namespace: gateway-system
+    listeners:
+      - name: https
+        port: 443
+        protocol: HTTPS
+        hostname: app.example.com
+        tls:
+          mode: Terminate
+          certificateRefs:
+            - name: app-tls
+
+  same-namespace:
+    parentRef:
+      name: local-gateway
+    listeners:
+      - name: http
+        port: 80
+        protocol: HTTP
+        allowedRoutes:
+          namespaces:
+            from: Same

@@ -40,6 +40,9 @@ annotations:
     - kind: added
       description: |-
         Add native support for generic ephemeral volumes via the new `ephemeral` persistence type.
+    - kind: added
+      description: |-
+        Add support for the Gateway API ListenerSet resource (GEP-1713). Requires Gateway API >= 1.5.0.
     - kind: changed
       description: |-
         Minimum required Kubernetes version has been increased to 1.31

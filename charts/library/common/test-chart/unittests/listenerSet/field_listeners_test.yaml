@@ -1,0 +1,88 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: listenerSet - fields - listeners
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+tests:
+  - it: listeners are rendered correctly
+    set:
+      listenerSet.main:
+        parentRef:
+          name: my-gateway
+          namespace: gateway-ns
+        listeners:
+          - name: tls
+            port: 443
+            protocol: HTTPS
+            hostname: "*.example.com"
+    documentSelector:
+      path: $[?(@.kind == "ListenerSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.listeners[0].name
+          value: tls
+      - equal:
+          path: spec.listeners[0].port
+          value: 443
+      - equal:
+          path: spec.listeners[0].protocol
+          value: HTTPS
+      - equal:
+          path: spec.listeners[0].hostname
+          value: "*.example.com"
+
+  - it: multiple listeners are rendered correctly
+    set:
+      listenerSet.main:
+        parentRef:
+          name: my-gateway
+          namespace: gateway-ns
+        listeners:
+          - name: http
+            port: 80
+            protocol: HTTP
+          - name: tls
+            port: 443
+            protocol: HTTPS
+    documentSelector:
+      path: $[?(@.kind == "ListenerSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.listeners[0].name
+          value: http
+      - equal:
+          path: spec.listeners[1].name
+          value: tls
+
+  - it: tls configuration is rendered correctly
+    set:
+      listenerSet.main:
+        parentRef:
+          name: my-gateway
+          namespace: gateway-ns
+        listeners:
+          - name: tls
+            port: 443
+            protocol: HTTPS
+            tls:
+              mode: Terminate
+              certificateRefs:
+                - kind: Secret
+                  name: my-cert
+    documentSelector:
+      path: $[?(@.kind == "ListenerSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.listeners[0].tls.mode
+          value: Terminate
+      - equal:
+          path: spec.listeners[0].tls.certificateRefs[0].kind
+          value: Secret
+      - equal:
+          path: spec.listeners[0].tls.certificateRefs[0].name
+          value: my-cert

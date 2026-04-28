@@ -1,0 +1,106 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: listenerSet - fields - parentRef
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+tests:
+  - it: parentRef name and namespace should be set
+    set:
+      listenerSet.main:
+        parentRef:
+          name: my-gateway
+          namespace: gateway-ns
+        listeners:
+          - name: tls
+            port: 443
+            protocol: HTTPS
+    documentSelector:
+      path: $[?(@.kind == "ListenerSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.parentRef.name
+          value: my-gateway
+      - equal:
+          path: spec.parentRef.namespace
+          value: gateway-ns
+
+  - it: parentRef group defaults to gateway.networking.k8s.io
+    set:
+      listenerSet.main:
+        parentRef:
+          name: my-gateway
+          namespace: gateway-ns
+        listeners:
+          - name: tls
+            port: 443
+            protocol: HTTPS
+    documentSelector:
+      path: $[?(@.kind == "ListenerSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.parentRef.group
+          value: gateway.networking.k8s.io
+
+  - it: parentRef kind defaults to Gateway
+    set:
+      listenerSet.main:
+        parentRef:
+          name: my-gateway
+          namespace: gateway-ns
+        listeners:
+          - name: tls
+            port: 443
+            protocol: HTTPS
+    documentSelector:
+      path: $[?(@.kind == "ListenerSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.parentRef.kind
+          value: Gateway
+
+  - it: parentRef namespace is optional and omitted when not set
+    set:
+      listenerSet.main:
+        parentRef:
+          name: my-gateway
+        listeners:
+          - name: tls
+            port: 443
+            protocol: HTTPS
+    documentSelector:
+      path: $[?(@.kind == "ListenerSet")].metadata.name
+      value: release-name
+    asserts:
+      - notExists:
+          path: spec.parentRef.namespace
+      - equal:
+          path: spec.parentRef.name
+          value: my-gateway
+
+  - it: parentRef group and kind can be overridden
+    set:
+      listenerSet.main:
+        parentRef:
+          name: my-gateway
+          namespace: gateway-ns
+          group: custom.io
+          kind: CustomGateway
+        listeners:
+          - name: tls
+            port: 443
+            protocol: HTTPS
+    documentSelector:
+      path: $[?(@.kind == "ListenerSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.parentRef.group
+          value: custom.io
+      - equal:
+          path: spec.parentRef.kind
+          value: CustomGateway

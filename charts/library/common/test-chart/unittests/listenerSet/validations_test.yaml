@@ -1,0 +1,29 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: listenerSet - validations
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+tests:
+  - it: missing parentRef should fail
+    set:
+      listenerSet.main:
+        listeners:
+          - name: tls
+            port: 443
+            protocol: HTTPS
+    asserts:
+      - failedTemplate:
+          errorMessage: "ListenerSet 'main': parentRef is required."
+
+  - it: missing listeners should fail
+    set:
+      listenerSet.main:
+        parentRef:
+          name: my-gateway
+          namespace: gateway-ns
+    asserts:
+      - failedTemplate:
+          errorMessage: "ListenerSet 'main': at least one listener is required."
+

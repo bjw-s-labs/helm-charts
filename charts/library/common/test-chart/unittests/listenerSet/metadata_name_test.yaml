@@ -1,0 +1,73 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: listenerSet - metadata - name
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+tests:
+  - it: single ListenerSet gets release-name as name
+    set:
+      listenerSet.main:
+        parentRef:
+          name: my-gateway
+          namespace: gateway-ns
+        listeners:
+          - name: tls
+            port: 443
+            protocol: HTTPS
+    asserts:
+      - containsDocument:
+          kind: ListenerSet
+          apiVersion: gateway.networking.k8s.io/v1alpha2
+          name: release-name
+          any: true
+
+  - it: multiple ListenerSets get suffixed names
+    set:
+      listenerSet:
+        main:
+          parentRef:
+            name: gateway-a
+            namespace: infra
+          listeners:
+            - name: tls
+              port: 443
+              protocol: HTTPS
+        second:
+          parentRef:
+            name: gateway-b
+            namespace: infra
+          listeners:
+            - name: http
+              port: 80
+              protocol: HTTP
+    asserts:
+      - containsDocument:
+          kind: ListenerSet
+          apiVersion: gateway.networking.k8s.io/v1alpha2
+          name: release-name-main
+          any: true
+      - containsDocument:
+          kind: ListenerSet
+          apiVersion: gateway.networking.k8s.io/v1alpha2
+          name: release-name-second
+          any: true
+
+  - it: forceRename overrides the name
+    set:
+      listenerSet.main:
+        forceRename: my-custom-listenerset
+        parentRef:
+          name: my-gateway
+          namespace: gateway-ns
+        listeners:
+          - name: tls
+            port: 443
+            protocol: HTTPS
+    asserts:
+      - containsDocument:
+          kind: ListenerSet
+          apiVersion: gateway.networking.k8s.io/v1alpha2
+          name: my-custom-listenerset
+          any: true
