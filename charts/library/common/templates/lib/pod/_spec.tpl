@@ -8,7 +8,7 @@ The pod definition included in the controller.
 
 enableServiceLinks: {{ include "bjw-s.common.lib.pod.getOption" (dict "ctx" $ctx "option" "enableServiceLinks" "default" false) }}
 serviceAccountName: {{ include "bjw-s.common.lib.pod.field.serviceAccountName" (dict "ctx" $ctx) | trim }}
-automountServiceAccountToken: {{ include "bjw-s.common.lib.pod.getOption" (dict "ctx" $ctx "option" "automountServiceAccountToken" "default" true) }}
+automountServiceAccountToken: {{ include "bjw-s.common.lib.pod.getOption" (dict "ctx" $ctx "option" "automountServiceAccountToken" "default" false) }}
   {{- with (include "bjw-s.common.lib.pod.getOption" (dict "ctx" $ctx "option" "priorityClassName")) }}
 priorityClassName: {{ . | trim }}
   {{- end -}}

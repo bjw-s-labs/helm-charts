@@ -15,7 +15,7 @@
         },
         "automountServiceAccountToken": {
           "type": "boolean",
-          "default": true,
+          "default": false,
           "description": "Set to true to automatically mount the service account token."
         },
         "dnsConfig": {

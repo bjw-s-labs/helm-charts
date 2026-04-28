@@ -19,6 +19,9 @@ annotations:
     - kind: changed
       description: |-
         **Breaking**: Restructured rawResources to use a manifest wrapper key for cleaner syntax. Previously the K8s manifest content was placed under a `spec` key which caused confusion. Global chart labels and annotations are automatically merged with user-provided ones.
+    - kind: changed
+      description: |-
+        **Breaking**: automountServiceAccountToken now defaults to false to improve security posture.
     - kind: added
       description: |-
         Allow creating HorizontalPodAutoscaler objects for controllers.
