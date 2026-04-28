@@ -10,11 +10,21 @@
         },
         {
           "oneOf": [
-            { "$ref": "#/$defs/instance.type.deployment" },
-            { "$ref": "#/$defs/instance.type.statefulset" },
-            { "$ref": "#/$defs/instance.type.daemonset" },
-            { "$ref": "#/$defs/instance.type.cronjob" },
-            { "$ref": "#/$defs/instance.type.job" }
+            {
+              "$ref": "#/$defs/instance.type.deployment"
+            },
+            {
+              "$ref": "#/$defs/instance.type.statefulset"
+            },
+            {
+              "$ref": "#/$defs/instance.type.daemonset"
+            },
+            {
+              "$ref": "#/$defs/instance.type.cronjob"
+            },
+            {
+              "$ref": "#/$defs/instance.type.job"
+            }
           ]
         }
       ],
@@ -157,21 +167,29 @@
         }
       }
     },
-
     "instance.type.deployment": {
       "title": "Deployment controller",
       "properties": {
-        "type": { "const": "deployment" },
-        "horizontalPodAutoscaler": { "$ref": "#/$defs/horizontalPodAutoscaler" }
+        "type": {
+          "const": "deployment"
+        },
+        "horizontalPodAutoscaler": {
+          "$ref": "#/$defs/horizontalPodAutoscaler"
+        }
       }
     },
-
     "instance.type.statefulset": {
       "title": "StatefulSet controller",
-      "required": ["type"],
+      "required": [
+        "type"
+      ],
       "properties": {
-        "type": { "const": "statefulset" },
-        "horizontalPodAutoscaler": { "$ref": "#/$defs/horizontalPodAutoscaler" },
+        "type": {
+          "const": "statefulset"
+        },
+        "horizontalPodAutoscaler": {
+          "$ref": "#/$defs/horizontalPodAutoscaler"
+        },
         "statefulset": {
           "description": "StatefulSet-specific options.",
           "type": "object",
@@ -187,24 +205,34 @@
               "properties": {
                 "whenDeleted": {
                   "type": "string",
-                  "enum": ["Delete", "Retain"],
+                  "enum": [
+                    "Delete",
+                    "Retain"
+                  ],
                   "default": "Retain"
                 },
                 "whenScaled": {
                   "type": "string",
-                  "enum": ["Delete", "Retain"],
+                  "enum": [
+                    "Delete",
+                    "Retain"
+                  ],
                   "default": "Retain"
                 }
               }
             },
             "serviceName": {
               "oneOf": [
-                { "type": "string" },
+                {
+                  "type": "string"
+                },
                 {
                   "type": "object",
                   "additionalProperties": false,
                   "properties": {
-                    "identifier": { "type": "string" }
+                    "identifier": {
+                      "type": "string"
+                    }
                   }
                 }
               ]
@@ -225,25 +253,34 @@
         }
       }
     },
-
     "instance.type.daemonset": {
       "title": "DaemonSet controller",
-      "required": ["type"],
+      "required": [
+        "type"
+      ],
       "properties": {
-        "type": { "const": "daemonset" }
+        "type": {
+          "const": "daemonset"
+        }
       }
     },
-
     "instance.type.cronjob": {
       "title": "CronJob controller",
-      "required": ["type", "cronjob"],
+      "required": [
+        "type",
+        "cronjob"
+      ],
       "properties": {
-        "type": { "const": "cronjob" },
+        "type": {
+          "const": "cronjob"
+        },
         "cronjob": {
           "description": "CronJob-specific options.",
           "type": "object",
           "additionalProperties": false,
-          "required": ["schedule"],
+          "required": [
+            "schedule"
+          ],
           "properties": {
             "backoffLimit": {
               "description": "Number of retries before marking the job as failed.",
@@ -298,12 +335,15 @@
         }
       }
     },
-
     "instance.type.job": {
       "title": "Job controller",
-      "required": ["type"],
+      "required": [
+        "type"
+      ],
       "properties": {
-        "type": { "const": "job" },
+        "type": {
+          "const": "job"
+        },
         "job": {
           "description": "Job-specific options.",
           "type": "object",
@@ -340,11 +380,12 @@
         }
       }
     },
-
     "horizontalPodAutoscaler": {
       "description": "HorizontalPodAutoscaler configuration for this controller. Only supported for deployment and statefulset types. See https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/ for details.",
       "type": "object",
-      "required": ["maxReplicas"],
+      "required": [
+        "maxReplicas"
+      ],
       "properties": {
         "annotations": {
           "$ref": "definitions.json#/$defs/annotations"
@@ -353,9 +394,11 @@
           "$ref": "definitions.json#/$defs/labels"
         },
         "minReplicas": {
-          "description": "Minimum number of replicas.",
-          "type": "integer",
-          "minimum": 1
+          "description": "Minimum number of replicas. Set to 0 to enable scale-to-zero when the HPAScaleToZero feature gate is enabled.",
+          "type": [
+            "integer",
+            "null"
+          ]
         },
         "maxReplicas": {
           "description": "Maximum number of replicas.",
@@ -372,11 +415,13 @@
         }
       }
     },
-
     "statefulset.volumeClaimTemplate": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name", "size"],
+      "required": [
+        "name",
+        "size"
+      ],
       "properties": {
         "enabled": {
           "type": "boolean",

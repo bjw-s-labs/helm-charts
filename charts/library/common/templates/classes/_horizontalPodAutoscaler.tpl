@@ -44,7 +44,7 @@ spec:
     apiVersion: apps/v1
     kind: {{ $targetKind }}
     name: {{ $hpaObject.name }}
-  {{- if $hpaObject.minReplicas }}
+  {{- if and (hasKey $hpaObject "minReplicas") (ne $hpaObject.minReplicas nil) }}
   minReplicas: {{ $hpaObject.minReplicas }}
   {{- end }}
   maxReplicas: {{ $hpaObject.maxReplicas }}
