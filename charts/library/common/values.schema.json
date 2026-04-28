@@ -40,7 +40,7 @@
           "$ref": "schemas/definitions.json#/$defs/annotations"
         },
         "createDefaultServiceAccount": {
-          "description": "When true (default), automatically create a dedicated 'main' ServiceAccount if no serviceAccount is explicitly configured. Disable this if you want to use the namespace default ServiceAccount.",
+          "description": "When true (default), automatically create a dedicated ServiceAccount using the release name as the identifier if no serviceAccount is explicitly configured. If any serviceAccount entries are present, the default is not created and user configuration takes precedence.",
           "type": "boolean",
           "default": true
         }

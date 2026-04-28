@@ -15,9 +15,10 @@ global:
   labels: {}
   # -- Set additional global annotations. Helm templates can be used.
   annotations: {}
-  # -- When true (default), automatically create a dedicated 'main' ServiceAccount
-  # if no serviceAccount is explicitly configured. Disable this if you want to use
-  # the namespace default ServiceAccount.
+  # -- When true (default), automatically create a dedicated ServiceAccount using
+  # the release name as the identifier if no serviceAccount is explicitly
+  # configured. If any serviceAccount entries are present, the default is not
+  # created and user configuration takes precedence.
   createDefaultServiceAccount: true
 
 # -- Set the strategy for the default pod options. Defaults to overwrite.
