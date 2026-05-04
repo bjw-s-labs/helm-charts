@@ -1,0 +1,132 @@
+---
+title: "pod"
+description: "Pod-level options for this controller."
+sidebar:
+  label: "pod"
+---
+
+Pod-level options for this controller.
+
+## Type
+
+`object`
+
+## Properties
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| [`affinity`](./affinity/) | `object` | No | - | Set affinity constraint rules. Helm templates can be used... |
+| `annotations` | `object / null` | No | - | Annotations to set on the item. |
+| `automountServiceAccountToken` | `boolean` | No | `false` | Set to true to automatically mount the service account to... |
+| [`dnsConfig`](./dnsconfig/) | `object` | No | - | Specifies the DNS parameters of a pod. Parameters specifi... |
+| `dnsPolicy` | `string` | No | - | Configure the Pod DNS policy. Defaults to &#39;ClusterFir... |
+| `enableServiceLinks` | `boolean` | No | `false` | Enable/disable the generation of environment variables fo... |
+| `hostAliases` | `array` | No | - | Use hostAliases to add custom entries to /etc/hosts - map... |
+| `hostIPC` | `boolean` | No | `false` | Set to true to use the host&#39;s ipc namespace. |
+| `hostNetwork` | `boolean` | No | `false` | Set to false to disable host networking on the Pod. When ... |
+| `hostPID` | `boolean` | No | `false` | Set to true to use the host&#39;s pid namespace. |
+| `hostUsers` | `boolean / null` | No | - | Set to false to create a new userns for the Pod. (Require... |
+| `hostname` | `string` | No | - | Set the Pod&#39;s hostname. |
+| `imagePullSecrets` | `array` | No | - | Set image pull secrets. |
+| `labels` | `object / null` | No | - | Labels to set on the item. |
+| `nodeSelector` | `object` | No | - | Node selection constraint. See https://kubernetes.io/docs... |
+| `priorityClassName` | `string` | No | - | Custom priority class for different treatment by the sche... |
+| `resizePolicy` | `array` | No | - | Pod-level resize policy for controlling container restart... |
+| `resourceClaims` | `array` | No | - | ResourceClaims defines which ResourceClaims must be alloc... |
+| [`resources`](./resources/) | `object` | No | - | Set the resource requests / limits for the Pod. (Requires... |
+| `restartPolicy` | `string` | No | - | Set container restart policy. Defaults to &#39;Always&#39... |
+| `runtimeClassName` | `string` | No | - | Set a runtimeClassName other than the default one (ie: `n... |
+| `schedulerName` | `string` | No | - | Set a custom scheduler name. |
+| `schedulingGates` | `array` | No | - | SchedulingGates is an opaque list of values that if speci... |
+| [`securityContext`](./securitycontext/) | `object` | No | - | Configure the Security Context for the Pod. |
+| `shareProcessNamespace` | `boolean / null` | No | `false` | Allows sharing process namespace between containers in a ... |
+| `terminationGracePeriodSeconds` | `integer / null` | No | - | Duration in seconds the pod needs to terminate gracefully... |
+| `tolerations` | `array` | No | - | Specify taint tolerations. See https://kubernetes.io/docs... |
+| `topologySpreadConstraints` | `array` | No | - | Defines topologySpreadConstraint rules. See https://kuber... |
+
+### Property Details
+
+#### automountServiceAccountToken
+
+Set to true to automatically mount the service account token.
+
+#### dnsPolicy
+
+Configure the Pod DNS policy. Defaults to &#39;ClusterFirst&#39; if hostNetwork is false and &#39;ClusterFirstWithHostNet&#39; if hostNetwork is true.
+
+#### enableServiceLinks
+
+Enable/disable the generation of environment variables for services.
+See https://kubernetes.io/docs/concepts/services-networking/connect-applications-service/#accessing-the-service
+
+#### hostAliases
+
+Use hostAliases to add custom entries to /etc/hosts - mapping IP addresses to hostnames.
+See https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
+
+#### hostNetwork
+
+Set to false to disable host networking on the Pod. When using hostNetwork, make sure you set dnsPolicy to &#39;ClusterFirstWithHostNet&#39;
+
+#### hostUsers
+
+Set to false to create a new userns for the Pod. (Requires Kubernetes 1.29 or newer)
+
+#### nodeSelector
+
+Node selection constraint.
+See https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
+
+#### priorityClassName
+
+Custom priority class for different treatment by the scheduler.
+
+#### resizePolicy
+
+Pod-level resize policy for controlling container restart on resource resize. (Requires Kubernetes 1.36 or newer with InPlacePodLevelResourcesVerticalScaling enabled)
+
+#### resourceClaims
+
+ResourceClaims defines which ResourceClaims must be allocated and reserved before the Pod is allowed to start. The resources will be made available to those containers which consume them by name. (Requires Kubernetes 1.32 or newer)
+
+#### restartPolicy
+
+Set container restart policy. Defaults to &#39;Always&#39;. When controller.type is &#39;cronjob&#39; it defaults to &#39;Never&#39;.
+
+#### runtimeClassName
+
+Set a runtimeClassName other than the default one (ie: `nvidia`).
+
+#### schedulingGates
+
+SchedulingGates is an opaque list of values that if specified will block scheduling the pod. If schedulingGates is not empty, the pod will stay in the SchedulingGated state and the scheduler will not attempt to schedule the pod.
+See https://kubernetes.io/docs/concepts/scheduling-eviction/pod-scheduling-readiness/
+
+#### shareProcessNamespace
+
+Allows sharing process namespace between containers in a Pod.
+See https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/
+
+#### terminationGracePeriodSeconds
+
+Duration in seconds the pod needs to terminate gracefully.
+See https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#lifecycle
+
+#### tolerations
+
+Specify taint tolerations.
+See https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+
+#### topologySpreadConstraints
+
+Defines topologySpreadConstraint rules.
+See https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
+
+## Related Pages
+
+
+- [`affinity`](./affinity/)
+- [`dnsConfig`](./dnsconfig/)
+- [`resources`](./resources/)
+- [`securityContext`](./securitycontext/)

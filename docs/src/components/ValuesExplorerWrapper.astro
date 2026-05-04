@@ -1,0 +1,7 @@
+---
+import ValuesExplorer from './ValuesExplorer.tsx';
+
+const schemaUrl = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/schemas/values.schema.json`;
+---
+
+<ValuesExplorer client:only="react" schemaUrl={schemaUrl} />

@@ -1,0 +1,27 @@
+---
+title: "resource"
+description: "resource is an ObjectRef to another Kubernetes resource in the namespace of the Ingress object. I..."
+sidebar:
+  label: "resource"
+---
+
+resource is an ObjectRef to another Kubernetes resource in the namespace of the Ingress object. If resource is specified, a service.Name and service.Port must not be specified. This is a mutually exclusive setting with &#34;Service&#34;.
+
+## Type
+
+`object`
+
+## Properties
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `apiGroup` | `string` | No | - | APIGroup is the group for the resource being referenced. ... |
+| `kind` | `string` | **Yes** | - | Kind is the type of resource being referenced |
+| `name` | `string` | **Yes** | - | Name is the name of resource being referenced |
+
+### Property Details
+
+#### apiGroup
+
+APIGroup is the group for the resource being referenced. If APIGroup is not specified, the specified Kind must be in the core API group. For any other third-party types, APIGroup is required.

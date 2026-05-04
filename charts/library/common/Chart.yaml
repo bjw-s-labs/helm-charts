@@ -3,8 +3,8 @@ apiVersion: v2
 name: common
 description: Function library for Helm charts
 type: library
-version: 4.6.2
-kubeVersion: ">=1.28.0-0"
+version: 5.0.0
+kubeVersion: ">=1.31.0-0"
 keywords:
   - common
   - library
@@ -16,9 +16,48 @@ sources:
   - https://github.com/bjw-s-labs/helm-charts
 annotations:
   artifacthub.io/changes: |-
+    - kind: added
+      description: |-
+        NetworkPolicy now auto-detects and targets a single controller when no `controller` or `podSelector` is specified and exactly one controller exists.
+    - kind: changed
+      description: |-
+        **Breaking**: Restructured rawResources to use a manifest wrapper key for cleaner syntax. Previously the K8s manifest content was placed under a `spec` key which caused confusion. Global chart labels and annotations are automatically merged with user-provided ones.
+    - kind: changed
+      description: |-
+        **Breaking**: automountServiceAccountToken now defaults to false to improve security posture.
+    - kind: changed
+      description: |-
+        **Breaking**: Create an unprivileged serviceAccount by default. Can be disabled by setting `global.createDefaultServiceAccount` to false.
+    - kind: changed
+      description: |-
+        **Breaking**: ServiceMonitor and PodMonitor `jobLabel` fields now default to `app.kubernetes.io/name`.
+    - kind: added
+      description: |-
+        Allow creating HorizontalPodAutoscaler objects for controllers.
+    - kind: added
+      description: |-
+        Add support for creating PodMonitors in addition to ServiceMonitors
+    - kind: added
+      description: |-
+        Add support for setting container resizePolicy in Kubernetes versions >= 1.35
+    - kind: added
+      description: |-
+        Add support for setting Pod resizePolicy in Kubernetes versions >= 1.36
+    - kind: added
+      description: |-
+        Add native support for generic ephemeral volumes via the new `ephemeral` persistence type.
+    - kind: changed
+      description: |-
+        Minimum required Kubernetes version has been increased to 1.31
+    - kind: changed
+      description: |-
+        Minimum required Helm version has been increased to 3.18
     - kind: fixed
       description: |-
-        Make port selection by identifier in backendRefs of HTTPRoute actually do something.
+        Improve error messages
     - kind: fixed
       description: |-
-        Route port was no longer optional while it should be.
+        Fix edge case in volumeMounts where default persistence type was not properly set
+    - kind: fixed
+      description: |-
+        Fix whitespace handling in Route backendRefs

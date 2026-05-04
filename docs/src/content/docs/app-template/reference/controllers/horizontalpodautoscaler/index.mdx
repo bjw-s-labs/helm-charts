@@ -1,0 +1,38 @@
+---
+title: "horizontalPodAutoscaler"
+description: "HorizontalPodAutoscaler configuration for this controller. Only supported for deployment and stat..."
+sidebar:
+  label: "horizontalPodAutoscaler"
+---
+
+HorizontalPodAutoscaler configuration for this controller. Only supported for deployment and statefulset types. See https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/ for details.
+
+## Type
+
+`object`
+
+## Properties
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `annotations` | `object / null` | No | - | Annotations to set on the item. |
+| `behavior` | `object` | No | - | Scaling behavior configuration. Passed through directly t... |
+| `labels` | `object / null` | No | - | Labels to set on the item. |
+| `maxReplicas` | `integer` | **Yes** | - | Maximum number of replicas. |
+| `metrics` | `array` | No | - | Metrics to use for scaling. Passed through directly to th... |
+| `minReplicas` | `integer / null` | No | - | Minimum number of replicas. Set to 0 to enable scale-to-z... |
+
+### Property Details
+
+#### behavior
+
+Scaling behavior configuration. Passed through directly to the autoscaling/v2 HPA spec.
+
+#### metrics
+
+Metrics to use for scaling. Passed through directly to the autoscaling/v2 HPA spec.
+
+#### minReplicas
+
+Minimum number of replicas. Set to 0 to enable scale-to-zero when the HPAScaleToZero feature gate is enabled.

@@ -1,35 +1,44 @@
 {
-  "instance": {
-    "allOf": [
-      { "$ref": "definitions.json#/resourceIdentifier" },
-      {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "forceRename": {},
-          "prefix": {},
-          "suffix": {},
-          "enabled": {
-            "description": "Set to false to disable the resource.",
-            "type": "boolean",
-            "default": true
-          },
-          "apiVersion": {
-            "description": "apiVersion of the resource.",
-            "type": "string"
-          },
-          "kind": {
-            "description": "Kind of the resource.",
-            "type": "string"
-          },
-          "annotations": { "$ref": "definitions.json#/annotations" },
-          "labels": { "$ref": "definitions.json#/labels" },
-          "spec": {
-            "description": "Contents of the raw resource to be rendered."
-          }
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.0.0/charts/library/common/schemas/rawResource.json",
+  "$defs": {
+    "instance": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "definitions.json#/$defs/resourceIdentifier"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "properties": {
+        "enabled": {
+          "description": "Set to false to disable the resource.",
+          "type": "boolean",
+          "default": true
         },
-        "required": ["apiVersion", "kind", "spec"]
-      }
-    ]
+        "manifest": {
+          "description": "The raw K8s resource manifest to be rendered. apiVersion and kind are required.",
+          "type": "object",
+          "properties": {
+            "apiVersion": {
+              "description": "apiVersion of the resource.",
+              "type": "string"
+            },
+            "kind": {
+              "description": "Kind of the resource.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "apiVersion",
+            "kind"
+          ],
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "manifest"
+      ]
+    }
   }
 }

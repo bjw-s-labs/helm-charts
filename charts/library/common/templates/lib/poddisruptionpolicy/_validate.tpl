@@ -6,6 +6,6 @@ Validate PodDisruptionBudget values
   {{- $podDisruptionBudgetObject := .object -}}
 
   {{- if empty (get $podDisruptionBudgetObject "controller") -}}
-    {{- fail (printf "controller reference is required for PodDisruptionBudget. (PodDisruptionBudget %s)" $podDisruptionBudgetObject.identifier) -}}
+    {{- fail (printf "PodDisruptionBudget '%s': Controller reference is required. Specify a controller under 'podDisruptionBudgets.%s.controller'." $podDisruptionBudgetObject.identifier $podDisruptionBudgetObject.identifier) -}}
   {{- end -}}
 {{- end -}}

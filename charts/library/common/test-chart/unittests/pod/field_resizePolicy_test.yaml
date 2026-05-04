@@ -1,0 +1,113 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: pod - fields - resizePolicy
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+capabilities:
+  majorVersion: 1
+  minorVersion: 36
+tests:
+  - it: should not be present by default for kubernetes < 1.36
+    capabilities:
+      majorVersion: 1
+      minorVersion: 35
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - notExists:
+          path: spec.template.spec.resizePolicy
+
+  - it: should not be present even if specified for kubernetes < 1.36
+    capabilities:
+      majorVersion: 1
+      minorVersion: 35
+    set:
+      controllers:
+        main:
+          pod:
+            resizePolicy:
+              - resourceName: cpu
+                restartPolicy: NotRequired
+              - resourceName: memory
+                restartPolicy: RestartContainer
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - notExists:
+          path: spec.template.spec.resizePolicy
+
+  - it: should not be present by default for kubernetes >= 1.36
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - notExists:
+          path: spec.template.spec.resizePolicy
+
+  - it: custom resizePolicy can be configured for kubernetes >= 1.36
+    set:
+      controllers:
+        main:
+          pod:
+            resizePolicy:
+              - resourceName: cpu
+                restartPolicy: NotRequired
+              - resourceName: memory
+                restartPolicy: RestartContainer
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.resizePolicy
+          value:
+            - resourceName: cpu
+              restartPolicy: NotRequired
+            - resourceName: memory
+              restartPolicy: RestartContainer
+
+  - it: defaultPodOption should work for resizePolicy
+    set:
+      defaultPodOptions:
+        resizePolicy:
+          - resourceName: cpu
+            restartPolicy: NotRequired
+          - resourceName: memory
+            restartPolicy: NoRestart
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.resizePolicy
+          value:
+            - resourceName: cpu
+              restartPolicy: NotRequired
+            - resourceName: memory
+              restartPolicy: NoRestart
+
+  - it: controller pod-level resizePolicy should overwrite defaultPodOptions
+    set:
+      defaultPodOptions:
+        resizePolicy:
+          - resourceName: cpu
+            restartPolicy: NotRequired
+      controllers:
+        main:
+          pod:
+            resizePolicy:
+              - resourceName: memory
+                restartPolicy: RestartContainer
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.resizePolicy
+          value:
+            - resourceName: memory
+              restartPolicy: RestartContainer

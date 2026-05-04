@@ -1,0 +1,73 @@
+{{- /*
+  values.yaml.tmpl renders a Helm values.yaml with helm-docs-style comments.
+
+  Root context: RootContext
+    .SchemaPath  string     — yaml-language-server header (empty = omit)
+    .Entries     []*Entry   — top-level entries
+
+  entryCtx is passed for recursive rendering:
+    .Indent   string     — current indentation prefix
+    .Entries  []*Entry
+    .Top      bool       — true for root-level entries (blank line separator)
+*/ -}}
+
+{{- define "commentLines" -}}
+{{- $indent := .Indent -}}
+{{- range splitLines .Comment }}
+{{ $indent }}# {{ . }}
+{{- end }}
+{{- end -}}
+
+{{- define "exampleLines" -}}
+{{- $indent := .Indent -}}
+{{- range .Examples }}
+{{- range splitLines . }}
+{{ $indent }}#   {{ . }}
+{{- end }}
+{{- end }}
+{{- end -}}
+
+{{- /*
+  "entries" renders a list of Entry values at the given indentation level.
+  Top-level entries are separated by a blank line.
+  Nested entries (Top=false) are separated only by a single newline.
+  The caller writes `key:{{- template "entries" ... "Top" false }}` so that
+  the first child's leading newline appears immediately after the colon.
+*/ -}}
+{{- define "entries" -}}
+{{- $indent := .Indent -}}
+{{- $top := .Top -}}
+{{- range .Entries -}}
+{{- if $top }}
+{{ else if and (not .Comment) (not .Examples) }}
+{{ end -}}
+{{- if .Comment }}{{ template "commentLines" dict "Indent" $indent "Comment" .Comment }}
+{{ end -}}
+{{- if .Examples }}{{ template "exampleLines" dict "Indent" $indent "Examples" .Examples }}
+{{ end -}}
+{{- if .CommentOut -}}
+{{ $indent }}# {{ .Key }}:
+{{- else if .Children -}}
+{{- if allCommentedOut .Children -}}
+{{ $indent }}{{ .Key }}: {}
+{{- range .Children -}}
+{{- if .Comment }}{{ template "commentLines" dict "Indent" $indent "Comment" .Comment }}
+{{ end -}}
+{{ $indent }}# {{ .Key }}:
+{{- end -}}
+{{- else -}}
+{{ $indent }}{{ .Key }}:{{- template "entries" dict "Indent" (deeper $indent) "Entries" .Children "Top" false }}
+{{- end -}}
+{{- else -}}
+{{ $indent }}{{ .Key }}: {{ .Value }}
+{{- if .ExampleBlock }}
+{{ .ExampleBlock }}
+{{- end }}
+{{- end }}
+{{- end -}}
+{{- end -}}
+
+{{- if .SchemaPath -}}
+# yaml-language-server: $schema={{ .SchemaPath }}
+{{- end -}}
+{{- template "entries" dict "Indent" "" "Entries" .Entries "Top" true }}

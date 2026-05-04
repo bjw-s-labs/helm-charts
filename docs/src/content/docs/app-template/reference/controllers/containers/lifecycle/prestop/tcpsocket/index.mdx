@@ -1,0 +1,26 @@
+---
+title: "tcpSocket"
+description: "Deprecated. TCPSocket is NOT supported as a LifecycleHandler and kept for the backward compatibil..."
+sidebar:
+  label: "tcpSocket"
+---
+
+Deprecated. TCPSocket is NOT supported as a LifecycleHandler and kept for the backward compatibility. There are no validation of this field and lifecycle hooks will fail in runtime when tcp handler is specified.
+
+## Type
+
+`object`
+
+## Properties
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `host` | `string / null` | No | - | Optional: Host name to connect to, defaults to the pod IP. |
+| `port` | `string / integer` | **Yes** | - | Number or name of the port to access on the container. Nu... |
+
+### Property Details
+
+#### port
+
+Number or name of the port to access on the container. Number must be in the range 1 to 65535. Name must be an IANA_SVC_NAME.

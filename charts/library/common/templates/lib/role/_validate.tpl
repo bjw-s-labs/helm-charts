@@ -7,6 +7,6 @@ Validate Role values
   {{- $rules := $roleValues.rules -}}
 
   {{- if not $rules -}}
-    {{- fail "Rules can't be empty" -}}
+    {{- fail (printf "Role '%s': Rules cannot be empty. Define at least one rule under 'roles.%s.rules'." $roleValues.identifier $roleValues.identifier) -}}
   {{- end -}}
 {{- end -}}

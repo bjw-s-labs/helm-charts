@@ -34,7 +34,7 @@ tests:
               scrapeTimeout: 10s
     asserts:
       - failedTemplate:
-          errorMessage: "Either service.name or service.identifier is required because automatic Service detection is not possible. (serviceMonitor: main)"
+          errorMessage: "ServiceMonitor 'main': Either 'service.name' or 'service.identifier' is required because automatic Service detection is not possible (found 0 enabled services). Specify the target service explicitly."
 
   - it: automatic service determination should fail when >1 service is enabled
     set:
@@ -59,4 +59,4 @@ tests:
               scrapeTimeout: 10s
     asserts:
       - failedTemplate:
-          errorMessage: "Either service.name or service.identifier is required because automatic Service detection is not possible. (serviceMonitor: main)"
+          errorMessage: "ServiceMonitor 'main': Either 'service.name' or 'service.identifier' is required because automatic Service detection is not possible (found 2 enabled services). Specify the target service explicitly."

@@ -6,7 +6,7 @@ templates:
 values:
   - ../_values/controllers_main_default_container.yaml
 tests:
-  - it: networkpolicy targets the correct controller by default
+  - it: networkpolicy targets the correct controller by identifier
     set:
       networkpolicies:
         main:
@@ -27,15 +27,13 @@ tests:
               app.kubernetes.io/instance: RELEASE-NAME
               app.kubernetes.io/name: RELEASE-NAME
 
-  - it: networkpolicy targets supports custom podSelector
+  - it: networkpolicy auto-targets single controller when none specified
     set:
       networkpolicies:
         main:
-          controller: main
           policyTypes:
             - Ingress
             - Egress
-          podSelector: {}
           rules: {}
     documentSelector:
       path: $[?(@.kind == "NetworkPolicy")].metadata.name
@@ -43,4 +41,105 @@ tests:
     asserts:
       - equal:
           path: spec.podSelector
-          value: {}
+          value:
+            matchLabels:
+              app.kubernetes.io/controller: main
+              app.kubernetes.io/instance: RELEASE-NAME
+              app.kubernetes.io/name: RELEASE-NAME
+
+  - it: networkpolicy supports controller with extraSelectorLabels
+    set:
+      networkpolicies:
+        main:
+          controller: main
+          extraSelectorLabels:
+            custom-label: custom-value
+          policyTypes:
+            - Ingress
+            - Egress
+          rules: {}
+    documentSelector:
+      path: $[?(@.kind == "NetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.podSelector
+          value:
+            matchLabels:
+              custom-label: custom-value
+              app.kubernetes.io/controller: main
+              app.kubernetes.io/instance: RELEASE-NAME
+              app.kubernetes.io/name: RELEASE-NAME
+
+  - it: auto-targeting controller with extraSelectorLabels is supported
+    set:
+      networkpolicies:
+        main:
+          extraSelectorLabels:
+            custom-label: custom-value
+          policyTypes:
+            - Ingress
+            - Egress
+          rules: {}
+    documentSelector:
+      path: $[?(@.kind == "NetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.podSelector
+          value:
+            matchLabels:
+              custom-label: custom-value
+              app.kubernetes.io/controller: main
+              app.kubernetes.io/instance: RELEASE-NAME
+              app.kubernetes.io/name: RELEASE-NAME
+
+  - it: networkpolicy supports custom podSelector with matchLabels
+    set:
+      networkpolicies:
+        main:
+          policyTypes:
+            - Ingress
+            - Egress
+          podSelector:
+            matchLabels:
+              role: frontend
+          rules: {}
+    documentSelector:
+      path: $[?(@.kind == "NetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.podSelector
+          value:
+            matchLabels:
+              role: frontend
+
+  - it: networkpolicy supports custom podSelector with matchExpressions
+    set:
+      networkpolicies:
+        main:
+          policyTypes:
+            - Ingress
+            - Egress
+          podSelector:
+            matchExpressions:
+              - key: tier
+                operator: In
+                values:
+                  - frontend
+                  - backend
+          rules: {}
+    documentSelector:
+      path: $[?(@.kind == "NetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.podSelector
+          value:
+            matchExpressions:
+              - key: tier
+                operator: In
+                values:
+                  - frontend
+                  - backend

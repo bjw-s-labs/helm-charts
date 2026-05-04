@@ -6,15 +6,15 @@ templates:
 values:
   - ../_values/controllers_main_default_container.yaml
 tests:
-  - it: serviceAccount is not created by default
+  - it: serviceAccount is created by default
     asserts:
-      - not: true
-        containsDocument:
+      - containsDocument:
           apiVersion: v1
           kind: ServiceAccount
+          name: release-name
           any: true
 
-  - it: serviceAccounts are enabled by default
+  - it: serviceAccounts can be explicitly configured
     set:
       serviceAccount:
         main: {}
@@ -25,11 +25,10 @@ tests:
           name: release-name
           any: true
 
-  - it: serviceAccounts can be disabled
+  - it: serviceAccount creation can be disabled via global flag
     set:
-      serviceAccount:
-        default:
-          enabled: false
+      global:
+        createDefaultServiceAccount: false
     asserts:
       - not: true
         containsDocument:

@@ -29,7 +29,7 @@ tests:
                 port: 8081
     asserts:
       - failedTemplate:
-          errorMessage: "Either service.name or service.identifier is required because automatic Service detection is not possible. (ingress: main, host: chart-example.local, path: /)"
+          errorMessage: "Ingress 'main': Either 'service.name' or 'service.identifier' is required for host 'chart-example.local' path '/' because automatic Service detection is not possible (found 0 enabled services). Specify the target service explicitly."
 
   - it: automatic service determination should fail when >1 service is enabled
     set:
@@ -52,4 +52,4 @@ tests:
                 port: 8081
     asserts:
       - failedTemplate:
-          errorMessage: "Either service.name or service.identifier is required because automatic Service detection is not possible. (ingress: main, host: chart-example.local, path: /)"
+          errorMessage: "Ingress 'main': Either 'service.name' or 'service.identifier' is required for host 'chart-example.local' path '/' because automatic Service detection is not possible (found 2 enabled services). Specify the target service explicitly."

@@ -1,0 +1,30 @@
+---
+title: "rules"
+description: "Ingress and egress rules for the NetworkPolicy. See https://kubernetes.io/docs/concepts/services-..."
+sidebar:
+  label: "rules"
+---
+
+Ingress and egress rules for the NetworkPolicy. See https://kubernetes.io/docs/concepts/services-networking/network-policies/#networkpolicy-resource for details. Use `- \{\}` as an item to allow all traffic for that direction.
+
+## Type
+
+`object`
+
+## Properties
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `egress` | `array` | No | - | Egress rules for this networkPolicy. An entry of `\{\}` a... |
+| `ingress` | `array` | No | - | Ingress rules for this networkPolicy. An entry of `\{\}` ... |
+
+### Property Details
+
+#### egress
+
+Egress rules for this networkPolicy. An entry of `\{\}` allows all egress traffic.
+
+#### ingress
+
+Ingress rules for this networkPolicy. An entry of `\{\}` allows all ingress traffic.

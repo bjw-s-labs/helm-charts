@@ -13,7 +13,7 @@ tests:
           controller: other
     asserts:
       - failedTemplate:
-          errorMessage: "No enabled controller found with this identifier. (service: 'main', controller: 'other')"
+          errorMessage: "Service 'main': No enabled controller found with identifier 'other'. Available controllers: [main]"
 
   - it: automatic controller determination should fail when no controller is enabled
     set:
@@ -24,7 +24,7 @@ tests:
         main: {}
     asserts:
       - failedTemplate:
-          errorMessage: "controller field is required because automatic controller detection is not possible. (service: main)"
+          errorMessage: "Service 'main': controller field is required because automatic controller detection is not possible (found 0 enabled controllers). Please specify which controller this service should use."
 
   - it: automatic controller determination should fail when >1 controller is enabled
     set:
@@ -40,7 +40,7 @@ tests:
         main: {}
     asserts:
       - failedTemplate:
-          errorMessage: "controller field is required because automatic controller detection is not possible. (service: main)"
+          errorMessage: "Service 'main': controller field is required because automatic controller detection is not possible (found 2 enabled controllers). Please specify which controller this service should use."
 
   - it: no ports enabled should fail
     values:
@@ -53,4 +53,56 @@ tests:
               enabled: false
     asserts:
       - failedTemplate:
-          errorMessage: "No ports are enabled for Service with this identifier. (service: 'main')"
+          errorMessage: "Service 'main': No ports are enabled. At least one port must be enabled for service type 'ClusterIP'. Add ports under 'services.main.ports' in your values."
+
+  - it: duplicate port number and protocol should fail
+    values:
+      - ../_values/service_main_default.yaml
+    set:
+      service:
+        main:
+          ports:
+            http:
+              port: 8080
+            metrics:
+              port: 8080
+    asserts:
+      - failedTemplate:
+          errorMessage: "Duplicate port 8080/TCP found in Service. (service: 'main', ports: 'http' and 'metrics')"
+
+  - it: same port number with different protocols should pass
+    values:
+      - ../_values/service_main_default.yaml
+    set:
+      service:
+        main:
+          ports:
+            http:
+              port: 8080
+            udp:
+              port: 8080
+              protocol: UDP
+    documentSelector:
+      path: $[?(@.kind == "Service")].metadata.name
+      value: release-name
+    asserts:
+      - isKind:
+          of: Service
+
+  - it: non-overlapping ports should pass
+    values:
+      - ../_values/service_main_default.yaml
+    set:
+      service:
+        main:
+          ports:
+            http:
+              port: 8080
+            metrics:
+              port: 9090
+    documentSelector:
+      path: $[?(@.kind == "Service")].metadata.name
+      value: release-name
+    asserts:
+      - isKind:
+          of: Service

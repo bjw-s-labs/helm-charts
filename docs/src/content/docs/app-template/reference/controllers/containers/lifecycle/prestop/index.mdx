@@ -1,0 +1,30 @@
+---
+title: "preStop"
+description: "PreStop is called immediately before a container is terminated due to an API request or managemen..."
+sidebar:
+  label: "preStop"
+---
+
+PreStop is called immediately before a container is terminated due to an API request or management event such as liveness/startup probe failure, preemption, resource contention, etc. The handler is not called if the container crashes or exits. The Pod&#39;s termination grace period countdown begins before the PreStop hook is executed. Regardless of the outcome of the handler, the container will eventually terminate within the Pod&#39;s termination grace period (unless delayed by finalizers). Other management of the container blocks until the hook completes or until the termination grace period is reached. More info: https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#container-hooks
+
+## Type
+
+`object`
+
+## Properties
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| [`exec`](./exec/) | `object` | No | - | Exec specifies the action to take. |
+| [`httpGet`](./httpget/) | `object` | No | - | HTTPGet specifies the http request to perform. |
+| [`sleep`](./sleep/) | `object` | No | - | Sleep represents the duration that the container should s... |
+| [`tcpSocket`](./tcpsocket/) | `object` | No | - | Deprecated. TCPSocket is NOT supported as a LifecycleHand... |
+
+## Related Pages
+
+
+- [`exec`](./exec/)
+- [`httpGet`](./httpget/)
+- [`sleep`](./sleep/)
+- [`tcpSocket`](./tcpsocket/)

@@ -8,8 +8,10 @@ on:
       - main
     paths:
       - ".github/workflows/docs-release.yaml"
-      - ".ci/mkdocs/mkdocs.yml"
       - "docs/**"
+      - "charts/library/common/schemas/**"
+      - "charts/library/common/values.schema.json"
+      - "tools/helm-schema-tools/**"
 
 permissions:
   contents: read
@@ -34,10 +36,16 @@ jobs:
         with:
           cache_key: "mise-v1-{{file_hash}}"
 
-      - name: Build and publish docs
+      - name: Build Go tool
         run: |
-          source .venv/bin/activate
-          mkdocs build -f .ci/mkdocs/mkdocs.yml
+          cd tools/helm-schema-tools
+          go build -o helm-schema-tools ./cmd/helm-schema-tools/
+
+      - name: Generate reference docs and schema
+        run: just docs::generate
+
+      - name: Build Starlight site
+        run: just docs::build
 
       - name: Generate Token
         uses: actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859 # v3.0.0
@@ -51,7 +59,7 @@ jobs:
         if: ${{ github.ref == 'refs/heads/main' }}
         with:
           github_token: ${{ steps.app-token.outputs.token }}
-          publish_dir: ./site
+          publish_dir: ./docs/dist
           destination_dir: docs
 
   publish-docs:

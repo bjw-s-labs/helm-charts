@@ -16,14 +16,14 @@ set:
           interval: 1m
           scrapeTimeout: 10s
 tests:
-  - it: jobLabel defaults to serviceMonitor metadata.name
+  - it: jobLabel defaults to "app.kubernetes.io/name"
     documentSelector:
       path: $[?(@.kind == "ServiceMonitor")].metadata.name
       value: release-name
     asserts:
       - equal:
           path: spec.jobLabel
-          value: release-name
+          value: app.kubernetes.io/name
 
   - it: jobLabel can be configured
     documentSelector:
@@ -32,11 +32,11 @@ tests:
     set:
       serviceMonitor:
         main:
-          jobLabel: app.kubernetes.io/name
+          jobLabel: testLabel
     asserts:
       - equal:
           path: spec.jobLabel
-          value: app.kubernetes.io/name
+          value: testLabel
 
   - it: jobLabel can be configured with a template
     documentSelector:

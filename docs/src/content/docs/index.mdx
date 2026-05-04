@@ -1,0 +1,30 @@
+---
+title: Helm Charts
+description: Reusable Helm charts for Kubernetes
+template: splash
+hero:
+  tagline: A collection of Helm charts for deploying applications in Kubernetes.
+  actions:
+    - text: Go to App Template documentation
+      link: /helm-charts/docs/app-template/
+      icon: open-book
+---
+
+import { Card, CardGrid } from "@astrojs/starlight/components";
+
+## Available Charts
+
+<CardGrid>
+  <Card title="App Template" icon="rocket">
+    An application chart built on the Common Library. Deploy any application by
+    providing Kubernetes resource definitions in your values.yaml.
+  </Card>
+  <Card title="Multus CNI" icon="pencil">
+    A chart for deploying Multus CNI in your Kubernetes cluster, enabling
+    multiple network interfaces per pod.
+  </Card>
+  <Card title="Common Library" icon="puzzle">
+    A library chart providing reusable template functions for Deployments,
+    Services, ConfigMaps, Ingress, and more.
+  </Card>
+</CardGrid>

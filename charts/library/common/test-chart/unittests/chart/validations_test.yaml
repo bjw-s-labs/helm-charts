@@ -21,7 +21,7 @@ tests:
                   subPath: config.yaml
     asserts:
       - failedTemplate:
-          errorMessage: "No enabled controller found with this identifier. (persistence item: 'data', controller: 'test')"
+          errorMessage: "Persistence 'data': No enabled controller found with identifier 'test'. Ensure a controller with this identifier exists and is enabled under 'controllers.test'."
 
   - it: advancedMounts for disabled persistence should not fail
     set:

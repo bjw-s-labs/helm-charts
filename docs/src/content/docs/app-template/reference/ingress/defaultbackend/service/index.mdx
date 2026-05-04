@@ -1,0 +1,31 @@
+---
+title: "service"
+description: "service references a service as a backend. This is a mutually exclusive setting with &#34;Resourc..."
+sidebar:
+  label: "service"
+---
+
+service references a service as a backend. This is a mutually exclusive setting with &#34;Resource&#34;.
+
+## Type
+
+`object`
+
+## Properties
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `name` | `string` | **Yes** | - | name is the referenced service. The service must exist in... |
+| [`port`](./port/) | `object` | No | - | port of the referenced service. A port name or port numbe... |
+
+### Property Details
+
+#### name
+
+name is the referenced service. The service must exist in the same namespace as the Ingress object.
+
+## Related Pages
+
+
+- [`port`](./port/)

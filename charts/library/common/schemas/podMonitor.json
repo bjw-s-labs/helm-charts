@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.0.0/charts/library/common/schemas/podMonitor.json",
+  "$defs": {
+    "instance": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "definitions.json#/$defs/resourceIdentifier"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "properties": {
+        "enabled": {
+          "description": "Set to false to disable the PodMonitor.",
+          "type": "boolean",
+          "default": true
+        },
+        "annotations": {
+          "$ref": "definitions.json#/$defs/annotations"
+        },
+        "labels": {
+          "$ref": "definitions.json#/$defs/labels"
+        },
+        "jobLabel": {
+          "description": "The label to use to retrieve the job name from the target pod's metadata. Defaults to 'app.kubernetes.io/name'. Helm templates can be used.",
+          "default": "app.kubernetes.io/name",
+          "type": "string"
+        },
+        "podMetricsEndpoints": {
+          "description": "Pod metrics endpoints allowed as part of this PodMonitor. Typical fields per endpoint include `port`, `scheme`, `path`, `interval`, `scrapeTimeout`. See https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api-reference/api.md#podmetricsendpoint for the full schema.",
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "selector": {
+          "description": "Selector to select Pod objects.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "matchLabels": {
+              "description": "matchLabels is a map of {key,value} pairs. The requirements are ANDed.",
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "matchExpressions": {
+              "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "operator": {
+                    "type": "string"
+                  },
+                  "values": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "controller": {
+          "description": "Controller whose pods to monitor.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "identifier": {
+              "description": "Reference a controller identifier defined within the chart values.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "identifier"
+          ]
+        },
+        "podTargetLabels": {
+          "description": "Transfers labels from the Kubernetes Pod onto the created metrics. See https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api-reference/api.md#podmonitorspec for details.",
+          "type": "array"
+        }
+      },
+      "dependentSchemas": {
+        "selector": {
+          "not": {
+            "required": [
+              "controller"
+            ]
+          }
+        },
+        "controller": {
+          "not": {
+            "required": [
+              "selector"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

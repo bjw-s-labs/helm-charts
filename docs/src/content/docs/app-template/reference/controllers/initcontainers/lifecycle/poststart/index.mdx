@@ -1,0 +1,30 @@
+---
+title: "postStart"
+description: "PostStart is called immediately after a container is created. If the handler fails, the container..."
+sidebar:
+  label: "postStart"
+---
+
+PostStart is called immediately after a container is created. If the handler fails, the container is terminated and restarted according to its restart policy. Other management of the container blocks until the hook completes. More info: https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#container-hooks
+
+## Type
+
+`object`
+
+## Properties
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| [`exec`](./exec/) | `object` | No | - | Exec specifies the action to take. |
+| [`httpGet`](./httpget/) | `object` | No | - | HTTPGet specifies the http request to perform. |
+| [`sleep`](./sleep/) | `object` | No | - | Sleep represents the duration that the container should s... |
+| [`tcpSocket`](./tcpsocket/) | `object` | No | - | Deprecated. TCPSocket is NOT supported as a LifecycleHand... |
+
+## Related Pages
+
+
+- [`exec`](./exec/)
+- [`httpGet`](./httpget/)
+- [`sleep`](./sleep/)
+- [`tcpSocket`](./tcpsocket/)

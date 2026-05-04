@@ -1,0 +1,53 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: podMonitor - fields - jobLabel
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+set:
+  podMonitor:
+    main:
+      controller:
+        identifier: main
+      podMetricsEndpoints:
+        - port: http
+          scheme: http
+          path: /metrics
+          interval: 1m
+          scrapeTimeout: 10s
+tests:
+  - it: jobLabel defaults to "app.kubernetes.io/name"
+    documentSelector:
+      path: $[?(@.kind == "PodMonitor")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.jobLabel
+          value: app.kubernetes.io/name
+
+  - it: jobLabel can be configured
+    documentSelector:
+      path: $[?(@.kind == "PodMonitor")].metadata.name
+      value: release-name
+    set:
+      podMonitor:
+        main:
+          jobLabel: testLabel
+    asserts:
+      - equal:
+          path: spec.jobLabel
+          value: testLabel
+
+  - it: jobLabel can be configured with a template
+    documentSelector:
+      path: $[?(@.kind == "PodMonitor")].metadata.name
+      value: release-name
+    set:
+      podMonitor:
+        main:
+          jobLabel: "{{ .Release.Name | lower }}-test"
+    asserts:
+      - equal:
+          path: spec.jobLabel
+          value: release-name-test

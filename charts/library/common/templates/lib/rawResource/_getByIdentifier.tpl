@@ -8,6 +8,6 @@ Return a RawResource Object by its Identifier.
 
   {{- if (hasKey $enabledRawResources $identifier) -}}
     {{- $objectValues := get $enabledRawResources $identifier -}}
-    {{- include "bjw-s.common.lib.valuesToObject" (dict "rootContext" $rootContext "id" $identifier "values" $objectValues "itemCount" (len $enabledRawResources)) -}}
+    {{- include "bjw-s.common.lib.rawResource.valuesToObject" (dict "rootContext" $rootContext "id" $identifier "values" $objectValues "itemCount" (len $enabledRawResources)) -}}
   {{- end -}}
 {{- end -}}

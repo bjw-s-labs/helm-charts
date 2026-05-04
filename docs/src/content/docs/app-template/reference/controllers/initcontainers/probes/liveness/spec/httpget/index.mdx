@@ -1,0 +1,37 @@
+---
+title: "httpGet"
+description: "HTTPGet specifies the http request to perform."
+sidebar:
+  label: "httpGet"
+---
+
+HTTPGet specifies the http request to perform.
+
+## Type
+
+`object`
+
+## Properties
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `host` | `string / null` | No | - | Host name to connect to, defaults to the pod IP. You prob... |
+| `httpHeaders` | `array / null` | No | - | Custom headers to set in the request. HTTP allows repeate... |
+| `path` | `string / null` | No | - | Path to access on the HTTP server. |
+| `port` | `string / integer` | **Yes** | - | Name or number of the port to access on the container. Nu... |
+| `scheme` | `string / null` | No | - | Scheme to use for connecting to the host. Defaults to HTTP. |
+
+### Property Details
+
+#### host
+
+Host name to connect to, defaults to the pod IP. You probably want to set &#34;Host&#34; in httpHeaders instead.
+
+#### httpHeaders
+
+Custom headers to set in the request. HTTP allows repeated headers.
+
+#### port
+
+Name or number of the port to access on the container. Number must be in the range 1 to 65535. Name must be an IANA_SVC_NAME.

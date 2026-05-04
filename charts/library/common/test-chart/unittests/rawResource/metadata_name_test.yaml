@@ -7,12 +7,30 @@ values:
   - ../_values/controllers_main_default_container.yaml
 set:
   rawResources.main:
-    apiVersion: v1
-    kind: Endpoint
-    spec:
-      test: test
+    manifest:
+      apiVersion: v1
+      kind: Endpoint
+      spec:
+        test: test
 tests:
   - it: name defaults to chart fullName
+    asserts:
+      - containsDocument:
+          kind: Endpoint
+          apiVersion: v1
+          name: release-name
+          any: true
+
+  - it: user-provided metadata.name is overwritten
+    set:
+      rawResources.main:
+        manifest:
+          apiVersion: v1
+          kind: Endpoint
+          metadata:
+            name: user-provided-name
+          spec:
+            test: test
     asserts:
       - containsDocument:
           kind: Endpoint
@@ -113,10 +131,11 @@ tests:
   - it: multiple items
     set:
       rawResources.second:
-        apiVersion: v1
-        kind: Endpoint
-        spec:
-          test: test
+        manifest:
+          apiVersion: v1
+          kind: Endpoint
+          spec:
+            test: test
     asserts:
       - containsDocument:
           kind: Endpoint
@@ -133,10 +152,11 @@ tests:
     set:
       rawResources.second:
         prefix: prefix
-        apiVersion: v1
-        kind: Endpoint
-        spec:
-          test: test
+        manifest:
+          apiVersion: v1
+          kind: Endpoint
+          spec:
+            test: test
     asserts:
       - containsDocument:
           kind: Endpoint
@@ -153,10 +173,11 @@ tests:
     set:
       rawResources.second:
         suffix: suffix
-        apiVersion: v1
-        kind: Endpoint
-        spec:
-          test: test
+        manifest:
+          apiVersion: v1
+          kind: Endpoint
+          spec:
+            test: test
     asserts:
       - containsDocument:
           kind: Endpoint
@@ -174,10 +195,11 @@ tests:
       rawResources.second:
         prefix: prefix
         suffix: suffix
-        apiVersion: v1
-        kind: Endpoint
-        spec:
-          test: test
+        manifest:
+          apiVersion: v1
+          kind: Endpoint
+          spec:
+            test: test
     asserts:
       - containsDocument:
           kind: Endpoint
@@ -196,10 +218,11 @@ tests:
         forceRename: forceRename
         prefix: prefix
         suffix: suffix
-        apiVersion: v1
-        kind: Endpoint
-        spec:
-          test: test
+        manifest:
+          apiVersion: v1
+          kind: Endpoint
+          spec:
+            test: test
     asserts:
       - failedTemplate:
           errorPattern: "values don't meet the specifications of the schema"

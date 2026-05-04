@@ -18,11 +18,33 @@ within the common library.
   {{- if (hasKey $networkPolicyObject "podSelector") -}}
     {{- $podSelector = $networkPolicyObject.podSelector -}}
   {{- else -}}
-    {{- $podSelector = dict "matchLabels" (merge
-      ($networkPolicyObject.extraSelectorLabels | default dict)
-      (dict "app.kubernetes.io/controller" $networkPolicyObject.controller)
+    {{- /* Determine the controller identifier to use */ -}}
+    {{- $controllerIdentifier := "" -}}
+    {{- if and (hasKey $networkPolicyObject "controller") $networkPolicyObject.controller -}}
+      {{- $controllerIdentifier = $networkPolicyObject.controller -}}
+    {{- else -}}
+      {{- /* Auto-detect: if only one controller exists, use it */ -}}
+      {{- $enabledControllers := (include "bjw-s.common.lib.controller.enabledControllers" (dict "rootContext" $rootContext) | fromYaml) -}}
+      {{- if eq (len $enabledControllers) 1 -}}
+        {{- $controllerIdentifier = keys $enabledControllers | first -}}
+      {{- end -}}
+    {{- end -}}
+
+    {{- /* Build the pod selector */ -}}
+    {{- $selectorLabels := dict "app.kubernetes.io/controller" $controllerIdentifier -}}
+    {{- /* Add global selector labels first */ -}}
+    {{- $selectorLabels = merge
       (include "bjw-s.common.lib.metadata.selectorLabels" $rootContext | fromYaml)
-    ) -}}
+      $selectorLabels
+    -}}
+    {{- /* Add extra selector labels last (takes precedence) */ -}}
+    {{- if hasKey $networkPolicyObject "extraSelectorLabels" -}}
+      {{- $selectorLabels = merge
+        $selectorLabels
+        ($networkPolicyObject.extraSelectorLabels | default dict)
+      -}}
+    {{- end -}}
+    {{- $podSelector = dict "matchLabels" $selectorLabels -}}
   {{- end -}}
 ---
 apiVersion: networking.k8s.io/v1

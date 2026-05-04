@@ -9,7 +9,6 @@ Returns the value for serviceMonitor jobLabel
   {{- if $serviceMonitorObject.jobLabel -}}
     {{- tpl $serviceMonitorObject.jobLabel $rootContext -}}
   {{- else -}}
-    {{- /* TODO: Change this to app.kubernetes.io/name in v5 */ -}}
-    {{- $serviceMonitorObject.name -}}
+    app.kubernetes.io/name
   {{- end -}}
 {{- end -}}

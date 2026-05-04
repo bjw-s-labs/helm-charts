@@ -1,0 +1,52 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: podMonitor - validations
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+tests:
+  - it: controller reference to non-existing controller identifier should fail
+    set:
+      podMonitor:
+        main:
+          controller:
+            identifier: nonexistent
+          podMetricsEndpoints:
+            - port: http
+              path: /metrics
+    asserts:
+      - failedTemplate:
+          errorMessage: "No enabled controller found with this identifier. (podMonitor: 'main', identifier: 'nonexistent')"
+
+  - it: automatic controller determination should fail when no controller is enabled
+    set:
+      controllers:
+        main:
+          enabled: false
+      podMonitor:
+        main:
+          podMetricsEndpoints:
+            - port: http
+              path: /metrics
+    asserts:
+      - failedTemplate:
+          errorMessage: "PodMonitor 'main': Either 'controller.identifier' or 'selector' is required because automatic controller detection is not possible (found 0 enabled controllers). Specify the target controller explicitly."
+
+  - it: automatic controller determination should fail when >1 controller is enabled
+    set:
+      controllers:
+        second:
+          containers:
+            main:
+              image:
+                repository: ghcr.io/mendhak/http-https-echo
+                tag: 31
+      podMonitor:
+        main:
+          podMetricsEndpoints:
+            - port: http
+              path: /metrics
+    asserts:
+      - failedTemplate:
+          errorMessage: "PodMonitor 'main': Either 'controller.identifier' or 'selector' is required because automatic controller detection is not possible (found 2 enabled controllers). Specify the target controller explicitly."

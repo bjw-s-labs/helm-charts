@@ -86,6 +86,36 @@ jobs:
             core.setOutput("filteredCharts", filteredCharts);
             console.log('charts to install:', JSON.stringify(filteredCharts, null, 2));
 
+  check-values:
+    name: Check values.yaml is up-to-date
+    runs-on: ubuntu-24.04
+    needs:
+      - prepare
+    if: |
+      ${{
+        contains(join(fromJSON(needs.prepare.outputs.addedOrModifiedFiles), ' '), 'charts/library/common/values.schema.json') ||
+        contains(join(fromJSON(needs.prepare.outputs.addedOrModifiedFiles), ' '), 'charts/library/common/schemas/') ||
+        contains(join(fromJSON(needs.prepare.outputs.addedOrModifiedFiles), ' '), 'tools/helm-schema-tools/')
+      }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Install Mise and required tools
+        uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
+        with:
+          cache_key: "mise-v1-{{file_hash}}"
+
+      - name: Build Go tool
+        run: |
+          cd tools/helm-schema-tools
+          go build -o helm-schema-tools ./cmd/helm-schema-tools/
+
+      - name: Check values.yaml is up-to-date
+        run: just chart::check-values library/common
+
   pre-commit-check:
     name: Perform Pre-Commit check
     runs-on: ubuntu-24.04
@@ -96,6 +126,11 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
+
+      - name: Install Mise and required tools
+        uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
+        with:
+          cache_key: "mise-v1-{{file_hash}}"
 
       - name: Run against changes
         uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1

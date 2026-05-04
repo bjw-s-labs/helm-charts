@@ -220,3 +220,37 @@ tests:
             namespace: NAMESPACE
             port: 8081
             weight: 1
+
+  - it: multiple backendRefs can be configured
+    values:
+      - ../_values/service_main_default.yaml
+    set:
+      route.main:
+        parentRefs:
+          - name: parentName
+            namespace: parentNamespace
+        rules:
+          - backendRefs:
+              - group: ""
+                kind: Service
+                name: RELEASE-NAME
+                namespace: NAMESPACE
+                port: 8080
+                weight: 1
+              - identifier: main
+                port: 8080
+              - identifier: main
+                port: http
+    documentSelector:
+      path: $[?(@.kind == "HTTPRoute")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.rules[0].backendRefs[0].name
+          value: RELEASE-NAME
+      - equal:
+          path: spec.rules[0].backendRefs[1].name
+          value: release-name
+      - equal:
+          path: spec.rules[0].backendRefs[2].name
+          value: release-name

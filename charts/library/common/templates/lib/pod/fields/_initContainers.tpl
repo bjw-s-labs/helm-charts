@@ -24,7 +24,7 @@ Returns the value for initContainers
       {{- $containerObject := (include "bjw-s.common.lib.container.valuesToObject" (dict "rootContext" $rootContext "controllerObject" $controllerObject "containerType" "init" "id" $key "values" $containerValues)) | fromYaml -}}
 
       {{- /* Perform validations on the Container before rendering */ -}}
-      {{- include "bjw-s.common.lib.container.validate" (dict "rootContext" $ "controllerObject" $controllerObject "containerObject" $containerObject) -}}
+      {{- include "bjw-s.common.lib.container.validate" (dict "rootContext" $rootContext "controllerObject" $controllerObject "containerObject" $containerObject) -}}
 
       {{- /* Generate the Container spec */ -}}
       {{- $renderedContainer := include "bjw-s.common.lib.container.spec" (dict "rootContext" $rootContext "controllerObject" $controllerObject "containerObject" $containerObject) | fromYaml -}}
@@ -42,7 +42,7 @@ Returns the value for initContainers
   {{- end -}}
 
   {{- /* Process graph */ -}}
-  {{- $args := dict "graph" $graph "out" list -}}
+  {{- $args := dict "graph" $graph "out" list "contextType" "initContainer" "contextId" $controllerObject.identifier -}}
   {{- include "bjw-s.common.lib.kahn" $args -}}
 
   {{- range $name := $args.out -}}

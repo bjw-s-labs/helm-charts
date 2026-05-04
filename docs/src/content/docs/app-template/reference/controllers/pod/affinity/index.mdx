@@ -1,0 +1,29 @@
+---
+title: "affinity"
+description: "Set affinity constraint rules. Helm templates can be used. See https://kubernetes.io/docs/concept..."
+sidebar:
+  label: "affinity"
+---
+
+Set affinity constraint rules. Helm templates can be used.
+See https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity
+
+## Type
+
+`object`
+
+## Properties
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| [`nodeAffinity`](./nodeaffinity/) | `object` | No | - | Describes node affinity scheduling rules for the pod. |
+| [`podAffinity`](./podaffinity/) | `object` | No | - | Describes pod affinity scheduling rules (e.g. co-locate t... |
+| [`podAntiAffinity`](./podantiaffinity/) | `object` | No | - | Describes pod anti-affinity scheduling rules (e.g. avoid ... |
+
+## Related Pages
+
+
+- [`nodeAffinity`](./nodeaffinity/)
+- [`podAffinity`](./podaffinity/)
+- [`podAntiAffinity`](./podantiaffinity/)

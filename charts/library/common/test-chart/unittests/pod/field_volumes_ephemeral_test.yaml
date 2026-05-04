@@ -1,0 +1,74 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: pod - fields - volumes (ephemeral)
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+set:
+  persistence:
+    config:
+      type: ephemeral
+tests:
+  - it: default ephemeral should pass
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[0]
+          value:
+            name: config
+            ephemeral:
+              volumeClaimTemplate:
+                spec: {}
+
+  - it: ephemeral with accessMode and size should pass
+    set:
+      persistence:
+        config:
+          type: ephemeral
+          accessMode: ReadWriteOnce
+          size: 10Gi
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[0]
+          value:
+            name: config
+            ephemeral:
+              volumeClaimTemplate:
+                spec:
+                  accessModes:
+                    - ReadWriteOnce
+                  resources:
+                    requests:
+                      storage: 10Gi
+
+  - it: ephemeral with full configuration should pass
+    set:
+      persistence:
+        config:
+          type: ephemeral
+          accessMode: ReadWriteOnce
+          storageClass: fast-ssd
+          size: 10Gi
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[0]
+          value:
+            name: config
+            ephemeral:
+              volumeClaimTemplate:
+                spec:
+                  accessModes:
+                    - ReadWriteOnce
+                  storageClassName: fast-ssd
+                  resources:
+                    requests:
+                      storage: 10Gi

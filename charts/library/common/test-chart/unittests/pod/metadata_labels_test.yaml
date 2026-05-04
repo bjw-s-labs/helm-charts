@@ -73,6 +73,19 @@ tests:
           content:
             globalLabel: test
 
+  - it: pod labels with template functions should be rendered
+    set:
+      controllers.main.pod.labels:
+        test_label: "{{ .Release.Name }}"
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - isSubset:
+          path: spec.template.metadata.labels
+          content:
+            test_label: RELEASE-NAME
+
   - it: labels from multiple controllers should not interfere with each other
     set:
       defaultPodOptions.labels:

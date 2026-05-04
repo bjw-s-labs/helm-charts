@@ -40,7 +40,7 @@ tests:
                   statusCode: 301
     asserts:
       - failedTemplate:
-          errorMessage: "backend refs and request redirect filters cannot co-exist."
+          errorMessage: "Route 'main': RequestRedirect filter cannot be used together with backendRefs. Remove either the filter or the backendRefs."
 
   - it: automatic service determination should fail when no service is enabled
     set:
@@ -53,7 +53,7 @@ tests:
               - port: 8080
     asserts:
       - failedTemplate:
-          errorMessage: "Either name or identifier is required because automatic Service detection is not possible. (route: main)"
+          errorMessage: "Route 'main': Either 'name' or 'identifier' is required in backendRef because automatic Service detection is not possible (found 0 enabled services). Specify the target service explicitly."
 
   - it: automatic service determination should fail when >1 service is enabled
     set:
@@ -77,7 +77,7 @@ tests:
               - port: 8080
     asserts:
       - failedTemplate:
-          errorMessage: "Either name or identifier is required because automatic Service detection is not possible. (route: main)"
+          errorMessage: "Route 'main': Either 'name' or 'identifier' is required in backendRef because automatic Service detection is not possible (found 2 enabled services). Specify the target service explicitly."
 
   - it: automatic service and port reference should fail with absent rules field and when >1 service is enabled
     set:

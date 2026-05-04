@@ -1,0 +1,26 @@
+---
+title: "lifecycle"
+description: "Lifecycle event hooks (postStart, preStop) for the container. See https://kubernetes.io/docs/task..."
+sidebar:
+  label: "lifecycle"
+---
+
+Lifecycle event hooks (postStart, preStop) for the container. See https://kubernetes.io/docs/tasks/configure-pod-container/attach-handler-lifecycle-event/ and https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#lifecycle for details.
+
+## Type
+
+`object`
+
+## Properties
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| [`postStart`](./poststart/) | `object` | No | - | PostStart is called immediately after a container is crea... |
+| [`preStop`](./prestop/) | `object` | No | - | PreStop is called immediately before a container is termi... |
+
+## Related Pages
+
+
+- [`postStart`](./poststart/)
+- [`preStop`](./prestop/)

@@ -5,7 +5,7 @@ inputs:
   min_k8s_version:
     description: Minimum Kubernetes version
     required: false
-    default: "1.28"
+    default: "1.31"
   github_token:
     description: GitHub token used for API requests
     required: true

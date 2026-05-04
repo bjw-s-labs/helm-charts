@@ -1,0 +1,523 @@
+---
+title: "persistence"
+description: "Configure persistent storage and mount options. Each key is an identifier for a persistence item...."
+sidebar:
+  label: "persistence"
+---
+
+import { Tabs, TabItem, Badge } from '@astrojs/starlight/components';
+
+Configure persistent storage and mount options. Each key is an identifier for a persistence item.
+Supported types: persistentVolumeClaim (default), configMap, secret, nfs, emptyDir, hostPath, image, custom.
+By default each item mounts to /&lt;identifier&gt;. Use globalMounts or advancedMounts to customize mount paths.
+
+## Type
+
+`object`
+
+## Usage
+
+Keys are identifiers for `persistence` instances.
+
+```yaml
+persistence:
+  main:
+    enabled: true
+    # ... configuration
+
+  secondary:
+    enabled: true
+    # ... configuration
+```
+
+## Examples
+
+```yaml
+persistence:
+  config:
+    type: persistentVolumeClaim
+    accessMode: ReadWriteOnce
+    size: 1Gi
+    globalMounts:
+      - path: /config
+  tmp:
+    type: emptyDir
+```
+
+```yaml
+persistence:
+  config:
+    type: persistentVolumeClaim
+    accessMode: ReadWriteOnce
+    size: 1Gi
+```
+
+<details>
+<summary>More examples (19)</summary>
+
+```yaml
+persistence:
+  config:
+    type: persistentVolumeClaim
+    accessMode: ReadWriteOnce
+    size: 10Gi
+    storageClass: fast-ssd
+    retain: true
+    globalMounts:
+      - path: /config
+```
+
+```yaml
+persistence:
+  config:
+    type: persistentVolumeClaim
+    existingClaim: my-app-data
+```
+
+```yaml
+persistence:
+  config:
+    type: configMap
+    name: my-configmap
+```
+
+```yaml
+persistence:
+  config:
+    type: configMap
+    identifier: my-chart-configmap
+    globalMounts:
+      - path: /etc/app/config
+        readOnly: true
+```
+
+```yaml
+persistence:
+  config:
+    type: configMap
+    name: my-configmap
+    items:
+      - key: settings.yaml
+        path: settings.yaml
+```
+
+```yaml
+persistence:
+  credentials:
+    type: secret
+    name: my-secret
+```
+
+```yaml
+persistence:
+  tls:
+    type: secret
+    name: app-tls-cert
+    globalMounts:
+      - path: /etc/ssl/certs
+        readOnly: true
+```
+
+```yaml
+persistence:
+  media:
+    type: nfs
+    server: 192.168.1.100
+    path: /mnt/share/media
+```
+
+```yaml
+persistence:
+  backups:
+    type: nfs
+    server: nas.example.lan
+    path: /volume/Backups/k8s/app
+    globalMounts:
+      - path: /backups
+```
+
+```yaml
+persistence:
+  tmp:
+    type: emptyDir
+```
+
+```yaml
+persistence:
+  cache:
+    type: emptyDir
+    medium: Memory
+    sizeLimit: 256Mi
+```
+
+```yaml
+persistence:
+  cache:
+    type: ephemeral
+```
+
+```yaml
+persistence:
+  cache:
+    type: ephemeral
+    accessMode: ReadWriteOnce
+    storageClass: fast-ssd
+    size: 10Gi
+```
+
+```yaml
+persistence:
+  dev-tun:
+    type: hostPath
+    hostPath: /dev/net/tun
+    hostPathType: CharDevice
+```
+
+```yaml
+persistence:
+  data:
+    type: hostPath
+    hostPath: /mnt/local-data
+    hostPathType: DirectoryOrCreate
+```
+
+```yaml
+persistence:
+  static-assets:
+    type: image
+    image: registry.example.com/assets:v1.0
+```
+
+```yaml
+persistence:
+  tools:
+    type: image
+    image:
+      repository: registry.example.com/tools
+      tag: latest
+    pullPolicy: Always
+```
+
+```yaml
+persistence:
+  ceph:
+    type: custom
+    volumeSpec:
+      cephfs:
+        monitors:
+          - 10.0.0.1:6789
+        user: admin
+        secretRef:
+          name: ceph-secret
+```
+
+```yaml
+persistence:
+  projected:
+    type: custom
+    volumeSpec:
+      projected:
+        sources:
+          - secret:
+              name: my-secret
+          - configMap:
+              name: my-config
+```
+
+</details>
+
+## Type Variants
+
+<Tabs>
+  <TabItem label="persistentVolumeClaim (1)">
+
+Dynamically provision a PersistentVolumeClaim. This is the default persistence type and will be used when no type is specified.
+
+
+```yaml
+persistence:
+  config:
+    type: persistentVolumeClaim
+    accessMode: ReadWriteOnce
+    size: 1Gi
+```
+
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `accessMode` | `string` | **Yes** | - | AccessMode for the persistent volume. Make sure to select... |
+| `annotations` | `object / null` | No | - | Annotations to set on the item. |
+| `dataSource` | `object` | No | - | The optional data source for the persistentVolumeClaim. S... |
+| `dataSourceRef` | `object` | No | - | The optional volume populator for the persistentVolumeCla... |
+| `forceRename` | `string` | No | - | Override the default resource name. Mutually exclusive wi... |
+| `labels` | `object / null` | No | - | Labels to set on the item. |
+| `prefix` | `string` | No | `` | Prefix to prepend to the resource name. Mutually exclusiv... |
+| `retain` | `boolean` | No | - | Set to true to retain the PVC upon helm uninstall. |
+| `size` | `string` | **Yes** | - | The amount of storage that is requested for the persisten... |
+| `storageClass` | `string` | No | - | Storage Class for the config volume. If set to &#39;-&#39... |
+| `suffix` | `string` | No | - | Suffix to append to the resource name. Defaults to the re... |
+| `volumeName` | `string` | No | - |  |
+
+  </TabItem>
+  <TabItem label="persistentVolumeClaim (2)">
+
+Attach an existing PersistentVolumeClaim instead of creating a new one.
+
+
+```yaml
+persistence:
+  config:
+    type: persistentVolumeClaim
+    existingClaim: my-app-data
+```
+
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `existingClaim` | `string` | **Yes** | - | The name of an existing PersistentVolumeClaim to use. Hel... |
+
+  </TabItem>
+  <TabItem label="configMap">
+
+Mount a ConfigMap as a volume. Use &#39;name&#39; for external ConfigMaps, or &#39;identifier&#39; to reference one managed by this chart.
+
+
+```yaml
+persistence:
+  config:
+    type: configMap
+    name: my-configmap
+```
+
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `defaultMode` | `integer` | No | - |  |
+| `identifier` | `string` | No | - |  |
+| `items` | `array` | No | - |  |
+| `name` | `string` | **Yes** | - |  |
+
+  </TabItem>
+  <TabItem label="secret">
+
+Mount a Secret as a volume. Use &#39;name&#39; for external Secrets, or &#39;identifier&#39; to reference one managed by this chart.
+
+
+```yaml
+persistence:
+  credentials:
+    type: secret
+    name: my-secret
+```
+
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `defaultMode` | `integer` | No | - |  |
+| `identifier` | `string` | No | - |  |
+| `items` | `array` | No | - |  |
+| `name` | `string` | **Yes** | - |  |
+
+  </TabItem>
+  <TabItem label="nfs">
+
+Mount an NFS share as a volume.
+
+
+```yaml
+persistence:
+  media:
+    type: nfs
+    server: 192.168.1.100
+    path: /mnt/share/media
+```
+
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `path` | `string` | **Yes** | - | The NFS export path on the server. |
+| `server` | `string` | **Yes** | - | The NFS server hostname or IP address. |
+
+  </TabItem>
+  <TabItem label="emptyDir">
+
+Use an emptyDir volume for scratch space or sharing data between containers in the same pod. Data is lost when the pod is removed.
+
+
+```yaml
+persistence:
+  tmp:
+    type: emptyDir
+```
+
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `medium` | `string` | No | - | Storage medium. Set to &#39;Memory&#39; for tmpfs (RAM-ba... |
+| `sizeLimit` | `string` | No | - | Maximum size of the volume (e.g. &#39;1Gi&#39;). Only enf... |
+
+  </TabItem>
+  <TabItem label="ephemeral">
+
+Use a generic ephemeral volume for scratch space or sharing data between containers. The volume is created and deleted with the pod.
+
+
+```yaml
+persistence:
+  cache:
+    type: ephemeral
+```
+
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `accessMode` | `string` | No | - | AccessMode for the ephemeral volume. Make sure to select ... |
+| `size` | `string` | No | - | The amount of storage that is requested for the ephemeral... |
+| `storageClass` | `string` | No | - | Storage Class for the ephemeral volume. If set to &#39;-&... |
+
+  </TabItem>
+  <TabItem label="hostPath">
+
+Mount a path from the host node into the pod. Use with caution as it ties the pod to a specific node.
+
+
+```yaml
+persistence:
+  dev-tun:
+    type: hostPath
+    hostPath: /dev/net/tun
+    hostPathType: CharDevice
+```
+
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `hostPath` | `string` | No | - | Path on the host node to mount. |
+| `hostPathType` | `string` | No | - | Type of the host path. Values: DirectoryOrCreate, Directo... |
+
+  </TabItem>
+  <TabItem label="image">
+
+Mount OCI image or artifact contents as a read-only volume. Requires Kubernetes 1.31+ with the ImageVolume feature gate.
+
+
+```yaml
+persistence:
+  static-assets:
+    type: image
+    image: registry.example.com/assets:v1.0
+```
+
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `image` | `string / object` | **Yes** | - | OCI artifact reference to be used. |
+| `pullPolicy` | `string` | No | - | The image pull policy for the image persistence item. |
+
+  </TabItem>
+  <TabItem label="custom">
+
+Specify a custom volume type not covered by the built-in types. The volumeSpec is passed through directly to the pod spec.
+
+
+```yaml
+persistence:
+  ceph:
+    type: custom
+    volumeSpec:
+      cephfs:
+        monitors:
+          - 10.0.0.1:6789
+        user: admin
+        secretRef:
+          name: ceph-secret
+```
+
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `volumeSpec` | `object` | **Yes** | - | Raw Kubernetes volume specification. Passed through direc... |
+
+  </TabItem>
+</Tabs>
+
+## Instance Properties
+Common properties:
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `accessMode` | `string` | **Yes** | - | AccessMode for the persistent volume. Make sure to select... |
+| `advancedMounts` | `object` | No | - | Explicitly configure mounts for specific controllers and ... |
+| `annotations` | `object / null` | No | - | Annotations to set on the item. |
+| [`dataSource`](./datasource/) | `object` | No | - | The optional data source for the persistentVolumeClaim. S... |
+| [`dataSourceRef`](./datasourceref/) | `object` | No | - | The optional volume populator for the persistentVolumeCla... |
+| `enabled` | `boolean` | No | `true` | Set to false to disable the persistence item. |
+| `forceRename` | `string` | No | - | Override the default resource name. Mutually exclusive wi... |
+| `globalMounts` | `array` | No | - | Configure mounts to all controllers and containers. By de... |
+| `labels` | `object / null` | No | - | Labels to set on the item. |
+| `prefix` | `string` | No | `` | Prefix to prepend to the resource name. Mutually exclusiv... |
+| `retain` | `boolean` | No | - | Set to true to retain the PVC upon helm uninstall. |
+| `size` | `string` | **Yes** | - | The amount of storage that is requested for the persisten... |
+| `storageClass` | `string` | No | - | Storage Class for the config volume. If set to &#39;-&#39... |
+| `suffix` | `string` | No | - | Suffix to append to the resource name. Defaults to the re... |
+| `type` | `any` | No | - |  |
+| `volumeName` | `string` | No | - |  |
+
+### Property Details
+
+#### accessMode
+
+AccessMode for the persistent volume. Make sure to select an access mode that is supported by your storage provider!
+See https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes
+
+#### advancedMounts
+
+Explicitly configure mounts for specific controllers and containers.
+Structure: advancedMounts.&lt;controller_name&gt;.&lt;container_name&gt;[].path
+Use this instead of globalMounts when different controllers need different mount configurations.
+
+#### forceRename
+
+Override the default resource name. Mutually exclusive with prefix and suffix.
+
+#### globalMounts
+
+Configure mounts to all controllers and containers.
+By default the persistence item will be mounted to /&lt;name_of_the_persistence_item&gt;.
+Each entry supports: path, readOnly, subPath, subPathExpr, and mountPropagation.
+
+#### prefix
+
+Prefix to prepend to the resource name. Mutually exclusive with forceRename.
+
+#### size
+
+The amount of storage that is requested for the persistent volume.
+
+#### storageClass
+
+Storage Class for the config volume.
+If set to &#39;-&#39;, dynamic provisioning is disabled.
+If set to something else, the given storageClass is used.
+If undefined (the default) or set to null, no storageClassName spec is set, choosing the default provisioner.
+
+#### suffix
+
+Suffix to append to the resource name. Defaults to the resource identifier if there are multiple items, otherwise empty. Mutually exclusive with forceRename.
+
+## Related Pages
+
+
+- [`dataSource`](./datasource/)
+- [`dataSourceRef`](./datasourceref/)

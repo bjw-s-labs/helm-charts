@@ -1,393 +1,506 @@
 {
-  "item": {
-    "oneOf": [
-      { "$ref": "#/persistentVolumeClaimItem" },
-      { "$ref": "#/persistentVolumeClaimWithExistingClaimItem" },
-      { "$ref": "#/configMapItem" },
-      { "$ref": "#/secretItem" },
-      { "$ref": "#/nfsItem" },
-      { "$ref": "#/emptyDirItem" },
-      { "$ref": "#/hostPathItem" },
-      { "$ref": "#/imageItem" },
-      { "$ref": "#/customItem" }
-    ]
-  },
-
-  "persistentVolumeClaimItem": {
-    "allOf": [
-      { "$ref": "definitions.json#/resourceIdentifier" },
-      {
-        "type": "object",
-        "additionalProperties": false,
-
-        "properties": {
-          "type": {
-            "const": "persistentVolumeClaim"
-          },
-          "forceRename": {},
-          "prefix": {},
-          "suffix": {},
-          "enabled": {
-            "type": "boolean",
-            "default": true,
-            "description": "Set to false to disable the persistence item."
-          },
-          "accessMode": {
-            "type": "string",
-            "description": "AccessMode for the persistent volume. Make sure to select an access mode that is supported by your storage provider!\nSee https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes"
-          },
-          "annotations": {
-            "$ref": "definitions.json#/annotations"
-          },
-          "dataSource": {
-            "$ref": "#/dataSourceReference",
-            "description": "The optional data source for the persistentVolumeClaim.\nSee https://kubernetes.io/docs/concepts/storage/persistent-volumes/#volume-populators-and-data-sources"
-          },
-          "dataSourceRef": {
-            "$ref": "#/dataSourceReference",
-            "description": "The optional volume populator for the persistentVolumeClaim.\nSee https://kubernetes.io/docs/concepts/storage/persistent-volumes/#volume-populators-and-data-sources"
-          },
-          "labels": {
-            "$ref": "definitions.json#/labels"
-          },
-          "retain": {
-            "type": "boolean",
-            "description": "Set to true to retain the PVC upon helm uninstall."
-          },
-          "size": {
-            "type": "string",
-            "description": "The amount of storage that is requested for the persistent volume."
-          },
-          "storageClass": {
-            "type": "string",
-            "description": "Storage Class for the config volume.\nIf set to '-', dynamic provisioning is disabled.\nIf set to something else, the given storageClass is used.\nIf undefined (the default) or set to null, no storageClassName spec is set, choosing the default provisioner."
-          },
-          "volumeName": {
-            "type": "string"
-          },
-          "advancedMounts": {
-            "$ref": "#/advancedMounts",
-            "description": "Explicitly configure mounts for specific controllers and containers.\nSee https://bjw-s-labs.github.io/helm-charts/docs/common-library/storage/globalOptions/#advancedmounts"
-          },
-          "globalMounts": {
-            "$ref": "#/globalMounts",
-            "description": "Configure mounts to all controllers and containers.\nBy default the persistence item will be mounted to /<name_of_the_peristence_item>.\nSee https://bjw-s-labs.github.io/helm-charts/docs/common-library/storage/globalOptions/#globalmounts"
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.0.0/charts/library/common/schemas/persistence.json",
+  "$defs": {
+    "item": {
+      "properties": {
+        "enabled": {
+          "description": "Set to false to disable the persistence item.",
+          "type": "boolean",
+          "default": true
+        },
+        "globalMounts": {
+          "$ref": "#/$defs/globalMounts",
+          "description": "Configure mounts to all controllers and containers.\nBy default the persistence item will be mounted to /<name_of_the_persistence_item>.\nEach entry supports: path, readOnly, subPath, subPathExpr, and mountPropagation."
+        },
+        "advancedMounts": {
+          "$ref": "#/$defs/advancedMounts",
+          "description": "Explicitly configure mounts for specific controllers and containers.\nStructure: advancedMounts.<controller_name>.<container_name>[].path\nUse this instead of globalMounts when different controllers need different mount configurations."
+        }
+      },
+      "unevaluatedProperties": false,
+      "oneOf": [
+        {
+          "$ref": "#/$defs/item.type.persistentVolumeClaim"
+        },
+        {
+          "$ref": "#/$defs/item.type.persistentVolumeClaimExisting"
+        },
+        {
+          "$ref": "#/$defs/item.type.configMap"
+        },
+        {
+          "$ref": "#/$defs/item.type.secret"
+        },
+        {
+          "$ref": "#/$defs/item.type.nfs"
+        },
+        {
+          "$ref": "#/$defs/item.type.emptyDir"
+        },
+        {
+          "$ref": "#/$defs/item.type.ephemeral"
+        },
+        {
+          "$ref": "#/$defs/item.type.hostPath"
+        },
+        {
+          "$ref": "#/$defs/item.type.image"
+        },
+        {
+          "$ref": "#/$defs/item.type.custom"
+        }
+      ]
+    },
+    "item.type.persistentVolumeClaim": {
+      "type": "object",
+      "description": "Dynamically provision a PersistentVolumeClaim. This is the default persistence type and will be used when no type is specified.",
+      "examples": [
+        "persistence:\n  config:\n    type: persistentVolumeClaim\n    accessMode: ReadWriteOnce\n    size: 1Gi",
+        "persistence:\n  config:\n    type: persistentVolumeClaim\n    accessMode: ReadWriteOnce\n    size: 10Gi\n    storageClass: fast-ssd\n    retain: true\n    globalMounts:\n      - path: /config"
+      ],
+      "allOf": [
+        {
+          "$ref": "definitions.json#/$defs/resourceIdentifier"
+        }
+      ],
+      "required": [
+        "accessMode",
+        "size"
+      ],
+      "properties": {
+        "type": {
+          "const": "persistentVolumeClaim"
+        },
+        "accessMode": {
+          "type": "string",
+          "description": "AccessMode for the persistent volume. Make sure to select an access mode that is supported by your storage provider!\nSee https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes"
+        },
+        "annotations": {
+          "$ref": "definitions.json#/$defs/annotations"
+        },
+        "dataSource": {
+          "$ref": "#/$defs/dataSourceReference",
+          "description": "The optional data source for the persistentVolumeClaim.\nSee https://kubernetes.io/docs/concepts/storage/persistent-volumes/#volume-populators-and-data-sources"
+        },
+        "dataSourceRef": {
+          "$ref": "#/$defs/dataSourceReference",
+          "description": "The optional volume populator for the persistentVolumeClaim.\nSee https://kubernetes.io/docs/concepts/storage/persistent-volumes/#volume-populators-and-data-sources"
+        },
+        "labels": {
+          "$ref": "definitions.json#/$defs/labels"
+        },
+        "retain": {
+          "type": "boolean",
+          "description": "Set to true to retain the PVC upon helm uninstall."
+        },
+        "size": {
+          "type": "string",
+          "description": "The amount of storage that is requested for the persistent volume."
+        },
+        "storageClass": {
+          "type": "string",
+          "description": "Storage Class for the config volume.\nIf set to '-', dynamic provisioning is disabled.\nIf set to something else, the given storageClass is used.\nIf undefined (the default) or set to null, no storageClassName spec is set, choosing the default provisioner."
+        },
+        "volumeName": {
+          "type": "string"
+        }
+      }
+    },
+    "item.type.persistentVolumeClaimExisting": {
+      "type": "object",
+      "description": "Attach an existing PersistentVolumeClaim instead of creating a new one.",
+      "examples": [
+        "persistence:\n  config:\n    type: persistentVolumeClaim\n    existingClaim: my-app-data"
+      ],
+      "required": [
+        "existingClaim"
+      ],
+      "properties": {
+        "type": {
+          "const": "persistentVolumeClaim"
+        },
+        "existingClaim": {
+          "type": "string",
+          "description": "The name of an existing PersistentVolumeClaim to use. Helm templates are supported.\nThis will not create a new PVC, but use the existing one instead."
+        }
+      }
+    },
+    "item.type.configMap": {
+      "type": "object",
+      "description": "Mount a ConfigMap as a volume. Use 'name' for external ConfigMaps, or 'identifier' to reference one managed by this chart.",
+      "examples": [
+        "persistence:\n  config:\n    type: configMap\n    name: my-configmap",
+        "persistence:\n  config:\n    type: configMap\n    identifier: my-chart-configmap\n    globalMounts:\n      - path: /etc/app/config\n        readOnly: true",
+        "persistence:\n  config:\n    type: configMap\n    name: my-configmap\n    items:\n      - key: settings.yaml\n        path: settings.yaml"
+      ],
+      "required": [
+        "type"
+      ],
+      "$comment": "oneOf enforces that at least one of name/identifier is present. dependentSchemas enforces mutual exclusion with a targeted error when both are set. Both are needed — do not simplify to oneOf alone.",
+      "oneOf": [
+        {
+          "required": [
+            "name"
+          ]
+        },
+        {
+          "required": [
+            "identifier"
+          ]
+        }
+      ],
+      "dependentSchemas": {
+        "name": {
+          "not": {
+            "required": [
+              "identifier"
+            ]
           }
         },
-        "required": ["accessMode", "size"]
-      }
-    ]
-  },
-
-  "persistentVolumeClaimWithExistingClaimItem": {
-    "type": "object",
-    "additionalProperties": false,
-
-    "properties": {
-      "type": {
-        "const": "persistentVolumeClaim"
-      },
-      "enabled": {
-        "type": "boolean",
-        "default": true
-      },
-      "existingClaim": {
-        "type": "string",
-        "description": "The name of an existing PersistentVolumeClaim to use. Helm templates are supported.\nThis will not create a new PVC, but use the existing one instead."
-      },
-      "advancedMounts": { "$ref": "#/advancedMounts" },
-      "globalMounts": { "$ref": "#/globalMounts" }
-    },
-    "required": ["existingClaim"]
-  },
-
-  "configMapItem": {
-    "type": "object",
-    "additionalProperties": false,
-
-    "properties": {
-      "type": {
-        "const": "configMap"
-      },
-      "enabled": {
-        "type": "boolean",
-        "default": true
-      },
-      "name": {
-        "type": "string"
-      },
-      "identifier": {
-        "type": "string"
-      },
-      "defaultMode": {
-        "type": "integer",
-        "format": "int32"
-      },
-      "items": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "key": {
-              "type": "string"
-            },
-            "mode": {
-              "format": "int32",
-              "type": "integer"
-            },
-            "path": {
-              "type": "string"
-            }
+        "identifier": {
+          "not": {
+            "required": [
+              "name"
+            ]
           }
         }
       },
-      "advancedMounts": { "$ref": "#/advancedMounts" },
-      "globalMounts": { "$ref": "#/globalMounts" }
-    },
-    "oneOf": [{ "required": ["name"] }, { "required": ["identifier"] }],
-    "dependencies": {
-      "name": {
-        "not": { "required": ["identifier"] }
-      },
-      "identifier": {
-        "not": { "required": ["name"] }
-      }
-    }
-  },
-
-  "secretItem": {
-    "type": "object",
-    "additionalProperties": false,
-
-    "properties": {
-      "type": {
-        "const": "secret"
-      },
-      "enabled": {
-        "type": "boolean",
-        "default": true
-      },
-      "name": {
-        "type": "string"
-      },
-      "identifier": {
-        "type": "string"
-      },
-      "defaultMode": {
-        "type": "integer",
-        "format": "int32"
-      },
-      "items": {
-        "type": "array",
+      "properties": {
+        "type": {
+          "const": "configMap"
+        },
+        "name": {
+          "type": "string"
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "defaultMode": {
+          "type": "integer",
+          "format": "int32"
+        },
         "items": {
-          "type": "object",
-          "properties": {
-            "key": {
-              "type": "string"
-            },
-            "mode": {
-              "format": "int32",
-              "type": "integer"
-            },
-            "path": {
-              "type": "string"
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "mode": {
+                "format": "int32",
+                "type": "integer"
+              },
+              "path": {
+                "type": "string"
+              }
             }
           }
         }
-      },
-      "advancedMounts": { "$ref": "#/advancedMounts" },
-      "globalMounts": { "$ref": "#/globalMounts" }
-    },
-    "oneOf": [{ "required": ["name"] }, { "required": ["identifier"] }],
-    "dependencies": {
-      "name": {
-        "not": { "required": ["identifier"] }
-      },
-      "identifier": {
-        "not": { "required": ["name"] }
-      }
-    }
-  },
-
-  "nfsItem": {
-    "type": "object",
-    "additionalProperties": false,
-
-    "properties": {
-      "type": {
-        "const": "nfs"
-      },
-      "enabled": {
-        "type": "boolean",
-        "default": true
-      },
-      "path": {
-        "type": "string"
-      },
-      "server": {
-        "type": "string"
-      },
-      "advancedMounts": { "$ref": "#/advancedMounts" },
-      "globalMounts": { "$ref": "#/globalMounts" }
-    },
-    "required": ["server", "path"]
-  },
-
-  "emptyDirItem": {
-    "type": "object",
-    "additionalProperties": false,
-
-    "properties": {
-      "type": {
-        "const": "emptyDir"
-      },
-      "enabled": {
-        "type": "boolean",
-        "default": true
-      },
-      "medium": {
-        "type": "string"
-      },
-      "sizeLimit": {
-        "type": "string"
-      },
-      "advancedMounts": { "$ref": "#/advancedMounts" },
-      "globalMounts": { "$ref": "#/globalMounts" }
-    }
-  },
-
-  "hostPathItem": {
-    "type": "object",
-    "additionalProperties": false,
-
-    "properties": {
-      "type": {
-        "const": "hostPath"
-      },
-      "enabled": {
-        "type": "boolean",
-        "default": true
-      },
-      "hostPath": {
-        "type": "string"
-      },
-      "hostPathType": {
-        "type": "string"
-      },
-      "advancedMounts": { "$ref": "#/advancedMounts" },
-      "globalMounts": { "$ref": "#/globalMounts" }
-    }
-  },
-
-  "imageItem": {
-    "type": "object",
-    "additionalProperties": false,
-
-    "properties": {
-      "type": {
-        "const": "image"
-      },
-      "enabled": {
-        "description": "Set to false to disable the persistence item.",
-        "type": "boolean",
-        "default": true
-      },
-      "image": {
-        "description": "OCI artifact reference to be used.",
-        "oneOf": [
-          { "type": "string" },
-          { "$ref": "definitions.json#/imageSpecification" }
-        ]
-      },
-      "pullPolicy": {
-        "description": "The image pull policy for the image persistence item.",
-        "type": "string",
-        "enum": ["Always", "Never", "IfNotPresent"]
-      },
-      "advancedMounts": { "$ref": "#/advancedMounts" },
-      "globalMounts": { "$ref": "#/globalMounts" }
-    },
-    "required": ["image"]
-  },
-
-  "customItem": {
-    "type": "object",
-    "additionalProperties": false,
-
-    "properties": {
-      "type": {
-        "const": "custom"
-      },
-      "enabled": {
-        "type": "boolean",
-        "default": true
-      },
-      "volumeSpec": {
-        "type": "object"
-      },
-      "globalMounts": { "$ref": "#/globalMounts" },
-      "advancedMounts": { "$ref": "#/advancedMounts" }
-    },
-    "required": ["volumeSpec"]
-  },
-
-  "dataSourceReference": {
-    "type": "object",
-    "additionalProperties": false,
-    "properties": {
-      "apiGroup": {
-        "type": "string"
-      },
-      "kind": {
-        "type": "string"
-      },
-      "name": {
-        "type": "string"
       }
     },
-    "required": ["kind", "name"]
-  },
-
-  "globalMounts": {
-    "type": "array",
-    "items": {
-      "$ref": "#/mountPath"
-    }
-  },
-
-  "advancedMounts": {
-    "additionalProperties": {
+    "item.type.secret": {
       "type": "object",
-      "additionalProperties": {
-        "$ref": "#/mountPathCollection"
+      "description": "Mount a Secret as a volume. Use 'name' for external Secrets, or 'identifier' to reference one managed by this chart.",
+      "examples": [
+        "persistence:\n  credentials:\n    type: secret\n    name: my-secret",
+        "persistence:\n  tls:\n    type: secret\n    name: app-tls-cert\n    globalMounts:\n      - path: /etc/ssl/certs\n        readOnly: true"
+      ],
+      "required": [
+        "type"
+      ],
+      "$comment": "oneOf enforces that at least one of name/identifier is present. dependentSchemas enforces mutual exclusion with a targeted error when both are set. Both are needed — do not simplify to oneOf alone.",
+      "oneOf": [
+        {
+          "required": [
+            "name"
+          ]
+        },
+        {
+          "required": [
+            "identifier"
+          ]
+        }
+      ],
+      "dependentSchemas": {
+        "name": {
+          "not": {
+            "required": [
+              "identifier"
+            ]
+          }
+        },
+        "identifier": {
+          "not": {
+            "required": [
+              "name"
+            ]
+          }
+        }
+      },
+      "properties": {
+        "type": {
+          "const": "secret"
+        },
+        "name": {
+          "type": "string"
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "defaultMode": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "mode": {
+                "format": "int32",
+                "type": "integer"
+              },
+              "path": {
+                "type": "string"
+              }
+            }
+          }
+        }
       }
-    }
-  },
-
-  "mountPathCollection": {
-    "type": "array",
-    "items": { "$ref": "#/mountPath" }
-  },
-
-  "mountPath": {
-    "additionalProperties": false,
-    "properties": {
-      "path": {
-        "type": "string",
-        "description": "The path where the volume should be mounted in the container. Helm templates are supported.\nIf not specified, the mount path will be set to /<identifier_of_the_peristence_item>."
-      },
-      "readOnly": {
-        "type": "boolean"
-      },
-      "subPath": {
-        "type": "string",
-        "description": "The subPath within the volume to mount. Helm templates are supported.\nIf not specified, the entire volume will be mounted."
-      },
-      "subPathExpr": {
-        "type": "string"
-      },
-      "mountPropagation": {
-        "type": "string"
+    },
+    "item.type.nfs": {
+      "type": "object",
+      "description": "Mount an NFS share as a volume.",
+      "examples": [
+        "persistence:\n  media:\n    type: nfs\n    server: 192.168.1.100\n    path: /mnt/share/media",
+        "persistence:\n  backups:\n    type: nfs\n    server: nas.example.lan\n    path: /volume/Backups/k8s/app\n    globalMounts:\n      - path: /backups"
+      ],
+      "required": [
+        "type",
+        "server",
+        "path"
+      ],
+      "properties": {
+        "type": {
+          "const": "nfs"
+        },
+        "path": {
+          "type": "string",
+          "description": "The NFS export path on the server."
+        },
+        "server": {
+          "type": "string",
+          "description": "The NFS server hostname or IP address."
+        }
+      }
+    },
+    "item.type.emptyDir": {
+      "type": "object",
+      "description": "Use an emptyDir volume for scratch space or sharing data between containers in the same pod. Data is lost when the pod is removed.",
+      "examples": [
+        "persistence:\n  tmp:\n    type: emptyDir",
+        "persistence:\n  cache:\n    type: emptyDir\n    medium: Memory\n    sizeLimit: 256Mi"
+      ],
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "const": "emptyDir"
+        },
+        "medium": {
+          "type": "string",
+          "description": "Storage medium. Set to 'Memory' for tmpfs (RAM-backed). Leave empty for node disk."
+        },
+        "sizeLimit": {
+          "type": "string",
+          "description": "Maximum size of the volume (e.g. '1Gi'). Only enforced for tmpfs."
+        }
+      }
+    },
+    "item.type.ephemeral": {
+      "type": "object",
+      "description": "Use a generic ephemeral volume for scratch space or sharing data between containers. The volume is created and deleted with the pod.",
+      "examples": [
+        "persistence:\n  cache:\n    type: ephemeral",
+        "persistence:\n  cache:\n    type: ephemeral\n    accessMode: ReadWriteOnce\n    storageClass: fast-ssd\n    size: 10Gi"
+      ],
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "const": "ephemeral"
+        },
+        "accessMode": {
+          "type": "string",
+          "description": "AccessMode for the ephemeral volume. Make sure to select an access mode that is supported by your storage provider!\nSee https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes"
+        },
+        "storageClass": {
+          "type": "string",
+          "description": "Storage Class for the ephemeral volume.\nIf set to '-', dynamic provisioning is disabled.\nIf set to something else, the given storageClass is used.\nIf undefined (the default) or set to null, no storageClassName spec is set, choosing the default provisioner."
+        },
+        "size": {
+          "type": "string",
+          "description": "The amount of storage that is requested for the ephemeral volume."
+        }
+      }
+    },
+    "item.type.hostPath": {
+      "type": "object",
+      "description": "Mount a path from the host node into the pod. Use with caution as it ties the pod to a specific node.",
+      "examples": [
+        "persistence:\n  dev-tun:\n    type: hostPath\n    hostPath: /dev/net/tun\n    hostPathType: CharDevice",
+        "persistence:\n  data:\n    type: hostPath\n    hostPath: /mnt/local-data\n    hostPathType: DirectoryOrCreate"
+      ],
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "const": "hostPath"
+        },
+        "hostPath": {
+          "type": "string",
+          "description": "Path on the host node to mount."
+        },
+        "hostPathType": {
+          "type": "string",
+          "description": "Type of the host path. Values: DirectoryOrCreate, Directory, FileOrCreate, File, Socket, CharDevice, BlockDevice."
+        }
+      }
+    },
+    "item.type.image": {
+      "type": "object",
+      "description": "Mount OCI image or artifact contents as a read-only volume. Requires Kubernetes 1.31+ with the ImageVolume feature gate.",
+      "examples": [
+        "persistence:\n  static-assets:\n    type: image\n    image: registry.example.com/assets:v1.0",
+        "persistence:\n  tools:\n    type: image\n    image:\n      repository: registry.example.com/tools\n      tag: latest\n    pullPolicy: Always"
+      ],
+      "required": [
+        "type",
+        "image"
+      ],
+      "properties": {
+        "type": {
+          "const": "image"
+        },
+        "image": {
+          "description": "OCI artifact reference to be used.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "definitions.json#/$defs/imageSpecification"
+            }
+          ]
+        },
+        "pullPolicy": {
+          "description": "The image pull policy for the image persistence item.",
+          "type": "string",
+          "enum": [
+            "Always",
+            "Never",
+            "IfNotPresent"
+          ]
+        }
+      }
+    },
+    "item.type.custom": {
+      "type": "object",
+      "description": "Specify a custom volume type not covered by the built-in types. The volumeSpec is passed through directly to the pod spec.",
+      "examples": [
+        "persistence:\n  ceph:\n    type: custom\n    volumeSpec:\n      cephfs:\n        monitors:\n          - 10.0.0.1:6789\n        user: admin\n        secretRef:\n          name: ceph-secret",
+        "persistence:\n  projected:\n    type: custom\n    volumeSpec:\n      projected:\n        sources:\n          - secret:\n              name: my-secret\n          - configMap:\n              name: my-config"
+      ],
+      "required": [
+        "type",
+        "volumeSpec"
+      ],
+      "properties": {
+        "type": {
+          "const": "custom"
+        },
+        "volumeSpec": {
+          "type": "object",
+          "description": "Raw Kubernetes volume specification. Passed through directly to the pod spec volumes list."
+        }
+      }
+    },
+    "dataSourceReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "name"
+      ],
+      "properties": {
+        "apiGroup": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "globalMounts": {
+      "description": "Mount the volume to all controllers and containers. Each entry specifies a mount point.",
+      "type": "array",
+      "examples": [
+        "globalMounts:\n  - path: /config",
+        "globalMounts:\n  - path: /data\n    readOnly: true\n  - path: /data/subdir\n    subPath: subdir"
+      ],
+      "items": {
+        "$ref": "#/$defs/mountPath"
+      }
+    },
+    "advancedMounts": {
+      "description": "Mount the volume to specific controllers and containers. Use when different containers need different mount configurations.",
+      "examples": [
+        "advancedMounts:\n  main:\n    main:\n      - path: /config\n    sidecar:\n      - path: /shared\n        readOnly: true"
+      ],
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#/$defs/mountPathCollection"
+        }
+      }
+    },
+    "mountPathCollection": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/mountPath"
+      }
+    },
+    "mountPath": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "The path where the volume should be mounted in the container. Helm templates are supported.\nIf not specified, the mount path will be set to /<identifier_of_the_peristence_item>."
+        },
+        "readOnly": {
+          "type": "boolean"
+        },
+        "subPath": {
+          "type": "string",
+          "description": "The subPath within the volume to mount. Helm templates are supported.\nIf not specified, the entire volume will be mounted."
+        },
+        "subPathExpr": {
+          "type": "string"
+        },
+        "mountPropagation": {
+          "type": "string"
+        }
       }
     }
   }

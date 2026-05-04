@@ -20,7 +20,7 @@ envFrom field used by the container.
         {{- if not (empty (dig "identifier" nil .configMapRef)) -}}
           {{- $configMap := include "bjw-s.common.lib.configMap.getByIdentifier" (dict "rootContext" $rootContext "id" .configMapRef.identifier) | fromYaml -}}
           {{- if empty $configMap -}}
-            {{- fail (printf "No configMap configured with identifier '%s'" .configMapRef.identifier) -}}
+            {{- fail (printf "Container '%s': No ConfigMap found with identifier '%s'. Ensure a ConfigMap with this identifier exists and is enabled under 'configMaps.%s'." $containerObject.identifier .configMapRef.identifier .configMapRef.identifier) -}}
           {{- end -}}
 
           {{- $_ := set $item "configMapRef" (dict "name" $configMap.name) -}}
@@ -38,7 +38,7 @@ envFrom field used by the container.
         {{- if not (empty (dig "identifier" nil .secretRef)) -}}
           {{- $secret := include "bjw-s.common.lib.secret.getByIdentifier" (dict "rootContext" $rootContext "id" .secretRef.identifier) | fromYaml -}}
           {{- if empty $secret -}}
-            {{- fail (printf "No secret configured with identifier '%s'" .secretRef.identifier) -}}
+            {{- fail (printf "Container '%s': No Secret found with identifier '%s'. Ensure a Secret with this identifier exists and is enabled under 'secrets.%s'." $containerObject.identifier .secretRef.identifier .secretRef.identifier) -}}
           {{- end -}}
 
           {{- $_ := set $item "secretRef" (dict "name" $secret.name) -}}

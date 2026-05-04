@@ -1,0 +1,58 @@
+---
+title: "rawResources"
+description: "Allows for the inclusion of raw Kubernetes resources that are not supported by the chart otherwise\u200b"
+sidebar:
+  label: "rawResources"
+---
+
+Allows for the inclusion of raw Kubernetes resources that are not supported by the chart otherwise​
+
+## Type
+
+`object`
+
+## Usage
+
+Keys are identifiers for `rawResources` instances.
+
+```yaml
+rawResources:
+  main:
+    enabled: true
+    # ... configuration
+
+  secondary:
+    enabled: true
+    # ... configuration
+```
+
+## Instance Properties
+Available properties:
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `enabled` | `boolean` | No | `true` | Set to false to disable the resource. |
+| `forceRename` | `string` | No | - | Override the default resource name. Mutually exclusive wi... |
+| [`manifest`](./manifest/) | `object` | **Yes** | - | The raw K8s resource manifest to be rendered. apiVersion ... |
+| `prefix` | `string` | No | `` | Prefix to prepend to the resource name. Mutually exclusiv... |
+| `suffix` | `string` | No | - | Suffix to append to the resource name. Defaults to the re... |
+
+### Property Details
+
+#### forceRename
+
+Override the default resource name. Mutually exclusive with prefix and suffix.
+
+#### prefix
+
+Prefix to prepend to the resource name. Mutually exclusive with forceRename.
+
+#### suffix
+
+Suffix to append to the resource name. Defaults to the resource identifier if there are multiple items, otherwise empty. Mutually exclusive with forceRename.
+
+## Related Pages
+
+
+- [`manifest`](./manifest/)

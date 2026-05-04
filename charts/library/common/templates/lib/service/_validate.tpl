@@ -11,7 +11,7 @@ Validate Service values
   {{/* Verify automatic controller detection */}}
   {{- if not (eq 1 (len $enabledControllers)) -}}
     {{- if or (not (has "controller" (keys $serviceObject))) (empty (get $serviceObject "controller")) -}}
-      {{- fail (printf "controller field is required because automatic controller detection is not possible. (service: %s)" $serviceObject.identifier ) -}}
+      {{- fail (printf "Service '%s': controller field is required because automatic controller detection is not possible (found %d enabled controllers). Please specify which controller this service should use." $serviceObject.identifier (len $enabledControllers)) -}}
     {{- end -}}
   {{- end -}}
 
@@ -21,7 +21,11 @@ Validate Service values
 
   {{- $serviceController := include "bjw-s.common.lib.controller.getByIdentifier" (dict "rootContext" $rootContext "id" $serviceObject.controller) -}}
   {{- if empty $serviceController -}}
-    {{- fail (printf "No enabled controller found with this identifier. (service: '%s', controller: '%s')" $serviceObject.identifier $serviceObject.controller) -}}
+    {{- $availableControllers := list -}}
+    {{- range $key, $ctrl := $enabledControllers -}}
+      {{- $availableControllers = append $availableControllers $key -}}
+    {{- end -}}
+    {{- fail (printf "Service '%s': No enabled controller found with identifier '%s'. Available controllers: [%s]" $serviceObject.identifier $serviceObject.controller (join ", " $availableControllers)) -}}
   {{- end -}}
 
   {{- /* Validate Service type */ -}}
@@ -39,7 +43,24 @@ Validate Service values
     {{- $enabledPorts := include "bjw-s.common.lib.service.enabledPorts" (dict "rootContext" $rootContext "serviceObject" $serviceObject) | fromYaml }}
     {{- /* Validate at least one port is enabled */ -}}
     {{- if not $enabledPorts -}}
-      {{- fail (printf "No ports are enabled for Service with this identifier. (service: '%s')" $serviceObject.identifier) -}}
+      {{- $serviceType := $serviceObject.type | default "ClusterIP" -}}
+      {{- fail (printf "Service '%s': No ports are enabled. At least one port must be enabled for service type '%s'. Add ports under 'services.%s.ports' in your values." $serviceObject.identifier $serviceType $serviceObject.identifier) -}}
+    {{- end -}}
+
+    {{- /* Validate no duplicate port number+protocol combinations */ -}}
+    {{- $seenPorts := dict -}}
+    {{- range $name, $port := $enabledPorts -}}
+      {{- if $port.port -}}
+        {{- $portProtocol := $port.protocol | default "TCP" -}}
+        {{- if has $portProtocol (list "HTTP" "HTTPS") -}}
+          {{- $portProtocol = "TCP" -}}
+        {{- end -}}
+        {{- $portKey := printf "%v/%s" $port.port $portProtocol -}}
+        {{- if hasKey $seenPorts $portKey -}}
+          {{- fail (printf "Duplicate port %v/%s found in Service. (service: '%s', ports: '%s' and '%s')" $port.port $portProtocol $serviceObject.identifier (get $seenPorts $portKey) $name) -}}
+        {{- end -}}
+        {{- $_ := set $seenPorts $portKey $name -}}
+      {{- end -}}
     {{- end -}}
   {{- end -}}
 {{- end -}}
