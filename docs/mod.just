@@ -48,6 +48,6 @@ generate CHART="library/common":
     "$TOOL" generate llms-txt \
       --schema "$CHART_DIR/values.schema.json" \
       --output "{{ DOCS_DIR }}/public/llms.txt" \
-      --base-url "https://bjw-s-labs.github.io/helm-charts"
+      --base-url "https://bjw-s-labs.github.io/helm-charts/docs"
 
     echo "Done."
