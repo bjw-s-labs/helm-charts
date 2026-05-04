@@ -8,6 +8,7 @@ pipx.uvx = true
 [tools]
 rust = "1.94.1"                      # Required for schematools
 go = "1.26.2"                       # Required for helm-schema-tools
+node = "24"                         # Required for Astro (>=22.12.0)
 bun = "latest"                      # Required for docs site
 k3d = "5.8.3"
 "aqua:astral-sh/uv" = "0.11.2"
