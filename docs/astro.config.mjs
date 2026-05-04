@@ -7,7 +7,7 @@ import starlightLinksValidator from "starlight-links-validator";
 
 export default defineConfig({
   site: "https://bjw-s-labs.github.io",
-  base: "/helm-charts",
+  base: "/helm-charts/docs",
   markdown: {
     shikiConfig: {
       langs: [],
