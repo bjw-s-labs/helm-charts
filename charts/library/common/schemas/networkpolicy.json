@@ -23,17 +23,29 @@
           "description": "Controller this NetworkPolicy should target.",
           "type": "string"
         },
+        "extraSelectorLabels": {
+          "description": "Additional match labels to add to the pod selector. These are merged with labels derived from the controller identifier.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
         "labels": {
           "$ref": "definitions.json#/$defs/labels"
         },
         "podSelector": {
-          "description": "Custom podSelector for the NetworkPolicy. Takes precedence over targeting a controller."
+          "description": "Custom podSelector for the NetworkPolicy. Takes precedence over targeting a controller via the controller identifier."
         },
         "policyTypes": {
           "description": "Policy types for the NetworkPolicy.",
           "type": "array",
+          "minItems": 1,
           "items": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "Egress",
+              "Ingress"
+            ]
           }
         },
         "rules": {
@@ -58,7 +70,24 @@
           }
         }
       },
+      "dependentSchemas": {
+        "podSelector": {
+          "not": {
+            "required": [
+              "controller"
+            ]
+          }
+        },
+        "controller": {
+          "not": {
+            "required": [
+              "podSelector"
+            ]
+          }
+        }
+      },
       "required": [
+        "policyTypes",
         "rules"
       ]
     }

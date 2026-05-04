@@ -5,34 +5,54 @@ templates:
   - common.yaml
 values:
   - ../_values/controllers_main_default_container.yaml
-set:
-  networkpolicies:
-    main:
-      controller: ""
-      rules: {}
 tests:
-  - it: networkpolicy requires either controller reference or podSelector
-    asserts:
-      - failedTemplate:
-          errorMessage: "controller reference or podSelector is required for NetworkPolicy. (NetworkPolicy main)"
-
-  - it: policyTypes is required
+  - it: networkpolicy requires either controller reference or podSelector when multiple controllers exist
     set:
+      controllers:
+        secondary:
+          containers:
+            main:
+              image:
+                repository: nginx
+                tag: latest
       networkpolicies:
         main:
-          controller: main
-          policyTypes: []
-    asserts:
-      - failedTemplate:
-          errorMessage: "policyTypes is required for NetworkPolicy. (NetworkPolicy main)"
-
-  - it: policyTypes values check
-    set:
-      networkpolicies:
-        main:
-          controller: main
           policyTypes:
-            - test
+            - Ingress
+          rules: {}
     asserts:
       - failedTemplate:
-          errorMessage: "Not a valid policyType for NetworkPolicy. (NetworkPolicy main, value test)"
+          errorMessage: "NetworkPolicy 'main': controller or podSelector field is required because automatic controller detection is not possible (found 2 enabled controllers). Please specify which controller this NetworkPolicy should reference."
+
+  - it: networkpolicy auto-detects single controller when controller not specified
+    set:
+      networkpolicies:
+        main:
+          policyTypes:
+            - Ingress
+          rules: {}
+    documentSelector:
+      path: $[?(@.kind == "NetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.podSelector
+          value:
+            matchLabels:
+              app.kubernetes.io/controller: main
+              app.kubernetes.io/instance: RELEASE-NAME
+              app.kubernetes.io/name: RELEASE-NAME
+
+  - it: networkpolicy fails validation when controller and podSelector are both specified
+    set:
+      networkpolicies:
+        main:
+          controller: main
+          podSelector:
+            matchLabels:
+              app: custom-app
+          policyTypes:
+            - Ingress
+          rules: {}
+    asserts:
+      - failedTemplate: {}

@@ -35,15 +35,20 @@ Available properties:
 | `annotations` | `object / null` | No | - | Annotations to set on the item. |
 | `controller` | `string` | No | - | Controller this NetworkPolicy should target. |
 | `enabled` | `boolean` | No | `true` | Set to false to disable the NetworkPolicy. |
+| `extraSelectorLabels` | `object` | No | - | Additional match labels to add to the pod selector. These... |
 | `forceRename` | `string` | No | - | Override the default resource name. Mutually exclusive wi... |
 | `labels` | `object / null` | No | - | Labels to set on the item. |
 | `podSelector` | `any` | No | - | Custom podSelector for the NetworkPolicy. Takes precedenc... |
-| `policyTypes` | `array` | No | - | Policy types for the NetworkPolicy. |
+| `policyTypes` | `array` | **Yes** | - | Policy types for the NetworkPolicy. |
 | `prefix` | `string` | No | `` | Prefix to prepend to the resource name. Mutually exclusiv... |
 | [`rules`](./rules/) | `object` | **Yes** | - | Ingress and egress rules for the NetworkPolicy. See https... |
 | `suffix` | `string` | No | - | Suffix to append to the resource name. Defaults to the re... |
 
 ### Property Details
+
+#### extraSelectorLabels
+
+Additional match labels to add to the pod selector. These are merged with labels derived from the controller identifier.
 
 #### forceRename
 
@@ -51,7 +56,7 @@ Override the default resource name. Mutually exclusive with prefix and suffix.
 
 #### podSelector
 
-Custom podSelector for the NetworkPolicy. Takes precedence over targeting a controller.
+Custom podSelector for the NetworkPolicy. Takes precedence over targeting a controller via the controller identifier.
 
 #### prefix
 

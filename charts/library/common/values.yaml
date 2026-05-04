@@ -2244,10 +2244,13 @@ networkpolicies: {}
     # annotations: {}
     # -- (string) Controller this NetworkPolicy should target.
     # controller:
+    # -- Additional match labels to add to the pod selector. These are merged with
+    # labels derived from the controller identifier.
+    # extraSelectorLabels: {}
     # -- Labels to set on the item.
     # labels: {}
     # -- Custom podSelector for the NetworkPolicy. Takes precedence over targeting a
-    # controller.
+    # controller via the controller identifier.
     # podSelector: null
     # -- Policy types for the NetworkPolicy.
     # policyTypes: []
