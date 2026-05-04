@@ -12,6 +12,7 @@ controllers:
   multus:
     type: daemonset
     pod:
+      automountServiceAccountToken: true
       hostNetwork: true
       priorityClassName: system-node-critical
       tolerations:
@@ -93,9 +94,6 @@ rbac:
             - "create"
             - "patch"
             - "update"
-
-serviceAccount:
-  multus: {}
 
 {{- end -}}
 {{- $_ := mergeOverwrite .Values (include "multus.hardcodedValues" . | fromYaml) -}}
