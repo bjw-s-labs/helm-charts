@@ -9,7 +9,7 @@ How to deploy Home-Assistant with a code-server sidecar.
 
 ```yaml
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/app-template-4.6.2/charts/other/app-template/values.schema.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/app-template-5.0.0/charts/other/app-template/values.schema.json
 
 # Configure options applied to all pods
 defaultPodOptions:

@@ -9,7 +9,7 @@ How to deploy qBittorrent with a gluetun VPN sidecar.
 
 ```yaml
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/app-template-4.6.2/charts/other/app-template/values.schema.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/app-template-5.0.0/charts/other/app-template/values.schema.json
 
 # Configure options applied to all pods
 defaultPodOptions:
@@ -35,7 +35,7 @@ controllers:
           repository: ghcr.io/onedr0p/qbittorrent
           # -- image tag
           # this example is not automatically updated, so be sure to use the latest image
-          tag: 4.6.2
+          tag: 5.0.0
         # Configure the container-specific securityContext
         securityContext:
           runAsUser: 568
