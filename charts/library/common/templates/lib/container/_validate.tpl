@@ -6,7 +6,7 @@ Validate container values
   {{- $controllerObject := .controllerObject -}}
   {{- $containerObject := .containerObject -}}
 
-  {{- if not (kindIs "map" $containerObject.image)  -}}
+  {{- if or (empty $containerObject.image) (not (kindIs "map" $containerObject.image)) -}}
     {{- fail (printf "Container '%s': Image must be a dictionary with repository and tag fields. Define the image properly under 'controllers.%s.containers.%s.image'." $containerObject.identifier $controllerObject.identifier $containerObject.identifier) }}
   {{- end -}}
 

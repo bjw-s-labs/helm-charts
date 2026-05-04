@@ -72,7 +72,7 @@
           "description": "Set image pull secrets."
         },
         "labels": {
-          "$ref": "definitions.json#/$defs/annotations"
+          "$ref": "definitions.json#/$defs/labels"
         },
         "nodeSelector": {
           "type": "object",

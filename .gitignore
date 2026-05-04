@@ -4,3 +4,5 @@ charts/**/charts/
 
 # Testing
 __snapshot__/
+
+plans/

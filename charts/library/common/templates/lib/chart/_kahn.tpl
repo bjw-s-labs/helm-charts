@@ -40,8 +40,6 @@ source: https://github.com/dastrobu/helm-charts/blob/main/environment-variables/
     {{- end -}}
 
     {{- if empty $S -}}
-      {{- $contextType := .contextType | default "graph" -}}
-      {{- $contextId := .contextId | default "" -}}
       {{- $errorPrefix := "" -}}
       {{- if eq $contextType "container" -}}
         {{- $errorPrefix = printf "Cyclic dependency detected in container ordering for controller '%s'. " $contextId -}}

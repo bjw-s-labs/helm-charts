@@ -32,18 +32,18 @@ within the common library.
 
     {{- /* Build the pod selector */ -}}
     {{- $selectorLabels := dict "app.kubernetes.io/controller" $controllerIdentifier -}}
-    {{- /* Add extra selector labels if specified */ -}}
-    {{- if hasKey $networkPolicyObject "extraSelectorLabels" -}}
-      {{- $selectorLabels = merge
-        ($networkPolicyObject.extraSelectorLabels | default dict)
-        $selectorLabels
-      -}}
-    {{- end -}}
-    {{- /* Add global selector labels */ -}}
+    {{- /* Add global selector labels first */ -}}
     {{- $selectorLabels = merge
       (include "bjw-s.common.lib.metadata.selectorLabels" $rootContext | fromYaml)
       $selectorLabels
     -}}
+    {{- /* Add extra selector labels last (takes precedence) */ -}}
+    {{- if hasKey $networkPolicyObject "extraSelectorLabels" -}}
+      {{- $selectorLabels = merge
+        $selectorLabels
+        ($networkPolicyObject.extraSelectorLabels | default dict)
+      -}}
+    {{- end -}}
     {{- $podSelector = dict "matchLabels" $selectorLabels -}}
   {{- end -}}
 ---
