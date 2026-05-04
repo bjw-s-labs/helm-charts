@@ -13,6 +13,15 @@
   }
 }
 
+:root {
+  --sl-content-width: 60rem;
+}
+
+.sl-markdown-content
+  > :is(p, ul, ol, dl, h1, h2, h3, h4, h5, h6, blockquote, .starlight-aside) {
+  max-width: 48rem;
+}
+
 .sl-markdown-content .sl-heading-wrapper {
   margin-bottom: 1rem !important;
   margin-top: 1rem !important;
