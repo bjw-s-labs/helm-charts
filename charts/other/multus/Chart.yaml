@@ -17,4 +17,4 @@ annotations:
   artifacthub.io/changes: |-
     - kind: changed
       description: |-
-        Update common library to v5.0.0
+        Adjust values to common v5
