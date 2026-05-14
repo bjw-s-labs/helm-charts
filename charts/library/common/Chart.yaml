@@ -21,7 +21,7 @@ annotations:
         Pod spec.serviceAccountName now properly uses the resolved name (including global.nameOverride) when auto-detecting a single serviceAccount.
     - kind: fixed
       description: |-
-        Allow omitting namespace in route parentRefs.        
+        Allow omitting namespace in route parentRefs.
     - kind: changed
       description: |-
         Allow setting namespace field on rawResources.
