@@ -27,6 +27,9 @@ apiVersion: {{ $manifest.apiVersion }}
 kind: {{ $manifest.kind }}
 metadata:
   name: {{ $internalData.name }}
+  {{- with ($manifest.metadata).namespace }}
+  namespace: {{ tpl . $rootContext | quote }}
+  {{- end }}
   {{- with $labels }}
   labels:
     {{- toYaml . | nindent 4 }}

@@ -1,0 +1,41 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: rawResource - metadata - namespace
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+set:
+  rawResources.main:
+    manifest:
+      apiVersion: v1
+      kind: Endpoint
+      spec:
+        test: test
+tests:
+  - it: static namespace
+    set:
+      rawResources.main.manifest.metadata.namespace: test-namespace
+    asserts:
+      - containsDocument:
+          kind: Endpoint
+          apiVersion: v1
+          namespace: test-namespace
+          any: true
+
+  - it: templated namespace
+    set:
+      rawResources.main.manifest.metadata.namespace: '{{ "templated-namespace" }}'
+    asserts:
+      - containsDocument:
+          kind: Endpoint
+          apiVersion: v1
+          namespace: templated-namespace
+          any: true
+
+  - it: namespace is not present when not set
+    asserts:
+      - documentSelector:
+          path: $[?(@.kind == "Endpoint")]
+        notExists:
+          path: metadata.namespace

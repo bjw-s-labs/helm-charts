@@ -2457,6 +2457,13 @@ rawResources: {}
       # apiVersion: ""
       # -- Kind of the resource.
       # kind: ""
+      # metadata:
+        # -- Namespace of the resource.
+        # namespace: ""
+        # -- Labels to set on the item.
+        # labels: {}
+        # -- Annotations to set on the item.
+        # annotations: {}
     # -- (string) Override the default resource name. Mutually exclusive with prefix
     # and suffix.
     # forceRename:

@@ -27,6 +27,21 @@
             "kind": {
               "description": "Kind of the resource.",
               "type": "string"
+            },
+            "metadata": {
+              "type": "object",
+              "properties": {
+                "namespace": {
+                  "description": "Namespace of the resource.",
+                  "type": "string"
+                },
+                "labels": {
+                  "$ref": "definitions.json#/$defs/labels"
+                },
+                "annotations": {
+                  "$ref": "definitions.json#/$defs/annotations"
+                }
+              }
             }
           },
           "required": [
