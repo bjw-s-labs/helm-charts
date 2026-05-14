@@ -46,7 +46,9 @@ spec:
     - group: {{ .group | default "gateway.networking.k8s.io" }}
       kind: {{ .kind | default "Gateway" }}
       name: {{ required (printf "parentRef name is required for %v %v" $routeKind $routeObject.name) .name }}
-      namespace: {{ required (printf "parentRef namespace is required for %v %v" $routeKind $routeObject.name) .namespace }}
+      {{- if .namespace }}
+      namespace: {{ .namespace | quote }}
+      {{- end }}
       {{- if .sectionName }}
       sectionName: {{ .sectionName | quote }}
       {{- end }}

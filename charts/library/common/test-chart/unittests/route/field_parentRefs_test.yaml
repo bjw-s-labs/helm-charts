@@ -24,6 +24,29 @@ tests:
           path: spec.parentRefs[0].namespace
           value: parentNamespace
 
+  - it: namespace should be optional
+    set:
+      route:
+        main:
+          parentRefs:
+            - name: parentName
+        second:
+          parentRefs:
+            - name: parentName
+              namespace: parentNamespace
+    asserts:
+      - documentSelector:
+          path: $[?(@.kind == "HTTPRoute")].metadata.name
+          value: release-name-main
+        notExists:
+          path: spec.parentRefs[0].namespace
+      - documentSelector:
+          path: $[?(@.kind == "HTTPRoute")].metadata.name
+          value: release-name-second
+        equal:
+          path: spec.parentRefs[0].namespace
+          value: parentNamespace
+
   - it: sectionName should be optional
     set:
       route:
