@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.0.0/charts/library/common/schemas/gw-api.json",
+  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.0.1/charts/library/common/schemas/gw-api.json",
   "$defs": {
     "v1.grpcRouteMatch": {
       "description": "GRPCRouteMatch defines the predicate used to match requests to a given\naction. Multiple match types are ANDed together, i.e. the match will\nevaluate to true only if all conditions are satisfied.\n\nFor example, the match below will match a gRPC request only if its service\nis `foo` AND it contains the `version: v1` header:\n\n```\nmatches:\n  - method:\n    type: Exact\n    service: \"foo\"\n    headers:\n  - name: \"version\"\n    value \"v1\"\n\n```",

@@ -10,7 +10,9 @@ Returns the value for serviceAccountName
 
   {{- if not (has "serviceAccount" (keys $controllerObject)) -}}
     {{- if (eq (len $enabledServiceAccounts) 1) -}}
-      {{- $serviceAccountName = ($enabledServiceAccounts | keys | first) -}}
+      {{- $saIdentifier := ($enabledServiceAccounts | keys | first) -}}
+      {{- $subject := (include "bjw-s.common.lib.serviceAccount.getByIdentifier" (dict "rootContext" $rootContext "id" $saIdentifier) | fromYaml) -}}
+      {{- $serviceAccountName = get $subject "name" -}}
     {{- end -}}
   {{- else -}}
     {{- if hasKey $controllerObject.serviceAccount "identifier" -}}

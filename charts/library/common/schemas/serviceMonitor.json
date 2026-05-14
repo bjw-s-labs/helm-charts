@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.0.0/charts/library/common/schemas/serviceMonitor.json",
+  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.0.1/charts/library/common/schemas/serviceMonitor.json",
   "$defs": {
     "instance": {
       "type": "object",
