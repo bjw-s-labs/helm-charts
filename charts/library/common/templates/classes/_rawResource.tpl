@@ -27,8 +27,8 @@ apiVersion: {{ $manifest.apiVersion }}
 kind: {{ $manifest.kind }}
 metadata:
   name: {{ $internalData.name }}
-  {{- with ($manifest.metadata).namespace }}
-  namespace: {{ tpl . $rootContext | quote }}
+  {{- if not (empty (dig "metadata" "namespace" nil $manifest)) }}
+  namespace: {{ tpl $manifest.metadata.namespace $rootContext | quote }}
   {{- end }}
   {{- with $labels }}
   labels:

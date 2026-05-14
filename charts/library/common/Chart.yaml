@@ -19,3 +19,6 @@ annotations:
     - kind: fixed
       description: |-
         Pod spec.serviceAccountName now properly uses the resolved name (including global.nameOverride) when auto-detecting a single serviceAccount.
+    - kind: changed
+      description: |-
+        Allow setting namespace field on rawResources.
