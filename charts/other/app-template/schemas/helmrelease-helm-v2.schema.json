@@ -96,6 +96,7 @@
                     }
                   },
                   "required": [
+                    "kind",
                     "name"
                   ],
                   "type": "object",
@@ -172,7 +173,8 @@
               "description": "Kind of the referent.",
               "enum": [
                 "OCIRepository",
-                "HelmChart"
+                "HelmChart",
+                "ExternalArtifact"
               ],
               "type": "string"
             },
@@ -196,17 +198,42 @@
           "type": "object",
           "additionalProperties": false
         },
+        "commonMetadata": {
+          "description": "CommonMetadata specifies the common labels and annotations that are\napplied to all resources. Any existing label or annotation will be\noverridden if its key matches a common one.",
+          "properties": {
+            "annotations": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "description": "Annotations to be added to the object's metadata.",
+              "type": "object"
+            },
+            "labels": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "description": "Labels to be added to the object's metadata.",
+              "type": "object"
+            }
+          },
+          "type": "object",
+          "additionalProperties": false
+        },
         "dependsOn": {
-          "description": "DependsOn may contain a meta.NamespacedObjectReference slice with\nreferences to HelmRelease resources that must be ready before this HelmRelease\ncan be reconciled.",
+          "description": "DependsOn may contain a DependencyReference slice with\nreferences to HelmRelease resources that must be ready before this HelmRelease\ncan be reconciled.",
           "items": {
-            "description": "NamespacedObjectReference contains enough information to locate the referenced Kubernetes resource object in any\nnamespace.",
+            "description": "DependencyReference defines a HelmRelease dependency on another HelmRelease resource.",
             "properties": {
               "name": {
                 "description": "Name of the referent.",
                 "type": "string"
               },
               "namespace": {
-                "description": "Namespace of the referent, when not specified it acts as LocalObjectReference.",
+                "description": "Namespace of the referent, defaults to the namespace of the HelmRelease\nresource object that contains the reference.",
+                "type": "string"
+              },
+              "readyExpr": {
+                "description": "ReadyExpr is a CEL expression that can be used to assess the readiness\nof a dependency. When specified, the built-in readiness check\nis replaced by the logic defined in the CEL expression.\nTo make the CEL expression additive to the built-in readiness check,\nthe feature gate `AdditiveCELDependencyCheck` must be set to `true`.",
                 "type": "string"
               }
             },
@@ -294,7 +321,7 @@
           "description": "Install holds the configuration for Helm install actions for this HelmRelease.",
           "properties": {
             "crds": {
-              "description": "CRDs upgrade CRDs from the Helm Chart's crds directory according\nto the CRD upgrade policy provided here. Valid values are `Skip`,\n`Create` or `CreateReplace`. Default is `Create` and if omitted\nCRDs are installed but not updated.\n\n\nSkip: do neither install nor replace (update) any CRDs.\n\n\nCreate: new CRDs are created, existing CRDs are neither updated nor deleted.\n\n\nCreateReplace: new CRDs are created, existing CRDs are updated (replaced)\nbut not deleted.\n\n\nBy default, CRDs are applied (installed) during Helm install action.\nWith this option users can opt in to CRD replace existing CRDs on Helm\ninstall actions, which is not (yet) natively supported by Helm.\nhttps://helm.sh/docs/chart_best_practices/custom_resource_definitions.",
+              "description": "CRDs upgrade CRDs from the Helm Chart's crds directory according\nto the CRD upgrade policy provided here. Valid values are `Skip`,\n`Create` or `CreateReplace`. Default is `Create` and if omitted\nCRDs are installed but not updated.\n\nSkip: do neither install nor replace (update) any CRDs.\n\nCreate: new CRDs are created, existing CRDs are neither updated nor deleted.\n\nCreateReplace: new CRDs are created, existing CRDs are updated (replaced)\nbut not deleted.\n\nBy default, CRDs are applied (installed) during Helm install action.\nWith this option users can opt in to CRD replace existing CRDs on Helm\ninstall actions, which is not (yet) natively supported by Helm.\nhttps://helm.sh/docs/chart_best_practices/custom_resource_definitions.",
               "enum": [
                 "Skip",
                 "Create",
@@ -312,6 +339,14 @@
             },
             "disableOpenAPIValidation": {
               "description": "DisableOpenAPIValidation prevents the Helm install action from validating\nrendered templates against the Kubernetes OpenAPI Schema.",
+              "type": "boolean"
+            },
+            "disableSchemaValidation": {
+              "description": "DisableSchemaValidation prevents the Helm install action from validating\nthe values against the JSON Schema.",
+              "type": "boolean"
+            },
+            "disableTakeOwnership": {
+              "description": "DisableTakeOwnership disables taking ownership of existing resources\nduring the Helm install action. Defaults to false.",
               "type": "boolean"
             },
             "disableWait": {
@@ -346,8 +381,37 @@
               "type": "boolean"
             },
             "skipCRDs": {
-              "description": "SkipCRDs tells the Helm install action to not install any CRDs. By default,\nCRDs are installed if not already present.\n\n\nDeprecated use CRD policy (`crds`) attribute with value `Skip` instead.",
+              "description": "SkipCRDs tells the Helm install action to not install any CRDs. By default,\nCRDs are installed if not already present.\n\nDeprecated use CRD policy (`crds`) attribute with value `Skip` instead.",
               "type": "boolean"
+            },
+            "strategy": {
+              "description": "Strategy defines the install strategy to use for this HelmRelease.\nDefaults to 'RemediateOnFailure'.",
+              "properties": {
+                "name": {
+                  "description": "Name of the install strategy.",
+                  "enum": [
+                    "RemediateOnFailure",
+                    "RetryOnFailure"
+                  ],
+                  "type": "string"
+                },
+                "retryInterval": {
+                  "description": "RetryInterval is the interval at which to retry a failed install.\nCan be used only when Name is set to RetryOnFailure.\nDefaults to '5m'.",
+                  "pattern": "^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "type": "object",
+              "x-kubernetes-validations": [
+                {
+                  "message": ".retryInterval cannot be set when .name is 'RemediateOnFailure'",
+                  "rule": "!has(self.retryInterval) || self.name != 'RemediateOnFailure'"
+                }
+              ],
+              "additionalProperties": false
             },
             "timeout": {
               "description": "Timeout is the time to wait for any individual Kubernetes operation (like\nJobs for hooks) during the performance of a Helm install action. Defaults to\n'HelmReleaseSpec.Timeout'.",
@@ -366,8 +430,22 @@
         "kubeConfig": {
           "description": "KubeConfig for reconciling the HelmRelease on a remote cluster.\nWhen used in combination with HelmReleaseSpec.ServiceAccountName,\nforces the controller to act on behalf of that Service Account at the\ntarget cluster.\nIf the --default-service-account flag is set, its value will be used as\na controller level fallback for when HelmReleaseSpec.ServiceAccountName\nis empty.",
           "properties": {
+            "configMapRef": {
+              "description": "ConfigMapRef holds an optional name of a ConfigMap that contains\nthe following keys:\n\n- `provider`: the provider to use. One of `aws`, `azure`, `gcp`, or\n   `generic`. Required.\n- `cluster`: the fully qualified resource name of the Kubernetes\n   cluster in the cloud provider API. Not used by the `generic`\n   provider. Required when one of `address` or `ca.crt` is not set.\n- `address`: the address of the Kubernetes API server. Required\n   for `generic`. For the other providers, if not specified, the\n   first address in the cluster resource will be used, and if\n   specified, it must match one of the addresses in the cluster\n   resource.\n   If audiences is not set, will be used as the audience for the\n   `generic` provider.\n- `ca.crt`: the optional PEM-encoded CA certificate for the\n   Kubernetes API server. If not set, the controller will use the\n   CA certificate from the cluster resource.\n- `audiences`: the optional audiences as a list of\n   line-break-separated strings for the Kubernetes ServiceAccount\n   token. Defaults to the `address` for the `generic` provider, or\n   to specific values for the other providers depending on the\n   provider.\n-  `serviceAccountName`: the optional name of the Kubernetes\n   ServiceAccount in the same namespace that should be used\n   for authentication. If not specified, the controller\n   ServiceAccount will be used.\n\nMutually exclusive with SecretRef.",
+              "properties": {
+                "name": {
+                  "description": "Name of the referent.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "type": "object",
+              "additionalProperties": false
+            },
             "secretRef": {
-              "description": "SecretRef holds the name of a secret that contains a key with\nthe kubeconfig file as the value. If no key is set, the key will default\nto 'value'.\nIt is recommended that the kubeconfig is self-contained, and the secret\nis regularly updated if credentials such as a cloud-access-token expire.\nCloud specific `cmd-path` auth helpers will not function without adding\nbinaries and credentials to the Pod that is responsible for reconciling\nKubernetes resources.",
+              "description": "SecretRef holds an optional name of a secret that contains a key with\nthe kubeconfig file as the value. If no key is set, the key will default\nto 'value'. Mutually exclusive with ConfigMapRef.\nIt is recommended that the kubeconfig is self-contained, and the secret\nis regularly updated if credentials such as a cloud-access-token expire.\nCloud specific `cmd-path` auth helpers will not function without adding\nbinaries and credentials to the Pod that is responsible for reconciling\nKubernetes resources. Supported only for the generic provider.",
               "properties": {
                 "key": {
                   "description": "Key in the Secret, when not specified an implementation-specific default key is used.",
@@ -385,10 +463,17 @@
               "additionalProperties": false
             }
           },
-          "required": [
-            "secretRef"
-          ],
           "type": "object",
+          "x-kubernetes-validations": [
+            {
+              "message": "exactly one of spec.kubeConfig.configMapRef or spec.kubeConfig.secretRef must be specified",
+              "rule": "has(self.configMapRef) || has(self.secretRef)"
+            },
+            {
+              "message": "exactly one of spec.kubeConfig.configMapRef or spec.kubeConfig.secretRef must be specified",
+              "rule": "!has(self.configMapRef) || !has(self.secretRef)"
+            }
+          ],
           "additionalProperties": false
         },
         "maxHistory": {
@@ -396,7 +481,7 @@
           "type": "integer"
         },
         "persistentClient": {
-          "description": "PersistentClient tells the controller to use a persistent Kubernetes\nclient for this release. When enabled, the client will be reused for the\nduration of the reconciliation, instead of being created and destroyed\nfor each (step of a) Helm action.\n\n\nThis can improve performance, but may cause issues with some Helm charts\nthat for example do create Custom Resource Definitions during installation\noutside Helm's CRD lifecycle hooks, which are then not observed to be\navailable by e.g. post-install hooks.\n\n\nIf not set, it defaults to true.",
+          "description": "PersistentClient tells the controller to use a persistent Kubernetes\nclient for this release. When enabled, the client will be reused for the\nduration of the reconciliation, instead of being created and destroyed\nfor each (step of a) Helm action.\n\nThis can improve performance, but may cause issues with some Helm charts\nthat for example do create Custom Resource Definitions during installation\noutside Helm's CRD lifecycle hooks, which are then not observed to be\navailable by e.g. post-install hooks.\n\nIf not set, it defaults to true.",
           "type": "boolean"
         },
         "postRenderers": {
@@ -655,7 +740,7 @@
               "type": "boolean"
             },
             "crds": {
-              "description": "CRDs upgrade CRDs from the Helm Chart's crds directory according\nto the CRD upgrade policy provided here. Valid values are `Skip`,\n`Create` or `CreateReplace`. Default is `Skip` and if omitted\nCRDs are neither installed nor upgraded.\n\n\nSkip: do neither install nor replace (update) any CRDs.\n\n\nCreate: new CRDs are created, existing CRDs are neither updated nor deleted.\n\n\nCreateReplace: new CRDs are created, existing CRDs are updated (replaced)\nbut not deleted.\n\n\nBy default, CRDs are not applied during Helm upgrade action. With this\noption users can opt-in to CRD upgrade, which is not (yet) natively supported by Helm.\nhttps://helm.sh/docs/chart_best_practices/custom_resource_definitions.",
+              "description": "CRDs upgrade CRDs from the Helm Chart's crds directory according\nto the CRD upgrade policy provided here. Valid values are `Skip`,\n`Create` or `CreateReplace`. Default is `Skip` and if omitted\nCRDs are neither installed nor upgraded.\n\nSkip: do neither install nor replace (update) any CRDs.\n\nCreate: new CRDs are created, existing CRDs are neither updated nor deleted.\n\nCreateReplace: new CRDs are created, existing CRDs are updated (replaced)\nbut not deleted.\n\nBy default, CRDs are not applied during Helm upgrade action. With this\noption users can opt-in to CRD upgrade, which is not (yet) natively supported by Helm.\nhttps://helm.sh/docs/chart_best_practices/custom_resource_definitions.",
               "enum": [
                 "Skip",
                 "Create",
@@ -669,6 +754,14 @@
             },
             "disableOpenAPIValidation": {
               "description": "DisableOpenAPIValidation prevents the Helm upgrade action from validating\nrendered templates against the Kubernetes OpenAPI Schema.",
+              "type": "boolean"
+            },
+            "disableSchemaValidation": {
+              "description": "DisableSchemaValidation prevents the Helm upgrade action from validating\nthe values against the JSON Schema.",
+              "type": "boolean"
+            },
+            "disableTakeOwnership": {
+              "description": "DisableTakeOwnership disables taking ownership of existing resources\nduring the Helm upgrade action. Defaults to false.",
               "type": "boolean"
             },
             "disableWait": {
@@ -712,6 +805,35 @@
                 }
               },
               "type": "object",
+              "additionalProperties": false
+            },
+            "strategy": {
+              "description": "Strategy defines the upgrade strategy to use for this HelmRelease.\nDefaults to 'RemediateOnFailure'.",
+              "properties": {
+                "name": {
+                  "description": "Name of the upgrade strategy.",
+                  "enum": [
+                    "RemediateOnFailure",
+                    "RetryOnFailure"
+                  ],
+                  "type": "string"
+                },
+                "retryInterval": {
+                  "description": "RetryInterval is the interval at which to retry a failed upgrade.\nCan be used only when Name is set to RetryOnFailure.\nDefaults to '5m'.",
+                  "pattern": "^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "type": "object",
+              "x-kubernetes-validations": [
+                {
+                  "message": ".retryInterval can only be set when .name is 'RetryOnFailure'",
+                  "rule": "!has(self.retryInterval) || self.name == 'RetryOnFailure'"
+                }
+              ],
               "additionalProperties": false
             },
             "timeout": {
@@ -795,7 +917,7 @@
         "conditions": {
           "description": "Conditions holds the conditions for the HelmRelease.",
           "items": {
-            "description": "Condition contains details for one aspect of the current state of this API Resource.\n---\nThis struct is intended for direct use as an array at the field path .status.conditions.  For example,\n\n\n\ttype FooStatus struct{\n\t    // Represents the observations of a foo's current state.\n\t    // Known .status.conditions.type are: \"Available\", \"Progressing\", and \"Degraded\"\n\t    // +patchMergeKey=type\n\t    // +patchStrategy=merge\n\t    // +listType=map\n\t    // +listMapKey=type\n\t    Conditions []metav1.Condition `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\" protobuf:\"bytes,1,rep,name=conditions\"`\n\n\n\t    // other fields\n\t}",
+            "description": "Condition contains details for one aspect of the current state of this API Resource.",
             "properties": {
               "lastTransitionTime": {
                 "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
@@ -830,7 +952,7 @@
                 "type": "string"
               },
               "type": {
-                "description": "type of condition in CamelCase or in foo.example.com/CamelCase.\n---\nMany .condition.type values are consistent across resources like Available, but because arbitrary conditions can be\nuseful (see .node.status.conditions), the ability to deconflict is important.\nThe regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)",
+                "description": "type of condition in CamelCase or in foo.example.com/CamelCase.",
                 "maxLength": 316,
                 "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$",
                 "type": "string"
@@ -979,11 +1101,15 @@
           "type": "integer"
         },
         "lastAttemptedReleaseAction": {
-          "description": "LastAttemptedReleaseAction is the last release action performed for this\nHelmRelease. It is used to determine the active remediation strategy.",
+          "description": "LastAttemptedReleaseAction is the last release action performed for this\nHelmRelease. It is used to determine the active retry or remediation\nstrategy.",
           "enum": [
             "install",
             "upgrade"
           ],
+          "type": "string"
+        },
+        "lastAttemptedReleaseActionDuration": {
+          "description": "LastAttemptedReleaseActionDuration is the duration of the last\nrelease action performed for this HelmRelease.",
           "type": "string"
         },
         "lastAttemptedRevision": {
@@ -995,11 +1121,11 @@
           "type": "string"
         },
         "lastAttemptedValuesChecksum": {
-          "description": "LastAttemptedValuesChecksum is the SHA1 checksum for the values of the last\nreconciliation attempt.\nDeprecated: Use LastAttemptedConfigDigest instead.",
+          "description": "LastAttemptedValuesChecksum is the SHA1 checksum for the values of the last\nreconciliation attempt.\n\nDeprecated: Use LastAttemptedConfigDigest instead.",
           "type": "string"
         },
         "lastHandledForceAt": {
-          "description": "LastHandledForceAt holds the value of the most recent force request\nvalue, so a change of the annotation value can be detected.",
+          "description": "LastHandledForceAt holds the value of the most recent\nforce request value, so a change of the annotation value\ncan be detected.",
           "type": "string"
         },
         "lastHandledReconcileAt": {
@@ -1011,8 +1137,12 @@
           "type": "string"
         },
         "lastReleaseRevision": {
-          "description": "LastReleaseRevision is the revision of the last successful Helm release.\nDeprecated: Use History instead.",
+          "description": "LastReleaseRevision is the revision of the last successful Helm release.\n\nDeprecated: Use History instead.",
           "type": "integer"
+        },
+        "observedCommonMetadataDigest": {
+          "description": "ObservedCommonMetadataDigest is the digest for the common metadata of\nthe last successful reconciliation attempt.",
+          "type": "string"
         },
         "observedGeneration": {
           "description": "ObservedGeneration is the last observed generation.",
