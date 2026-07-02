@@ -16,12 +16,6 @@ sources:
   - https://github.com/bjw-s-labs/helm-charts
 annotations:
   artifacthub.io/changes: |-
-    - kind: fixed
+    - kind: added
       description: |-
-        Pod spec.serviceAccountName now properly uses the resolved name (including global.nameOverride) when auto-detecting a single serviceAccount.
-    - kind: fixed
-      description: |-
-        Allow omitting namespace in route parentRefs.
-    - kind: changed
-      description: |-
-        Allow setting namespace field on rawResources.
+        Add support for configuring DaemonSet updateStrategy

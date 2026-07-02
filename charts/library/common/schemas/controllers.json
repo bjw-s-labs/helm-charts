@@ -74,7 +74,7 @@
           "type": "object"
         },
         "strategy": {
-          "description": "Controller upgrade strategy. For Deployments: `Recreate` or `RollingUpdate`. For StatefulSets: `OnDelete` or `RollingUpdate`. DaemonSets, CronJobs and Jobs ignore this field.",
+          "description": "Controller upgrade strategy. For Deployments: `Recreate` or `RollingUpdate`. For StatefulSets and DaemonSets: `OnDelete` or `RollingUpdate`. CronJobs and Jobs ignore this field.",
           "type": "string"
         },
         "applyDefaultContainerOptionsToInitContainers": {
