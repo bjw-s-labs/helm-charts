@@ -2032,6 +2032,17 @@ route: {}
     # annotations: {}
     # -- Labels to set on the item.
     # labels: {}
+    # -- (string) Override the namespace the Route is deployed to. When set to a
+    # different namespace than the release namespace, a ReferenceGrant is
+    # automatically generated (unless disabled).
+    # namespaceOverride:
+    # -- ReferenceGrant auto-generation for cross-namespace backend references. When
+    # the Route is deployed to a different namespace than its backend Services, a
+    # ReferenceGrant is automatically generated in the Services' namespace (the
+    # release namespace).
+    # referenceGrant:
+      # -- Set to false to disable automatic ReferenceGrant generation.
+      # enabled: true
     # -- Host addresses for the Route. Helm templates are supported.
     # hostnames: []
     # -- (string) Route kind. Supported values: GRPCRoute, HTTPRoute, TCPRoute,

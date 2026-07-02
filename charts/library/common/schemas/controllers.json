@@ -243,7 +243,7 @@
               "default": 0
             },
             "maxUnavailable": {
-              "description": "Maximum number of pods that can be unavailable during the update. Can be an absolute number or a percentage. Only available on Kubernetes >= 1.24.",
+              "description": "Maximum number of pods that can be unavailable during the update. Can be an absolute number or a percentage.",
               "type": [
                 "integer",
                 "string"
