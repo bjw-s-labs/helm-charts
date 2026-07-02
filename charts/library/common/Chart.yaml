@@ -3,7 +3,7 @@ apiVersion: v2
 name: common
 description: Function library for Helm charts
 type: library
-version: 5.0.2
+version: 5.1.0
 kubeVersion: ">=1.31.0-0"
 keywords:
   - common
@@ -16,15 +16,6 @@ sources:
   - https://github.com/bjw-s-labs/helm-charts
 annotations:
   artifacthub.io/changes: |-
-    - kind: fixed
+    - kind: added
       description: |-
-        Pod spec.serviceAccountName now properly uses the resolved name (including global.nameOverride) when auto-detecting a single serviceAccount.
-    - kind: fixed
-      description: |-
-        Allow omitting namespace in route parentRefs.
-    - kind: changed
-      description: |-
-        Allow setting namespace field on rawResources.
-    - kind: changed
-      description: |-
-        Add to use strategy and rollingUpdate fields on DaemonSet template.
+        Add support for configuring DaemonSet updateStrategy
