@@ -61,9 +61,9 @@ Available properties:
 | `prefix` | `string` | No | `` | Prefix to prepend to the resource name. Mutually exclusiv... |
 | `replicas` | `integer / null` | No | `1` | Number of desired pods. When a HorizontalPodAutoscaler is... |
 | `revisionHistoryLimit` | `integer` | No | - | ReplicaSet revision history limit. |
-| `rollingUpdate` | `object` | No | - | Controller upgrade strategy options. |
+| [`rollingUpdate`](./rollingupdate/) | `object` | No | - | Rolling update options. Only valid when strategy is `Roll... |
 | [`serviceAccount`](./serviceaccount/) | `object` | No | - | ServiceAccount used by the controller. Only use one of `n... |
-| `strategy` | `string` | No | - | Controller upgrade strategy. For Deployments: `Recreate` ... |
+| `strategy` | `string` | No | `Recreate` | Controller upgrade strategy. Valid values: `Recreate` or ... |
 | `suffix` | `string` | No | - | Suffix to append to the resource name. Defaults to the re... |
 | `type` | `string` | No | `deployment` | Controller type. Supported values: deployment, daemonset,... |
 
@@ -91,7 +91,9 @@ Number of desired pods. When a HorizontalPodAutoscaler is configured, `replicas`
 
 #### strategy
 
-Controller upgrade strategy. For Deployments: `Recreate` or `RollingUpdate`. For StatefulSets: `OnDelete` or `RollingUpdate`. DaemonSets, CronJobs and Jobs ignore this field.
+Controller upgrade strategy. Valid values: `Recreate` or `RollingUpdate`.
+
+**Allowed values:** `Recreate`, `RollingUpdate`
 
 #### suffix
 
@@ -112,4 +114,5 @@ Controller type. Supported values: deployment, daemonset, statefulset, cronjob, 
 - [`initContainers`](./initcontainers/)
 - [`pod`](./pod/)
 - [`podDisruptionBudget`](./poddisruptionbudget/)
+- [`rollingUpdate`](./rollingupdate/)
 - [`serviceAccount`](./serviceaccount/)

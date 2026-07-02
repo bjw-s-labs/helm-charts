@@ -1,0 +1,40 @@
+---
+title: "rollingUpdate"
+description: "Rolling update options. Only valid when strategy is `RollingUpdate`. Both the shorthand keys (`su..."
+sidebar:
+  label: "rollingUpdate"
+---
+
+Rolling update options. Only valid when strategy is `RollingUpdate`. Both the shorthand keys (`surge`/`unavailable`) and the upstream Kubernetes keys (`maxSurge`/`maxUnavailable`) are accepted. When both are set, the Kubernetes key takes priority. The shorthand keys are deprecated and Will be removed in v6.0.
+
+## Type
+
+`object`
+
+## Properties
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `maxSurge` | `integer / string` | No | - | Maximum number of pods that can be created over the desir... |
+| `maxUnavailable` | `integer / string` | No | - | Maximum number of pods that can be unavailable during the... |
+| `surge` | `integer / string` | No | - | Deprecated: use `maxSurge` instead. Will be removed in v6... |
+| `unavailable` | `integer / string` | No | - | Deprecated: use `maxUnavailable` instead. Will be removed... |
+
+### Property Details
+
+#### maxSurge
+
+Maximum number of pods that can be created over the desired replicas during the update.
+
+#### maxUnavailable
+
+Maximum number of pods that can be unavailable during the update.
+
+#### surge
+
+Deprecated: use `maxSurge` instead. Will be removed in v6.0. Maximum number of pods that can be created over the desired replicas during the update.
+
+#### unavailable
+
+Deprecated: use `maxUnavailable` instead. Will be removed in v6.0. Maximum number of pods that can be unavailable during the update.

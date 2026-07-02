@@ -39,13 +39,23 @@ spec:
   updateStrategy:
     type: {{ $daemonsetObject.strategy }}
     {{- with $daemonsetObject.rollingUpdate }}
-      {{- if and (eq $daemonsetObject.strategy "RollingUpdate") (or (hasKey . "surge") (hasKey . "unavailable")) }}
+      {{- $hasUnavailable := or (hasKey . "maxUnavailable") (hasKey . "unavailable") }}
+      {{- $hasSurge := or (hasKey . "maxSurge") (hasKey . "surge") }}
+      {{- if and (eq $daemonsetObject.strategy "RollingUpdate") (or $hasUnavailable $hasSurge) }}
     rollingUpdate:
-        {{- if hasKey . "unavailable" }}
+        {{- if $hasUnavailable }}
+          {{- if hasKey . "maxUnavailable" }}
+      maxUnavailable: {{ .maxUnavailable }}
+          {{- else }}
       maxUnavailable: {{ .unavailable }}
+          {{- end }}
         {{- end }}
-        {{- if hasKey . "surge" }}
+        {{- if $hasSurge }}
+          {{- if hasKey . "maxSurge" }}
+      maxSurge: {{ .maxSurge }}
+          {{- else }}
       maxSurge: {{ .surge }}
+          {{- end }}
         {{- end }}
       {{- end }}
     {{- end }}

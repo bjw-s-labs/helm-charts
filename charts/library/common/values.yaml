@@ -566,12 +566,6 @@ controllers: {}
     # replicas: null
     # -- (int) ReplicaSet revision history limit.
     # revisionHistoryLimit:
-    # -- Controller upgrade strategy options.
-    # rollingUpdate: {}
-    # -- (string) Controller upgrade strategy. For Deployments: `Recreate` or
-    # `RollingUpdate`. For StatefulSets and DaemonSets: `OnDelete` or `RollingUpdate`.
-    # CronJobs and Jobs ignore this field.
-    # strategy:
     # -- Apply defaultContainerOptions to initContainers.
     # applyDefaultContainerOptionsToInitContainers: true
     # -- Strategy for default container options. overwrite: use container-level
@@ -1787,6 +1781,27 @@ controllers: {}
     # -- Prefix to prepend to the resource name. Mutually exclusive with
     # forceRename.
     # prefix: ""
+    # -- Rolling update options. Only valid when strategy is `RollingUpdate`. Both
+    # the shorthand keys (`surge`/`unavailable`) and the upstream Kubernetes keys
+    # (`maxSurge`/`maxUnavailable`) are accepted. When both are set, the Kubernetes
+    # key takes priority. The shorthand keys are deprecated and Will be removed in
+    # v6.0.
+    # rollingUpdate: {}
+    # -- (int/string) Maximum number of pods that can be created over the desired
+    # replicas during the update.
+    # maxSurge:
+    # -- (int/string) Maximum number of pods that can be unavailable during the
+    # update.
+    # maxUnavailable:
+    # -- (int/string) Deprecated: use `maxSurge` instead. Will be removed in v6.0.
+    # Maximum number of pods that can be created over the desired replicas during
+    # the update.
+    # surge:
+    # -- (int/string) Deprecated: use `maxUnavailable` instead. Will be removed in
+    # v6.0. Maximum number of pods that can be unavailable during the update.
+    # unavailable:
+    # -- Controller upgrade strategy. Valid values: `Recreate` or `RollingUpdate`.
+    # strategy: Recreate
     # -- (string) Suffix to append to the resource name. Defaults to the resource
     # identifier if there are multiple items, otherwise empty. Mutually exclusive
     # with forceRename.
