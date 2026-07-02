@@ -19,3 +19,6 @@ annotations:
     - kind: added
       description: |-
         Add support for configuring DaemonSet updateStrategy
+    - kind: changed
+      description: |-
+        Moved controller strategy validation to values schema
