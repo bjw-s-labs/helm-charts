@@ -18,6 +18,9 @@ annotations:
   artifacthub.io/changes: |-
     - kind: added
       description: |-
+        Added support for configuring automountServiceAccountToken on generated ServiceAccount objects
+    - kind: added
+      description: |-
         Added support for configuring DaemonSet updateStrategy
     - kind: added
       description: |-

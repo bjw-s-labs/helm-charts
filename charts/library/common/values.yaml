@@ -1820,6 +1820,9 @@ serviceAccount: {}
     # labels: {}
     # -- Set to true to create a long-lived static token for the ServiceAccount.
     # staticToken: false
+    # -- (bool) Set to false to prevent the ServiceAccount token from being
+    # automatically mounted.
+    # automountServiceAccountToken:
     # -- (string) Override the default resource name. Mutually exclusive with prefix
     # and suffix.
     # forceRename:
