@@ -90,6 +90,13 @@ jobs:
           TARGET_DIR=$(basename $(dirname ${CHART_DIR}))
           echo "chart_folder=${TARGET_DIR}" >> "$GITHUB_OUTPUT"
 
+      - name: Create tag
+        if: ${{ inputs.createGithubRelease }}
+        uses: EndBug/latest-tag@461da6d88985c6266724c147fcabeb0f05261a38 # latest
+        with:
+          ref: ${{ steps.chart-details.outputs.name }}-${{ steps.chart-details.outputs.version }}
+          git-directory: src
+
       - name: Format changelog
         id: format-changelog
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
@@ -201,13 +208,6 @@ jobs:
       # ----------------------------
       # Create GitHub release
       # ----------------------------
-      - name: Create tag
-        if: ${{ inputs.createGithubRelease }}
-        uses: EndBug/latest-tag@461da6d88985c6266724c147fcabeb0f05261a38 # latest
-        with:
-          ref: ${{ steps.chart-details.outputs.name }}-${{ steps.chart-details.outputs.version }}
-          git-directory: src
-
       - name: Create release for tag
         uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1.21.0
         if: ${{ inputs.createGithubRelease }}
