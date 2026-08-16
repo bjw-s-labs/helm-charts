@@ -39,7 +39,7 @@ metadata:
     {{- printf "%s: %s" $key (tpl $value $rootContext | toYaml ) | nindent 4 }}
     {{- end }}
   {{- end }}
-  namespace: {{ $rootContext.Release.Namespace }}
+  namespace: {{ $routeObject.namespaceOverride | default $rootContext.Release.Namespace }}
 spec:
   parentRefs:
   {{- range $routeObject.parentRefs }}

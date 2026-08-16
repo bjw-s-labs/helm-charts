@@ -32,6 +32,9 @@ metadata:
     {{- end }}
   {{- end }}
   namespace: {{ $rootContext.Release.Namespace }}
+{{- if hasKey $serviceAccountObject "automountServiceAccountToken" }}
+automountServiceAccountToken: {{ $serviceAccountObject.automountServiceAccountToken }}
+{{- end }}
 {{- if $serviceAccountObject.staticToken }}
 secrets:
   - name: {{ get (include "bjw-s.common.lib.secret.getByIdentifier" (dict "rootContext" $rootContext "id" (printf "%s-sa-token" $serviceAccountObject.identifier) ) | fromYaml) "name"}}

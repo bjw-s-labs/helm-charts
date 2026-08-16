@@ -1,0 +1,181 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: daemonset - fields - rollingUpdate
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+set:
+  controllers.main.type: daemonset
+tests:
+  - it: default (no strategy) should not render updateStrategy
+    documentSelector:
+      path: $[?(@.kind == "DaemonSet")].metadata.name
+      value: release-name
+    asserts:
+      - notExists:
+          path: spec.updateStrategy
+
+  - it: strategy OnDelete should render type but not rollingUpdate
+    set:
+      controllers.main:
+        strategy: OnDelete
+    documentSelector:
+      path: $[?(@.kind == "DaemonSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.updateStrategy.type
+          value: OnDelete
+      - notExists:
+          path: spec.updateStrategy.rollingUpdate
+
+  - it: strategy RollingUpdate with unavailable only should render maxUnavailable
+    set:
+      controllers.main:
+        strategy: RollingUpdate
+        rollingUpdate:
+          unavailable: 2
+    documentSelector:
+      path: $[?(@.kind == "DaemonSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.updateStrategy.type
+          value: RollingUpdate
+      - equal:
+          path: spec.updateStrategy.rollingUpdate.maxUnavailable
+          value: 2
+      - notExists:
+          path: spec.updateStrategy.rollingUpdate.maxSurge
+
+  - it: strategy RollingUpdate with surge only should render maxSurge
+    set:
+      controllers.main:
+        strategy: RollingUpdate
+        rollingUpdate:
+          surge: 1
+    documentSelector:
+      path: $[?(@.kind == "DaemonSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.updateStrategy.type
+          value: RollingUpdate
+      - equal:
+          path: spec.updateStrategy.rollingUpdate.maxSurge
+          value: 1
+      - notExists:
+          path: spec.updateStrategy.rollingUpdate.maxUnavailable
+
+  - it: strategy RollingUpdate with both should render both
+    set:
+      controllers.main:
+        strategy: RollingUpdate
+        rollingUpdate:
+          unavailable: 1
+          surge: 2
+    documentSelector:
+      path: $[?(@.kind == "DaemonSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.updateStrategy.type
+          value: RollingUpdate
+      - equal:
+          path: spec.updateStrategy.rollingUpdate.maxUnavailable
+          value: 1
+      - equal:
+          path: spec.updateStrategy.rollingUpdate.maxSurge
+          value: 2
+
+  - it: strategy RollingUpdate with percentage values
+    set:
+      controllers.main:
+        strategy: RollingUpdate
+        rollingUpdate:
+          unavailable: 10%
+          surge: 25%
+    documentSelector:
+      path: $[?(@.kind == "DaemonSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.updateStrategy.type
+          value: RollingUpdate
+      - equal:
+          path: spec.updateStrategy.rollingUpdate.maxUnavailable
+          value: 10%
+      - equal:
+          path: spec.updateStrategy.rollingUpdate.maxSurge
+          value: 25%
+
+  - it: strategy RollingUpdate with maxUnavailable (K8s key) should render maxUnavailable
+    set:
+      controllers.main:
+        strategy: RollingUpdate
+        rollingUpdate:
+          maxUnavailable: 2
+    documentSelector:
+      path: $[?(@.kind == "DaemonSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.updateStrategy.rollingUpdate.maxUnavailable
+          value: 2
+      - notExists:
+          path: spec.updateStrategy.rollingUpdate.maxSurge
+
+  - it: strategy RollingUpdate with maxSurge (K8s key) should render maxSurge
+    set:
+      controllers.main:
+        strategy: RollingUpdate
+        rollingUpdate:
+          maxSurge: 1
+    documentSelector:
+      path: $[?(@.kind == "DaemonSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.updateStrategy.rollingUpdate.maxSurge
+          value: 1
+      - notExists:
+          path: spec.updateStrategy.rollingUpdate.maxUnavailable
+
+  - it: K8s key takes priority over legacy key when both are set
+    set:
+      controllers.main:
+        strategy: RollingUpdate
+        rollingUpdate:
+          unavailable: 1
+          surge: 2
+          maxUnavailable: 3
+          maxSurge: 4
+    documentSelector:
+      path: $[?(@.kind == "DaemonSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.updateStrategy.rollingUpdate.maxUnavailable
+          value: 3
+      - equal:
+          path: spec.updateStrategy.rollingUpdate.maxSurge
+          value: 4
+
+  - it: strategy RollingUpdate with maxUnavailable 0 should render
+    set:
+      controllers.main:
+        strategy: RollingUpdate
+        rollingUpdate:
+          maxUnavailable: 0
+          maxSurge: 1
+    documentSelector:
+      path: $[?(@.kind == "DaemonSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.updateStrategy.rollingUpdate.maxUnavailable
+          value: 0
+      - equal:
+          path: spec.updateStrategy.rollingUpdate.maxSurge
+          value: 1

@@ -1,0 +1,52 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: route - fields - namespaceOverride
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+  - ../_values/service_main_default.yaml
+tests:
+  - it: route renders in Release namespace by default
+    set:
+      route.main:
+        parentRefs:
+          - name: parentName
+            namespace: parentNamespace
+    documentSelector:
+      path: $[?(@.kind == "HTTPRoute")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: NAMESPACE
+
+  - it: route renders in namespaceOverride when set
+    set:
+      route.main:
+        namespaceOverride: custom-namespace
+        parentRefs:
+          - name: parentName
+            namespace: parentNamespace
+    documentSelector:
+      path: $[?(@.kind == "HTTPRoute")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: custom-namespace
+
+  - it: route with empty namespaceOverride falls back to Release namespace
+    set:
+      route.main:
+        namespaceOverride: ""
+        parentRefs:
+          - name: parentName
+            namespace: parentNamespace
+    documentSelector:
+      path: $[?(@.kind == "HTTPRoute")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: NAMESPACE

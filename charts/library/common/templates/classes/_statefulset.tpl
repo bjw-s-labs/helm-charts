@@ -39,9 +39,16 @@ spec:
   podManagementPolicy: {{ dig "statefulset" "podManagementPolicy" "OrderedReady" $statefulsetObject }}
   updateStrategy:
     type: {{ $statefulsetObject.strategy }}
-    {{- if and (eq $statefulsetObject.strategy "RollingUpdate") (dig "rollingUpdate" "partition" nil $statefulsetObject) }}
+    {{- with $statefulsetObject.rollingUpdate }}
+      {{- if and (eq $statefulsetObject.strategy "RollingUpdate") (or (hasKey . "partition") (hasKey . "maxUnavailable")) }}
     rollingUpdate:
-      partition: {{ $statefulsetObject.rollingUpdate.partition }}
+        {{- if hasKey . "partition" }}
+      partition: {{ .partition }}
+        {{- end }}
+        {{- if hasKey . "maxUnavailable" }}
+      maxUnavailable: {{ .maxUnavailable }}
+        {{- end }}
+      {{- end }}
     {{- end }}
   {{- with (dig "statefulset" "startOrdinal" nil $statefulsetObject) }}
   ordinals:

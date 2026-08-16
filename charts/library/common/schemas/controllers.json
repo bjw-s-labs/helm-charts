@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.0.1/charts/library/common/schemas/controllers.json",
+  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.1.0/charts/library/common/schemas/controllers.json",
   "$defs": {
     "instance": {
       "type": "object",
@@ -68,14 +68,6 @@
         "revisionHistoryLimit": {
           "description": "ReplicaSet revision history limit.",
           "type": "integer"
-        },
-        "rollingUpdate": {
-          "description": "Controller upgrade strategy options.",
-          "type": "object"
-        },
-        "strategy": {
-          "description": "Controller upgrade strategy. For Deployments: `Recreate` or `RollingUpdate`. For StatefulSets: `OnDelete` or `RollingUpdate`. DaemonSets, CronJobs and Jobs ignore this field.",
-          "type": "string"
         },
         "applyDefaultContainerOptionsToInitContainers": {
           "description": "Apply defaultContainerOptions to initContainers.",
@@ -173,6 +165,50 @@
         "type": {
           "const": "deployment"
         },
+        "strategy": {
+          "description": "Controller upgrade strategy. Valid values: `Recreate` or `RollingUpdate`.",
+          "type": "string",
+          "enum": [
+            "Recreate",
+            "RollingUpdate"
+          ],
+          "default": "Recreate"
+        },
+        "rollingUpdate": {
+          "description": "Rolling update options. Only valid when strategy is `RollingUpdate`. Both the shorthand keys (`surge`/`unavailable`) and the upstream Kubernetes keys (`maxSurge`/`maxUnavailable`) are accepted. When both are set, the Kubernetes key takes priority. The shorthand keys are deprecated and Will be removed in v6.0.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "unavailable": {
+              "description": "Deprecated: use `maxUnavailable` instead. Will be removed in v6.0. Maximum number of pods that can be unavailable during the update.",
+              "type": [
+                "integer",
+                "string"
+              ]
+            },
+            "surge": {
+              "description": "Deprecated: use `maxSurge` instead. Will be removed in v6.0. Maximum number of pods that can be created over the desired replicas during the update.",
+              "type": [
+                "integer",
+                "string"
+              ]
+            },
+            "maxUnavailable": {
+              "description": "Maximum number of pods that can be unavailable during the update.",
+              "type": [
+                "integer",
+                "string"
+              ]
+            },
+            "maxSurge": {
+              "description": "Maximum number of pods that can be created over the desired replicas during the update.",
+              "type": [
+                "integer",
+                "string"
+              ]
+            }
+          }
+        },
         "horizontalPodAutoscaler": {
           "$ref": "#/$defs/horizontalPodAutoscaler"
         }
@@ -186,6 +222,34 @@
       "properties": {
         "type": {
           "const": "statefulset"
+        },
+        "strategy": {
+          "description": "Controller upgrade strategy. Valid values: `OnDelete` or `RollingUpdate`.",
+          "type": "string",
+          "enum": [
+            "OnDelete",
+            "RollingUpdate"
+          ],
+          "default": "RollingUpdate"
+        },
+        "rollingUpdate": {
+          "description": "Rolling update options. Only valid when strategy is `RollingUpdate`.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "partition": {
+              "description": "Partition for rolling update. When set, all pods with ordinal index < partition are updated; pods with ordinal >= partition are not touched.",
+              "type": "integer",
+              "default": 0
+            },
+            "maxUnavailable": {
+              "description": "Maximum number of pods that can be unavailable during the update. Can be an absolute number or a percentage.",
+              "type": [
+                "integer",
+                "string"
+              ]
+            }
+          }
         },
         "horizontalPodAutoscaler": {
           "$ref": "#/$defs/horizontalPodAutoscaler"
@@ -261,6 +325,49 @@
       "properties": {
         "type": {
           "const": "daemonset"
+        },
+        "strategy": {
+          "description": "Controller upgrade strategy. Valid values: `OnDelete` or `RollingUpdate`.",
+          "type": "string",
+          "enum": [
+            "OnDelete",
+            "RollingUpdate"
+          ]
+        },
+        "rollingUpdate": {
+          "description": "Rolling update options. Only valid when strategy is `RollingUpdate`. Both the shorthand keys (`surge`/`unavailable`) and the upstream Kubernetes keys (`maxSurge`/`maxUnavailable`) are accepted. When both are set, the Kubernetes key takes priority. The shorthand keys are deprecated and Will be removed in v6.0.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "unavailable": {
+              "description": "Deprecated: use `maxUnavailable` instead. Will be removed in v6.0. Maximum number of pods that can be unavailable during the update.",
+              "type": [
+                "integer",
+                "string"
+              ]
+            },
+            "surge": {
+              "description": "Deprecated: use `maxSurge` instead. Will be removed in v6.0. Maximum number of nodes that can have an updated DaemonSet pod created before an old pod is deleted.",
+              "type": [
+                "integer",
+                "string"
+              ]
+            },
+            "maxUnavailable": {
+              "description": "Maximum number of pods that can be unavailable during the update.",
+              "type": [
+                "integer",
+                "string"
+              ]
+            },
+            "maxSurge": {
+              "description": "Maximum number of nodes that can have an updated DaemonSet pod created before an old pod is deleted.",
+              "type": [
+                "integer",
+                "string"
+              ]
+            }
+          }
         }
       }
     },
@@ -321,7 +428,7 @@
               "default": false
             },
             "timeZone": {
-              "description": "IANA time zone name for CronJob schedule (e.g. 'Etc/UTC'). Only works in Kubernetes >= 1.27.",
+              "description": "IANA time zone name for CronJob schedule (e.g. 'Etc/UTC').",
               "type": "string"
             },
             "activeDeadlineSeconds": {

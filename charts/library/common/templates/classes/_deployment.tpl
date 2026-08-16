@@ -45,13 +45,23 @@ spec:
   strategy:
     type: {{ $deploymentObject.strategy }}
     {{- with $deploymentObject.rollingUpdate }}
-      {{- if and (eq $deploymentObject.strategy "RollingUpdate") (or .surge .unavailable) }}
+      {{- $hasUnavailable := or (hasKey . "maxUnavailable") (hasKey . "unavailable") }}
+      {{- $hasSurge := or (hasKey . "maxSurge") (hasKey . "surge") }}
+      {{- if and (eq $deploymentObject.strategy "RollingUpdate") (or $hasUnavailable $hasSurge) }}
     rollingUpdate:
-        {{- with .unavailable }}
-      maxUnavailable: {{ . }}
+        {{- if $hasUnavailable }}
+          {{- if hasKey . "maxUnavailable" }}
+      maxUnavailable: {{ .maxUnavailable }}
+          {{- else }}
+      maxUnavailable: {{ .unavailable }}
+          {{- end }}
         {{- end }}
-        {{- with .surge }}
-      maxSurge: {{ . }}
+        {{- if $hasSurge }}
+          {{- if hasKey . "maxSurge" }}
+      maxSurge: {{ .maxSurge }}
+          {{- else }}
+      maxSurge: {{ .surge }}
+          {{- end }}
         {{- end }}
       {{- end }}
     {{- end }}

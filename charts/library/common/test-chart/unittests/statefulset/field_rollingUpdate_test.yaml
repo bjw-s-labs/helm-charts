@@ -1,0 +1,116 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: statefulset - fields - rollingUpdate
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+set:
+  controllers.main.type: statefulset
+tests:
+  - it: default strategy (RollingUpdate) should not render rollingUpdate when no options are set
+    documentSelector:
+      path: $[?(@.kind == "StatefulSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.updateStrategy.type
+          value: RollingUpdate
+      - notExists:
+          path: spec.updateStrategy.rollingUpdate
+
+  - it: strategy OnDelete should not render rollingUpdate even when rollingUpdate values are set
+    set:
+      controllers.main:
+        strategy: OnDelete
+        rollingUpdate:
+          partition: 2
+    documentSelector:
+      path: $[?(@.kind == "StatefulSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.updateStrategy.type
+          value: OnDelete
+      - notExists:
+          path: spec.updateStrategy.rollingUpdate
+
+  - it: strategy RollingUpdate with partition only should render partition
+    set:
+      controllers.main:
+        strategy: RollingUpdate
+        rollingUpdate:
+          partition: 3
+    documentSelector:
+      path: $[?(@.kind == "StatefulSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.updateStrategy.rollingUpdate.partition
+          value: 3
+      - notExists:
+          path: spec.updateStrategy.rollingUpdate.maxUnavailable
+
+  - it: strategy RollingUpdate with partition 0 should render partition
+    set:
+      controllers.main:
+        strategy: RollingUpdate
+        rollingUpdate:
+          partition: 0
+    documentSelector:
+      path: $[?(@.kind == "StatefulSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.updateStrategy.rollingUpdate.partition
+          value: 0
+      - notExists:
+          path: spec.updateStrategy.rollingUpdate.maxUnavailable
+
+  - it: strategy RollingUpdate with maxUnavailable only should render maxUnavailable
+    set:
+      controllers.main:
+        strategy: RollingUpdate
+        rollingUpdate:
+          maxUnavailable: 2
+    documentSelector:
+      path: $[?(@.kind == "StatefulSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.updateStrategy.rollingUpdate.maxUnavailable
+          value: 2
+      - notExists:
+          path: spec.updateStrategy.rollingUpdate.partition
+
+  - it: strategy RollingUpdate with both partition and maxUnavailable should render both
+    set:
+      controllers.main:
+        strategy: RollingUpdate
+        rollingUpdate:
+          partition: 1
+          maxUnavailable: 3
+    documentSelector:
+      path: $[?(@.kind == "StatefulSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.updateStrategy.rollingUpdate.partition
+          value: 1
+      - equal:
+          path: spec.updateStrategy.rollingUpdate.maxUnavailable
+          value: 3
+
+  - it: strategy RollingUpdate with maxUnavailable as percentage should render percentage
+    set:
+      controllers.main:
+        strategy: RollingUpdate
+        rollingUpdate:
+          maxUnavailable: 25%
+    documentSelector:
+      path: $[?(@.kind == "StatefulSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.updateStrategy.rollingUpdate.maxUnavailable
+          value: 25%

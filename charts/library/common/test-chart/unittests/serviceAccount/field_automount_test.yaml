@@ -1,0 +1,39 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: serviceAccount - fields - automountServiceAccountToken
+templates:
+  - common.yaml
+set:
+  serviceAccount.main: {}
+values:
+  - ../_values/controllers_main_default_container.yaml
+tests:
+  - it: does not set automountServiceAccountToken by default
+    asserts:
+      - documentSelector:
+          path: $[?(@.kind == "ServiceAccount")].metadata.name
+          value: release-name
+        notExists:
+          path: automountServiceAccountToken
+
+  - it: can disable automountServiceAccountToken
+    set:
+      serviceAccount.main.automountServiceAccountToken: false
+    asserts:
+      - documentSelector:
+          path: $[?(@.kind == "ServiceAccount")].metadata.name
+          value: release-name
+        equal:
+          path: automountServiceAccountToken
+          value: false
+
+  - it: can enable automountServiceAccountToken
+    set:
+      serviceAccount.main.automountServiceAccountToken: true
+    asserts:
+      - documentSelector:
+          path: $[?(@.kind == "ServiceAccount")].metadata.name
+          value: release-name
+        equal:
+          path: automountServiceAccountToken
+          value: true
