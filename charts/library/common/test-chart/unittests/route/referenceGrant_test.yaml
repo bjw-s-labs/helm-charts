@@ -1,0 +1,217 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: route - referenceGrant
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+  - ../_values/service_main_default.yaml
+tests:
+  - it: no ReferenceGrant is generated when route is in the release namespace
+    set:
+      route.main:
+        parentRefs:
+          - name: parentName
+            namespace: parentNamespace
+    asserts:
+      - not: true
+        containsDocument:
+          kind: ReferenceGrant
+          any: true
+
+  - it: no ReferenceGrant when namespaceOverride equals release namespace
+    set:
+      route.main:
+        namespaceOverride: NAMESPACE
+        parentRefs:
+          - name: parentName
+            namespace: parentNamespace
+    asserts:
+      - not: true
+        containsDocument:
+          kind: ReferenceGrant
+          any: true
+
+  - it: no ReferenceGrant when disabled even with cross-namespace route
+    set:
+      route.main:
+        namespaceOverride: custom-ns
+        referenceGrant:
+          enabled: false
+        parentRefs:
+          - name: parentName
+            namespace: parentNamespace
+        rules:
+          - backendRefs:
+              - identifier: main
+    asserts:
+      - not: true
+        containsDocument:
+          kind: ReferenceGrant
+          any: true
+
+  - it: no ReferenceGrant when route has no backendRefs (filters only)
+    set:
+      route.main:
+        namespaceOverride: custom-ns
+        parentRefs:
+          - name: parentName
+            namespace: parentNamespace
+        rules:
+          - filters:
+              - type: RequestRedirect
+                requestRedirect:
+                  scheme: https
+                  statusCode: 301
+    asserts:
+      - not: true
+        containsDocument:
+          kind: ReferenceGrant
+          any: true
+
+  - it: ReferenceGrant is generated with correct from/to for identifier-based backendRef
+    set:
+      route.main:
+        namespaceOverride: custom-ns
+        parentRefs:
+          - name: parentName
+            namespace: parentNamespace
+        rules:
+          - backendRefs:
+              - identifier: main
+                port: 8080
+    documentSelector:
+      path: $[?(@.kind == "ReferenceGrant")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: NAMESPACE
+      - equal:
+          path: spec.from[0].group
+          value: gateway.networking.k8s.io
+      - equal:
+          path: spec.from[0].kind
+          value: HTTPRoute
+      - equal:
+          path: spec.from[0].namespace
+          value: custom-ns
+      - equal:
+          path: spec.to[0].group
+          value: ""
+      - equal:
+          path: spec.to[0].kind
+          value: Service
+      - equal:
+          path: spec.to[0].name
+          value: release-name
+
+  - it: ReferenceGrant is generated with named service backendRef
+    set:
+      route.main:
+        namespaceOverride: custom-ns
+        parentRefs:
+          - name: parentName
+            namespace: parentNamespace
+        rules:
+          - backendRefs:
+              - name: my-service
+                namespace: NAMESPACE
+                port: 8080
+    documentSelector:
+      path: $[?(@.kind == "ReferenceGrant")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.to[0].name
+          value: my-service
+
+  - it: ReferenceGrant deduplicates service names
+    set:
+      route.main:
+        namespaceOverride: custom-ns
+        parentRefs:
+          - name: parentName
+            namespace: parentNamespace
+        rules:
+          - backendRefs:
+              - identifier: main
+                port: 8080
+              - name: release-name
+                namespace: NAMESPACE
+          - backendRefs:
+              - identifier: main
+                port: http
+    documentSelector:
+      path: $[?(@.kind == "ReferenceGrant")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.to[0].name
+          value: release-name
+      - lengthEqual:
+          path: spec.to
+          count: 1
+
+  - it: ReferenceGrant skips backendRefs in other namespaces
+    set:
+      route.main:
+        namespaceOverride: custom-ns
+        parentRefs:
+          - name: parentName
+            namespace: parentNamespace
+        rules:
+          - backendRefs:
+              - identifier: main
+                port: 8080
+              - name: external-svc
+                namespace: other-ns
+                port: 9090
+    documentSelector:
+      path: $[?(@.kind == "ReferenceGrant")].metadata.name
+      value: release-name
+    asserts:
+      - lengthEqual:
+          path: spec.to
+          count: 1
+      - equal:
+          path: spec.to[0].name
+          value: release-name
+
+  - it: ReferenceGrant uses TCPRoute kind when route kind is TCPRoute
+    set:
+      route.main:
+        kind: TCPRoute
+        namespaceOverride: custom-ns
+        parentRefs:
+          - name: parentName
+            namespace: parentNamespace
+        rules:
+          - backendRefs:
+              - identifier: main
+                port: 8080
+    documentSelector:
+      path: $[?(@.kind == "ReferenceGrant")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.from[0].kind
+          value: TCPRoute
+
+  - it: no ReferenceGrant when all backendRefs point to other namespaces
+    set:
+      route.main:
+        namespaceOverride: custom-ns
+        parentRefs:
+          - name: parentName
+            namespace: parentNamespace
+        rules:
+          - backendRefs:
+              - name: external-svc
+                namespace: other-ns
+                port: 9090
+    asserts:
+      - not: true
+        containsDocument:
+          kind: ReferenceGrant
+          any: true

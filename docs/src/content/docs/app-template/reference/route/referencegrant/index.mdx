@@ -1,0 +1,25 @@
+---
+title: "referenceGrant"
+description: "ReferenceGrant auto-generation for cross-namespace backend references. When the Route is deployed..."
+sidebar:
+  label: "referenceGrant"
+---
+
+ReferenceGrant auto-generation for cross-namespace backend references. When the Route is deployed to a different namespace than its backend Services, a ReferenceGrant is automatically generated in the Services&#39; namespace (the release namespace).
+
+## Type
+
+`object`
+
+## Default
+
+```yaml
+map[enabled:true]
+```
+
+## Properties
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `enabled` | `boolean` | No | `true` | Set to false to disable automatic ReferenceGrant generation. |

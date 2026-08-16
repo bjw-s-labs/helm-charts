@@ -1,0 +1,165 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: deployment - fields - rollingUpdate
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+set:
+  controllers.main.type: deployment
+tests:
+  - it: default strategy (Recreate) should not render rollingUpdate
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.strategy.type
+          value: Recreate
+      - notExists:
+          path: spec.strategy.rollingUpdate
+
+  - it: strategy RollingUpdate with unavailable only should render maxUnavailable
+    set:
+      controllers.main:
+        strategy: RollingUpdate
+        rollingUpdate:
+          unavailable: 2
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.strategy.type
+          value: RollingUpdate
+      - equal:
+          path: spec.strategy.rollingUpdate.maxUnavailable
+          value: 2
+      - notExists:
+          path: spec.strategy.rollingUpdate.maxSurge
+
+  - it: strategy RollingUpdate with surge only should render maxSurge
+    set:
+      controllers.main:
+        strategy: RollingUpdate
+        rollingUpdate:
+          surge: 25%
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.strategy.type
+          value: RollingUpdate
+      - equal:
+          path: spec.strategy.rollingUpdate.maxSurge
+          value: 25%
+      - notExists:
+          path: spec.strategy.rollingUpdate.maxUnavailable
+
+  - it: strategy RollingUpdate with both should render both
+    set:
+      controllers.main:
+        strategy: RollingUpdate
+        rollingUpdate:
+          unavailable: 1
+          surge: 3
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.strategy.type
+          value: RollingUpdate
+      - equal:
+          path: spec.strategy.rollingUpdate.maxUnavailable
+          value: 1
+      - equal:
+          path: spec.strategy.rollingUpdate.maxSurge
+          value: 3
+
+  - it: strategy Recreate should not render rollingUpdate even when rollingUpdate values are set
+    set:
+      controllers.main:
+        strategy: Recreate
+        rollingUpdate:
+          unavailable: 2
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.strategy.type
+          value: Recreate
+      - notExists:
+          path: spec.strategy.rollingUpdate
+
+  - it: strategy RollingUpdate with maxUnavailable (K8s key) should render maxUnavailable
+    set:
+      controllers.main:
+        strategy: RollingUpdate
+        rollingUpdate:
+          maxUnavailable: 2
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.strategy.rollingUpdate.maxUnavailable
+          value: 2
+      - notExists:
+          path: spec.strategy.rollingUpdate.maxSurge
+
+  - it: strategy RollingUpdate with maxSurge (K8s key) should render maxSurge
+    set:
+      controllers.main:
+        strategy: RollingUpdate
+        rollingUpdate:
+          maxSurge: 25%
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.strategy.rollingUpdate.maxSurge
+          value: 25%
+      - notExists:
+          path: spec.strategy.rollingUpdate.maxUnavailable
+
+  - it: K8s key takes priority over legacy key when both are set
+    set:
+      controllers.main:
+        strategy: RollingUpdate
+        rollingUpdate:
+          unavailable: 1
+          surge: 3
+          maxUnavailable: 5
+          maxSurge: 7
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.strategy.rollingUpdate.maxUnavailable
+          value: 5
+      - equal:
+          path: spec.strategy.rollingUpdate.maxSurge
+          value: 7
+
+  - it: strategy RollingUpdate with maxUnavailable 0 should render
+    set:
+      controllers.main:
+        strategy: RollingUpdate
+        rollingUpdate:
+          maxUnavailable: 0
+          maxSurge: 1
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.strategy.rollingUpdate.maxUnavailable
+          value: 0
+      - equal:
+          path: spec.strategy.rollingUpdate.maxSurge
+          value: 1

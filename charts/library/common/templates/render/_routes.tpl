@@ -15,5 +15,8 @@ Renders the Route objects required by the chart
 
     {{- /* Include the Route class */ -}}
     {{- include "bjw-s.common.class.route" (dict "rootContext" $rootContext "object" $routeObject) | nindent 0 -}}
+
+    {{- /* Include the ReferenceGrant class (renders empty when not needed) */ -}}
+    {{- include "bjw-s.common.class.route.referenceGrant" (dict "rootContext" $rootContext "object" $routeObject) | nindent 0 -}}
   {{- end -}}
 {{- end -}}

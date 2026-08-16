@@ -3,7 +3,7 @@ apiVersion: v2
 name: common
 description: Function library for Helm charts
 type: library
-version: 5.0.1
+version: 5.1.0
 kubeVersion: ">=1.31.0-0"
 keywords:
   - common
@@ -16,12 +16,15 @@ sources:
   - https://github.com/bjw-s-labs/helm-charts
 annotations:
   artifacthub.io/changes: |-
-    - kind: fixed
+    - kind: added
       description: |-
-        Pod spec.serviceAccountName now properly uses the resolved name (including global.nameOverride) when auto-detecting a single serviceAccount.
-    - kind: fixed
+        Added support for configuring automountServiceAccountToken on generated ServiceAccount objects
+    - kind: added
       description: |-
-        Allow omitting namespace in route parentRefs.
+        Added support for configuring DaemonSet updateStrategy
+    - kind: added
+      description: |-
+        Added support automatically generating ReferenceGrant when Route namespace != Helm release namespace
     - kind: changed
       description: |-
-        Allow setting namespace field on rawResources.
+        Moved controller strategy validation to values schema

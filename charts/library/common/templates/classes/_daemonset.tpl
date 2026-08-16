@@ -35,6 +35,31 @@ metadata:
   namespace: {{ $rootContext.Release.Namespace }}
 spec:
   revisionHistoryLimit: {{ include "bjw-s.common.lib.defaultKeepNonNullValue" (dict "value" $daemonsetObject.revisionHistoryLimit "default" 3) }}
+  {{- if $daemonsetObject.strategy }}
+  updateStrategy:
+    type: {{ $daemonsetObject.strategy }}
+    {{- with $daemonsetObject.rollingUpdate }}
+      {{- $hasUnavailable := or (hasKey . "maxUnavailable") (hasKey . "unavailable") }}
+      {{- $hasSurge := or (hasKey . "maxSurge") (hasKey . "surge") }}
+      {{- if and (eq $daemonsetObject.strategy "RollingUpdate") (or $hasUnavailable $hasSurge) }}
+    rollingUpdate:
+        {{- if $hasUnavailable }}
+          {{- if hasKey . "maxUnavailable" }}
+      maxUnavailable: {{ .maxUnavailable }}
+          {{- else }}
+      maxUnavailable: {{ .unavailable }}
+          {{- end }}
+        {{- end }}
+        {{- if $hasSurge }}
+          {{- if hasKey . "maxSurge" }}
+      maxSurge: {{ .maxSurge }}
+          {{- else }}
+      maxSurge: {{ .surge }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
   selector:
     matchLabels:
       app.kubernetes.io/controller: {{ $daemonsetObject.identifier }}

@@ -33,6 +33,7 @@ Available properties:
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
 | `annotations` | `object / null` | No | - | Annotations to set on the item. |
+| `automountServiceAccountToken` | `boolean` | No | - | Set to false to prevent the ServiceAccount token from bei... |
 | `enabled` | `boolean` | No | `true` | Set to false to disable the ServiceAccount. |
 | `forceRename` | `string` | No | - | Override the default resource name. Mutually exclusive wi... |
 | `labels` | `object / null` | No | - | Labels to set on the item. |
@@ -41,6 +42,10 @@ Available properties:
 | `suffix` | `string` | No | - | Suffix to append to the resource name. Defaults to the re... |
 
 ### Property Details
+
+#### automountServiceAccountToken
+
+Set to false to prevent the ServiceAccount token from being automatically mounted.
 
 #### forceRename
 

@@ -38,8 +38,10 @@ Available properties:
 | `hostnames` | `array` | No | - | Host addresses for the Route. Helm templates are supported. |
 | `kind` | `string` | No | - | Route kind. Supported values: GRPCRoute, HTTPRoute, TCPRo... |
 | `labels` | `object / null` | No | - | Labels to set on the item. |
+| `namespaceOverride` | `string` | No | - | Override the namespace the Route is deployed to. When set... |
 | `parentRefs` | `array` | No | - | Resource the Route attaches to. |
 | `prefix` | `string` | No | `` | Prefix to prepend to the resource name. Mutually exclusiv... |
+| [`referenceGrant`](./referencegrant/) | `object` | No | `map[enabled:true]` | ReferenceGrant auto-generation for cross-namespace backen... |
 | `rules` | `array` | No | - | Rules for routing. Defaults to the primary service. |
 | `suffix` | `string` | No | - | Suffix to append to the resource name. Defaults to the re... |
 
@@ -55,6 +57,10 @@ Route kind. Supported values: GRPCRoute, HTTPRoute, TCPRoute, TLSRoute, UDPRoute
 
 **Allowed values:** `GRPCRoute`, `HTTPRoute`, `TCPRoute`, `TLSRoute`, `UDPRoute`
 
+#### namespaceOverride
+
+Override the namespace the Route is deployed to. When set to a different namespace than the release namespace, a ReferenceGrant is automatically generated (unless disabled).
+
 #### prefix
 
 Prefix to prepend to the resource name. Mutually exclusive with forceRename.
@@ -62,3 +68,8 @@ Prefix to prepend to the resource name. Mutually exclusive with forceRename.
 #### suffix
 
 Suffix to append to the resource name. Defaults to the resource identifier if there are multiple items, otherwise empty. Mutually exclusive with forceRename.
+
+## Related Pages
+
+
+- [`referenceGrant`](./referencegrant/)

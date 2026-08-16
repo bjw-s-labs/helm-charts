@@ -5,10 +5,6 @@ Validate StatefulSet values
   {{- $rootContext := .rootContext -}}
   {{- $statefulsetValues := .object -}}
 
-  {{- if and (ne $statefulsetValues.strategy "OnDelete") (ne $statefulsetValues.strategy "RollingUpdate") -}}
-    {{- fail (printf "StatefulSet '%s': Invalid strategy type '%s'. Valid options are 'OnDelete' or 'RollingUpdate'. Specify a valid strategy under 'controllers.%s.strategy'." $statefulsetValues.identifier $statefulsetValues.strategy $statefulsetValues.identifier) -}}
-  {{- end -}}
-
   {{- if not (empty (dig "statefulset" "volumeClaimTemplates" "" $statefulsetValues)) -}}
     {{- range $index, $volumeClaimTemplate := $statefulsetValues.statefulset.volumeClaimTemplates -}}
       {{- if empty (get . "size") -}}

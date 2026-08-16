@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.0.1/charts/library/common/schemas/route.json",
+  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.1.0/charts/library/common/schemas/route.json",
   "$defs": {
     "instance": {
       "type": "object",
@@ -21,6 +21,25 @@
         },
         "labels": {
           "$ref": "definitions.json#/$defs/labels"
+        },
+        "namespaceOverride": {
+          "description": "Override the namespace the Route is deployed to. When set to a different namespace than the release namespace, a ReferenceGrant is automatically generated (unless disabled).",
+          "type": "string"
+        },
+        "referenceGrant": {
+          "description": "ReferenceGrant auto-generation for cross-namespace backend references. When the Route is deployed to a different namespace than its backend Services, a ReferenceGrant is automatically generated in the Services' namespace (the release namespace).",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {
+              "description": "Set to false to disable automatic ReferenceGrant generation.",
+              "type": "boolean",
+              "default": true
+            }
+          },
+          "default": {
+            "enabled": true
+          }
         },
         "hostnames": {
           "description": "Host addresses for the Route. Helm templates are supported.",
