@@ -1,0 +1,76 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: ciliumNetworkPolicy - fields - rules
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+tests:
+  - it: renders Cilium allow and deny rules
+    set:
+      ciliumNetworkPolicies.main:
+        controller: main
+        description: "Policy for {{ .Release.Name }}"
+        ingress:
+          - fromEntities:
+              - cluster
+        ingressDeny:
+          - fromCIDR:
+              - 10.0.0.0/8
+        egress:
+          - toFQDNs:
+              - matchName: "{{ .Release.Name }}.example.com"
+            toPorts:
+              - ports:
+                  - port: "443"
+                    protocol: TCP
+                rules:
+                  http:
+                    - method: GET
+                      path: /health
+        egressDeny:
+          - toEntities:
+              - world
+        enableDefaultDeny:
+          ingress: true
+          egress: false
+        log: matched-policy
+    documentSelector:
+      path: $[?(@.kind == "CiliumNetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.description
+          value: Policy for RELEASE-NAME
+      - equal:
+          path: spec.ingress
+          value:
+            - fromEntities:
+                - cluster
+      - equal:
+          path: spec.ingressDeny
+          value:
+            - fromCIDR:
+                - 10.0.0.0/8
+      - equal:
+          path: spec.egress[0].toFQDNs[0].matchName
+          value: RELEASE-NAME.example.com
+      - equal:
+          path: spec.egress[0].toPorts[0].rules.http[0]
+          value:
+            method: GET
+            path: /health
+      - equal:
+          path: spec.egressDeny
+          value:
+            - toEntities:
+                - world
+      - equal:
+          path: spec.enableDefaultDeny
+          value:
+            ingress: true
+            egress: false
+      - equal:
+          path: spec.log
+          value:
+            value: matched-policy

@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.1.0/charts/library/common/schemas/ciliumNetworkPolicy.json",
+  "$defs": {
+    "instance": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "definitions.json#/$defs/resourceIdentifier"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "properties": {
+        "enabled": {
+          "description": "Set to false to disable the CiliumNetworkPolicy.",
+          "type": "boolean",
+          "default": true
+        },
+        "annotations": {
+          "$ref": "definitions.json#/$defs/annotations"
+        },
+        "controller": {
+          "description": "Controller this CiliumNetworkPolicy should target.",
+          "type": "string"
+        },
+        "extraSelectorLabels": {
+          "description": "Additional match labels to add to the endpoint selector. These are merged with labels derived from the controller identifier.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "labels": {
+          "$ref": "definitions.json#/$defs/labels"
+        },
+        "endpointSelector": {
+          "description": "Custom endpointSelector for the CiliumNetworkPolicy. Takes precedence over targeting a controller via the controller identifier.",
+          "$ref": "k8s-api.json#/$defs/meta.v1.LabelSelector"
+        },
+        "description": {
+          "description": "Human-readable description of the policy.",
+          "type": "string"
+        },
+        "ingress": {
+          "description": "Cilium ingress rules. See https://docs.cilium.io/en/stable/security/policy/language/ for details.",
+          "$ref": "#/$defs/rules"
+        },
+        "ingressDeny": {
+          "description": "Cilium ingress deny rules. Deny rules take precedence over allow rules.",
+          "$ref": "#/$defs/rules"
+        },
+        "egress": {
+          "description": "Cilium egress rules. See https://docs.cilium.io/en/stable/security/policy/language/ for details.",
+          "$ref": "#/$defs/rules"
+        },
+        "egressDeny": {
+          "description": "Cilium egress deny rules. Deny rules take precedence over allow rules.",
+          "$ref": "#/$defs/rules"
+        },
+        "enableDefaultDeny": {
+          "description": "Configure whether the selected endpoints enter default-deny mode for ingress and egress traffic.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "ingress": {
+              "type": "boolean"
+            },
+            "egress": {
+              "type": "boolean"
+            }
+          }
+        },
+        "log": {
+          "description": "Free-form value included in Hubble flows matching this policy.",
+          "type": "string",
+          "maxLength": 32
+        }
+      },
+      "dependentSchemas": {
+        "endpointSelector": {
+          "not": {
+            "required": [
+              "controller"
+            ]
+          }
+        },
+        "controller": {
+          "not": {
+            "required": [
+              "endpointSelector"
+            ]
+          }
+        }
+      },
+      "anyOf": [
+        {
+          "properties": {
+            "ingress": {
+              "minItems": 1
+            }
+          },
+          "required": [
+            "ingress"
+          ]
+        },
+        {
+          "properties": {
+            "ingressDeny": {
+              "minItems": 1
+            }
+          },
+          "required": [
+            "ingressDeny"
+          ]
+        },
+        {
+          "properties": {
+            "egress": {
+              "minItems": 1
+            }
+          },
+          "required": [
+            "egress"
+          ]
+        },
+        {
+          "properties": {
+            "egressDeny": {
+              "minItems": 1
+            }
+          },
+          "required": [
+            "egressDeny"
+          ]
+        }
+      ]
+    },
+    "rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    }
+  }
+}

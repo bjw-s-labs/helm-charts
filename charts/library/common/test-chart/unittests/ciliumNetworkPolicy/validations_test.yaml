@@ -1,0 +1,53 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: ciliumNetworkPolicy - validations
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+tests:
+  - it: requires controller or endpointSelector with multiple controllers
+    set:
+      controllers.secondary:
+        containers:
+          main:
+            image:
+              repository: nginx
+              tag: latest
+      ciliumNetworkPolicies.main:
+        ingress:
+          - {}
+    asserts:
+      - failedTemplate:
+          errorMessage: "CiliumNetworkPolicy 'main': controller or endpointSelector field is required because automatic controller detection is not possible (found 2 enabled controllers). Please specify which controller this CiliumNetworkPolicy should reference."
+
+  - it: validates controller references
+    set:
+      ciliumNetworkPolicies.main:
+        controller: missing
+        ingress:
+          - {}
+    asserts:
+      - failedTemplate:
+          errorMessage: "CiliumNetworkPolicy 'main': No enabled controller found with identifier 'missing'. Available controllers: [main]"
+
+  - it: rejects controller and endpointSelector together
+    set:
+      ciliumNetworkPolicies.main:
+        controller: main
+        endpointSelector:
+          matchLabels:
+            role: frontend
+        ingress:
+          - {}
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: requires at least one rule direction
+    set:
+      ciliumNetworkPolicies.main:
+        controller: main
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
