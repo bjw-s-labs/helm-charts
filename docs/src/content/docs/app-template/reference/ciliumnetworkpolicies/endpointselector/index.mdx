@@ -1,0 +1,30 @@
+---
+title: "endpointSelector"
+description: "Custom endpointSelector for the CiliumNetworkPolicy. Takes precedence over targeting a controller..."
+sidebar:
+  label: "endpointSelector"
+---
+
+Custom endpointSelector for the CiliumNetworkPolicy. Takes precedence over targeting a controller via the controller identifier.
+
+## Type
+
+`object`
+
+## Properties
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `matchExpressions` | `array` | No | - | matchExpressions is a list of label selector requirements... |
+| `matchLabels` | `object` | No | - | matchLabels is a map of \{key,value\} pairs. A single \{k... |
+
+### Property Details
+
+#### matchExpressions
+
+matchExpressions is a list of label selector requirements. The requirements are ANDed.
+
+#### matchLabels
+
+matchLabels is a map of \{key,value\} pairs. A single \{key,value\} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is &#34;key&#34;, the operator is &#34;In&#34;, and the values array contains only &#34;value&#34;. The requirements are ANDed.

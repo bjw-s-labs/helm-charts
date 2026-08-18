@@ -1,0 +1,125 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: ciliumNetworkPolicy - fields - endpointSelector
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+tests:
+  - it: targets a controller by identifier
+    set:
+      ciliumNetworkPolicies.main:
+        controller: main
+        ingress:
+          - {}
+    documentSelector:
+      path: $[?(@.kind == "CiliumNetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.endpointSelector
+          value:
+            matchLabels:
+              app.kubernetes.io/controller: main
+              app.kubernetes.io/instance: RELEASE-NAME
+              app.kubernetes.io/name: RELEASE-NAME
+
+  - it: auto-targets a single controller
+    set:
+      ciliumNetworkPolicies.main:
+        ingress:
+          - {}
+    documentSelector:
+      path: $[?(@.kind == "CiliumNetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.endpointSelector
+          value:
+            matchLabels:
+              app.kubernetes.io/controller: main
+              app.kubernetes.io/instance: RELEASE-NAME
+              app.kubernetes.io/name: RELEASE-NAME
+
+  - it: supports extra selector labels
+    set:
+      ciliumNetworkPolicies.main:
+        controller: main
+        extraSelectorLabels:
+          workload-type: api
+        ingress:
+          - {}
+    documentSelector:
+      path: $[?(@.kind == "CiliumNetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.endpointSelector
+          value:
+            matchLabels:
+              app.kubernetes.io/controller: main
+              app.kubernetes.io/instance: RELEASE-NAME
+              app.kubernetes.io/name: RELEASE-NAME
+              workload-type: api
+
+  - it: supports extra selector labels with an auto-detected controller
+    set:
+      ciliumNetworkPolicies.main:
+        extraSelectorLabels:
+          workload-type: api
+        ingress:
+          - {}
+    documentSelector:
+      path: $[?(@.kind == "CiliumNetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.endpointSelector
+          value:
+            matchLabels:
+              app.kubernetes.io/controller: main
+              app.kubernetes.io/instance: RELEASE-NAME
+              app.kubernetes.io/name: RELEASE-NAME
+              workload-type: api
+
+  - it: supports a custom endpointSelector
+    set:
+      ciliumNetworkPolicies.main:
+        endpointSelector:
+          matchLabels:
+            role: frontend
+          matchExpressions:
+            - key: environment
+              operator: In
+              values:
+                - production
+        ingress:
+          - {}
+    documentSelector:
+      path: $[?(@.kind == "CiliumNetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.endpointSelector
+          value:
+            matchLabels:
+              role: frontend
+            matchExpressions:
+              - key: environment
+                operator: In
+                values:
+                  - production
+
+  - it: supports an empty custom endpointSelector
+    set:
+      ciliumNetworkPolicies.main:
+        endpointSelector: {}
+        ingress:
+          - {}
+    documentSelector:
+      path: $[?(@.kind == "CiliumNetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.endpointSelector
+          value: {}

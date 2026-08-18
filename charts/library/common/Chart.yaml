@@ -21,6 +21,9 @@ annotations:
         Added support for ExternalSecret resources
     - kind: added
       description: |-
+        Added support for CiliumNetworkPolicy resources
+    - kind: added
+      description: |-
         Added initial support for ListenerSet resources
     - kind: added
       description: |-
