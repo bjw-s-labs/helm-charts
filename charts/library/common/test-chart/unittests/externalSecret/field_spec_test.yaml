@@ -1,0 +1,154 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: externalSecret - fields - spec
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+tests:
+  - it: renders native ExternalSecret fields
+    set:
+      externalSecrets.main:
+        refreshPolicy: OnChange
+        refreshInterval: 30m
+        secretStoreRef:
+          kind: ClusterSecretStore
+          name: provider-store
+        syncWindows:
+          kind: deny
+          windows:
+            - schedule: "0 2 * * 6"
+              duration: 2h
+        target:
+          name: application-secret
+          creationPolicy: Orphan
+          deletionPolicy: Retain
+          template:
+            type: Opaque
+            data:
+              connection: "postgres://{{ .username }}:{{ .password }}@database"
+        data:
+          - secretKey: username
+            remoteRef:
+              key: database-credentials
+              property: username
+        dataFrom:
+          - extract:
+              key: shared-credentials
+    documentSelector:
+      path: $[?(@.kind == "ExternalSecret")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.refreshPolicy
+          value: OnChange
+      - equal:
+          path: spec.refreshInterval
+          value: 30m
+      - equal:
+          path: spec.secretStoreRef
+          value:
+            kind: ClusterSecretStore
+            name: provider-store
+      - equal:
+          path: spec.syncWindows
+          value:
+            kind: deny
+            windows:
+              - schedule: "0 2 * * 6"
+                duration: 2h
+      - equal:
+          path: spec.target
+          value:
+            name: application-secret
+            creationPolicy: Orphan
+            deletionPolicy: Retain
+            template:
+              type: Opaque
+              engineVersion: v2
+              mergePolicy: Replace
+              data:
+                connection: "postgres://{{ .username }}:{{ .password }}@database"
+      - equal:
+          path: spec.data
+          value:
+            - secretKey: username
+              remoteRef:
+                key: database-credentials
+                property: username
+      - equal:
+          path: spec.dataFrom
+          value:
+            - extract:
+                key: shared-credentials
+
+  - it: renders chart defaults
+    set:
+      externalSecrets.main:
+        data:
+          - secretKey: password
+            remoteRef:
+              key: credentials
+            sourceRef:
+              storeRef:
+                name: provider-store
+    documentSelector:
+      path: $[?(@.kind == "ExternalSecret")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.refreshInterval
+          value: 1h0m0s
+      - equal:
+          path: spec.target
+          value:
+            creationPolicy: Owner
+            deletionPolicy: Delete
+
+  - it: supports per-entry store references without a top-level store
+    set:
+      externalSecrets.main:
+        dataFrom:
+          - sourceRef:
+              storeRef:
+                kind: ClusterSecretStore
+                name: provider-store
+            extract:
+              key: shared-credentials
+    documentSelector:
+      path: $[?(@.kind == "ExternalSecret")].metadata.name
+      value: release-name
+    asserts:
+      - notExists:
+          path: spec.secretStoreRef
+      - equal:
+          path: spec.dataFrom
+          value:
+            - sourceRef:
+                storeRef:
+                  kind: ClusterSecretStore
+                  name: provider-store
+              extract:
+                key: shared-credentials
+
+  - it: uses and overrides the default SecretStore reference
+    set:
+      defaultExternalSecretStoreRef:
+        kind: ClusterSecretStore
+        name: default-store
+      externalSecrets.main:
+        secretStoreRef:
+          name: application-store
+        data:
+          - secretKey: password
+            remoteRef:
+              key: credentials
+    documentSelector:
+      path: $[?(@.kind == "ExternalSecret")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.secretStoreRef
+          value:
+            kind: ClusterSecretStore
+            name: application-store

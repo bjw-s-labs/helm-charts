@@ -20,6 +20,7 @@ Secondary entrypoint and primary loader for the common chart
   {{- include "bjw-s.common.render.podMonitors" $rootContext | nindent 0 -}}
   {{- include "bjw-s.common.render.routes" $rootContext | nindent 0 -}}
   {{- include "bjw-s.common.render.secrets" $rootContext | nindent 0 -}}
+  {{- include "bjw-s.common.render.externalSecrets" $rootContext | nindent 0 -}}
   {{- include "bjw-s.common.render.networkpolicies" $rootContext | nindent 0 -}}
   {{- include "bjw-s.common.render.rawResources" $rootContext | nindent 0 -}}
   {{- include "bjw-s.common.render.rbac" $rootContext | nindent 0 -}}
