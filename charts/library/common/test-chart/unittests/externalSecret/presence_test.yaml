@@ -1,0 +1,71 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: externalSecret - presence
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+set:
+  defaultExternalSecretStoreRef:
+    name: provider-store
+tests:
+  - it: externalSecret is not present by default
+    asserts:
+      - not: true
+        containsDocument:
+          apiVersion: external-secrets.io/v1
+          kind: ExternalSecret
+          any: true
+
+  - it: externalSecrets are enabled by default
+    set:
+      externalSecrets.main:
+        data:
+          - secretKey: password
+            remoteRef:
+              key: credentials
+    asserts:
+      - containsDocument:
+          apiVersion: external-secrets.io/v1
+          kind: ExternalSecret
+          any: true
+          name: release-name
+
+  - it: externalSecret is not present when disabled
+    set:
+      externalSecrets.main:
+        enabled: false
+        data:
+          - secretKey: password
+            remoteRef:
+              key: credentials
+    asserts:
+      - not: true
+        containsDocument:
+          apiVersion: external-secrets.io/v1
+          kind: ExternalSecret
+          any: true
+
+  - it: multiple externalSecrets can be enabled
+    set:
+      externalSecrets:
+        primary:
+          data:
+            - secretKey: password
+              remoteRef:
+                key: credentials
+        secondary:
+          dataFrom:
+            - extract:
+                key: other-credentials
+    asserts:
+      - containsDocument:
+          apiVersion: external-secrets.io/v1
+          kind: ExternalSecret
+          any: true
+          name: release-name-primary
+      - containsDocument:
+          apiVersion: external-secrets.io/v1
+          kind: ExternalSecret
+          any: true
+          name: release-name-secondary
