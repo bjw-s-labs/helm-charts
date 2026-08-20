@@ -1,0 +1,142 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: pod - fields - volumes (projected)
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+tests:
+  - it: should project a ServiceAccount token
+    set:
+      persistence:
+        api-token:
+          enabled: true
+          type: projected
+          sources:
+            - serviceAccountToken:
+                audience: https://api.example.com
+                expirationSeconds: 3600
+                path: token
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[0]
+          value:
+            name: api-token
+            projected:
+              sources:
+                - serviceAccountToken:
+                    audience: https://api.example.com
+                    expirationSeconds: 3600
+                    path: token
+
+  - it: should render Helm templates inside sources
+    set:
+      global:
+        apiHost: https://api.example.test
+      persistence:
+        api-token:
+          enabled: true
+          type: projected
+          sources:
+            - serviceAccountToken:
+                audience: "{{ .Values.global.apiHost }}"
+                path: token
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[0].projected.sources[0].serviceAccountToken.audience
+          value: https://api.example.test
+
+  - it: should project multiple sources into one volume
+    set:
+      persistence:
+        bundle:
+          enabled: true
+          type: projected
+          sources:
+            - serviceAccountToken:
+                audience: vault
+                path: vault-token
+            - configMap:
+                name: ca-bundle
+                items:
+                  - key: ca.crt
+                    path: ca.crt
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[0]
+          value:
+            name: bundle
+            projected:
+              sources:
+                - serviceAccountToken:
+                    audience: vault
+                    path: vault-token
+                - configMap:
+                    name: ca-bundle
+                    items:
+                      - key: ca.crt
+                        path: ca.crt
+
+  - it: should set defaultMode when specified
+    set:
+      persistence:
+        api-token:
+          enabled: true
+          type: projected
+          defaultMode: 0400
+          sources:
+            - serviceAccountToken:
+                path: token
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[0].projected.defaultMode
+          value: 256
+
+  - it: should omit defaultMode when not specified
+    set:
+      persistence:
+        api-token:
+          enabled: true
+          type: projected
+          sources:
+            - serviceAccountToken:
+                path: token
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - notExists:
+          path: spec.template.spec.volumes[0].projected.defaultMode
+
+  - it: should mount the projected volume in the container
+    set:
+      persistence:
+        api-token:
+          enabled: true
+          type: projected
+          sources:
+            - serviceAccountToken:
+                path: token
+          globalMounts:
+            - path: /var/run/secrets/tokens
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[0]
+          value:
+            name: api-token
+            mountPath: /var/run/secrets/tokens
