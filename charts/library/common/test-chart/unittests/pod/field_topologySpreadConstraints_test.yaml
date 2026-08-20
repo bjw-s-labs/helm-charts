@@ -98,3 +98,36 @@ tests:
               labelSelector:
                 matchLabels:
                   app: RELEASE-NAME
+
+  - it: defaultPodOption should scope each constraint to its controller
+    set:
+      defaultPodOptions:
+        topologySpreadConstraints:
+          - maxSkew: 1
+            topologyKey: kubernetes.io/hostname
+            whenUnsatisfiable: DoNotSchedule
+      controllers.secondary:
+        containers:
+          main:
+            image:
+              repository: nginx
+              tag: latest
+    asserts:
+      - documentSelector:
+          path: $[?(@.kind == "Deployment")].metadata.name
+          value: release-name-main
+        equal:
+          path: spec.template.spec.topologySpreadConstraints[0].labelSelector.matchLabels
+          value:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/controller: main
+      - documentSelector:
+          path: $[?(@.kind == "Deployment")].metadata.name
+          value: release-name-secondary
+        equal:
+          path: spec.template.spec.topologySpreadConstraints[0].labelSelector.matchLabels
+          value:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/controller: secondary
