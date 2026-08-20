@@ -265,13 +265,14 @@
       }
     },
     "persistence": {
-      "description": "Configure persistent storage and mount options. Each key is an identifier for a persistence item.\nSupported types: persistentVolumeClaim (default), configMap, secret, nfs, emptyDir, hostPath, image, custom.\nBy default each item mounts to /<identifier>. Use globalMounts or advancedMounts to customize mount paths.",
+      "description": "Configure persistent storage and mount options. Each key is an identifier for a persistence item.\nSupported types: persistentVolumeClaim (default), configMap, secret, nfs, emptyDir, hostPath, image, projected, custom.\nBy default each item mounts to /<identifier>. Use globalMounts or advancedMounts to customize mount paths.",
       "type": "object",
       "additionalProperties": {
         "$ref": "schemas/persistence.json#/$defs/item"
       },
       "examples": [
-        "persistence:\n  config:\n    type: persistentVolumeClaim\n    accessMode: ReadWriteOnce\n    size: 1Gi\n    globalMounts:\n      - path: /config\n  tmp:\n    type: emptyDir"
+        "persistence:\n  config:\n    type: persistentVolumeClaim\n    accessMode: ReadWriteOnce\n    size: 1Gi\n    globalMounts:\n      - path: /config\n  tmp:\n    type: emptyDir",
+        "persistence:\n  api-token:\n    type: projected\n    defaultMode: 0400\n    sources:\n      - serviceAccountToken:\n          audience: https://api.example.com\n          expirationSeconds: 3600\n          path: token\n    globalMounts:\n      - path: /var/run/secrets/tokens"
       ]
     },
     "rbac": {
