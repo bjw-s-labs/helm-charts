@@ -19,3 +19,6 @@ annotations:
     - kind: added
       description: |-
         Added support for ExternalSecret resources
+    - kind: added
+      description: |-
+        Added default selectors to topologySpreadConstraints to the same controller
