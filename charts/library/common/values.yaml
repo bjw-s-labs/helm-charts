@@ -2306,9 +2306,9 @@ networkpolicies: {}
 
 # -- Configure persistent storage and mount options. Each key is an identifier
 # for a persistence item. Supported types: persistentVolumeClaim (default),
-# configMap, secret, nfs, emptyDir, hostPath, image, custom. By default each
-# item mounts to /<identifier>. Use globalMounts or advancedMounts to customize
-# mount paths.
+# configMap, secret, nfs, emptyDir, hostPath, image, projected, custom. By
+# default each item mounts to /<identifier>. Use globalMounts or advancedMounts
+# to customize mount paths.
 # @default -- See below
 
 #   persistence:
@@ -2320,6 +2320,17 @@ networkpolicies: {}
 #         - path: /config
 #     tmp:
 #       type: emptyDir
+#   persistence:
+#     api-token:
+#       type: projected
+#       defaultMode: 0400
+#       sources:
+#         - serviceAccountToken:
+#             audience: https://api.example.com
+#             expirationSeconds: 3600
+#             path: token
+#       globalMounts:
+#         - path: /var/run/secrets/tokens
 #   persistence:
 #     config:
 #       type: persistentVolumeClaim

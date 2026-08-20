@@ -48,6 +48,9 @@
           "$ref": "#/$defs/item.type.image"
         },
         {
+          "$ref": "#/$defs/item.type.projected"
+        },
+        {
           "$ref": "#/$defs/item.type.custom"
         }
       ]
@@ -409,6 +412,127 @@
             "Never",
             "IfNotPresent"
           ]
+        }
+      }
+    },
+    "item.type.projected": {
+      "type": "object",
+      "description": "Project one or more sources into a single volume. Sources may be ServiceAccount tokens, ConfigMaps or Secrets, all mounted into the same directory.",
+      "examples": [
+        "persistence:\n  api-token:\n    type: projected\n    sources:\n      - serviceAccountToken:\n          audience: https://api.example.com\n          expirationSeconds: 3600\n          path: token",
+        "persistence:\n  bundle:\n    type: projected\n    defaultMode: 0400\n    sources:\n      - serviceAccountToken:\n          audience: vault\n          path: vault-token\n      - configMap:\n          name: ca-bundle\n          items:\n            - key: ca.crt\n              path: ca.crt"
+      ],
+      "required": [
+        "type",
+        "sources"
+      ],
+      "properties": {
+        "type": {
+          "const": "projected"
+        },
+        "defaultMode": {
+          "type": "integer",
+          "description": "Permissions applied to the projected files, in octal (for example 0400). Individual items may override this."
+        },
+        "sources": {
+          "type": "array",
+          "description": "The list of volume projections to mount into this volume. Helm templates are supported.",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/volumeProjection"
+          }
+        }
+      }
+    },
+    "volumeProjection": {
+      "type": "object",
+      "description": "A single projection source. Exactly one of serviceAccountToken, configMap or secret must be set.",
+      "minProperties": 1,
+      "properties": {
+        "serviceAccountToken": {
+          "type": "object",
+          "description": "Project a ServiceAccount token into the volume.",
+          "required": [
+            "path"
+          ],
+          "properties": {
+            "audience": {
+              "type": "string",
+              "description": "The intended audience of the token. A recipient of the token must identify itself with this identifier, otherwise it should reject the token. Defaults to the API server's identifier. Helm templates are supported."
+            },
+            "expirationSeconds": {
+              "type": "integer",
+              "description": "The requested duration of validity of the token, in seconds. The kubelet starts rotating the token once it is older than 80% of this value, or after 24 hours, whichever is sooner."
+            },
+            "path": {
+              "type": "string",
+              "description": "The path relative to the mount point of the file to project the token into. Helm templates are supported."
+            }
+          }
+        },
+        "configMap": {
+          "type": "object",
+          "description": "Project a ConfigMap into the volume.",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "The name of the ConfigMap to project. Helm templates are supported."
+            },
+            "optional": {
+              "type": "boolean",
+              "description": "Whether the ConfigMap must be defined for the pod to start."
+            },
+            "items": {
+              "type": "array",
+              "description": "Map specific keys to specific paths within the volume.",
+              "items": {
+                "$ref": "#/$defs/keyToPath"
+              }
+            }
+          }
+        },
+        "secret": {
+          "type": "object",
+          "description": "Project a Secret into the volume.",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "The name of the Secret to project. Helm templates are supported."
+            },
+            "optional": {
+              "type": "boolean",
+              "description": "Whether the Secret must be defined for the pod to start."
+            },
+            "items": {
+              "type": "array",
+              "description": "Map specific keys to specific paths within the volume.",
+              "items": {
+                "$ref": "#/$defs/keyToPath"
+              }
+            }
+          }
+        }
+      }
+    },
+    "keyToPath": {
+      "type": "object",
+      "description": "Maps a key from a ConfigMap or Secret to a path within the volume.",
+      "required": [
+        "key",
+        "path"
+      ],
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The key to project."
+        },
+        "path": {
+          "type": "string",
+          "description": "The relative path of the file to map the key to. Helm templates are supported."
+        },
+        "mode": {
+          "type": "integer",
+          "description": "Permissions applied to this file, in octal (for example 0400)."
         }
       }
     },
