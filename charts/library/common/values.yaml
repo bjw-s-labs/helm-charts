@@ -706,9 +706,10 @@ controllers: {}
       # env: []
       # -- Secrets and/or ConfigMaps to load as environment variables in bulk. Each
       # entry references either a ConfigMap (via `configMap` name or
-      # `configMapRef.identifier`) or a Secret (via `secret` name or
-      # `secretRef.identifier`), with optional `prefix`. See the Environment Variables
-      # howto for detailed patterns.
+      # `configMapRef.identifier`), a Secret (via `secret` name or
+      # `secretRef.identifier`), or an ExternalSecret (via
+      # `externalSecretRef.identifier`), with optional `prefix`. See the Environment
+      # Variables howto for detailed patterns.
       # envFrom: []
       # -- Image configuration for the container.
       # image: {}
@@ -1234,9 +1235,10 @@ controllers: {}
       # env: []
       # -- Secrets and/or ConfigMaps to load as environment variables in bulk. Each
       # entry references either a ConfigMap (via `configMap` name or
-      # `configMapRef.identifier`) or a Secret (via `secret` name or
-      # `secretRef.identifier`), with optional `prefix`. See the Environment Variables
-      # howto for detailed patterns.
+      # `configMapRef.identifier`), a Secret (via `secret` name or
+      # `secretRef.identifier`), or an ExternalSecret (via
+      # `externalSecretRef.identifier`), with optional `prefix`. See the Environment
+      # Variables howto for detailed patterns.
       # envFrom: []
       # -- Image configuration for the container.
       # image: {}

@@ -303,7 +303,7 @@ persistence:
   </TabItem>
   <TabItem label="secret">
 
-Mount a Secret as a volume. Use &#39;name&#39; for external Secrets, or &#39;identifier&#39; to reference one managed by this chart.
+Mount a Secret as a volume. Use &#39;name&#39; for an existing Secret, &#39;identifier&#39; for a Secret managed by this chart, or &#39;externalSecretRef&#39; for an ExternalSecret managed by this chart.
 
 
 ```yaml
@@ -318,6 +318,7 @@ persistence:
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
 | `defaultMode` | `integer` | No | - |  |
+| `externalSecretRef` | `string` | No | - |  |
 | `identifier` | `string` | No | - |  |
 | `items` | `array` | No | - |  |
 | `name` | `string` | **Yes** | - |  |

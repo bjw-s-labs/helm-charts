@@ -202,7 +202,7 @@
     },
     "item.type.secret": {
       "type": "object",
-      "description": "Mount a Secret as a volume. Use 'name' for external Secrets, or 'identifier' to reference one managed by this chart.",
+      "description": "Mount a Secret as a volume. Use 'name' for an existing Secret, 'identifier' for a Secret managed by this chart, or 'externalSecretRef' for an ExternalSecret managed by this chart.",
       "examples": [
         "persistence:\n  credentials:\n    type: secret\n    name: my-secret",
         "persistence:\n  tls:\n    type: secret\n    name: app-tls-cert\n    globalMounts:\n      - path: /etc/ssl/certs\n        readOnly: true"
@@ -210,7 +210,7 @@
       "required": [
         "type"
       ],
-      "$comment": "oneOf enforces that at least one of name/identifier is present. dependentSchemas enforces mutual exclusion with a targeted error when both are set. Both are needed — do not simplify to oneOf alone.",
+      "$comment": "oneOf enforces that at least one of name/identifier/externalSecretRef is present. dependentSchemas enforces mutual exclusion. Both are needed — do not simplify to oneOf alone.",
       "oneOf": [
         {
           "required": [
@@ -221,20 +221,59 @@
           "required": [
             "identifier"
           ]
+        },
+        {
+          "required": [
+            "externalSecretRef"
+          ]
         }
       ],
       "dependentSchemas": {
         "name": {
           "not": {
-            "required": [
-              "identifier"
+            "anyOf": [
+              {
+                "required": [
+                  "identifier"
+                ]
+              },
+              {
+                "required": [
+                  "externalSecretRef"
+                ]
+              }
             ]
           }
         },
         "identifier": {
           "not": {
-            "required": [
-              "name"
+            "anyOf": [
+              {
+                "required": [
+                  "name"
+                ]
+              },
+              {
+                "required": [
+                  "externalSecretRef"
+                ]
+              }
+            ]
+          }
+        },
+        "externalSecretRef": {
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "name"
+                ]
+              },
+              {
+                "required": [
+                  "identifier"
+                ]
+              }
             ]
           }
         }
@@ -247,6 +286,9 @@
           "type": "string"
         },
         "identifier": {
+          "type": "string"
+        },
+        "externalSecretRef": {
           "type": "string"
         },
         "defaultMode": {
