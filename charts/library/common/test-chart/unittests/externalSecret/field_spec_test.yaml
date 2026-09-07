@@ -25,6 +25,8 @@ tests:
           deletionPolicy: Retain
           template:
             type: Opaque
+            engineVersion: v1
+            mergePolicy: Merge
             data:
               connection: "postgres://{{ .username }}:{{ .password }}@database"
         data:
@@ -65,8 +67,8 @@ tests:
             deletionPolicy: Retain
             template:
               type: Opaque
-              engineVersion: v2
-              mergePolicy: Replace
+              engineVersion: v1
+              mergePolicy: Merge
               data:
                 connection: "postgres://{{ .username }}:{{ .password }}@database"
       - equal:
@@ -82,7 +84,7 @@ tests:
             - extract:
                 key: shared-credentials
 
-  - it: renders chart defaults
+  - it: does not inject chart defaults
     set:
       externalSecrets.main:
         data:
@@ -96,14 +98,36 @@ tests:
       path: $[?(@.kind == "ExternalSecret")].metadata.name
       value: release-name
     asserts:
-      - equal:
+      - notExists:
           path: spec.refreshInterval
-          value: 1h0m0s
       - equal:
           path: spec.target
           value:
-            creationPolicy: Owner
             deletionPolicy: Delete
+
+  - it: supports generator references without a SecretStore
+    set:
+      externalSecrets.main:
+        dataFrom:
+          - sourceRef:
+              generatorRef:
+                apiVersion: generators.external-secrets.io/v1alpha1
+                kind: Password
+                name: generated-password
+    documentSelector:
+      path: $[?(@.kind == "ExternalSecret")].metadata.name
+      value: release-name
+    asserts:
+      - notExists:
+          path: spec.secretStoreRef
+      - equal:
+          path: spec.dataFrom
+          value:
+            - sourceRef:
+                generatorRef:
+                  apiVersion: generators.external-secrets.io/v1alpha1
+                  kind: Password
+                  name: generated-password
 
   - it: supports per-entry store references without a top-level store
     set:

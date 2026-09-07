@@ -54,6 +54,13 @@ The `common` library chart follows a modular architecture:
 3. **Run tests** via `just chart::test library/common`
 4. **Verify** all tests pass before committing
 
+### Resource and Schema Workflow
+
+- New schema files must use the current chart version in their `$id`, and all referenced files must be available at the versioned URL.
+- Resource renderers should avoid mutating user values or injecting provider-specific defaults unless the behavior is explicitly documented and tested.
+- After changing a values schema, run `just chart::generate-values library/common` followed by `just chart::check-values library/common`.
+- Ensure the `helm-unittest` plugin is installed and run `helm dep update` in the test chart after template changes before running focused unit tests.
+
 ## Development Environment
 
 ### Tools
