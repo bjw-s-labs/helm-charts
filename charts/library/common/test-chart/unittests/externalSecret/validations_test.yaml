@@ -1,0 +1,54 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: externalSecret - validations
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+tests:
+  - it: requires a store for data entries
+    set:
+      externalSecrets.main:
+        data:
+          - secretKey: password
+            remoteRef:
+              key: credentials
+    asserts:
+      - failedTemplate:
+          errorMessage: "ExternalSecret 'main': data entry 0 has no SecretStore reference. Configure a default store, a resource-level store, or 'externalSecrets.main.data[0].sourceRef.storeRef'."
+
+  - it: requires a store for dataFrom entries
+    set:
+      externalSecrets.main:
+        dataFrom:
+          - extract:
+              key: credentials
+    asserts:
+      - failedTemplate:
+          errorMessage: "ExternalSecret 'main': dataFrom entry 0 has no SecretStore reference. Configure a default store, a resource-level store, or 'externalSecrets.main.dataFrom[0].sourceRef.storeRef'."
+
+  - it: rejects invalid refreshPolicy
+    set:
+      externalSecrets.main:
+        refreshPolicy: Invalid
+        data:
+          - secretKey: password
+            remoteRef:
+              key: credentials
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects invalid syncWindows
+    set:
+      externalSecrets.main:
+        syncWindows:
+          kind: invalid
+          windows: []
+        data:
+          - secretKey: password
+            remoteRef:
+              key: credentials
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
