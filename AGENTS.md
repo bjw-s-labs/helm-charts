@@ -61,6 +61,13 @@ The `common` library chart follows a modular architecture:
 - After changing a values schema, run `just chart::generate-values library/common` followed by `just chart::check-values library/common`.
 - Ensure the `helm-unittest` plugin is installed and run `helm dep update` in the test chart after template changes before running focused unit tests.
 
+## Defaulting and User Values
+
+- Distinguish absent keys from explicitly empty or partial values; a missing key is not the same as an empty value.
+- Use presence checks such as `hasKey` when absence has semantic meaning.
+- Preserve explicitly configured selectors and objects instead of overwriting them with derived or auto-detected values.
+- Test absent, explicit empty, `matchLabels`, `matchExpressions`, and templated values when relevant.
+
 ## Development Environment
 
 ### Tools
