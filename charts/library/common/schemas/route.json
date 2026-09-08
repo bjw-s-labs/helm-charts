@@ -76,6 +76,11 @@
                 "type": "string"
               },
               "name": {
+                "description": "Name of the Gateway (or other parent resource) the Route attaches to. Mutually exclusive with identifier.",
+                "type": "string"
+              },
+              "identifier": {
+                "description": "Reference to a ListenerSet identifier defined within the chart values. The parent resource name, kind and group are resolved from the ListenerSet. Mutually exclusive with name.",
                 "type": "string"
               },
               "sectionName": {
@@ -85,9 +90,24 @@
                 "type": "integer"
               }
             },
-            "required": [
-              "name"
-            ]
+            "oneOf": [
+              {
+                "required": [
+                  "name"
+                ]
+              },
+              {
+                "required": [
+                  "identifier"
+                ]
+              }
+            ],
+            "not": {
+              "required": [
+                "name",
+                "identifier"
+              ]
+            }
           }
         },
         "rules": {

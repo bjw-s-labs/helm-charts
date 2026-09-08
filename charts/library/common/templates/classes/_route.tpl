@@ -43,17 +43,39 @@ metadata:
 spec:
   parentRefs:
   {{- range $routeObject.parentRefs }}
-    - group: {{ .group | default "gateway.networking.k8s.io" }}
-      kind: {{ .kind | default "Gateway" }}
-      name: {{ required (printf "parentRef name is required for %v %v" $routeKind $routeObject.name) .name }}
-      {{- if .namespace }}
-      namespace: {{ .namespace | quote }}
+    {{- $parentRef := . -}}
+    {{- $parentGroup := $parentRef.group | default "gateway.networking.k8s.io" -}}
+    {{- $parentKind := $parentRef.kind | default "Gateway" -}}
+    {{- $parentName := $parentRef.name -}}
+    {{- $parentNamespace := $parentRef.namespace -}}
+    {{- if $parentRef.identifier -}}
+      {{- /* Resolve the parent from a locally generated ListenerSet */ -}}
+      {{- $listenerSet := include "bjw-s.common.lib.listenerSet.getByIdentifier" (dict "rootContext" $rootContext "id" $parentRef.identifier) | fromYaml -}}
+      {{- if not $listenerSet -}}
+        {{- fail (printf "Route '%s': No enabled ListenerSet found with identifier '%s'. Define and enable it under 'listenerSets.%s' or reference a parent Gateway by name." $routeObject.identifier $parentRef.identifier $parentRef.identifier) -}}
+      {{- end -}}
+      {{- $parentGroup = $listenerSet.group -}}
+      {{- $parentKind = $listenerSet.kind -}}
+      {{- $parentName = $listenerSet.name -}}
+      {{- if not $parentNamespace -}}
+        {{- $listenerSetNamespace := $listenerSet.namespaceOverride | default $rootContext.Release.Namespace -}}
+        {{- $routeNamespace := $routeObject.namespaceOverride | default $rootContext.Release.Namespace -}}
+        {{- if ne $listenerSetNamespace $routeNamespace -}}
+          {{- $parentNamespace = $listenerSetNamespace -}}
+        {{- end -}}
+      {{- end -}}
+    {{- end }}
+    - group: {{ $parentGroup }}
+      kind: {{ $parentKind }}
+      name: {{ required (printf "parentRef name is required for %v %v" $routeKind $routeObject.name) $parentName }}
+      {{- if $parentNamespace }}
+      namespace: {{ $parentNamespace | quote }}
       {{- end }}
-      {{- if .sectionName }}
-      sectionName: {{ .sectionName | quote }}
+      {{- if $parentRef.sectionName }}
+      sectionName: {{ $parentRef.sectionName | quote }}
       {{- end }}
-      {{- if .port }}
-      port: {{ .port }}
+      {{- if $parentRef.port }}
+      port: {{ $parentRef.port }}
       {{- end }}
   {{- end }}
   {{- if and (ne $routeKind "TCPRoute") (ne $routeKind "UDPRoute") $routeObject.hostnames }}

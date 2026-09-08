@@ -18,22 +18,11 @@ within the common library.
     (deepCopy ($rootContext.Values.defaultExternalSecretStoreRef | default dict))
     (deepCopy ($externalSecretObject.secretStoreRef | default dict))
   -}}
-
-  {{/* Render defaults explicitly to prevent Argo CD drift. Unlike ESO, default
-       deletionPolicy is set to Delete to favor cleanup of old secrets. */}}
   {{- $target := mergeOverwrite
-    (dict "creationPolicy" "Owner" "deletionPolicy" "Delete")
+    (dict "deletionPolicy" "Delete")
     (deepCopy ($externalSecretObject.target | default dict))
   -}}
-  {{- if hasKey $target "template" -}}
-    {{- $_ := set $target "template" (mergeOverwrite
-      (dict "engineVersion" "v2" "mergePolicy" "Replace")
-      (deepCopy $target.template)
-    ) -}}
-  {{- end -}}
 
-  {{- $data := deepCopy ($externalSecretObject.data | default list) -}}
-  {{- $dataFrom := deepCopy ($externalSecretObject.dataFrom | default list) -}}
 ---
 apiVersion: external-secrets.io/v1
 kind: ExternalSecret
@@ -56,9 +45,11 @@ spec:
   {{- with $externalSecretObject.refreshPolicy }}
   refreshPolicy: {{ . }}
   {{- end }}
-  refreshInterval: {{ $externalSecretObject.refreshInterval | default "1h0m0s" | quote }}
-  {{- with $secretStoreRef }}
-  secretStoreRef: {{- toYaml . | nindent 4 -}}
+  {{- with $externalSecretObject.refreshInterval }}
+  refreshInterval: {{ . | quote }}
+  {{- end }}
+  {{- if $secretStoreRef.name }}
+  secretStoreRef: {{- toYaml $secretStoreRef | nindent 4 -}}
   {{- end }}
   {{- with $externalSecretObject.syncWindows }}
   syncWindows: {{- toYaml . | nindent 4 -}}
@@ -66,10 +57,10 @@ spec:
   {{- with $target }}
   target: {{- toYaml . | nindent 4 -}}
   {{- end }}
-  {{- with $data }}
+  {{- with $externalSecretObject.data }}
   data: {{- toYaml . | nindent 4 -}}
   {{- end }}
-  {{- with $dataFrom }}
+  {{- with $externalSecretObject.dataFrom }}
   dataFrom: {{- toYaml . | nindent 4 -}}
   {{- end }}
 {{- end -}}

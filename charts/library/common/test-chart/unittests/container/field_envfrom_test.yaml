@@ -145,6 +145,54 @@ tests:
               name: release-name
             prefix: test
 
+  - it: envFrom ExternalSecret identifier reference should pass
+    set:
+      controllers.main.containers.main.envFrom:
+        - externalSecretRef:
+            identifier: external
+      defaultExternalSecretStoreRef:
+        name: provider-store
+      externalSecrets:
+        external:
+          target:
+            name: eso-managed-secret
+          data:
+            - secretKey: password
+              remoteRef:
+                key: credentials
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].envFrom[0]
+          value:
+            secretRef:
+              name: eso-managed-secret
+
+  - it: envFrom ExternalSecret identifier uses the generated target name by default
+    set:
+      controllers.main.containers.main.envFrom:
+        - externalSecretRef:
+            identifier: external
+      defaultExternalSecretStoreRef:
+        name: provider-store
+      externalSecrets:
+        external:
+          data:
+            - secretKey: password
+              remoteRef:
+                key: credentials
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].envFrom[0]
+          value:
+            secretRef:
+              name: release-name
+
   - it: envFrom with templated name reference should pass
     set:
       controllers.main.containers.main.envFrom:

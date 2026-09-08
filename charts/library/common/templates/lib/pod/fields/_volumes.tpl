@@ -83,6 +83,12 @@ Returns the value for volumes
           {{- fail (printf "Persistence '%s': No Secret found with identifier '%s'. Ensure a Secret with this identifier exists and is enabled under 'secrets.%s'." $identifier $persistenceValues.identifier $persistenceValues.identifier) -}}
         {{- end -}}
         {{- $objectName = $object.name -}}
+      {{- else if $persistenceValues.externalSecretRef -}}
+        {{- $object := (include "bjw-s.common.lib.externalSecret.getByIdentifier" (dict "rootContext" $rootContext "id" $persistenceValues.externalSecretRef) | fromYaml ) -}}
+        {{- if not $object -}}
+          {{- fail (printf "Persistence '%s': No ExternalSecret found with identifier '%s'. Ensure an ExternalSecret with this identifier exists and is enabled under 'externalSecrets.%s'." $identifier $persistenceValues.externalSecretRef $persistenceValues.externalSecretRef) -}}
+        {{- end -}}
+        {{- $objectName = include "bjw-s.common.lib.externalSecret.getSecretName" $object -}}
       {{- end -}}
       {{- $_ := set $volume "secret" dict -}}
       {{- $_ := set $volume.secret "secretName" $objectName -}}

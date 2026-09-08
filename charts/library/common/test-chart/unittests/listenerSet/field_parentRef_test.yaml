@@ -1,0 +1,90 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: listenerSet - fields - parentRef
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+capabilities:
+  apiVersions:
+    - gateway.networking.k8s.io/v1/ListenerSet
+set:
+  listenerSets.main.listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+tests:
+  - it: group and kind default to the Gateway API values
+    set:
+      listenerSets.main.parentRef:
+        name: main-gateway
+    documentSelector:
+      path: $[?(@.kind == "ListenerSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.parentRef.group
+          value: gateway.networking.k8s.io
+      - equal:
+          path: spec.parentRef.kind
+          value: Gateway
+      - equal:
+          path: spec.parentRef.name
+          value: main-gateway
+
+  - it: namespace is not emitted when not set
+    set:
+      listenerSets.main.parentRef:
+        name: main-gateway
+    documentSelector:
+      path: $[?(@.kind == "ListenerSet")].metadata.name
+      value: release-name
+    asserts:
+      - notExists:
+          path: spec.parentRef.namespace
+
+  - it: namespace is emitted when set
+    set:
+      listenerSets.main.parentRef:
+        name: main-gateway
+        namespace: gateway-ns
+    documentSelector:
+      path: $[?(@.kind == "ListenerSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.parentRef.namespace
+          value: gateway-ns
+
+  - it: custom group and kind
+    set:
+      listenerSets.main.parentRef:
+        group: example.com
+        kind: MyGateway
+        name: main-gateway
+    documentSelector:
+      path: $[?(@.kind == "ListenerSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.parentRef.group
+          value: example.com
+      - equal:
+          path: spec.parentRef.kind
+          value: MyGateway
+      - equal:
+          path: spec.parentRef.name
+          value: main-gateway
+
+  - it: parentRef is required
+    asserts:
+      - failedTemplate:
+          errorMessage: "ListenerSet 'main': spec.parentRef is required. Define it under 'listenerSets.main.parentRef' with a Gateway name."
+
+  - it: parentRef.name is required
+    set:
+      listenerSets.main.parentRef:
+        name: ""
+    asserts:
+      - failedTemplate:
+          errorMessage: "ListenerSet 'main': parentRef.name is required. Specify the parent Gateway name under 'listenerSets.main.parentRef.name'."
