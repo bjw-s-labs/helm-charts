@@ -19,3 +19,6 @@ annotations:
     - kind: added
       description: |-
         Added support for ExternalSecret resources
+    - kind: added
+      description: |-
+        Added initial support for ListenerSet resources
