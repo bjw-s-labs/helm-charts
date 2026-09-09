@@ -131,3 +131,43 @@ tests:
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/name: RELEASE-NAME
             app.kubernetes.io/controller: secondary
+
+  - it: matchExpressions-only selector should pass unchanged
+    set:
+      controllers.main.pod.topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - foo
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.topologySpreadConstraints[0].labelSelector
+          value:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - foo
+
+  - it: empty selector should pass unchanged
+    set:
+      controllers.main.pod.topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector: {}
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.topologySpreadConstraints[0].labelSelector
+          value: {}
