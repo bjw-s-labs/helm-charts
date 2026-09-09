@@ -98,3 +98,76 @@ tests:
               labelSelector:
                 matchLabels:
                   app: RELEASE-NAME
+
+  - it: defaultPodOption should scope each constraint to its controller
+    set:
+      defaultPodOptions:
+        topologySpreadConstraints:
+          - maxSkew: 1
+            topologyKey: kubernetes.io/hostname
+            whenUnsatisfiable: DoNotSchedule
+      controllers.secondary:
+        containers:
+          main:
+            image:
+              repository: nginx
+              tag: latest
+    asserts:
+      - documentSelector:
+          path: $[?(@.kind == "Deployment")].metadata.name
+          value: release-name-main
+        equal:
+          path: spec.template.spec.topologySpreadConstraints[0].labelSelector.matchLabels
+          value:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/controller: main
+      - documentSelector:
+          path: $[?(@.kind == "Deployment")].metadata.name
+          value: release-name-secondary
+        equal:
+          path: spec.template.spec.topologySpreadConstraints[0].labelSelector.matchLabels
+          value:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/controller: secondary
+
+  - it: matchExpressions-only selector should pass unchanged
+    set:
+      controllers.main.pod.topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - foo
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.topologySpreadConstraints[0].labelSelector
+          value:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - foo
+
+  - it: empty selector should pass unchanged
+    set:
+      controllers.main.pod.topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector: {}
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.topologySpreadConstraints[0].labelSelector
+          value: {}

@@ -22,3 +22,6 @@ annotations:
     - kind: added
       description: |-
         Added initial support for ListenerSet resources
+    - kind: added
+      description: |-
+        Added default selectors to topologySpreadConstraints to the same controller
