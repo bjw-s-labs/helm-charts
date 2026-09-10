@@ -25,3 +25,6 @@ annotations:
     - kind: added
       description: |-
         Added default selectors to topologySpreadConstraints to the same controller
+    - kind: added
+      description: |-
+        Added native support for `projected` persistence items
