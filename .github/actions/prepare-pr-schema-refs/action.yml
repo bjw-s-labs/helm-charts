@@ -1,0 +1,25 @@
+---
+name: Prepare PR schema references
+description: Point repository raw schema URLs at local files in the workspace
+inputs:
+  repository:
+    description: Repository in owner/name form
+    required: true
+  root:
+    description: Checked-out repository root
+    required: false
+    default: .
+  path:
+    description: Relative path containing schema files
+    required: false
+    default: charts
+runs:
+  using: composite
+  steps:
+    - name: Rewrite PR schema references
+      shell: bash
+      run: >-
+        python3 "${{ github.action_path }}/prepare_schema_refs.py"
+        --repository "${{ inputs.repository }}"
+        --root "${{ inputs.root }}"
+        --path "${{ inputs.path }}"
