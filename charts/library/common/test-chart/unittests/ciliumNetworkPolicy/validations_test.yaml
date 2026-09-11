@@ -55,3 +55,17 @@ tests:
     asserts:
       - failedTemplate:
           errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects nodeSelector on a CiliumNetworkPolicy
+    set:
+      networkpolicies.main:
+        type: cilium
+        controller: main
+        nodeSelector:
+          matchLabels:
+            kubernetes.io/os: linux
+        ingress:
+          - {}
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema

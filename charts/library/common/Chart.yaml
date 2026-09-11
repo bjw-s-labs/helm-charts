@@ -22,6 +22,9 @@ annotations:
     - kind: added
       description: |-
         Added support for CiliumNetworkPolicy resources
+    - kind: added
+      description: |-
+        Added support for CiliumClusterwideNetworkPolicy resources
     - kind: fixed
       description: |-
         Fixed NetworkPolicy extraSelectorLabels precedence over generated selector labels

@@ -2,12 +2,10 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.2.0/charts/library/common/schemas/ciliumNetworkPolicy.json",
   "$defs": {
-    "instance": {
+    "base": {
       "type": "object",
       "allOf": [
-        {
-          "$ref": "definitions.json#/$defs/resourceIdentifier"
-        }
+        { "$ref": "definitions.json#/$defs/resourceIdentifier" }
       ],
       "unevaluatedProperties": false,
       "properties": {
@@ -17,9 +15,8 @@
           "default": true
         },
         "type": {
-          "description": "Resource implementation to render. Set to cilium to render a CiliumNetworkPolicy. Supported value: cilium.",
-          "type": "string",
-          "const": "cilium"
+          "description": "Resource implementation to render.",
+          "type": "string"
         },
         "annotations": {
           "$ref": "definitions.json#/$defs/annotations"
@@ -40,6 +37,10 @@
         },
         "endpointSelector": {
           "description": "Custom endpointSelector for the CiliumNetworkPolicy. Takes precedence over targeting a controller via the controller identifier.",
+          "$ref": "k8s-api.json#/$defs/meta.v1.LabelSelector"
+        },
+        "nodeSelector": {
+          "description": "Node selector for a CiliumClusterwideNetworkPolicy.",
           "$ref": "k8s-api.json#/$defs/meta.v1.LabelSelector"
         },
         "description": {
@@ -139,11 +140,22 @@
           ]
         }
       ],
-      "required": [
-        "type"
-      ],
+      "required": ["type"],
       "examples": [
         "networkpolicies:\n  cilium:\n    type: cilium\n    endpointSelector:\n      matchLabels:\n        app.kubernetes.io/name: example\n    description: Allow DNS and HTTPS traffic\n    ingress:\n      - fromEntities:\n          - cluster\n    ingressDeny:\n      - fromEntities:\n          - world\n    egress:\n      - toEntities:\n          - cluster\n    egressDeny:\n      - toEntities:\n          - world\n    enableDefaultDeny:\n      ingress: true\n      egress: true\n    log: example-policy"
+      ]
+    },
+    "instance": {
+      "description": "CiliumNetworkPolicy implementation to render.",
+      "type": "object",
+      "properties": {
+        "type": { "const": "cilium" }
+      },
+      "not": {
+        "required": ["nodeSelector"]
+      },
+      "allOf": [
+        { "$ref": "#/$defs/base" }
       ]
     },
     "rules": {

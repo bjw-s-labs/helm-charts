@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.2.0/charts/library/common/schemas/ciliumClusterwideNetworkPolicy.json",
+  "$defs": {
+    "instance": {
+      "description": "Cluster-scoped CiliumClusterwideNetworkPolicy implementation to render. The resource is rendered without metadata.namespace.",
+      "type": "object",
+      "properties": {
+        "type": { "const": "ciliumClusterwide" },
+        "nodeSelector": {
+          "description": "Node selector for a CiliumClusterwideNetworkPolicy.",
+          "$ref": "k8s-api.json#/$defs/meta.v1.LabelSelector"
+        }
+      },
+      "examples": [
+        "networkpolicies:\n  ciliumClusterwide:\n    type: ciliumClusterwide\n    nodeSelector:\n      matchLabels:\n        kubernetes.io/os: linux\n    ingress:\n      - fromEntities:\n          - cluster"
+      ],
+      "allOf": [
+        { "$ref": "ciliumNetworkPolicy.json#/$defs/base" },
+        {
+          "not": {
+            "anyOf": [
+              { "required": ["nodeSelector", "endpointSelector"] },
+              { "required": ["nodeSelector", "controller"] }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

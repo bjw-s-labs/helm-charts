@@ -8,7 +8,9 @@ values:
 set:
   networkpolicies.main:
     type: cilium
-    controller: main
+    endpointSelector:
+      matchLabels:
+        app.kubernetes.io/name: example
     ingress:
       - {}
 tests:
@@ -20,6 +22,11 @@ tests:
       - equal:
           path: metadata.namespace
           value: NAMESPACE
+      - equal:
+          path: spec.endpointSelector
+          value:
+            matchLabels:
+              app.kubernetes.io/name: example
       - equal:
           path: metadata.labels
           value:

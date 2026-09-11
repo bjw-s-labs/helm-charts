@@ -14,8 +14,11 @@ within the common library.
     ($ciliumNetworkPolicyObject.annotations | default dict)
     (include "bjw-s.common.lib.metadata.globalAnnotations" $rootContext | fromYaml)
   -}}
+  {{- $clusterwide := eq ($ciliumNetworkPolicyObject.type | default "cilium") "ciliumClusterwide" -}}
   {{- $endpointSelector := dict -}}
-  {{- if (hasKey $ciliumNetworkPolicyObject "endpointSelector") -}}
+  {{- if hasKey $ciliumNetworkPolicyObject "nodeSelector" -}}
+    {{- /* CiliumClusterwideNetworkPolicy node selectors replace endpoint selectors. */ -}}
+  {{- else if (hasKey $ciliumNetworkPolicyObject "endpointSelector") -}}
     {{- $endpointSelector = $ciliumNetworkPolicyObject.endpointSelector -}}
   {{- else -}}
     {{- /* Determine the controller identifier to use */ -}}
@@ -49,7 +52,7 @@ within the common library.
   {{- end -}}
 ---
 apiVersion: cilium.io/v2
-kind: CiliumNetworkPolicy
+kind: {{ if $clusterwide }}CiliumClusterwideNetworkPolicy{{ else }}CiliumNetworkPolicy{{ end }}
 metadata:
   name: {{ $ciliumNetworkPolicyObject.name }}
   {{- with $labels }}
@@ -64,9 +67,10 @@ metadata:
       {{- printf "%s: %s" $key (tpl $value $rootContext | toYaml ) | nindent 4 }}
     {{- end }}
   {{- end }}
-  namespace: {{ $rootContext.Release.Namespace }}
+  {{ if not $clusterwide }}namespace: {{ $rootContext.Release.Namespace }}{{ end }}
 spec:
-  endpointSelector: {{- toYaml $endpointSelector | nindent 4 }}
+  {{ if hasKey $ciliumNetworkPolicyObject "nodeSelector" }}nodeSelector: {{ tpl (toYaml $ciliumNetworkPolicyObject.nodeSelector) $rootContext | nindent 4 }}
+  {{ else }}endpointSelector: {{ toYaml $endpointSelector | nindent 4 }}{{ end }}
   {{- with $ciliumNetworkPolicyObject.description }}
   description: {{ tpl . $rootContext | quote }}
   {{- end }}
