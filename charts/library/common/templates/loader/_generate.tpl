@@ -4,6 +4,10 @@ Secondary entrypoint and primary loader for the common chart
 {{- define "bjw-s.common.loader.generate" -}}
   {{- $rootContext := $ -}}
 
+  {{- /* Single-pass evaluation against the post-merge root context. */ -}}
+  {{- $evaluatedValues := include "bjw-s.common.values.evaluateTemplate" (dict "rootContext" $rootContext "value" (deepCopy $rootContext.Values)) | fromJson -}}
+  {{- $_ := set $rootContext "Values" (index $evaluatedValues "value") -}}
+
   {{- /* Run global chart validations */ -}}
   {{- include "bjw-s.common.lib.chart.validate" $rootContext -}}
 
@@ -18,8 +22,10 @@ Secondary entrypoint and primary loader for the common chart
   {{- include "bjw-s.common.render.ingresses" $rootContext | nindent 0 -}}
   {{- include "bjw-s.common.render.serviceMonitors" $rootContext | nindent 0 -}}
   {{- include "bjw-s.common.render.podMonitors" $rootContext | nindent 0 -}}
+  {{- include "bjw-s.common.render.listenerSets" $rootContext | nindent 0 -}}
   {{- include "bjw-s.common.render.routes" $rootContext | nindent 0 -}}
   {{- include "bjw-s.common.render.secrets" $rootContext | nindent 0 -}}
+  {{- include "bjw-s.common.render.externalSecrets" $rootContext | nindent 0 -}}
   {{- include "bjw-s.common.render.networkpolicies" $rootContext | nindent 0 -}}
   {{- include "bjw-s.common.render.rawResources" $rootContext | nindent 0 -}}
   {{- include "bjw-s.common.render.rbac" $rootContext | nindent 0 -}}

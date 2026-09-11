@@ -41,7 +41,7 @@ Available properties:
 | `prefix` | `string` | No | `` | Prefix to prepend to the resource name. Mutually exclusiv... |
 | [`selector`](./selector/) | `object` | No | - | Selector to select Endpoints objects. |
 | `service` | `object` | No | - | Service to monitor. Either &#39;serviceName&#39; or &#39;... |
-| `serviceName` | `string` | No | - | Reference to a Service name to monitor. Helm templates ar... |
+| `serviceName` | `string` | No | - | Reference to a Service name to monitor. Deprecated in fav... |
 | `suffix` | `string` | No | - | Suffix to append to the resource name. Defaults to the re... |
 | `targetLabels` | `array` | No | - | Transfers labels from the Kubernetes Service onto the cre... |
 
@@ -53,7 +53,7 @@ Override the default resource name. Mutually exclusive with prefix and suffix.
 
 #### jobLabel
 
-The label to use to retrieve the job name from the target service&#39;s metadata. Defaults to &#39;app.kubernetes.io/name&#39;. Helm templates can be used.
+The label to use to retrieve the job name from the target service&#39;s metadata. Defaults to &#39;app.kubernetes.io/name&#39;.
 
 #### prefix
 
@@ -69,7 +69,7 @@ Service to monitor. Either &#39;serviceName&#39; or &#39;service&#39; must be sp
 
 #### serviceName
 
-Reference to a Service name to monitor. Helm templates are supported. Deprecated in favor of &#39;service&#39;.
+Reference to a Service name to monitor. Deprecated in favor of &#39;service&#39;.
 
 #### suffix
 

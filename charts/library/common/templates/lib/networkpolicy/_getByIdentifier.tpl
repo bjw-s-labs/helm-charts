@@ -8,6 +8,7 @@ Return a NetworkPolicy object by its Identifier.
 
   {{- if (hasKey $enabledNetworkPolicies $identifier) -}}
     {{- $objectValues := get $enabledNetworkPolicies $identifier -}}
-    {{- include "bjw-s.common.lib.valuesToObject" (dict "rootContext" $rootContext "id" $identifier "values" $objectValues "itemCount" (len $enabledNetworkPolicies)) -}}
+    {{- $itemCount := len $enabledNetworkPolicies -}}
+    {{- include "bjw-s.common.lib.valuesToObject" (dict "rootContext" $rootContext "id" $identifier "values" $objectValues "itemCount" $itemCount) -}}
   {{- end -}}
 {{- end -}}

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.1.0/charts/library/common/schemas/pod.json",
+  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.2.0/charts/library/common/schemas/pod.json",
   "$defs": {
     "options": {
       "type": "object",
@@ -8,7 +8,7 @@
       "properties": {
         "affinity": {
           "$ref": "k8s-api.json#/$defs/core.v1.Affinity",
-          "description": "Set affinity constraint rules. Helm templates can be used.\nSee https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity"
+          "description": "Set affinity constraint rules.\nSee https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity"
         },
         "annotations": {
           "$ref": "definitions.json#/$defs/annotations"

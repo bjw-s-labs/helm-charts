@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.1.0/charts/library/common/schemas/serviceMonitor.json",
+  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.2.0/charts/library/common/schemas/serviceMonitor.json",
   "$defs": {
     "instance": {
       "type": "object",
@@ -23,7 +23,7 @@
           "$ref": "definitions.json#/$defs/labels"
         },
         "jobLabel": {
-          "description": "The label to use to retrieve the job name from the target service's metadata. Defaults to 'app.kubernetes.io/name'. Helm templates can be used.",
+          "description": "The label to use to retrieve the job name from the target service's metadata. Defaults to 'app.kubernetes.io/name'.",
           "default": "app.kubernetes.io/name",
           "type": "string"
         },
@@ -74,7 +74,7 @@
           "description": "Service to monitor. Either 'serviceName' or 'service' must be specified.",
           "oneOf": [
             {
-              "description": "Reference to a Service name. Helm templates are supported.",
+              "description": "Reference to a Service name.",
               "type": "object",
               "additionalProperties": false,
               "properties": {
@@ -102,7 +102,7 @@
           ]
         },
         "serviceName": {
-          "description": "Reference to a Service name to monitor. Helm templates are supported. Deprecated in favor of 'service'.",
+          "description": "Reference to a Service name to monitor. Deprecated in favor of 'service'.",
           "type": "string",
           "deprecated": true
         },

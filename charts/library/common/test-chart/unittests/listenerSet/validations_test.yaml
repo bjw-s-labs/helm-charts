@@ -1,0 +1,71 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: listenerSet - validations
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+capabilities:
+  apiVersions:
+    - gateway.networking.k8s.io/v1/ListenerSet
+set:
+  listenerSets.main:
+    parentRef:
+      name: main-gateway
+    listeners:
+      - name: http
+        port: 80
+        protocol: HTTP
+tests:
+  - it: at least one listener is required
+    set:
+      listenerSets.main.listeners: []
+    asserts:
+      - failedTemplate:
+          errorMessage: "ListenerSet 'main': At least one listener is required. Add entries under 'listenerSets.main.listeners'."
+
+  - it: listener name is required
+    set:
+      listenerSets.main.listeners:
+        - name: http
+          port: 80
+          protocol: HTTP
+        - name: ""
+          port: 443
+          protocol: HTTPS
+    asserts:
+      - failedTemplate:
+          errorMessage: "ListenerSet 'main': Listener at index 1 requires a name. Specify it under 'listenerSets.main.listeners[1].name'."
+
+  - it: listener name must be unique
+    set:
+      listenerSets.main.listeners:
+        - name: http
+          port: 80
+          protocol: HTTP
+        - name: http
+          port: 443
+          protocol: HTTPS
+    asserts:
+      - failedTemplate:
+          errorMessage: "ListenerSet 'main': Listener name 'http' is not unique. Ensure each listener has a unique name under 'listenerSets.main.listeners'."
+
+  - it: invalid protocol is rejected by the schema
+    set:
+      listenerSets.main.listeners:
+        - name: http
+          port: 80
+          protocol: FOO
+    asserts:
+      - failedTemplate:
+          errorPattern: "values don't meet the specifications of the schema"
+
+  - it: invalid port is rejected by the schema
+    set:
+      listenerSets.main.listeners:
+        - name: http
+          port: 0
+          protocol: HTTP
+    asserts:
+      - failedTemplate:
+          errorPattern: "values don't meet the specifications of the schema"

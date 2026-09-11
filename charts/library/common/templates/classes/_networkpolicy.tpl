@@ -39,7 +39,8 @@ within the common library.
     -}}
     {{- /* Add extra selector labels last (takes precedence) */ -}}
     {{- if hasKey $networkPolicyObject "extraSelectorLabels" -}}
-      {{- $selectorLabels = merge
+      {{- $selectorLabels = mergeOverwrite
+        (dict)
         $selectorLabels
         ($networkPolicyObject.extraSelectorLabels | default dict)
       -}}

@@ -1,0 +1,28 @@
+---
+title: "target"
+description: "Target Secret configuration. For more details, see https://external-secrets.io/latest/api/externa..."
+sidebar:
+  label: "target"
+---
+
+Target Secret configuration. For more details, see https://external-secrets.io/latest/api/externalsecret/.
+
+## Type
+
+`object`
+
+## Properties
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `creationPolicy` | `string` | No | - | Policy controlling how the target Secret is created. |
+| `deletionPolicy` | `string` | No | `Delete` | Policy controlling what happens to the target Secret when... |
+
+### Property Details
+
+#### deletionPolicy
+
+Policy controlling what happens to the target Secret when provider data is deleted. Defaults to Delete to clean up the target Secret when provider data is removed.
+
+**Allowed values:** `Delete`, `Merge`, `Retain`

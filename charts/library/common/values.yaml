@@ -11,9 +11,9 @@ global:
   alwaysAppendIdentifierToResourceName: false
   # -- Set to true to propagate global metadata to Pod labels.
   propagateGlobalMetadataToPods: false
-  # -- Set additional global labels. Helm templates can be used.
+  # -- Set additional global labels.
   labels: {}
-  # -- Set additional global annotations. Helm templates can be used.
+  # -- Set additional global annotations.
   annotations: {}
   # -- When true (default), automatically create a dedicated ServiceAccount using
   # the release name as the identifier if no serviceAccount is explicitly
@@ -31,7 +31,7 @@ defaultPodOptionsStrategy: overwrite
 # tolerations, security contexts, or service accounts that should apply to every
 # pod.
 defaultPodOptions:
-  # -- Set affinity constraint rules. Helm templates can be used. See
+  # -- Set affinity constraint rules. See
   # https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity
   affinity: {}
     # -- Describes node affinity scheduling rules for the pod.
@@ -309,7 +309,7 @@ controllers: {}
     # labels: {}
     # -- Pod-level options for this controller.
     # pod: {}
-    # -- Set affinity constraint rules. Helm templates can be used. See
+    # -- Set affinity constraint rules. See
     # https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity
     # affinity: {}
       # -- Describes node affinity scheduling rules for the pod.
@@ -700,15 +700,15 @@ controllers: {}
       # dependsOn: []
       # -- Environment variables for the container. Supports multiple syntax styles:
       # simple map (key: value), list of K8s v1.EnvVar entries, and valueFrom
-      # references (configMapKeyRef, secretKeyRef, fieldRef, resourceFieldRef). Helm
-      # templates can be used in values. See the Environment Variables howto for
-      # detailed patterns and examples.
+      # references (configMapKeyRef, secretKeyRef, fieldRef, resourceFieldRef). See
+      # the Environment Variables howto for detailed patterns and examples.
       # env: []
       # -- Secrets and/or ConfigMaps to load as environment variables in bulk. Each
       # entry references either a ConfigMap (via `configMap` name or
-      # `configMapRef.identifier`) or a Secret (via `secret` name or
-      # `secretRef.identifier`), with optional `prefix`. See the Environment Variables
-      # howto for detailed patterns.
+      # `configMapRef.identifier`), a Secret (via `secret` name or
+      # `secretRef.identifier`), or an ExternalSecret (via
+      # `externalSecretRef.identifier`), with optional `prefix`. See the Environment
+      # Variables howto for detailed patterns.
       # envFrom: []
       # -- Image configuration for the container.
       # image: {}
@@ -1228,15 +1228,15 @@ controllers: {}
       # dependsOn: []
       # -- Environment variables for the container. Supports multiple syntax styles:
       # simple map (key: value), list of K8s v1.EnvVar entries, and valueFrom
-      # references (configMapKeyRef, secretKeyRef, fieldRef, resourceFieldRef). Helm
-      # templates can be used in values. See the Environment Variables howto for
-      # detailed patterns and examples.
+      # references (configMapKeyRef, secretKeyRef, fieldRef, resourceFieldRef). See
+      # the Environment Variables howto for detailed patterns and examples.
       # env: []
       # -- Secrets and/or ConfigMaps to load as environment variables in bulk. Each
       # entry references either a ConfigMap (via `configMap` name or
-      # `configMapRef.identifier`) or a Secret (via `secret` name or
-      # `secretRef.identifier`), with optional `prefix`. See the Environment Variables
-      # howto for detailed patterns.
+      # `configMapRef.identifier`), a Secret (via `secret` name or
+      # `secretRef.identifier`), or an ExternalSecret (via
+      # `externalSecretRef.identifier`), with optional `prefix`. See the Environment
+      # Variables howto for detailed patterns.
       # envFrom: []
       # -- Image configuration for the container.
       # image: {}
@@ -1744,8 +1744,7 @@ controllers: {}
     # -- ServiceAccount used by the controller. Only use one of `name` or
     # `identifier`. When both are specified, `identifier` takes priority.
     # serviceAccount: {}
-    # -- (string) Reference a serviceAccount by its name. Helm templates are
-    # supported.
+    # -- (string) Reference a serviceAccount by its name.
     # name:
     # -- (string) Reference a serviceAccount configured in this chart by its key.
     # identifier:
@@ -1852,7 +1851,7 @@ configMaps: {}
     # annotations: {}
     # -- Labels to set on the item.
     # labels: {}
-    # -- ConfigMap data content. Helm templates are supported.
+    # -- ConfigMap data content.
     # data: {}
     # -- ConfigMap binaryData content.
     # binaryData: {}
@@ -1914,8 +1913,73 @@ secrets: {}
     # labels: {}
     # -- (string) Secret type.
     # type:
-    # -- Secret stringData content. Helm templates are supported.
+    # -- Secret stringData content.
     # stringData: {}
+    # -- (string) Override the default resource name. Mutually exclusive with prefix
+    # and suffix.
+    # forceRename:
+    # -- Prefix to prepend to the resource name. Mutually exclusive with
+    # forceRename.
+    # prefix: ""
+    # -- (string) Suffix to append to the resource name. Defaults to the resource
+    # identifier if there are multiple items, otherwise empty. Mutually exclusive
+    # with forceRename.
+    # suffix:
+
+# -- Default SecretStore or ClusterSecretStore reference for ExternalSecret
+# objects.
+defaultExternalSecretStoreRef:
+  # -- (string) Kind of the SecretStore resource.
+  # kind:
+  # -- Name of the SecretStore resource.
+  name: ""
+
+# -- ExternalSecret objects to be generated by the chart. Each key is an
+# ExternalSecret identifier.
+# @default -- See below
+externalSecrets: {}
+  # Example entry - rename as needed
+  # main:
+    # -- Set to false to disable the ExternalSecret.
+    # enabled: true
+    # -- Annotations to set on the item.
+    # annotations: {}
+    # -- Labels to set on the item.
+    # labels: {}
+    # -- (string) Policy controlling when the ExternalSecret is refreshed.
+    # refreshPolicy:
+    # -- (string) Amount of time before values are read again from the SecretStore
+    # provider.
+    # refreshInterval:
+    # -- SecretStore or ClusterSecretStore to fetch secret data from. Values
+    # override defaultExternalSecretStoreRef.
+    # secretStoreRef: {}
+    # -- (string) Kind of the SecretStore resource.
+    # kind:
+    # -- Name of the SecretStore resource.
+    # name: ""
+    # -- Time windows restricting when periodic refreshes may occur. See
+    # https://external-secrets.io/latest/api/externalsecret/ for details.
+    # syncWindows: {}
+    # -- Whether the windows allow or deny periodic refreshes.
+    # kind: allow
+    # -- Schedule and duration pairs defining the refresh windows.
+    # windows: []
+    # -- Target Secret configuration. For more details, see
+    # https://external-secrets.io/latest/api/externalsecret/.
+    # target: {}
+    # -- (string) Policy controlling how the target Secret is created.
+    # creationPolicy:
+    # -- Policy controlling what happens to the target Secret when provider data is
+    # deleted. Defaults to Delete to clean up the target Secret when provider data
+    # is removed.
+    # deletionPolicy: Delete
+    # -- Mappings between Kubernetes Secret keys and provider data. See
+    # https://external-secrets.io/latest/api/externalsecret/ for details.
+    # data: []
+    # -- Provider data sources whose values are merged into the target Secret. See
+    # https://external-secrets.io/latest/api/externalsecret/ for details.
+    # dataFrom: []
     # -- (string) Override the default resource name. Mutually exclusive with prefix
     # and suffix.
     # forceRename:
@@ -2046,7 +2110,7 @@ route: {}
     # referenceGrant:
       # -- Set to false to disable automatic ReferenceGrant generation.
       # enabled: true
-    # -- Host addresses for the Route. Helm templates are supported.
+    # -- Host addresses for the Route.
     # hostnames: []
     # -- (string) Route kind. Supported values: GRPCRoute, HTTPRoute, TCPRoute,
     # TLSRoute, UDPRoute.
@@ -2055,6 +2119,49 @@ route: {}
     # parentRefs: []
     # -- Rules for routing. Defaults to the primary service.
     # rules: []
+    # -- (string) Override the default resource name. Mutually exclusive with prefix
+    # and suffix.
+    # forceRename:
+    # -- Prefix to prepend to the resource name. Mutually exclusive with
+    # forceRename.
+    # prefix: ""
+    # -- (string) Suffix to append to the resource name. Defaults to the resource
+    # identifier if there are multiple items, otherwise empty. Mutually exclusive
+    # with forceRename.
+    # suffix:
+
+# -- Kubernetes Gateway API ListenerSet objects to be generated by the chart.
+# Each key is a ListenerSet identifier. Routes can attach to a ListenerSet by
+# referencing its identifier via the route parentRefs[].identifier key. See
+# https://gateway-api.sigs.k8s.io/references/spec/ for the Gateway API
+# specification.
+# @default -- See below
+listenerSets: {}
+  # Example entry - rename as needed
+  # main:
+    # -- Set to false to disable the ListenerSet.
+    # enabled: true
+    # -- Annotations to set on the item.
+    # annotations: {}
+    # -- Labels to set on the item.
+    # labels: {}
+    # -- (string) Override the namespace the ListenerSet is deployed to.
+    # namespaceOverride:
+    # -- Reference to the Gateway this ListenerSet is attached to.
+    # parentRef: {}
+    # -- (string) Group of the referenced Gateway. Defaults to
+    # 'gateway.networking.k8s.io'.
+    # group:
+    # -- (string) Kind of the referenced Gateway. Defaults to 'Gateway'.
+    # kind:
+    # -- Name of the referenced Gateway. This field is required.
+    # name: ""
+    # -- (string) Namespace of the referenced Gateway. Defaults to the namespace the
+    # ListenerSet is deployed to.
+    # namespace:
+    # -- Listeners associated with this ListenerSet. Each listener defines how the
+    # attached Gateway listens for connections.
+    # listeners: []
     # -- (string) Override the default resource name. Mutually exclusive with prefix
     # and suffix.
     # forceRename:
@@ -2184,7 +2291,7 @@ serviceMonitor: {}
     # -- Labels to set on the item.
     # labels: {}
     # -- The label to use to retrieve the job name from the target service's
-    # metadata. Defaults to 'app.kubernetes.io/name'. Helm templates can be used.
+    # metadata. Defaults to 'app.kubernetes.io/name'.
     # jobLabel: app.kubernetes.io/name
     # -- Endpoints allowed as part of this ServiceMonitor.
     # endpoints: []
@@ -2195,8 +2302,8 @@ serviceMonitor: {}
     # -- matchExpressions is a list of label selector requirements. The requirements
     # are ANDed.
     # matchExpressions: []
-    # -- (string) Reference to a Service name to monitor. Helm templates are
-    # supported. Deprecated in favor of 'service'.
+    # -- (string) Reference to a Service name to monitor. Deprecated in favor of
+    # 'service'.
     # serviceName:
     # -- Transfers labels from the Kubernetes Service onto the created metrics. See
     # https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api-reference/api.md#servicemonitorspec
@@ -2226,7 +2333,7 @@ podMonitor: {}
     # -- Labels to set on the item.
     # labels: {}
     # -- The label to use to retrieve the job name from the target pod's metadata.
-    # Defaults to 'app.kubernetes.io/name'. Helm templates can be used.
+    # Defaults to 'app.kubernetes.io/name'.
     # jobLabel: app.kubernetes.io/name
     # -- Pod metrics endpoints allowed as part of this PodMonitor. Typical fields
     # per endpoint include `port`, `scheme`, `path`, `interval`, `scrapeTimeout`.
@@ -2264,18 +2371,34 @@ podMonitor: {}
 # networkPolicies can be added by adding a dictionary key similar to the 'main'
 # networkPolicy.
 # @default -- See below
+
+#   networkpolicies:
+#     ciliumClusterwide:
+#       type: ciliumClusterwide
+#       nodeSelector:
+#         matchLabels:
+#           kubernetes.io/os: linux
+#       ingress:
+#         - fromEntities:
+#             - cluster
 networkpolicies: {}
   # Example entry - rename as needed
   # main:
-    # -- Set to false to disable the NetworkPolicy.
-    # enabled: true
+    # -- (string) Resource implementation to render. Set type to native, cilium, or
+    # ciliumClusterwide.
+    # type:
     # -- Annotations to set on the item.
     # annotations: {}
     # -- (string) Controller this NetworkPolicy should target.
     # controller:
+    # -- Set to false to disable the NetworkPolicy.
+    # enabled: true
     # -- Additional match labels to add to the pod selector. These are merged with
     # labels derived from the controller identifier.
     # extraSelectorLabels: {}
+    # -- (string) Override the default resource name. Mutually exclusive with prefix
+    # and suffix.
+    # forceRename:
     # -- Labels to set on the item.
     # labels: {}
     # -- Custom podSelector for the NetworkPolicy. Takes precedence over targeting a
@@ -2283,22 +2406,19 @@ networkpolicies: {}
     # podSelector: null
     # -- Policy types for the NetworkPolicy.
     # policyTypes: []
+    # -- Prefix to prepend to the resource name. Mutually exclusive with
+    # forceRename.
+    # prefix: ""
     # -- Ingress and egress rules for the NetworkPolicy. See
     # https://kubernetes.io/docs/concepts/services-networking/network-policies/#networkpolicy-resource
     # for details. Use `- {}` as an item to allow all traffic for that direction.
     # rules:
-      # -- Ingress rules for this networkPolicy. An entry of `{}` allows all ingress
-      # traffic.
-      # ingress: []
       # -- Egress rules for this networkPolicy. An entry of `{}` allows all egress
       # traffic.
       # egress: []
-    # -- (string) Override the default resource name. Mutually exclusive with prefix
-    # and suffix.
-    # forceRename:
-    # -- Prefix to prepend to the resource name. Mutually exclusive with
-    # forceRename.
-    # prefix: ""
+      # -- Ingress rules for this networkPolicy. An entry of `{}` allows all ingress
+      # traffic.
+      # ingress: []
     # -- (string) Suffix to append to the resource name. Defaults to the resource
     # identifier if there are multiple items, otherwise empty. Mutually exclusive
     # with forceRename.
@@ -2306,9 +2426,9 @@ networkpolicies: {}
 
 # -- Configure persistent storage and mount options. Each key is an identifier
 # for a persistence item. Supported types: persistentVolumeClaim (default),
-# configMap, secret, nfs, emptyDir, hostPath, image, custom. By default each
-# item mounts to /<identifier>. Use globalMounts or advancedMounts to customize
-# mount paths.
+# configMap, secret, nfs, emptyDir, hostPath, image, projected, custom. By
+# default each item mounts to /<identifier>. Use globalMounts or advancedMounts
+# to customize mount paths.
 # @default -- See below
 
 #   persistence:
@@ -2321,19 +2441,21 @@ networkpolicies: {}
 #     tmp:
 #       type: emptyDir
 #   persistence:
-#     config:
-#       type: persistentVolumeClaim
-#       accessMode: ReadWriteOnce
-#       size: 1Gi
+#     api-token:
+#       type: projected
+#       defaultMode: 0400
+#       sources:
+#         - serviceAccountToken:
+#             audience: https://api.example.com
+#             expirationSeconds: 3600
+#             path: token
+#       globalMounts:
+#         - path: /var/run/secrets/tokens
 #   persistence:
 #     config:
 #       type: persistentVolumeClaim
 #       accessMode: ReadWriteOnce
-#       size: 10Gi
-#       storageClass: fast-ssd
-#       retain: true
-#       globalMounts:
-#         - path: /config
+#       size: 1Gi
 persistence: {}
   # Example entry - rename as needed
   # main:
@@ -2452,8 +2574,7 @@ rbac:
       # roleRef:
         # -- Reference an Role or ClusterRole configured in this chart by its key.
         # identifier: ""
-        # -- (string) Reference a Role or ClusterRole by its name. Helm template
-        # enabled.
+        # -- (string) Reference a Role or ClusterRole by its name.
         # name:
         # -- (string) The kind of the referenced object. Supported values: Role,
         # ClusterRole.
