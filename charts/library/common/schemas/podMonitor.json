@@ -23,7 +23,7 @@
           "$ref": "definitions.json#/$defs/labels"
         },
         "jobLabel": {
-          "description": "The label to use to retrieve the job name from the target pod's metadata. Defaults to 'app.kubernetes.io/name'. Helm templates can be used.",
+          "description": "The label to use to retrieve the job name from the target pod's metadata. Defaults to 'app.kubernetes.io/name'.",
           "default": "app.kubernetes.io/name",
           "type": "string"
         },

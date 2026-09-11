@@ -4,6 +4,10 @@ Secondary entrypoint and primary loader for the common chart
 {{- define "bjw-s.common.loader.generate" -}}
   {{- $rootContext := $ -}}
 
+  {{- /* Single-pass evaluation against the post-merge root context. */ -}}
+  {{- $evaluatedValues := include "bjw-s.common.values.evaluateTemplate" (dict "rootContext" $rootContext "value" (deepCopy $rootContext.Values)) | fromJson -}}
+  {{- $_ := set $rootContext "Values" (index $evaluatedValues "value") -}}
+
   {{- /* Run global chart validations */ -}}
   {{- include "bjw-s.common.lib.chart.validate" $rootContext -}}
 

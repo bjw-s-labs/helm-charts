@@ -37,3 +37,6 @@ annotations:
     - kind: added
       description: |-
         Added native support for `projected` persistence items
+    - kind: added
+      description: |-
+        Added global support for templating string fields

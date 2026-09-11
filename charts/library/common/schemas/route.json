@@ -42,7 +42,7 @@
           }
         },
         "hostnames": {
-          "description": "Host addresses for the Route. Helm templates are supported.",
+          "description": "Host addresses for the Route.",
           "type": "array",
           "items": {
             "type": "string"

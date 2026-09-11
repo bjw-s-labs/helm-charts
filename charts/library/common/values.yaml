@@ -11,9 +11,9 @@ global:
   alwaysAppendIdentifierToResourceName: false
   # -- Set to true to propagate global metadata to Pod labels.
   propagateGlobalMetadataToPods: false
-  # -- Set additional global labels. Helm templates can be used.
+  # -- Set additional global labels.
   labels: {}
-  # -- Set additional global annotations. Helm templates can be used.
+  # -- Set additional global annotations.
   annotations: {}
   # -- When true (default), automatically create a dedicated ServiceAccount using
   # the release name as the identifier if no serviceAccount is explicitly
@@ -31,7 +31,7 @@ defaultPodOptionsStrategy: overwrite
 # tolerations, security contexts, or service accounts that should apply to every
 # pod.
 defaultPodOptions:
-  # -- Set affinity constraint rules. Helm templates can be used. See
+  # -- Set affinity constraint rules. See
   # https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity
   affinity: {}
     # -- Describes node affinity scheduling rules for the pod.
@@ -309,7 +309,7 @@ controllers: {}
     # labels: {}
     # -- Pod-level options for this controller.
     # pod: {}
-    # -- Set affinity constraint rules. Helm templates can be used. See
+    # -- Set affinity constraint rules. See
     # https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity
     # affinity: {}
       # -- Describes node affinity scheduling rules for the pod.
@@ -700,9 +700,8 @@ controllers: {}
       # dependsOn: []
       # -- Environment variables for the container. Supports multiple syntax styles:
       # simple map (key: value), list of K8s v1.EnvVar entries, and valueFrom
-      # references (configMapKeyRef, secretKeyRef, fieldRef, resourceFieldRef). Helm
-      # templates can be used in values. See the Environment Variables howto for
-      # detailed patterns and examples.
+      # references (configMapKeyRef, secretKeyRef, fieldRef, resourceFieldRef). See
+      # the Environment Variables howto for detailed patterns and examples.
       # env: []
       # -- Secrets and/or ConfigMaps to load as environment variables in bulk. Each
       # entry references either a ConfigMap (via `configMap` name or
@@ -1229,9 +1228,8 @@ controllers: {}
       # dependsOn: []
       # -- Environment variables for the container. Supports multiple syntax styles:
       # simple map (key: value), list of K8s v1.EnvVar entries, and valueFrom
-      # references (configMapKeyRef, secretKeyRef, fieldRef, resourceFieldRef). Helm
-      # templates can be used in values. See the Environment Variables howto for
-      # detailed patterns and examples.
+      # references (configMapKeyRef, secretKeyRef, fieldRef, resourceFieldRef). See
+      # the Environment Variables howto for detailed patterns and examples.
       # env: []
       # -- Secrets and/or ConfigMaps to load as environment variables in bulk. Each
       # entry references either a ConfigMap (via `configMap` name or
@@ -1746,8 +1744,7 @@ controllers: {}
     # -- ServiceAccount used by the controller. Only use one of `name` or
     # `identifier`. When both are specified, `identifier` takes priority.
     # serviceAccount: {}
-    # -- (string) Reference a serviceAccount by its name. Helm templates are
-    # supported.
+    # -- (string) Reference a serviceAccount by its name.
     # name:
     # -- (string) Reference a serviceAccount configured in this chart by its key.
     # identifier:
@@ -1854,7 +1851,7 @@ configMaps: {}
     # annotations: {}
     # -- Labels to set on the item.
     # labels: {}
-    # -- ConfigMap data content. Helm templates are supported.
+    # -- ConfigMap data content.
     # data: {}
     # -- ConfigMap binaryData content.
     # binaryData: {}
@@ -1916,7 +1913,7 @@ secrets: {}
     # labels: {}
     # -- (string) Secret type.
     # type:
-    # -- Secret stringData content. Helm templates are supported.
+    # -- Secret stringData content.
     # stringData: {}
     # -- (string) Override the default resource name. Mutually exclusive with prefix
     # and suffix.
@@ -2113,7 +2110,7 @@ route: {}
     # referenceGrant:
       # -- Set to false to disable automatic ReferenceGrant generation.
       # enabled: true
-    # -- Host addresses for the Route. Helm templates are supported.
+    # -- Host addresses for the Route.
     # hostnames: []
     # -- (string) Route kind. Supported values: GRPCRoute, HTTPRoute, TCPRoute,
     # TLSRoute, UDPRoute.
@@ -2294,7 +2291,7 @@ serviceMonitor: {}
     # -- Labels to set on the item.
     # labels: {}
     # -- The label to use to retrieve the job name from the target service's
-    # metadata. Defaults to 'app.kubernetes.io/name'. Helm templates can be used.
+    # metadata. Defaults to 'app.kubernetes.io/name'.
     # jobLabel: app.kubernetes.io/name
     # -- Endpoints allowed as part of this ServiceMonitor.
     # endpoints: []
@@ -2305,8 +2302,8 @@ serviceMonitor: {}
     # -- matchExpressions is a list of label selector requirements. The requirements
     # are ANDed.
     # matchExpressions: []
-    # -- (string) Reference to a Service name to monitor. Helm templates are
-    # supported. Deprecated in favor of 'service'.
+    # -- (string) Reference to a Service name to monitor. Deprecated in favor of
+    # 'service'.
     # serviceName:
     # -- Transfers labels from the Kubernetes Service onto the created metrics. See
     # https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api-reference/api.md#servicemonitorspec
@@ -2336,7 +2333,7 @@ podMonitor: {}
     # -- Labels to set on the item.
     # labels: {}
     # -- The label to use to retrieve the job name from the target pod's metadata.
-    # Defaults to 'app.kubernetes.io/name'. Helm templates can be used.
+    # Defaults to 'app.kubernetes.io/name'.
     # jobLabel: app.kubernetes.io/name
     # -- Pod metrics endpoints allowed as part of this PodMonitor. Typical fields
     # per endpoint include `port`, `scheme`, `path`, `interval`, `scrapeTimeout`.
@@ -2370,38 +2367,11 @@ podMonitor: {}
     # with forceRename.
     # suffix:
 
-# -- NetworkPolicy objects to be generated by the chart. Omit type for native
-# Kubernetes NetworkPolicies, set type to cilium for a CiliumNetworkPolicy, or
-# set type to ciliumClusterwide for a cluster-scoped
-# CiliumClusterwideNetworkPolicy rendered without metadata.namespace. Supported
-# type values are native, cilium, and ciliumClusterwide. Additional
+# -- networkPolicy objects to be generated by the chart. Additional
 # networkPolicies can be added by adding a dictionary key similar to the 'main'
 # networkPolicy.
 # @default -- See below
 
-#   networkpolicies:
-#     cilium:
-#       type: cilium
-#       endpointSelector:
-#         matchLabels:
-#           app.kubernetes.io/name: example
-#       description: Allow DNS and HTTPS traffic
-#       ingress:
-#         - fromEntities:
-#             - cluster
-#       ingressDeny:
-#         - fromEntities:
-#             - world
-#       egress:
-#         - toEntities:
-#             - cluster
-#       egressDeny:
-#         - toEntities:
-#             - world
-#       enableDefaultDeny:
-#         ingress: true
-#         egress: true
-#       log: example-policy
 #   networkpolicies:
 #     ciliumClusterwide:
 #       type: ciliumClusterwide
@@ -2414,9 +2384,9 @@ podMonitor: {}
 networkpolicies: {}
   # Example entry - rename as needed
   # main:
-    # -- Resource implementation to render. Set type to native, cilium, or
+    # -- (string) Resource implementation to render. Set type to native, cilium, or
     # ciliumClusterwide.
-    # type: native
+    # type:
     # -- Annotations to set on the item.
     # annotations: {}
     # -- (string) Controller this NetworkPolicy should target.
@@ -2604,8 +2574,7 @@ rbac:
       # roleRef:
         # -- Reference an Role or ClusterRole configured in this chart by its key.
         # identifier: ""
-        # -- (string) Reference a Role or ClusterRole by its name. Helm template
-        # enabled.
+        # -- (string) Reference a Role or ClusterRole by its name.
         # name:
         # -- (string) The kind of the referenced object. Supported values: Role,
         # ClusterRole.

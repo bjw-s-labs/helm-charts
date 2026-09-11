@@ -64,7 +64,7 @@
                 "type": "string"
               },
               "hostname": {
-                "description": "Hostname specifies the virtual hostname to match for protocol types that define this concept. Helm templates are supported.",
+                "description": "Hostname specifies the virtual hostname to match for protocol types that define this concept.",
                 "type": "string"
               },
               "port": {
