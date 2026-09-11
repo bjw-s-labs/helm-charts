@@ -50,7 +50,7 @@
       "additionalProperties": false,
       "properties": {
         "host": {
-          "description": "Set the host address. Helm templates are supported.",
+          "description": "Set the host address.",
           "type": "string"
         },
         "paths": {
@@ -93,7 +93,7 @@
       "additionalProperties": false,
       "properties": {
         "hosts": {
-          "description": "Set the hosts for the TLS entry. Helm templates are supported.",
+          "description": "Set the hosts for the TLS entry.",
           "type": "array",
           "items": {
             "type": [
@@ -102,7 +102,7 @@
           }
         },
         "secretName": {
-          "description": "Set the secretName for the TLS entry. Helm templates are supported.",
+          "description": "Set the secretName for the TLS entry.",
           "type": "string"
         }
       },

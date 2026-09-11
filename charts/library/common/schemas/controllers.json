@@ -130,7 +130,7 @@
           "type": "object",
           "properties": {
             "name": {
-              "description": "Reference a serviceAccount by its name. Helm templates are supported.",
+              "description": "Reference a serviceAccount by its name.",
               "type": "string"
             },
             "identifier": {

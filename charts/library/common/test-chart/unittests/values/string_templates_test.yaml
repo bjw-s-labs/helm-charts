@@ -1,0 +1,90 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: values - centralized string templates
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+tests:
+  - it: evaluates nested strings and list items while preserving native scalars
+    set:
+      controllers:
+        main:
+          replicas: 3
+          pod:
+            hostUsers: true
+            annotations:
+              nested: "{{ .Release.Name }}-nested"
+            imagePullSecrets:
+              - name: "{{ .Release.Name }}-pull"
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 3
+      - equal:
+          path: spec.template.metadata.annotations.nested
+          value: RELEASE-NAME-nested
+      - equal:
+          path: spec.template.spec.hostUsers
+          value: true
+      - equal:
+          path: spec.template.spec.imagePullSecrets
+          value:
+            - name: RELEASE-NAME-pull
+
+  - it: preserves an explicit null value
+    set:
+      controllers:
+        main:
+          replicas: null
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - notExists:
+          path: spec.replicas
+
+  - it: keeps templated scalar text as strings
+    set:
+      controllers:
+        main:
+          pod:
+            annotations:
+              booleanText: "{{ true }}"
+              integerText: "{{ 7 }}"
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.metadata.annotations.booleanText
+          value: "true"
+      - equal:
+          path: spec.template.metadata.annotations.integerText
+          value: "7"
+
+  - it: defers ExternalSecret target template data expressions
+    set:
+      externalSecrets:
+        templated:
+          target:
+            template:
+              data:
+                connection: "postgres://{{ .username }}:{{ .password }}@database"
+          data:
+            - secretKey: username
+              remoteRef:
+                key: database-credentials
+              sourceRef:
+                storeRef:
+                  name: provider-store
+    documentSelector:
+      path: $[?(@.kind == "ExternalSecret")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.target.template.data.connection
+          value: "postgres://{{ .username }}:{{ .password }}@database"

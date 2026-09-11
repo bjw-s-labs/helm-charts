@@ -80,7 +80,7 @@
             },
             "name": {
               "type": "string",
-              "description": "Reference a Role or ClusterRole by its name. Helm template enabled."
+              "description": "Reference a Role or ClusterRole by its name."
             },
             "kind": {
               "type": "string",

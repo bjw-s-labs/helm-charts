@@ -8,7 +8,7 @@
       "properties": {
         "affinity": {
           "$ref": "k8s-api.json#/$defs/core.v1.Affinity",
-          "description": "Set affinity constraint rules. Helm templates can be used.\nSee https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity"
+          "description": "Set affinity constraint rules.\nSee https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity"
         },
         "annotations": {
           "$ref": "definitions.json#/$defs/annotations"

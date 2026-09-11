@@ -32,7 +32,7 @@
           "$ref": "definitions.json#/$defs/labels"
         },
         "data": {
-          "description": "ConfigMap data content. Helm templates are supported.",
+          "description": "ConfigMap data content.",
           "type": "object",
           "additionalProperties": {
             "type": "string"
