@@ -62,6 +62,26 @@ tests:
               app.kubernetes.io/name: RELEASE-NAME
               workload-type: api
 
+  - it: extra selector labels take precedence over generated selector labels
+    set:
+      ciliumNetworkPolicies.main:
+        controller: main
+        extraSelectorLabels:
+          app.kubernetes.io/controller: overridden
+        ingress:
+          - {}
+    documentSelector:
+      path: $[?(@.kind == "CiliumNetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.endpointSelector
+          value:
+            matchLabels:
+              app.kubernetes.io/controller: overridden
+              app.kubernetes.io/instance: RELEASE-NAME
+              app.kubernetes.io/name: RELEASE-NAME
+
   - it: supports extra selector labels with an auto-detected controller
     set:
       ciliumNetworkPolicies.main:

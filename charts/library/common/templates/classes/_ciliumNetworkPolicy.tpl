@@ -39,7 +39,8 @@ within the common library.
     -}}
     {{- /* Add extra selector labels last (takes precedence) */ -}}
     {{- if hasKey $ciliumNetworkPolicyObject "extraSelectorLabels" -}}
-      {{- $selectorLabels = merge
+      {{- $selectorLabels = mergeOverwrite
+        (dict)
         $selectorLabels
         ($ciliumNetworkPolicyObject.extraSelectorLabels | default dict)
       -}}
