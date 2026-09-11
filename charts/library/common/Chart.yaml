@@ -21,6 +21,12 @@ annotations:
         Added support for ExternalSecret resources
     - kind: added
       description: |-
+        Added support for CiliumNetworkPolicy resources
+    - kind: fixed
+      description: |-
+        Fixed NetworkPolicy extraSelectorLabels precedence over generated selector labels
+    - kind: added
+      description: |-
         Added initial support for ListenerSet resources
     - kind: added
       description: |-

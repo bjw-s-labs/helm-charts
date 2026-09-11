@@ -1,27 +1,27 @@
 {{/*
-This template serves as a blueprint for all networkPolicy objects that are created
+This template serves as a blueprint for all ciliumNetworkPolicy objects that are created
 within the common library.
 */}}
-{{- define "bjw-s.common.class.networkpolicy" -}}
+{{- define "bjw-s.common.class.ciliumNetworkPolicy" -}}
   {{- $rootContext := .rootContext -}}
-  {{- $networkPolicyObject := .object -}}
+  {{- $ciliumNetworkPolicyObject := .object -}}
 
   {{- $labels := merge
-    ($networkPolicyObject.labels | default dict)
+    ($ciliumNetworkPolicyObject.labels | default dict)
     (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
   -}}
   {{- $annotations := merge
-    ($networkPolicyObject.annotations | default dict)
+    ($ciliumNetworkPolicyObject.annotations | default dict)
     (include "bjw-s.common.lib.metadata.globalAnnotations" $rootContext | fromYaml)
   -}}
-  {{- $podSelector := dict -}}
-  {{- if (hasKey $networkPolicyObject "podSelector") -}}
-    {{- $podSelector = $networkPolicyObject.podSelector -}}
+  {{- $endpointSelector := dict -}}
+  {{- if (hasKey $ciliumNetworkPolicyObject "endpointSelector") -}}
+    {{- $endpointSelector = $ciliumNetworkPolicyObject.endpointSelector -}}
   {{- else -}}
     {{- /* Determine the controller identifier to use */ -}}
     {{- $controllerIdentifier := "" -}}
-    {{- if and (hasKey $networkPolicyObject "controller") $networkPolicyObject.controller -}}
-      {{- $controllerIdentifier = $networkPolicyObject.controller -}}
+    {{- if and (hasKey $ciliumNetworkPolicyObject "controller") $ciliumNetworkPolicyObject.controller -}}
+      {{- $controllerIdentifier = $ciliumNetworkPolicyObject.controller -}}
     {{- else -}}
       {{- /* Auto-detect: if only one controller exists, use it */ -}}
       {{- $enabledControllers := (include "bjw-s.common.lib.controller.enabledControllers" (dict "rootContext" $rootContext) | fromYaml) -}}
@@ -30,7 +30,7 @@ within the common library.
       {{- end -}}
     {{- end -}}
 
-    {{- /* Build the pod selector */ -}}
+    {{- /* Build the endpoint selector */ -}}
     {{- $selectorLabels := dict "app.kubernetes.io/controller" $controllerIdentifier -}}
     {{- /* Add global selector labels first */ -}}
     {{- $selectorLabels = merge
@@ -38,20 +38,20 @@ within the common library.
       $selectorLabels
     -}}
     {{- /* Add extra selector labels last (takes precedence) */ -}}
-    {{- if hasKey $networkPolicyObject "extraSelectorLabels" -}}
+    {{- if hasKey $ciliumNetworkPolicyObject "extraSelectorLabels" -}}
       {{- $selectorLabels = mergeOverwrite
         (dict)
         $selectorLabels
-        ($networkPolicyObject.extraSelectorLabels | default dict)
+        ($ciliumNetworkPolicyObject.extraSelectorLabels | default dict)
       -}}
     {{- end -}}
-    {{- $podSelector = dict "matchLabels" $selectorLabels -}}
+    {{- $endpointSelector = dict "matchLabels" $selectorLabels -}}
   {{- end -}}
 ---
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
 metadata:
-  name: {{ $networkPolicyObject.name }}
+  name: {{ $ciliumNetworkPolicyObject.name }}
   {{- with $labels }}
   labels:
     {{- range $key, $value := . }}
@@ -66,14 +66,27 @@ metadata:
   {{- end }}
   namespace: {{ $rootContext.Release.Namespace }}
 spec:
-  podSelector: {{- toYaml $podSelector | nindent 4 }}
-  {{- with $networkPolicyObject.policyTypes }}
-  policyTypes: {{- toYaml . | nindent 4 -}}
+  endpointSelector: {{- toYaml $endpointSelector | nindent 4 }}
+  {{- with $ciliumNetworkPolicyObject.description }}
+  description: {{ tpl . $rootContext | quote }}
   {{- end }}
-  {{- with $networkPolicyObject.rules.ingress }}
+  {{- with $ciliumNetworkPolicyObject.ingress }}
   ingress: {{- tpl (toYaml .) $rootContext | nindent 4 -}}
   {{- end }}
-  {{- with $networkPolicyObject.rules.egress }}
+  {{- with $ciliumNetworkPolicyObject.ingressDeny }}
+  ingressDeny: {{- tpl (toYaml .) $rootContext | nindent 4 -}}
+  {{- end }}
+  {{- with $ciliumNetworkPolicyObject.egress }}
   egress: {{- tpl (toYaml .) $rootContext | nindent 4 -}}
+  {{- end }}
+  {{- with $ciliumNetworkPolicyObject.egressDeny }}
+  egressDeny: {{- tpl (toYaml .) $rootContext | nindent 4 -}}
+  {{- end }}
+  {{- with $ciliumNetworkPolicyObject.enableDefaultDeny }}
+  enableDefaultDeny: {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $ciliumNetworkPolicyObject.log }}
+  log:
+    value: {{ . | quote }}
   {{- end }}
 {{- end -}}
