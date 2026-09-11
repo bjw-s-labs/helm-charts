@@ -119,7 +119,6 @@ jobs:
         uses: ./.github/actions/prepare-pr-schema-refs
         with:
           repository: ${{ github.repository }}
-          revision: ${{ github.sha }}
           root: ${{ github.workspace }}
           path: charts
 
@@ -199,7 +198,6 @@ jobs:
         uses: ./.github/actions/prepare-pr-schema-refs
         with:
           repository: ${{ github.repository }}
-          revision: ${{ github.sha }}
           root: ${{ github.workspace }}
           path: charts
 

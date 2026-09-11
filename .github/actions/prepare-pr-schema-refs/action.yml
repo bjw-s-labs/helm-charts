@@ -1,12 +1,9 @@
 ---
 name: Prepare PR schema references
-description: Point repository raw schema URLs at the immutable pull request revision
+description: Point repository raw schema URLs at local files in the workspace
 inputs:
   repository:
     description: Repository in owner/name form
-    required: true
-  revision:
-    description: Immutable commit revision to use in raw URLs
     required: true
   root:
     description: Checked-out repository root
@@ -24,6 +21,5 @@ runs:
       run: >-
         python3 "${{ github.action_path }}/prepare_schema_refs.py"
         --repository "${{ inputs.repository }}"
-        --revision "${{ inputs.revision }}"
         --root "${{ inputs.root }}"
         --path "${{ inputs.path }}"
