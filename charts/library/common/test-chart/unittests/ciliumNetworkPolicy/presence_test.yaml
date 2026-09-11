@@ -1,6 +1,6 @@
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
-suite: ciliumNetworkPolicy - presence
+suite: CiliumNetworkPolicy - presence
 templates:
   - common.yaml
 values:
@@ -16,7 +16,8 @@ tests:
 
   - it: ciliumNetworkPolicy entries are enabled by default
     set:
-      ciliumNetworkPolicies.main:
+      networkpolicies.main:
+        type: cilium
         controller: main
         ingress:
           - {}
@@ -29,7 +30,8 @@ tests:
 
   - it: ciliumNetworkPolicy can be disabled
     set:
-      ciliumNetworkPolicies.main:
+      networkpolicies.main:
+        type: cilium
         enabled: false
         controller: main
         ingress:
@@ -43,12 +45,14 @@ tests:
 
   - it: multiple ciliumNetworkPolicies can be rendered
     set:
-      ciliumNetworkPolicies:
+      networkpolicies:
         ingress:
+          type: cilium
           controller: main
           ingress:
             - {}
         egress:
+          type: cilium
           controller: main
           egress:
             - {}

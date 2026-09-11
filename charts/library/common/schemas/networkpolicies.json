@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.2.0/charts/library/common/schemas/networkpolicies.json",
+  "$defs": {
+    "instance": {
+      "description": "NetworkPolicy implementation to render. Omit type for a native Kubernetes NetworkPolicy; supported values are native and cilium.",
+      "properties": {
+        "type": {
+          "description": "Resource implementation to render. Omit this field for a native Kubernetes NetworkPolicy, or set it to cilium for a CiliumNetworkPolicy.",
+          "type": "string",
+          "enum": [
+            "native",
+            "cilium"
+          ]
+        }
+      },
+      "oneOf": [
+        {
+          "$ref": "networkpolicy.json#/$defs/instance"
+        },
+        {
+          "$ref": "ciliumNetworkPolicy.json#/$defs/instance"
+        }
+      ]
+    }
+  }
+}

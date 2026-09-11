@@ -6,7 +6,8 @@ templates:
 values:
   - ../_values/controllers_main_default_container.yaml
 set:
-  ciliumNetworkPolicies.main:
+  networkpolicies.main:
+    type: cilium
     controller: main
     ingress:
       - {}
@@ -34,7 +35,8 @@ tests:
           global-label: global
         annotations:
           global-annotation: global
-      ciliumNetworkPolicies.main:
+      networkpolicies.main:
+        type: cilium
         labels:
           policy-label: policy
         annotations:
@@ -60,7 +62,8 @@ tests:
 
   - it: supports resource naming options
     set:
-      ciliumNetworkPolicies.main:
+      networkpolicies.main:
+        type: cilium
         prefix: cilium
         suffix: ingress
     asserts:
@@ -82,7 +85,9 @@ tests:
 
   - it: supports forceRename with templates
     set:
-      ciliumNetworkPolicies.main.forceRename: "{{ .Chart.Name }}"
+      networkpolicies.main:
+        type: cilium
+        forceRename: "{{ .Chart.Name }}"
     asserts:
       - containsDocument:
           apiVersion: cilium.io/v2

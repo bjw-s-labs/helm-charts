@@ -14,7 +14,8 @@ tests:
             image:
               repository: nginx
               tag: latest
-      ciliumNetworkPolicies.main:
+      networkpolicies.main:
+        type: cilium
         ingress:
           - {}
     asserts:
@@ -23,7 +24,8 @@ tests:
 
   - it: validates controller references
     set:
-      ciliumNetworkPolicies.main:
+      networkpolicies.main:
+        type: cilium
         controller: missing
         ingress:
           - {}
@@ -33,7 +35,8 @@ tests:
 
   - it: rejects controller and endpointSelector together
     set:
-      ciliumNetworkPolicies.main:
+      networkpolicies.main:
+        type: cilium
         controller: main
         endpointSelector:
           matchLabels:
@@ -46,7 +49,8 @@ tests:
 
   - it: requires at least one rule direction
     set:
-      ciliumNetworkPolicies.main:
+      networkpolicies.main:
+        type: cilium
         controller: main
     asserts:
       - failedTemplate:

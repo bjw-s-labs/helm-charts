@@ -16,6 +16,13 @@
           "type": "boolean",
           "default": true
         },
+        "type": {
+          "description": "Resource implementation to render. Omit this field to render a native Kubernetes NetworkPolicy. Supported values: native and cilium. Set type to cilium to configure a CiliumNetworkPolicy.",
+          "type": "string",
+          "enum": [
+            "native"
+          ]
+        },
         "annotations": {
           "$ref": "definitions.json#/$defs/annotations"
         },

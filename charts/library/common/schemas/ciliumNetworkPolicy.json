@@ -16,6 +16,11 @@
           "type": "boolean",
           "default": true
         },
+        "type": {
+          "description": "Resource implementation to render. Set to cilium to render a CiliumNetworkPolicy. Supported value: cilium.",
+          "type": "string",
+          "const": "cilium"
+        },
         "annotations": {
           "$ref": "definitions.json#/$defs/annotations"
         },
@@ -133,6 +138,12 @@
             "egressDeny"
           ]
         }
+      ],
+      "required": [
+        "type"
+      ],
+      "examples": [
+        "networkpolicies:\n  cilium:\n    type: cilium\n    endpointSelector:\n      matchLabels:\n        app.kubernetes.io/name: example\n    description: Allow DNS and HTTPS traffic\n    ingress:\n      - fromEntities:\n          - cluster\n    ingressDeny:\n      - fromEntities:\n          - world\n    egress:\n      - toEntities:\n          - cluster\n    egressDeny:\n      - toEntities:\n          - world\n    enableDefaultDeny:\n      ingress: true\n      egress: true\n    log: example-policy"
       ]
     },
     "rules": {

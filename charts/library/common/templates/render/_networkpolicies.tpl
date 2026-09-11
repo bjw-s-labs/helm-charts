@@ -10,10 +10,12 @@ Renders the networkPolicy objects required by the chart.
     {{- /* Generate object from the raw persistence values */ -}}
     {{- $networkPolicyObject := (include "bjw-s.common.lib.networkpolicy.getByIdentifier" (dict "rootContext" $rootContext "id" $identifier) | fromYaml) -}}
 
-    {{- /* Perform validations on the networkPolicy before rendering */ -}}
-    {{- include "bjw-s.common.lib.networkpolicy.validate" (dict "rootContext" $ "object" $networkPolicyObject) -}}
-
-    {{- /* Include the networkPolicy class */ -}}
-    {{- include "bjw-s.common.class.networkpolicy" (dict "rootContext" $ "object" $networkPolicyObject) | nindent 0 -}}
+    {{- if eq ($networkPolicyObject.type | default "native") "cilium" -}}
+      {{- include "bjw-s.common.lib.ciliumNetworkPolicy.validate" (dict "rootContext" $ "object" $networkPolicyObject) -}}
+      {{- include "bjw-s.common.class.ciliumNetworkPolicy" (dict "rootContext" $ "object" $networkPolicyObject) | nindent 0 -}}
+    {{- else -}}
+      {{- include "bjw-s.common.lib.networkpolicy.validate" (dict "rootContext" $ "object" $networkPolicyObject) -}}
+      {{- include "bjw-s.common.class.networkpolicy" (dict "rootContext" $ "object" $networkPolicyObject) | nindent 0 -}}
+    {{- end -}}
   {{- end -}}
 {{- end -}}
