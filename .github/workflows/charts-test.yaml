@@ -129,16 +129,11 @@ jobs:
             --output-file "charts/${{ matrix.chart }}/values.schema.json" \
             --allow-missing
 
-      - name: Always assume in-repo common library
+      - name: Use local common library for PR validation
         env:
           COMMON_LIBRARY_LOCATION: ${{ github.workspace }}/charts/library/common
         working-directory: charts/${{ matrix.chart }}
-        run: |
-          yq -i '. |= .dependencies |= map(select(.name == "common" and .repository == "https://bjw-s-labs.github.io/helm-charts").version = ">0.0.0-0")' Chart.yaml
-          yq -i '. |= .dependencies |= map(select(.name == "common" and .repository == "https://bjw-s-labs.github.io/helm-charts").repository = "file://" + strenv(COMMON_LIBRARY_LOCATION))' Chart.yaml
-          echo "::group::Modified Chart.yaml"
-          cat Chart.yaml
-          echo "::endgroup::"
+        run: ${{ github.workspace }}/.ci/scripts/use-local-common.sh
 
       - name: Run chart-testing (install)
         working-directory: "charts/${{ matrix.chart }}"
@@ -159,7 +154,7 @@ jobs:
       - name: Check matrix status
         if: >-
           ${{
-              (inputs.chartsToTest != '' && inputs.chartsToTest != '[]') &&
+              (inputs.charts != '' && inputs.charts != '[]') &&
               contains(needs.*.result, 'failure')
           }}
         run: exit 1
@@ -208,6 +203,12 @@ jobs:
             --output-file "charts/${{ matrix.chart }}/values.schema.json" \
             --allow-missing
 
+      - name: Use local common library for PR validation
+        env:
+          COMMON_LIBRARY_LOCATION: ${{ github.workspace }}/charts/library/common
+        working-directory: charts/${{ matrix.chart }}
+        run: ${{ github.workspace }}/.ci/scripts/use-local-common.sh
+
       - name: Run tests
         working-directory: "charts/${{ matrix.chart }}"
         env:
@@ -236,7 +237,7 @@ jobs:
       - name: Check matrix status
         if: >-
           ${{
-              (inputs.chartsToTest != '' && inputs.chartsToTest != '[]') &&
+              (inputs.charts != '' && inputs.charts != '[]') &&
               contains(needs.*.result, 'failure')
           }}
         run: exit 1
