@@ -123,11 +123,11 @@ jobs:
           path: charts
 
       - name: Dereference JSON schema
-        uses: bjw-s-labs/helm-charts-actions/dereference-json-schema@12a3eab9fffe251606af4454176d08bec10bb5af
-        with:
-          schemaFile: "charts/${{ matrix.chart }}/values.schema.json"
-          outputFile: "charts/${{ matrix.chart }}/values.schema.json"
-          allowFileNotFound: true
+        run: |
+          .ci/scripts/dereference-json-schema.sh \
+            --schema-file "charts/${{ matrix.chart }}/values.schema.json" \
+            --output-file "charts/${{ matrix.chart }}/values.schema.json" \
+            --allow-missing
 
       - name: Always assume in-repo common library
         env:
@@ -202,11 +202,11 @@ jobs:
           path: charts
 
       - name: Dereference JSON schema
-        uses: bjw-s-labs/helm-charts-actions/dereference-json-schema@12a3eab9fffe251606af4454176d08bec10bb5af
-        with:
-          schemaFile: "charts/${{ matrix.chart }}/values.schema.json"
-          outputFile: "charts/${{ matrix.chart }}/values.schema.json"
-          allowFileNotFound: true
+        run: |
+          .ci/scripts/dereference-json-schema.sh \
+            --schema-file "charts/${{ matrix.chart }}/values.schema.json" \
+            --output-file "charts/${{ matrix.chart }}/values.schema.json" \
+            --allow-missing
 
       - name: Run tests
         working-directory: "charts/${{ matrix.chart }}"

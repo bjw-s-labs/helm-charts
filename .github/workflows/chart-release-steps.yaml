@@ -133,11 +133,11 @@ jobs:
       # Package Helm chart
       # ----------------------------
       - name: Dereference JSON schema before packaging
-        uses: bjw-s-labs/helm-charts-actions/dereference-json-schema@12a3eab9fffe251606af4454176d08bec10bb5af
-        with:
-          schemaFile: "src/charts/${{ inputs.chart }}/values.schema.json"
-          outputFile: "src/charts/${{ inputs.chart }}/values.schema.json"
-          allowFileNotFound: true
+        run: |
+          src/.ci/scripts/dereference-json-schema.sh \
+            --schema-file "src/charts/${{ inputs.chart }}/values.schema.json" \
+            --output-file "src/charts/${{ inputs.chart }}/values.schema.json" \
+            --allow-missing
 
       - name: Package Helm Chart
         id: package-chart
