@@ -75,11 +75,11 @@ jobs:
       # ----------------------------
       - name: Get chart details
         id: chart-details
-        uses: bjw-s-labs/helm-charts-actions/get-chart-details@12a3eab9fffe251606af4454176d08bec10bb5af
-        with:
-          path: src/charts/${{ inputs.chart }}
-          validateChartYaml: true
-          requireChangelog: true
+        run: |
+          src/.ci/scripts/get-chart-details.sh \
+            "src/charts/${{ inputs.chart }}" \
+            --validateChartYaml \
+            --requireChangelog
 
       - name: Store chart folder
         id: chart-folder

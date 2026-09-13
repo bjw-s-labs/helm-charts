@@ -43,20 +43,18 @@ jobs:
 
       - name: Get chart details for PR
         id: chart-details-pr
-        uses: bjw-s-labs/helm-charts-actions/get-chart-details@12a3eab9fffe251606af4454176d08bec10bb5af
-        with:
-          path: pull/charts/${{ matrix.chart }}
-          validateChartYaml: true
-          requireChangelog: true
+        run: |
+          .ci/scripts/get-chart-details.sh \
+            "pull/charts/${{ matrix.chart }}" \
+            --validateChartYaml \
+            --requireChangelog
 
       - name: Get chart details for default branch
         id: chart-details-default
-        uses: bjw-s-labs/helm-charts-actions/get-chart-details@12a3eab9fffe251606af4454176d08bec10bb5af
-        with:
-          path: default/charts/${{ matrix.chart }}
-          allowChartToNotExist: true
-          validateChartYaml: false
-          requireChangelog: false
+        run: |
+          .ci/scripts/get-chart-details.sh \
+            "default/charts/${{ matrix.chart }}" \
+            --allowChartToNotExist
           # - name: Check version update
           #   if: ${{ steps.chart-details-pr.outputs.version == steps.chart-details-default.outputs.version }}
           #   uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
