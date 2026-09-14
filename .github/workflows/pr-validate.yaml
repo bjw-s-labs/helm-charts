@@ -92,11 +92,9 @@ jobs:
     needs:
       - prepare
     if: |
-      ${{
-        contains(join(fromJSON(needs.prepare.outputs.addedOrModifiedFiles), ' '), 'charts/library/common/values.schema.json') ||
-        contains(join(fromJSON(needs.prepare.outputs.addedOrModifiedFiles), ' '), 'charts/library/common/schemas/') ||
-        contains(join(fromJSON(needs.prepare.outputs.addedOrModifiedFiles), ' '), 'tools/helm-schema-tools/')
-      }}
+      contains(join(fromJSON(needs.prepare.outputs.addedOrModifiedFiles), ' '), 'charts/library/common/values.schema.json') ||
+      contains(join(fromJSON(needs.prepare.outputs.addedOrModifiedFiles), ' '), 'charts/library/common/schemas/') ||
+      contains(join(fromJSON(needs.prepare.outputs.addedOrModifiedFiles), ' '), 'tools/helm-schema-tools/')
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -137,18 +135,271 @@ jobs:
         with:
           extra_args: --files ${{ join(fromJSON(needs.prepare.outputs.addedOrModifiedFiles), ' ') }} --config .ci/pre-commit/config.yaml
 
-  charts-lint:
-    name: Lint charts
-    uses: ./.github/workflows/charts-lint.yaml
+  lint-validate-required-changes:
+    name: Validate required changes
+    strategy:
+      matrix:
+        chart: ${{ fromJSON(needs.prepare.outputs.chartsToLint) }}
+      fail-fast: false
     needs:
       - prepare
-    with:
-      charts: ${{ needs.prepare.outputs.chartsToLint }}
+    if: |
+      (needs.prepare.outputs.chartsToLint != '[]' && needs.prepare.outputs.chartsToLint != '')
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout pull request branch
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          path: pull
+          persist-credentials: false
 
-  charts-test:
-    name: Test charts
-    uses: ./.github/workflows/charts-test.yaml
+      - name: Checkout default branch
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: "${{ github.event.repository.default_branch }}"
+          path: default
+          persist-credentials: false
+
+      - name: Get chart details for PR
+        id: chart-details-pr
+        run: |
+          pull/.ci/scripts/get-chart-details.sh \
+            "pull/charts/${{ matrix.chart }}" \
+            --validateChartYaml \
+            --requireChangelog
+
+      - name: Get chart details for default branch
+        id: chart-details-default
+        run: |
+          pull/.ci/scripts/get-chart-details.sh \
+            "default/charts/${{ matrix.chart }}" \
+            --allowChartToNotExist
+
+  lint-validate-success:
     needs:
       - prepare
-    with:
-      charts: ${{ needs.prepare.outputs.chartsToInstall }}
+      - lint-validate-required-changes
+    if: ${{ !cancelled() }}
+    name: Validation successful
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check matrix status
+        if: >-
+          ${{
+              (needs.prepare.outputs.chartsToLint != '' && needs.prepare.outputs.chartsToLint != '[]') &&
+              contains(needs.*.result, 'failure')
+          }}
+        run: exit 1
+
+  lint-chart:
+    if: ${{ needs.prepare.outputs.chartsToLint != '[]' && needs.prepare.outputs.chartsToLint != '' }}
+    name: Lint chart
+    strategy:
+      matrix:
+        chart: ${{ fromJSON(needs.prepare.outputs.chartsToLint) }}
+      fail-fast: false
+    needs:
+      - prepare
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Install Mise and required tools
+        uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
+        with:
+          cache_key: "mise-v1-{{file_hash}}"
+
+      - name: Run chart-testing (lint)
+        working-directory: ${{ github.workspace }}
+        run: just chart::lint "${{ matrix.chart }}"
+
+  lint-success:
+    needs:
+      - prepare
+      - lint-chart
+    if: ${{ !cancelled() }}
+    name: Lint successful
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check matrix status
+        if: >-
+          ${{
+              (needs.prepare.outputs.chartsToLint != '' && needs.prepare.outputs.chartsToLint != '[]') &&
+              contains(needs.*.result, 'failure')
+          }}
+        run: exit 1
+
+  test-build-matrix:
+    name: Build charts/version matrix
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    needs:
+      - prepare
+    if: ${{ needs.prepare.outputs.chartsToInstall != '[]' && needs.prepare.outputs.chartsToInstall != '' }}
+    outputs:
+      matrix: ${{ steps.merge.outputs.matrix }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Build kubernetes version matrix
+        id: build
+        uses: ./.github/actions/build-k8s-k3s-version-matrix
+        with:
+          min_k8s_version: "1.28"
+          github_token: ${{ github.token }}
+
+      - name: Merge charts with versions
+        id: merge
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        env:
+          CHARTS_JSON: ${{ needs.prepare.outputs.chartsToInstall }}
+          VERSIONS_JSON: ${{ steps.build.outputs.versions }}
+        with:
+          script: |
+            const rawCharts = process.env.CHARTS_JSON;
+            const rawVersions = process.env.VERSIONS_JSON;
+
+            const charts = rawCharts && rawCharts !== 'null' ? JSON.parse(rawCharts) : [];
+            const versions = rawVersions && rawVersions !== 'null' ? JSON.parse(rawVersions) : [];
+
+            const matrix = charts.flatMap((chart) =>
+              versions.map((version) => ({
+                chart,
+                k8s_version: version.k8s_version,
+                k3s_tag: version.k3s_tag,
+              }))
+            );
+
+            core.setOutput('matrix', JSON.stringify(matrix));
+            console.log(JSON.stringify(matrix));
+
+  test-install-chart:
+    name: Install chart
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    needs:
+      - test-build-matrix
+    if: ${{ needs.test-build-matrix.outputs.matrix != '[]' && needs.test-build-matrix.outputs.matrix != '' }}
+    strategy:
+      matrix:
+        include: ${{ fromJSON(needs.test-build-matrix.outputs.matrix) }}
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Validate prerequisite folders
+        working-directory: "charts/${{ matrix.chart }}"
+        run: |
+          CHART_TYPE=$(yq '.type // "application"' Chart.yaml)
+          if [[ ("${CHART_TYPE}" == "library") && (! -d "test-chart") ]]; then
+            echo "Library charts require a \"test-chart\" directory to run tests"
+            exit 1
+          fi
+
+      - name: Install kubectl matching k8s version
+        uses: yokawasa/action-setup-kube-tools@5778123f7b071387e9c8e522492d8f39427dc6c7 # v0.13.4
+        with:
+          setup-tools: |
+            kubectl
+          kubectl: "${{ matrix.k8s_version }}"
+
+      - name: Install Mise and required tools
+        uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
+        with:
+          cache_key: "mise-v1-{{file_hash}}"
+
+      - name: Create a new k3s cluster
+        env:
+          GH_TOKEN: ${{ github.token }}
+          K8S_VERSION: ${{ matrix.k8s_version }}
+          K3S_IMAGE: docker.io/rancher/k3s
+          K3S_TAG: ${{ matrix.k3s_tag }}
+        run: |
+          k3d cluster create --image "${K3S_IMAGE}:${K3S_TAG}"
+          echo "::group::Waiting for cluster readiness"
+          while ! kubectl get serviceaccount default >/dev/null; do sleep 1; done
+          echo "::endgroup::"
+
+      - name: Remove node taints
+        run: |
+          kubectl taint --all=true nodes node.cloudprovider.kubernetes.io/uninitialized- || true
+
+      - name: Run chart-testing (install)
+        working-directory: ${{ github.workspace }}
+        run: just chart::integration-test "${{ matrix.chart }}"
+
+  test-install-success:
+    needs:
+      - prepare
+      - test-install-chart
+    if: ${{ !cancelled() }}
+    name: Install successful
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check matrix status
+        if: >-
+          ${{
+              (needs.prepare.outputs.chartsToInstall != '' && needs.prepare.outputs.chartsToInstall != '[]') &&
+              contains(needs.*.result, 'failure')
+          }}
+        run: exit 1
+
+  test-unittest-chart:
+    name: Unit-test chart
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    needs:
+      - prepare
+    if: ${{ needs.prepare.outputs.chartsToInstall != '[]' && needs.prepare.outputs.chartsToInstall != '' }}
+    strategy:
+      matrix:
+        chart: ${{ fromJSON(needs.prepare.outputs.chartsToInstall) }}
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Validate prerequisite folders
+        working-directory: "charts/${{ matrix.chart }}"
+        run: |
+          CHART_TYPE=$(yq '.type // "application"' Chart.yaml)
+          if [[ ("${CHART_TYPE}" == "library") && (! -d "test-chart") ]]; then
+            echo "Library charts require a \"test-chart\" directory to run tests"
+            exit 1
+          fi
+
+      - name: Install Mise and required tools
+        uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
+        with:
+          cache_key: "mise-v1-{{file_hash}}"
+
+      - name: Run tests
+        working-directory: ${{ github.workspace }}
+        run: just chart::unit-test "${{ matrix.chart }}" "**/*_test.yaml"
+
+  test-unittest-success:
+    needs:
+      - prepare
+      - test-unittest-chart
+    if: ${{ !cancelled() }}
+    name: Unittest successful
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check matrix status
+        if: >-
+          ${{
+              (needs.prepare.outputs.chartsToInstall != '' && needs.prepare.outputs.chartsToInstall != '[]') &&
+              contains(needs.*.result, 'failure')
+          }}
+        run: exit 1

@@ -51,7 +51,8 @@ The `common` library chart follows a modular architecture:
 
 1. **Make changes** to template files in `charts/library/common/templates/`
 2. **Update/add tests** in `charts/library/common/test-chart/unittests/`
-3. **Run tests** via `just chart::test library/common`
+3. **Run unit tests** via `just chart::unit-test library/common`
+   (the deprecated `chart::test` alias remains available for compatibility).
 4. **Verify** all tests pass before committing
 
 ### Resource and Schema Workflow
@@ -116,12 +117,21 @@ All error messages in Helm templates MUST follow structured logging principles:
 
 ## Testing
 
-- Run all tests via: `just chart::test library/common`
-- Run specific tests via glob pattern: `just chart::test library/common "container/*_test.yaml"`
+- Run all unit tests via: `just chart::unit-test library/common`
+- Run specific unit tests via glob pattern: `just chart::unit-test library/common "container/*_test.yaml"`
   - Examples:
-    - `just chart::test library/common "container/*_test.yaml"` - Run all container tests
-    - `just chart::test library/common "pod/field_*_test.yaml"` - Run all pod field tests
-    - `just chart::test library/common "**/field_env_*_test.yaml"` - Run all env-related tests
+    - `just chart::unit-test library/common "container/*_test.yaml"` - Run all container tests
+    - `just chart::unit-test library/common "pod/field_*_test.yaml"` - Run all pod field tests
+    - `just chart::unit-test library/common "**/field_env_*_test.yaml"` - Run all env-related tests
+- `chart::test` is a deprecated compatibility alias for `chart::unit-test` and
+  forwards the same chart and glob arguments.
+- Run local chart integration validation via
+  `just chart::integration-test library/common`; it uses chart-testing 3.14.0's
+  `ct install` command (not `ct test`). Actually running it requires a
+  configured cluster; the recipe's dry-run and static checks do not require a
+  cluster.
+- Bats is unavailable in the development environment and is not required for
+  validation; use the documented Just dry-run and static checks instead.
 - All validation changes MUST include corresponding unit test updates
 - Error messages in tests should match exactly (use `errorMessage` not `errorPattern` when possible)
 

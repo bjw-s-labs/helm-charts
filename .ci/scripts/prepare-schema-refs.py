@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Rewrite repository schema URLs to local files in the checked-out workspace."""
+"""Rewrite repository schema URLs to local files in a checked-out workspace."""
 
 import argparse
 import re
@@ -8,8 +8,10 @@ from pathlib import Path
 
 def rewrite_schema_refs(root: Path, path: str, repository: str) -> int:
     schema_root = (root / path).resolve()
+    if not schema_root.is_dir():
+        raise FileNotFoundError(f"Schema path not found: {schema_root}")
     file_uri = root.resolve().as_uri().encode("ascii")
-    url_pattern = re.compile(
+    pattern = re.compile(
         rb"https://raw\.githubusercontent\.com/"
         + re.escape(repository.encode("ascii"))
         + rb"/[^\"']*/(charts/[^\"']*)"
@@ -19,7 +21,7 @@ def rewrite_schema_refs(root: Path, path: str, repository: str) -> int:
         if not schema_file.is_file():
             continue
         original = schema_file.read_bytes()
-        rewritten = url_pattern.sub(
+        rewritten = pattern.sub(
             lambda match: file_uri + b"/" + match.group(1), original
         )
         if rewritten != original:
