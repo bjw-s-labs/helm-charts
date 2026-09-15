@@ -10,26 +10,22 @@ on:
         required: true
         type: string
       createGithubRelease:
-        description: >
-          Should the chart be published as a GitHub release
+        description: Should the chart be published as a GitHub release
         default: false
         required: false
         type: boolean
       publishToGhPages:
-        description: >
-          Should the charts be published to GitHub Pages.
+        description: Should the charts be published to GitHub Pages.
         default: false
         required: false
         type: boolean
       deployGhPages:
-        description: >
-          Should the GitHub pages repo be deployed.
+        description: Should the GitHub pages repo be deployed.
         default: false
         required: false
         type: boolean
       publishToOciRegistry:
-        description: >
-          Should the charts be published to an OCI registry.
+        description: Should the charts be published to an OCI registry.
         default: false
         required: false
         type: boolean
@@ -38,64 +34,37 @@ permissions:
   contents: read
 
 jobs:
-  release-chart:
-    name: Release chart
+  package-chart:
+    name: Package chart
     runs-on: ubuntu-24.04
-
     permissions:
-      pages: write
-      id-token: write
-      contents: write
-      packages: write
-
+      contents: read
+    outputs:
+      artifact-name: ${{ steps.artifact-metadata.outputs.artifact_name }}
     steps:
-      # ----------------------------
-      # Setup
-      # ----------------------------
       - name: Checkout source branch
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           path: src
+          persist-credentials: false
 
       - name: Install Mise and required tools
         uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
         with:
           cache_key: "mise-v1-{{file_hash}}"
 
-      - name: Login to OCI Registry
-        if: ${{ inputs.publishToOciRegistry }}
-        uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v4.0.0
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ github.token }}
-
-      # ----------------------------
-      # Collect chart metadata
-      # ----------------------------
       - name: Get chart details
         id: chart-details
+        env:
+          CHART: ${{ inputs.chart }}
         run: |
-          src/.ci/scripts/get-chart-details.sh \
-            "src/charts/${{ inputs.chart }}" \
-            --validateChartYaml \
-            --requireChangelog
+          src/.ci/scripts/get-chart-details.sh "src/charts/$CHART" --validateChartYaml --requireChangelog
 
       - name: Store chart folder
         id: chart-folder
-        shell: bash
         env:
-          CHART_DIR: "${{ inputs.chart }}"
-        run: |
-          TARGET_DIR=$(basename $(dirname ${CHART_DIR}))
-          echo "chart_folder=${TARGET_DIR}" >> "$GITHUB_OUTPUT"
-
-      - name: Create tag
-        if: ${{ inputs.createGithubRelease }}
-        uses: EndBug/latest-tag@461da6d88985c6266724c147fcabeb0f05261a38 # latest
-        with:
-          ref: ${{ steps.chart-details.outputs.name }}-${{ steps.chart-details.outputs.version }}
-          git-directory: src
+          CHART_DIR: ${{ inputs.chart }}
+        run: echo "chart_folder=$(basename "$(dirname "$CHART_DIR")")" >> "$GITHUB_OUTPUT"
 
       - name: Format changelog
         id: format-changelog
@@ -104,142 +73,692 @@ jobs:
           INPUTS_CHANGES: ${{ steps.chart-details.outputs.changes }}
         with:
           script: |
-            let input = process.env.INPUTS_CHANGES ?? '';
+            const inputParsed = JSON.parse(process.env.INPUTS_CHANGES ?? '');
             let changelog = "## Changelog:";
-            let inputParsed = JSON.parse(input);
-
-            var changelogGrouped = inputParsed.reduce((result, currentValue) => {
-              (result[currentValue['kind']] = result[currentValue['kind']] || []).push(currentValue);
+            const grouped = inputParsed.reduce((result, currentValue) => {
+              (result[currentValue.kind] = result[currentValue.kind] || []).push(currentValue);
               return result;
             }, {});
-
-            for (const key in changelogGrouped) {
-              changelog = changelog + `\n### ${key[0].toUpperCase() + key.slice(1)}`;
-              let entries = changelogGrouped[key];
-
-              entries.forEach(function (entry) {
-                changelog = changelog + `\n- ${entry.description}`;
-                if ('links' in entry) {
-                  entry.links.forEach(function (link) {
-                    changelog = changelog + `\n  - [${link.name}](${link.url})`;
-                  });
-                }
+            for (const key in grouped) {
+              changelog += `\n### ${key[0].toUpperCase() + key.slice(1)}`;
+              grouped[key].forEach((entry) => {
+                changelog += `\n- ${entry.description}`;
+                if ('links' in entry) entry.links.forEach((link) => { changelog += `\n  - [${link.name}](${link.url})`; });
               });
-              changelog = changelog + `\n`;
+              changelog += "\n";
             }
             core.setOutput('changelog', changelog);
 
-      # ----------------------------
-      # Package Helm chart
-      # ----------------------------
       - name: Dereference JSON schema before packaging
-        run: |
-          src/.ci/scripts/dereference-json-schema.sh \
-            --schema-file "src/charts/${{ inputs.chart }}/values.schema.json" \
-            --output-file "src/charts/${{ inputs.chart }}/values.schema.json" \
-            --allow-missing
-
-      - name: Package Helm Chart
-        id: package-chart
-        shell: bash
         env:
-          CHART_DIR: "src/charts/${{ inputs.chart }}"
-          TARGET_DIR: "${{ runner.temp }}/charts_out"
+          CHART: ${{ inputs.chart }}
         run: |
-          mkdir -p "${TARGET_DIR}"
-          helm package "${CHART_DIR}" --dependency-update --destination "${TARGET_DIR}"
-          echo "result=$(ls ${TARGET_DIR}/*.tgz)" >> "$GITHUB_OUTPUT"
+          src/.ci/scripts/dereference-json-schema.sh --schema-file "src/charts/$CHART/values.schema.json" --output-file "src/charts/$CHART/values.schema.json" --allow-missing
 
-      # ----------------------------
-      # Add chart to GitHub Pages
-      # ----------------------------
+      - name: Package Helm chart
+        id: package-chart
+        env:
+          CHART_DIR: src/charts/${{ inputs.chart }}
+          TARGET_DIR: ${{ runner.temp }}/charts_out
+        run: |
+          set -euo pipefail
+
+          mkdir -p "$TARGET_DIR"
+          helm package "$CHART_DIR" --dependency-update --destination "$TARGET_DIR"
+
+          mapfile -t files < <(find "$TARGET_DIR" -maxdepth 1 -type f -name '*.tgz' -print)
+
+          # Helm packaging must produce exactly one .tgz archive.
+          (( ${#files[@]} == 1 )) || { echo "Expected exactly one packaged chart" >&2; exit 1; }
+
+          # The archive name must match <name>-<version>.tgz from Chart.yaml.
+          expected="$(awk '/^name:/{n=$2} /^version:/{v=$2} END{print n "-" v ".tgz"}' "$CHART_DIR/Chart.yaml")"
+          [[ "$(basename "${files[0]}")" == "$expected" ]] || { echo "Unexpected package filename" >&2; exit 1; }
+
+          echo "result=${files[0]}" >> "$GITHUB_OUTPUT"
+
+      - name: Stage and validate release artifact
+        id: artifact-metadata
+        env:
+          INPUT_CHART: ${{ inputs.chart }}
+          CHART_FOLDER: ${{ steps.chart-folder.outputs.chart_folder }}
+          CHART_NAME: ${{ steps.chart-details.outputs.name }}
+          CHART_VERSION: ${{ steps.chart-details.outputs.version }}
+          PACKAGE_FILE: ${{ steps.package-chart.outputs.result }}
+          RELEASE_NOTES: ${{ steps.format-changelog.outputs.changelog }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          # Derive a filesystem-safe artifact name from the chart identifier.
+          safe_id="$(printf '%s' "$INPUT_CHART" | tr '/' '-')"
+          [[ "$safe_id" =~ ^[A-Za-z0-9_.-]+$ ]] || { echo "Invalid chart identifier" >&2; exit 1; }
+          artifact_name="chart-release-${safe_id}-${CHART_VERSION}-${RUN_ID}-${RUN_ATTEMPT}"
+          staging="$RUNNER_TEMP/$artifact_name"
+
+          # Stage the release notes and the packaged chart.
+          rm -rf "$staging"
+          mkdir -p "$staging/package"
+          printf '%s\n' "$RELEASE_NOTES" > "$staging/release-notes.md"
+          cp "$PACKAGE_FILE" "$staging/package/"
+          package_path="package/$(basename "$PACKAGE_FILE")"
+
+          # The staging layout must contain only release-notes.md and package/,
+          # with no symlinks and nothing nested below package/.
+          [[ -f "$PACKAGE_FILE" ]] || exit 1
+          [[ "$(find "$staging" -mindepth 1 -maxdepth 1 -type f -o -type d | wc -l)" -eq 2 ]] || exit 1
+          [[ "$(find "$staging/package" -mindepth 1 -maxdepth 1 -type f | wc -l)" -eq 1 ]] || exit 1
+          [[ "$(find "$staging" -type l -o -type d -mindepth 2 | wc -l)" -eq 0 ]] || exit 1
+
+          # Independently verify the packaged chart name, version, and filename
+          # against the metadata produced by the chart-details step.
+          helm show chart "$PACKAGE_FILE" > "$RUNNER_TEMP/package-chart.yaml"
+          package_name="$(awk '/^name:/{print $2; exit}' "$RUNNER_TEMP/package-chart.yaml")"
+          package_version="$(awk '/^version:/{print $2; exit}' "$RUNNER_TEMP/package-chart.yaml")"
+          [[ "$package_name" == "$CHART_NAME" && "$package_version" == "$CHART_VERSION" ]] || exit 1
+          [[ "$(basename "$PACKAGE_FILE")" == "$CHART_NAME-$CHART_VERSION.tgz" ]] || exit 1
+
+          package_sha="$(sha256sum "$staging/$package_path" | cut -d' ' -f1)"
+
+          # Build the artifact manifest that publish jobs will validate.
+          jq -n \
+            --arg artifactName "$artifact_name" \
+            --arg runId "$RUN_ID" \
+            --arg sourceSha "$SOURCE_SHA" \
+            --arg chart "$INPUT_CHART" \
+            --arg chartFolder "$CHART_FOLDER" \
+            --arg chartName "$CHART_NAME" \
+            --arg chartVersion "$CHART_VERSION" \
+            --arg packagePath "$package_path" \
+            --arg packageSha256 "$package_sha" \
+            --arg releaseTag "${CHART_NAME}-${CHART_VERSION}" \
+            '{
+              schemaVersion: 1,
+              artifactName: $artifactName,
+              runId: $runId,
+              runAttempt: ($ENV.RUN_ATTEMPT | tonumber),
+              sourceSha: $sourceSha,
+              chart: $chart,
+              chartFolder: $chartFolder,
+              chartName: $chartName,
+              chartVersion: $chartVersion,
+              packagePath: $packagePath,
+              packageSha256: $packageSha256,
+              releaseTag: $releaseTag,
+              releaseNotesPath: "release-notes.md",
+              packageCount: 1
+            }' > "$staging/manifest.json"
+
+          # Validate the exact three-entry layout with no symlinks.
+          [[ "$(find "$staging" -mindepth 1 -maxdepth 1 | wc -l)" -eq 3 ]] || exit 1
+          [[ -f "$staging/manifest.json" ]] || exit 1
+          [[ -f "$staging/release-notes.md" ]] || exit 1
+          [[ -d "$staging/package" ]] || exit 1
+          [[ -z "$(find "$staging" -type l -print -quit)" ]] || exit 1
+
+          # Validate every manifest field against the inputs and package metadata.
+          jq -e \
+            --arg p "$package_path" \
+            --arg sha "$package_sha" \
+            --arg n "$artifact_name" \
+            --arg chart "$INPUT_CHART" \
+            --arg folder "$CHART_FOLDER" \
+            --arg name "$CHART_NAME" \
+            --arg version "$CHART_VERSION" \
+            --arg run "$RUN_ID" \
+            --arg source "$SOURCE_SHA" \
+            --arg tag "$CHART_NAME-$CHART_VERSION" \
+            '
+            (keys_unsorted | sort) == [
+              "artifactName", "chart", "chartFolder", "chartName", "chartVersion",
+              "packageCount", "packagePath", "packageSha256", "releaseNotesPath",
+              "releaseTag", "runAttempt", "runId", "schemaVersion", "sourceSha"
+            ]
+            and .schemaVersion == 1
+            and .artifactName == $n
+            and .runId == $run
+            and .runAttempt == ($ENV.RUN_ATTEMPT | tonumber)
+            and .sourceSha == $source
+            and .chart == $chart
+            and .chartFolder == $folder
+            and .chartName == $name
+            and .chartVersion == $version
+            and .packagePath == $p
+            and .packageSha256 == $sha
+            and (.packageSha256 | test("^[0-9a-f]{64}$"))
+            and .releaseTag == $tag
+            and .releaseNotesPath == "release-notes.md"
+            and .packageCount == 1
+            ' "$staging/manifest.json" >/dev/null
+
+          echo "artifact_name=$artifact_name" >> "$GITHUB_OUTPUT"
+          echo "staging=$staging" >> "$GITHUB_OUTPUT"
+
+      - name: Upload immutable chart artifact
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: ${{ steps.artifact-metadata.outputs.artifact_name }}
+          path: ${{ steps.artifact-metadata.outputs.staging }}
+          if-no-files-found: error
+          overwrite: false
+
+  publish-gh-pages:
+    name: Publish chart to GitHub Pages
+    needs: package-chart
+    if: ${{ !cancelled() && needs.package-chart.result == 'success' && inputs.publishToGhPages }}
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Download run chart candidates
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v7.0.0
+        with:
+          pattern: chart-release-*-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/chart-candidates
+      - name: Validate selected chart artifact
+        id: validate-artifact
+        env:
+          INPUT_CHART: ${{ inputs.chart }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          root="$RUNNER_TEMP/chart-candidates"
+          selected=""
+          count=0
+
+          # Find the single candidate artifact for this run matching the chart input.
+          for candidate in "$root"/*; do
+            [[ -d "$candidate" && -f "$candidate/manifest.json" ]] || continue
+            if jq -e --arg c "$INPUT_CHART" '.chart == $c' "$candidate/manifest.json" >/dev/null 2>&1; then
+              selected="$candidate"
+              count=$((count + 1))
+            fi
+          done
+
+          [[ "$count" -eq 1 ]] || { echo 'Expected exactly one matching artifact' >&2; exit 1; }
+
+          manifest="$selected/manifest.json"
+          artifact="$(basename "$selected")"
+          folder="$(basename "$(dirname "$INPUT_CHART")")"
+
+          # Validate the manifest schema, run identity, chart identity, and package path.
+          jq -e \
+            --arg a "$artifact" \
+            --arg r "$RUN_ID" \
+            --arg t "$RUN_ATTEMPT" \
+            --arg c "$INPUT_CHART" \
+            --arg s "$SOURCE_SHA" \
+            --arg f "$folder" \
+            '
+            (keys_unsorted | sort) == [
+              "artifactName", "chart", "chartFolder", "chartName", "chartVersion",
+              "packageCount", "packagePath", "packageSha256", "releaseNotesPath",
+              "releaseTag", "runAttempt", "runId", "schemaVersion", "sourceSha"
+            ]
+            and .schemaVersion == 1
+            and .artifactName == $a
+            and .runId == $r
+            and .runAttempt == ($t | tonumber)
+            and .sourceSha == $s
+            and .chart == $c
+            and .chartFolder == $f
+            and .packagePath == ("package/" + .chartName + "-" + .chartVersion + ".tgz")
+            and (.packageSha256 | test("^[0-9a-f]{64}$"))
+            and .releaseTag == (.chartName + "-" + .chartVersion)
+            and .releaseNotesPath == "release-notes.md"
+            and .packageCount == 1
+            and .artifactName == ("chart-release-" + ($c | gsub("/"; "-")) + "-" + .chartVersion + "-" + $r + "-" + $t)
+            ' "$manifest" >/dev/null
+
+          # Validate the exact three-entry layout with no symlinks or nested directories.
+          [[ "$(find "$selected" -mindepth 1 -maxdepth 1 | wc -l)" -eq 3 ]] || exit 1
+          [[ -f "$selected/release-notes.md" ]] || exit 1
+          [[ -d "$selected/package" ]] || exit 1
+          [[ -z "$(find "$selected" -type l -print -quit)" ]] || exit 1
+          [[ -z "$(find "$selected" -mindepth 2 -type d -print -quit)" ]] || exit 1
+
+          # Validate the single package file at the manifest path.
+          package="$selected/$(jq -r .packagePath "$manifest")"
+          [[ -f "$package" ]] || exit 1
+          [[ "$(find "$selected/package" -mindepth 1 -maxdepth 1 -type f | wc -l)" -eq 1 ]] || exit 1
+
+          # Validate the package checksum matches the manifest.
+          [[ "$(sha256sum "$package" | cut -d' ' -f1)" == "$(jq -r .packageSha256 "$manifest")" ]] || exit 1
+
+          # Independently verify the packaged chart name and version with Helm.
+          helm show chart "$package" > "$RUNNER_TEMP/chart.yaml"
+          [[ "$(awk '/^name:/{print $2; exit}' "$RUNNER_TEMP/chart.yaml")" == "$(jq -r .chartName "$manifest")" ]] || exit 1
+          [[ "$(awk '/^version:/{print $2; exit}' "$RUNNER_TEMP/chart.yaml")" == "$(jq -r .chartVersion "$manifest")" ]] || exit 1
+
+          echo "package=$package" >> "$GITHUB_OUTPUT"
+          echo "manifest=$manifest" >> "$GITHUB_OUTPUT"
       - name: Checkout gh-pages branch
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        if: ${{ inputs.publishToGhPages }}
         with:
           path: gh-pages
           ref: gh-pages
-
+          persist-credentials: true
       - name: Copy package to gh-pages structure
-        id: copy-package
-        if: ${{ inputs.publishToGhPages }}
-        shell: bash
         env:
-          CHART_DIR: "${{ inputs.chart }}"
-          CHART_FOLDER: ${{ steps.chart-folder.outputs.chart_folder }}
-          PACKAGE_FILE: ${{ steps.package-chart.outputs.result }}
-        run: |
-          TARGET_DIR=$(dirname ${CHART_DIR})
-          cp "${PACKAGE_FILE}" "gh-pages/${CHART_FOLDER}/"
-
+          PACKAGE: ${{ steps.validate-artifact.outputs.package }}
+          MANIFEST: ${{ steps.validate-artifact.outputs.manifest }}
+        run: cp "$PACKAGE" "gh-pages/$(jq -r .chartFolder "$MANIFEST")/"
       - name: Update repository
-        if: ${{ inputs.publishToGhPages }}
-        shell: bash
         working-directory: gh-pages
-        run: |
-          git pull
-
+        run: git pull --rebase
       - name: Update Helm chart index
-        if: ${{ inputs.publishToGhPages && inputs.deployGhPages }}
-        shell: bash
+        if: ${{ inputs.deployGhPages }}
         working-directory: gh-pages
+        run: helm repo index . --url https://bjw-s-labs.github.io/helm-charts/
+      - name: Commit gh-pages changes
+        working-directory: gh-pages
+        env:
+          MANIFEST: ${{ steps.validate-artifact.outputs.manifest }}
         run: |
-          helm repo index . --url https://bjw-s-labs.github.io/helm-charts/
+          set -euo pipefail
 
-      - name: Commit Changes
-        if: ${{ inputs.publishToGhPages }}
-        uses: stefanzweifel/git-auto-commit-action@04702edda442b2e678b25b537cec683a1493fcb9 # v7.1.0
+          git add index.yaml '**/*.tgz'
+
+          # Only index.yaml and chart packages may be committed.
+          git diff --cached --name-only | while read -r file; do
+            case "$file" in
+              index.yaml|*.tgz) ;;
+              *) exit 1 ;;
+            esac
+          done
+
+          folder="$(jq -r .chartFolder "$MANIFEST")"
+          name="$(jq -r .chartName "$MANIFEST")"
+          version="$(jq -r .chartVersion "$MANIFEST")"
+
+          # Commit only when there are staged changes, then push.
+          git diff --cached --quiet || git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m "feat: Add Chart package $folder/$name-$version"
+          git push origin gh-pages
+
+  deploy-gh-pages:
+    name: Deploy GitHub Pages
+    needs: publish-gh-pages
+    if: ${{ !cancelled() && needs.publish-gh-pages.result == 'success' && inputs.deployGhPages }}
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      contents: read
+      actions: write
+      pages: write
+      id-token: write
+    steps:
+      - name: Download run chart candidates
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v7.0.0
         with:
-          commit_message: "feat: Add Chart package ${{ steps.chart-folder.outputs.chart_folder }}/${{ steps.chart-details.outputs.name }}-${{ steps.chart-details.outputs.version }}"
-          repository: gh-pages
-          branch: gh-pages
-          file_pattern: "index.yaml **/*.tgz"
-          commit_user_name: github-actions[bot]
-          commit_user_email: 41898282+github-actions[bot]@users.noreply.github.com
-          commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+          pattern: chart-release-*-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/chart-candidates
+      - name: Revalidate chart artifact before Pages write
+        env:
+          INPUT_CHART: ${{ inputs.chart }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
 
-      - name: Deploy changes to GitHub Pages
-        if: ${{ inputs.publishToGhPages && inputs.deployGhPages }}
-        uses: ./src/.github/actions/publish-folder-to-pages
+          root="$RUNNER_TEMP/chart-candidates"
+          selected=""
+          count=0
+
+          # Find the single candidate artifact for this run matching the chart input.
+          for candidate in "$root"/*; do
+            [[ -d "$candidate" && -f "$candidate/manifest.json" ]] || continue
+            if jq -e --arg c "$INPUT_CHART" '.chart == $c' "$candidate/manifest.json" >/dev/null 2>&1; then
+              selected="$candidate"
+              count=$((count + 1))
+            fi
+          done
+
+          [[ "$count" -eq 1 ]] || exit 1
+
+          manifest="$selected/manifest.json"
+          artifact="$(basename "$selected")"
+          folder="$(basename "$(dirname "$INPUT_CHART")")"
+
+          # Validate the manifest schema, run identity, chart identity, and package path.
+          jq -e \
+            --arg a "$artifact" \
+            --arg r "$RUN_ID" \
+            --arg t "$RUN_ATTEMPT" \
+            --arg c "$INPUT_CHART" \
+            --arg s "$SOURCE_SHA" \
+            --arg f "$folder" \
+            '
+            (keys_unsorted | sort) == [
+              "artifactName", "chart", "chartFolder", "chartName", "chartVersion",
+              "packageCount", "packagePath", "packageSha256", "releaseNotesPath",
+              "releaseTag", "runAttempt", "runId", "schemaVersion", "sourceSha"
+            ]
+            and .schemaVersion == 1
+            and .artifactName == $a
+            and .runId == $r
+            and .runAttempt == ($t | tonumber)
+            and .sourceSha == $s
+            and .chart == $c
+            and .chartFolder == $f
+            and .packagePath == ("package/" + .chartName + "-" + .chartVersion + ".tgz")
+            and (.packageSha256 | test("^[0-9a-f]{64}$"))
+            and .releaseTag == (.chartName + "-" + .chartVersion)
+            and .releaseNotesPath == "release-notes.md"
+            and .packageCount == 1
+            and .artifactName == ("chart-release-" + ($c | gsub("/"; "-")) + "-" + .chartVersion + "-" + $r + "-" + $t)
+            ' "$manifest" >/dev/null
+
+          # Validate the exact three-entry layout with no symlinks or nested directories.
+          [[ "$(find "$selected" -mindepth 1 -maxdepth 1 | wc -l)" -eq 3 ]] || exit 1
+          [[ -z "$(find "$selected" -type l -print -quit)" ]] || exit 1
+          [[ -z "$(find "$selected" -mindepth 2 -type d -print -quit)" ]] || exit 1
+
+          # Validate the single package file at the manifest path.
+          package="$selected/$(jq -r .packagePath "$manifest")"
+          [[ -f "$package" ]] || exit 1
+          [[ "$(find "$selected/package" -mindepth 1 -maxdepth 1 -type f | wc -l)" -eq 1 ]] || exit 1
+
+          # Validate the package checksum matches the manifest.
+          [[ "$(sha256sum "$package" | cut -d' ' -f1)" == "$(jq -r .packageSha256 "$manifest")" ]] || exit 1
+
+          # Independently verify the packaged chart name and version with Helm.
+          helm show chart "$package" > "$RUNNER_TEMP/chart.yaml"
+          [[ "$(awk '/^name:/{print $2; exit}' "$RUNNER_TEMP/chart.yaml")" == "$(jq -r .chartName "$manifest")" ]] || exit 1
+          [[ "$(awk '/^version:/{print $2; exit}' "$RUNNER_TEMP/chart.yaml")" == "$(jq -r .chartVersion "$manifest")" ]] || exit 1
+      - name: Checkout gh-pages data
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          path: gh-pages/
-          deleteArtifactAfterPublish: true
+          path: gh-pages
+          ref: gh-pages
+          persist-credentials: false
+      - name: Prepare GitHub Pages artifact
+        run: |
+          set -euo pipefail
 
-      # ----------------------------
-      # Create GitHub release
-      # ----------------------------
-      - name: Create release for tag
-        uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1.21.0
-        if: ${{ inputs.createGithubRelease }}
+          # Stage the gh-pages tree as the Pages artifact, excluding VCS and dotfiles.
+          rm -rf "$RUNNER_TEMP/pages"
+          mkdir "$RUNNER_TEMP/pages"
+          tar --dereference --hard-dereference --directory gh-pages -cf "$RUNNER_TEMP/pages.tar" --exclude=.git --exclude=.github --exclude='.[^/]*' .
+          tar -xf "$RUNNER_TEMP/pages.tar" -C "$RUNNER_TEMP/pages"
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
         with:
-          allowUpdates: true
-          tag: ${{ steps.chart-details.outputs.name }}-${{ steps.chart-details.outputs.version }}
-          body: ${{ steps.format-changelog.outputs.changelog }}
+          name: github-pages
+          path: ${{ runner.temp }}/pages
+      - name: Deploy GitHub Pages artifact
+        id: deployment
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
+        with:
+          artifact_name: github-pages
+      - name: Clean up Pages artifact
+        if: ${{ success() }}
+        uses: joernott/rm-artifact@bc186430160dc60ccdbff8a38bf1e880606921b2 # v2.0.0
+        with:
+          name: github-pages
+          useGlob: false
+          failOnError: true
 
-      # ----------------------------
-      # Publish chart to bjw-s OCI registry
-      # ----------------------------
+  publish-github-release:
+    name: Publish GitHub release
+    needs: package-chart
+    if: ${{ !cancelled() && needs.package-chart.result == 'success' && inputs.createGithubRelease }}
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Download run chart candidates
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v7.0.0
+        with:
+          pattern: chart-release-*-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/chart-candidates
+      - name: Validate selected chart artifact
+        id: validate-artifact
+        env:
+          INPUT_CHART: ${{ inputs.chart }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          root="$RUNNER_TEMP/chart-candidates"
+          selected=""
+          count=0
+
+          # Find the single candidate artifact for this run matching the chart input.
+          for candidate in "$root"/*; do
+            [[ -d "$candidate" && -f "$candidate/manifest.json" ]] || continue
+            if jq -e --arg c "$INPUT_CHART" '.chart == $c' "$candidate/manifest.json" >/dev/null 2>&1; then
+              selected="$candidate"
+              count=$((count + 1))
+            fi
+          done
+
+          [[ "$count" -eq 1 ]] || exit 1
+
+          manifest="$selected/manifest.json"
+          artifact="$(basename "$selected")"
+          folder="$(basename "$(dirname "$INPUT_CHART")")"
+
+          # Validate the manifest schema, run identity, chart identity, and package path.
+          jq -e \
+            --arg a "$artifact" \
+            --arg r "$RUN_ID" \
+            --arg t "$RUN_ATTEMPT" \
+            --arg c "$INPUT_CHART" \
+            --arg s "$SOURCE_SHA" \
+            --arg f "$folder" \
+            '
+            (keys_unsorted | sort) == [
+              "artifactName", "chart", "chartFolder", "chartName", "chartVersion",
+              "packageCount", "packagePath", "packageSha256", "releaseNotesPath",
+              "releaseTag", "runAttempt", "runId", "schemaVersion", "sourceSha"
+            ]
+            and .schemaVersion == 1
+            and .artifactName == $a
+            and .runId == $r
+            and .runAttempt == ($t | tonumber)
+            and .sourceSha == $s
+            and .chart == $c
+            and .chartFolder == $f
+            and .packagePath == ("package/" + .chartName + "-" + .chartVersion + ".tgz")
+            and (.packageSha256 | test("^[0-9a-f]{64}$"))
+            and .releaseTag == (.chartName + "-" + .chartVersion)
+            and .releaseNotesPath == "release-notes.md"
+            and .packageCount == 1
+            and .artifactName == ("chart-release-" + ($c | gsub("/"; "-")) + "-" + .chartVersion + "-" + $r + "-" + $t)
+            ' "$manifest" >/dev/null
+
+          # Validate the exact three-entry layout with no symlinks or nested directories.
+          [[ "$(find "$selected" -mindepth 1 -maxdepth 1 | wc -l)" -eq 3 ]] || exit 1
+          [[ -z "$(find "$selected" -type l -print -quit)" ]] || exit 1
+          [[ -z "$(find "$selected" -mindepth 2 -type d -print -quit)" ]] || exit 1
+
+          # Validate the single package file at the manifest path.
+          package="$selected/$(jq -r .packagePath "$manifest")"
+          [[ -f "$package" ]] || exit 1
+          [[ "$(find "$selected/package" -mindepth 1 -maxdepth 1 -type f | wc -l)" -eq 1 ]] || exit 1
+
+          # Validate the package checksum matches the manifest.
+          [[ "$(sha256sum "$package" | cut -d' ' -f1)" == "$(jq -r .packageSha256 "$manifest")" ]] || exit 1
+
+          # Independently verify the packaged chart name and version with Helm.
+          helm show chart "$package" > "$RUNNER_TEMP/chart.yaml"
+          [[ "$(awk '/^name:/{print $2; exit}' "$RUNNER_TEMP/chart.yaml")" == "$(jq -r .chartName "$manifest")" ]] || exit 1
+          [[ "$(awk '/^version:/{print $2; exit}' "$RUNNER_TEMP/chart.yaml")" == "$(jq -r .chartVersion "$manifest")" ]] || exit 1
+
+          echo "manifest=$manifest" >> "$GITHUB_OUTPUT"
+      - name: Ensure release tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MANIFEST: ${{ steps.validate-artifact.outputs.manifest }}
+        run: |
+          set -euo pipefail
+
+          tag="$(jq -r .releaseTag "$MANIFEST")"
+          sha="$(jq -r .sourceSha "$MANIFEST")"
+          response="$RUNNER_TEMP/tag-response"
+
+          # Create the tag from the manifest source SHA only when it does not
+          # already exist; any other API failure must abort the job.
+          if gh api --include "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" > "$response" 2>&1; then
+            :
+          else
+            status="$(awk '/^HTTP\//{code=$2} END{print code}' "$response")"
+            [[ "$status" == 404 ]] || { cat "$response" >&2; exit 1; }
+            gh api "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/$tag" -f sha="$sha" >/dev/null
+          fi
+      - name: Create or update GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MANIFEST: ${{ steps.validate-artifact.outputs.manifest }}
+        run: |
+          set -euo pipefail
+
+          tag="$(jq -r .releaseTag "$MANIFEST")"
+          notes="$(dirname "$MANIFEST")/$(jq -r .releaseNotesPath "$MANIFEST")"
+
+          # Update the existing release or create one from the verified tag.
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release edit "$tag" --notes-file "$notes"
+          else
+            gh release create "$tag" --verify-tag --notes-file "$notes"
+          fi
+
+  publish-oci:
+    name: Publish chart to OCI
+    needs: package-chart
+    if: ${{ !cancelled() && needs.package-chart.result == 'success' && inputs.publishToOciRegistry }}
+    runs-on: ubuntu-24.04
+    permissions:
+      packages: write
+      id-token: write
+    steps:
+      - name: Download run chart candidates
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v7.0.0
+        with:
+          pattern: chart-release-*-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/chart-candidates
+      - name: Validate selected chart artifact
+        id: validate-artifact
+        env:
+          INPUT_CHART: ${{ inputs.chart }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          root="$RUNNER_TEMP/chart-candidates"
+          selected=""
+          count=0
+
+          # Find the single candidate artifact for this run matching the chart input.
+          for candidate in "$root"/*; do
+            [[ -d "$candidate" && -f "$candidate/manifest.json" ]] || continue
+            if jq -e --arg c "$INPUT_CHART" '.chart == $c' "$candidate/manifest.json" >/dev/null 2>&1; then
+              selected="$candidate"
+              count=$((count + 1))
+            fi
+          done
+
+          [[ "$count" -eq 1 ]] || exit 1
+
+          manifest="$selected/manifest.json"
+          artifact="$(basename "$selected")"
+          folder="$(basename "$(dirname "$INPUT_CHART")")"
+
+          # Validate the manifest schema, run identity, chart identity, and package path.
+          jq -e \
+            --arg a "$artifact" \
+            --arg r "$RUN_ID" \
+            --arg t "$RUN_ATTEMPT" \
+            --arg c "$INPUT_CHART" \
+            --arg s "$SOURCE_SHA" \
+            --arg f "$folder" \
+            '
+            (keys_unsorted | sort) == [
+              "artifactName", "chart", "chartFolder", "chartName", "chartVersion",
+              "packageCount", "packagePath", "packageSha256", "releaseNotesPath",
+              "releaseTag", "runAttempt", "runId", "schemaVersion", "sourceSha"
+            ]
+            and .schemaVersion == 1
+            and .artifactName == $a
+            and .runId == $r
+            and .runAttempt == ($t | tonumber)
+            and .sourceSha == $s
+            and .chart == $c
+            and .chartFolder == $f
+            and .packagePath == ("package/" + .chartName + "-" + .chartVersion + ".tgz")
+            and (.packageSha256 | test("^[0-9a-f]{64}$"))
+            and .releaseTag == (.chartName + "-" + .chartVersion)
+            and .releaseNotesPath == "release-notes.md"
+            and .packageCount == 1
+            and .artifactName == ("chart-release-" + ($c | gsub("/"; "-")) + "-" + .chartVersion + "-" + $r + "-" + $t)
+            ' "$manifest" >/dev/null
+
+          # Validate the exact three-entry layout with no symlinks or nested directories.
+          [[ "$(find "$selected" -mindepth 1 -maxdepth 1 | wc -l)" -eq 3 ]] || exit 1
+          [[ -z "$(find "$selected" -type l -print -quit)" ]] || exit 1
+          [[ -z "$(find "$selected" -mindepth 2 -type d -print -quit)" ]] || exit 1
+
+          # Validate the single package file at the manifest path.
+          package="$selected/$(jq -r .packagePath "$manifest")"
+          [[ -f "$package" ]] || exit 1
+          [[ "$(find "$selected/package" -mindepth 1 -maxdepth 1 -type f | wc -l)" -eq 1 ]] || exit 1
+
+          # Validate the package checksum matches the manifest.
+          [[ "$(sha256sum "$package" | cut -d' ' -f1)" == "$(jq -r .packageSha256 "$manifest")" ]] || exit 1
+
+          # Independently verify the packaged chart name and version with Helm.
+          helm show chart "$package" > "$RUNNER_TEMP/chart.yaml"
+          [[ "$(awk '/^name:/{print $2; exit}' "$RUNNER_TEMP/chart.yaml")" == "$(jq -r .chartName "$manifest")" ]] || exit 1
+          [[ "$(awk '/^version:/{print $2; exit}' "$RUNNER_TEMP/chart.yaml")" == "$(jq -r .chartVersion "$manifest")" ]] || exit 1
+
+          echo "package=$package" >> "$GITHUB_OUTPUT"
+          echo "manifest=$manifest" >> "$GITHUB_OUTPUT"
+      - name: Login to OCI Registry
+        uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v4.0.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
       - name: Install Cosign
-        if: ${{ inputs.publishToOciRegistry }}
         uses: sigstore/cosign-installer@cad07c2e89fa2edd6e2d7bab4c1aa38e53f76003 # v4.1.1
         with:
           cosign-release: v2.6.1
-
-      - name: Push Helm charts to OCI registry
-        if: ${{ inputs.publishToOciRegistry }}
-        shell: bash
+      - name: Push and sign Helm chart
         env:
-          PACKAGE_FILE: ${{ steps.package-chart.outputs.result }}
-          CHART_NAME: ${{ steps.chart-details.outputs.name }}
-          CHART_VERSION: ${{ steps.chart-details.outputs.version }}
-          CHART_TAG_BASE: ghcr.io/bjw-s-labs/helm
-          CHART_TAG: ${{ steps.chart-details.outputs.name }}:${{ steps.chart-details.outputs.version }}
+          PACKAGE: ${{ steps.validate-artifact.outputs.package }}
+          MANIFEST: ${{ steps.validate-artifact.outputs.manifest }}
           GITHUB_REF: ${{ github.ref }}
-        run: |-
-          helm push "${PACKAGE_FILE}" oci://${CHART_TAG_BASE} &> push-metadata.txt
-          cat push-metadata.txt
-          CHART_DIGEST=$(awk '/Digest: /{print $2}' push-metadata.txt)
-          cosign sign --yes "${CHART_TAG_BASE}/${CHART_TAG}@${CHART_DIGEST}"
-          cosign verify "${CHART_TAG_BASE}/${CHART_TAG}@${CHART_DIGEST}" \
-            --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
-            --certificate-identity "https://github.com/${{ github.repository }}/.github/workflows/chart-release-steps.yaml@${GITHUB_REF}"
+        run: |
+          set -euo pipefail
+
+          name="$(jq -r .chartName "$MANIFEST")"
+          version="$(jq -r .chartVersion "$MANIFEST")"
+          base="ghcr.io/bjw-s-labs/helm"
+          log="$RUNNER_TEMP/helm-push.log"
+
+          # Push the validated package to the OCI registry, surfacing the log on failure.
+          helm push "$PACKAGE" "oci://$base" &> "$log" || { cat "$log"; exit 1; }
+          cat "$log"
+
+          # The push log must contain exactly one digest.
+          mapfile -t digests < <(grep -Eo 'sha256:[0-9a-f]{64}' "$log" | sort -u)
+          (( ${#digests[@]} == 1 )) || exit 1
+
+          # Sign and verify the pushed chart with keyless Cosign.
+          ref="$base/$name:$version@${digests[0]}"
+          cosign sign --yes "$ref"
+          cosign verify "$ref" \
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+            --certificate-identity "https://github.com/${{ github.repository }}/.github/workflows/chart-release-steps.yaml@$GITHUB_REF"

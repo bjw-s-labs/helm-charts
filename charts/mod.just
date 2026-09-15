@@ -1,9 +1,6 @@
 set quiet := true
 set shell := ["bash", "-euo", "pipefail", "-c"]
 
-# Static vars
-export REPO_CONFIG_FILE := justfile_dir() + "/.ci/repo-config.yaml"
-
 [private]
 default:
   just -l chart

@@ -21,7 +21,6 @@ jobs:
     name: Prepare data required for workflow
     runs-on: ubuntu-24.04
     outputs:
-      repoConfiguration: ${{ steps.repo-config.outputs.config }}
       addedOrModifiedFiles: ${{ steps.added-modified-files.outputs.changed_files }}
       chartsToLint: ${{ steps.charts-to-lint.outputs.filteredCharts }}
       chartsToInstall: ${{ steps.charts-to-install.outputs.filteredCharts }}
@@ -91,10 +90,6 @@ jobs:
     runs-on: ubuntu-24.04
     needs:
       - prepare
-    if: |
-      contains(join(fromJSON(needs.prepare.outputs.addedOrModifiedFiles), ' '), 'charts/library/common/values.schema.json') ||
-      contains(join(fromJSON(needs.prepare.outputs.addedOrModifiedFiles), ' '), 'charts/library/common/schemas/') ||
-      contains(join(fromJSON(needs.prepare.outputs.addedOrModifiedFiles), ' '), 'tools/helm-schema-tools/')
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -162,17 +157,21 @@ jobs:
 
       - name: Get chart details for PR
         id: chart-details-pr
+        env:
+          CHART: ${{ matrix.chart }}
         run: |
           pull/.ci/scripts/get-chart-details.sh \
-            "pull/charts/${{ matrix.chart }}" \
+            "pull/charts/${CHART}" \
             --validateChartYaml \
             --requireChangelog
 
       - name: Get chart details for default branch
         id: chart-details-default
+        env:
+          CHART: ${{ matrix.chart }}
         run: |
           pull/.ci/scripts/get-chart-details.sh \
-            "default/charts/${{ matrix.chart }}" \
+            "default/charts/${CHART}" \
             --allowChartToNotExist
 
   lint-validate-success:
@@ -214,7 +213,9 @@ jobs:
 
       - name: Run chart-testing (lint)
         working-directory: ${{ github.workspace }}
-        run: just chart::lint "${{ matrix.chart }}"
+        env:
+          CHART: ${{ matrix.chart }}
+        run: just chart::lint "${CHART}"
 
   lint-success:
     needs:
@@ -249,7 +250,7 @@ jobs:
 
       - name: Build kubernetes version matrix
         id: build
-        uses: ./.github/actions/build-k8s-k3s-version-matrix
+        uses: ./.github/actions/build-k8s-k3s-version-matrix # zizmor: ignore[self-repository] intentional workspace-local reference
         with:
           min_k8s_version: "1.28"
           github_token: ${{ github.token }}
@@ -297,7 +298,9 @@ jobs:
           persist-credentials: false
 
       - name: Validate prerequisite folders
-        working-directory: "charts/${{ matrix.chart }}"
+        env:
+          CHART_PATH: "charts/${{ matrix.chart }}"
+        working-directory: ${{ env.CHART_PATH }}
         run: |
           CHART_TYPE=$(yq '.type // "application"' Chart.yaml)
           if [[ ("${CHART_TYPE}" == "library") && (! -d "test-chart") ]]; then
@@ -319,7 +322,6 @@ jobs:
 
       - name: Create a new k3s cluster
         env:
-          GH_TOKEN: ${{ github.token }}
           K8S_VERSION: ${{ matrix.k8s_version }}
           K3S_IMAGE: docker.io/rancher/k3s
           K3S_TAG: ${{ matrix.k3s_tag }}
@@ -335,7 +337,9 @@ jobs:
 
       - name: Run chart-testing (install)
         working-directory: ${{ github.workspace }}
-        run: just chart::integration-test "${{ matrix.chart }}"
+        env:
+          CHART: ${{ matrix.chart }}
+        run: just chart::integration-test "${CHART}"
 
   test-install-success:
     needs:
@@ -371,7 +375,9 @@ jobs:
           persist-credentials: false
 
       - name: Validate prerequisite folders
-        working-directory: "charts/${{ matrix.chart }}"
+        env:
+          CHART_PATH: "charts/${{ matrix.chart }}"
+        working-directory: ${{ env.CHART_PATH }}
         run: |
           CHART_TYPE=$(yq '.type // "application"' Chart.yaml)
           if [[ ("${CHART_TYPE}" == "library") && (! -d "test-chart") ]]; then
@@ -386,7 +392,9 @@ jobs:
 
       - name: Run tests
         working-directory: ${{ github.workspace }}
-        run: just chart::unit-test "${{ matrix.chart }}" "**/*_test.yaml"
+        env:
+          CHART: ${{ matrix.chart }}
+        run: just chart::unit-test "${CHART}" "**/*_test.yaml"
 
   test-unittest-success:
     needs:
