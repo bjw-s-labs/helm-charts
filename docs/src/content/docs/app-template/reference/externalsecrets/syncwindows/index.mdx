@@ -1,0 +1,20 @@
+---
+title: "syncWindows"
+description: "Time windows restricting when periodic refreshes may occur. See https://external-secrets.io/lates..."
+sidebar:
+  label: "syncWindows"
+---
+
+Time windows restricting when periodic refreshes may occur. See https://external-secrets.io/latest/api/externalsecret/ for details.
+
+## Type
+
+`object`
+
+## Properties
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `kind` | `string` | **Yes** | - | Whether the windows allow or deny periodic refreshes. |
+| `windows` | `array` | **Yes** | - | Schedule and duration pairs defining the refresh windows. |

@@ -156,8 +156,7 @@ jobs:
       pages: write
       id-token: write
       contents: write
-      packages: write
-    uses: ./.github/workflows/chart-release-steps.yaml
+    uses: ./.github/workflows/chart-release-steps.yaml # zizmor: ignore[self-repository] intentional workspace-local reference
     with:
       chart: ${{ matrix.chart }}
       createGithubRelease: true
@@ -186,7 +185,7 @@ jobs:
       id-token: write
       contents: write
       packages: write
-    uses: ./.github/workflows/chart-release-steps.yaml
+    uses: ./.github/workflows/chart-release-steps.yaml # zizmor: ignore[self-repository] intentional workspace-local reference
     with:
       chart: ${{ matrix.chart }}
       createGithubRelease: true

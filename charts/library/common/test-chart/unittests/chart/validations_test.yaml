@@ -39,3 +39,25 @@ tests:
                   subPath: config.yaml
     asserts:
       - notFailedTemplate: {}
+
+  - it: native and ExternalSecret target name collisions should fail
+    set:
+      secrets:
+        native:
+          forceRename: shared-secret
+          stringData:
+            value: native
+      externalSecrets:
+        eso:
+          target:
+            name: shared-secret
+          data:
+            - secretKey: value
+              remoteRef:
+                key: credentials
+              sourceRef:
+                storeRef:
+                  name: provider-store
+    asserts:
+      - failedTemplate:
+          errorMessage: "Secret 'native': Rendered Secret name 'shared-secret' collides with ExternalSecret 'eso'. Choose unique Secret names."

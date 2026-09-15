@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.1.0/charts/library/common/schemas/rbac.json",
+  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.2.0/charts/library/common/schemas/rbac.json",
   "$defs": {
     "role": {
       "type": "object",
@@ -80,7 +80,7 @@
             },
             "name": {
               "type": "string",
-              "description": "Reference a Role or ClusterRole by its name. Helm template enabled."
+              "description": "Reference a Role or ClusterRole by its name."
             },
             "kind": {
               "type": "string",

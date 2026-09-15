@@ -24,7 +24,7 @@ jobs:
     name: Build documentation
     runs-on: ubuntu-24.04
     permissions:
-      contents: write
+      contents: read
     steps:
       - name: Checkout main branch
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -47,49 +47,29 @@ jobs:
       - name: Build Starlight site
         run: just docs::build
 
-      - name: Generate Token
-        uses: actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859 # v3.0.0
-        id: app-token
-        with:
-          app-id: ${{ secrets.LAB_ASSISTANT_APP_ID }}
-          private-key: ${{ secrets.LAB_ASSISTANT_APP_KEY }}
-
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e # v4.0.0
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
         if: ${{ github.ref == 'refs/heads/main' }}
         with:
-          github_token: ${{ steps.app-token.outputs.token }}
-          publish_dir: ./docs/dist
-          destination_dir: docs
+          path: docs/dist
+          name: github-pages
+          if-no-files-found: error
 
   publish-docs:
     name: Publish documentation
     runs-on: ubuntu-24.04
     needs:
       - build-docs
+    if: ${{ github.ref == 'refs/heads/main' }}
     permissions:
       contents: read
       pages: write
       id-token: write
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: https://bjw-s-labs.github.io/helm-charts/docs/
     steps:
-      - name: Checkout main branch
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          path: src
-          persist-credentials: false
-
-      - name: Checkout gh-pages branch
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          ref: gh-pages
-          path: gh-pages
-          persist-credentials: false
-
       - name: Deploy to GitHub Pages
-        uses: ./src/.github/actions/publish-folder-to-pages
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
         with:
-          path: gh-pages/
-          deleteArtifactAfterPublish: true
+          artifact_name: github-pages

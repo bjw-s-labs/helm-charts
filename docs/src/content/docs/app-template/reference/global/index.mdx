@@ -17,10 +17,10 @@ Allows for configuring chart-wide settings
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
 | `alwaysAppendIdentifierToResourceName` | `boolean` | No | `false` | Always append identifier slugs to resource names, regardl... |
-| `annotations` | `object / null` | No | - | Set additional global annotations. Helm templates can be ... |
+| `annotations` | `object / null` | No | - | Set additional global annotations. |
 | `createDefaultServiceAccount` | `boolean` | No | `true` | When true (default), automatically create a dedicated Ser... |
 | `fullnameOverride` | `string / null` | No | - | Set the chart fullname definition |
-| `labels` | `object / null` | No | - | Set additional global labels. Helm templates can be used. |
+| `labels` | `object / null` | No | - | Set additional global labels. |
 | `nameOverride` | `string / null` | No | - | Set the chart name |
 | `propagateGlobalMetadataToPods` | `boolean` | No | `false` | Set to true to propagate global metadata to Pod labels. |
 
@@ -29,10 +29,6 @@ Allows for configuring chart-wide settings
 #### alwaysAppendIdentifierToResourceName
 
 Always append identifier slugs to resource names, regardless of the enabled resource count.
-
-#### annotations
-
-Set additional global annotations. Helm templates can be used.
 
 #### createDefaultServiceAccount
 

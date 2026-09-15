@@ -34,6 +34,17 @@ envFrom field used by the container.
         {{- $secret := include "bjw-s.common.lib.secret.getByIdentifier" (dict "rootContext" $rootContext "id" .secret) | fromYaml -}}
         {{- $secretName := default (tpl .secret $rootContext) $secret.name -}}
         {{- $_ := set $item "secretRef" (dict "name" $secretName) -}}
+      {{- else if hasKey . "externalSecretRef" -}}
+        {{- $secret := include "bjw-s.common.lib.externalSecret.getByIdentifier" (dict "rootContext" $rootContext "id" .externalSecretRef.identifier) | fromYaml -}}
+        {{- if empty $secret -}}
+          {{- fail (printf "Container '%s': No ExternalSecret found with identifier '%s'. Ensure an ExternalSecret with this identifier exists and is enabled under 'externalSecrets.%s'" $containerObject.identifier .externalSecretRef.identifier .externalSecretRef.identifier) -}}
+        {{- end -}}
+
+        {{- $secretName := include "bjw-s.common.lib.externalSecret.getSecretName" $secret -}}
+        {{- $_ := set $item "secretRef" (dict "name" $secretName) -}}
+        {{- if not (empty (dig "optional" nil .externalSecretRef)) -}}
+          {{- $_ := set $item.secretRef "optional" .externalSecretRef.optional -}}
+        {{- end -}}
       {{- else if hasKey . "secretRef" -}}
         {{- if not (empty (dig "identifier" nil .secretRef)) -}}
           {{- $secret := include "bjw-s.common.lib.secret.getByIdentifier" (dict "rootContext" $rootContext "id" .secretRef.identifier) | fromYaml -}}

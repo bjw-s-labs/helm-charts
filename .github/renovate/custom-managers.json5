@@ -12,5 +12,16 @@
       versioningTemplate: "semver",
       registryUrlTemplate: "https://bjw-s-labs.github.io/helm-charts"
     },
+    {
+      customType: "regex",
+      description: "Process helm-unittest plugin version in charts mod task",
+      fileMatch: ["(^|/)charts/mod\\.just$"],
+      matchStrings: [
+        "PLUGIN_VERSION=\\\"(?<currentValue>\\d+\\.\\d+\\.\\d+)\\\"",
+      ],
+      depNameTemplate: "helm-unittest/helm-unittest",
+      datasourceTemplate: "github-releases",
+      versioningTemplate: "semver",
+    },
   ],
 }

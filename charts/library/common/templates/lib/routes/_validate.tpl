@@ -24,6 +24,13 @@ Validate Route values
     {{- end -}}
   {{- end -}}
 
+  {{/* Verify parentRefs name/identifier mutual exclusion */}}
+  {{- range $index, $parentRef := ($routeObject.parentRefs | default list) }}
+    {{- if and $parentRef.name $parentRef.identifier }}
+      {{- fail (printf "Route '%s': parentRefs[%d] cannot specify both 'name' and 'identifier'. Use either a literal parent name or a ListenerSet identifier." $routeObject.identifier $index) -}}
+    {{- end }}
+  {{- end }}
+
   {{/* Route Types */}}
   {{- $routeKind := $routeObject.kind | default "HTTPRoute"}}
   {{- if and (ne $routeKind "GRPCRoute") (ne $routeKind "HTTPRoute") (ne $routeKind "TCPRoute") (ne $routeKind "TLSRoute") (ne $routeKind "UDPRoute") }}
