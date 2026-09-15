@@ -71,6 +71,28 @@ integration-test CHART:
   schematools-cli process dereference "$CHART_DIR/values.schema.json" --to-file "$CHART_DIR/values.schema.json"
   ( cd "$REPO_ROOT" && ct install --config .ci/ct/ct.yaml --charts "$TEST_CHART_RELATIVE" )
 
+[doc('Render a chart with helm template')]
+template CHART *ARGS:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  REPO_ROOT="{{ justfile_dir() }}"
+  CHART_DIR="$REPO_ROOT/charts/{{CHART}}"
+  [ -d "$CHART_DIR" ] || { echo "Chart directory not found: $CHART_DIR"; exit 1; }
+  CHART_TYPE="$(yq eval '.type // "application"' "$CHART_DIR/Chart.yaml")"
+  if [ "$CHART_TYPE" = "library" ]; then TEST_CHART="$CHART_DIR/test-chart"; else TEST_CHART="$CHART_DIR"; fi
+  [ -d "$TEST_CHART" ] || { echo "Test chart directory not found: $TEST_CHART"; exit 1; }
+  BACKUP_DIR="$(mktemp -d)"
+  cp -a "$CHART_DIR" "$BACKUP_DIR/chart"
+  restore() { status=$?; rm -rf "$CHART_DIR"; cp -a "$BACKUP_DIR/chart" "$CHART_DIR"; rm -rf "$BACKUP_DIR"; exit "$status"; }
+  trap restore EXIT
+  python3 "$REPO_ROOT/.ci/scripts/prepare-schema-refs.py" --repository bjw-s-labs/helm-charts --root "$REPO_ROOT" --path "charts/{{CHART}}"
+  if [[ -n "${COMMON_LIBRARY_LOCATION:-}" ]]; then
+    ( cd "$TEST_CHART" && bash "$REPO_ROOT/.ci/scripts/use-local-common.sh" )
+  fi
+  schematools-cli process dereference "$CHART_DIR/values.schema.json" --to-file "$CHART_DIR/values.schema.json"
+  ( cd "$TEST_CHART" && helm dep update )
+  ( cd "$TEST_CHART" && helm template {{ARGS}} . )
+
 [doc('DEPRECATED: alias for chart::unit-test with the same chart and glob')]
 test CHART GLOB="**/*_test.yaml":
   just chart::unit-test "{{CHART}}" "{{GLOB}}"
