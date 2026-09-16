@@ -1,0 +1,36 @@
+---
+title: "parentRef"
+description: "Reference to the Gateway this ListenerSet is attached to."
+sidebar:
+  label: "parentRef"
+---
+
+Reference to the Gateway this ListenerSet is attached to.
+
+## Type
+
+`object`
+
+## Properties
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `group` | `string` | No | - | Group of the referenced Gateway. Defaults to &#39;gateway... |
+| `kind` | `string` | No | - | Kind of the referenced Gateway. Defaults to &#39;Gateway&... |
+| `name` | `string` | **Yes** | - | Name of the referenced Gateway. This field is required. |
+| `namespace` | `string` | No | - | Namespace of the referenced Gateway. Defaults to the name... |
+
+### Property Details
+
+#### group
+
+Group of the referenced Gateway. Defaults to &#39;gateway.networking.k8s.io&#39;.
+
+#### kind
+
+Kind of the referenced Gateway. Defaults to &#39;Gateway&#39;.
+
+#### namespace
+
+Namespace of the referenced Gateway. Defaults to the namespace the ListenerSet is deployed to.

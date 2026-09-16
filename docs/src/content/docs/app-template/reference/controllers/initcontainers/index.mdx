@@ -57,11 +57,11 @@ Available properties:
 
 #### env
 
-Environment variables for the container. Supports multiple syntax styles: simple map (key: value), list of K8s v1.EnvVar entries, and valueFrom references (configMapKeyRef, secretKeyRef, fieldRef, resourceFieldRef). Helm templates can be used in values. See the Environment Variables howto for detailed patterns and examples.
+Environment variables for the container. Supports multiple syntax styles: simple map (key: value), list of K8s v1.EnvVar entries, and valueFrom references (configMapKeyRef, secretKeyRef, fieldRef, resourceFieldRef). See the Environment Variables howto for detailed patterns and examples.
 
 #### envFrom
 
-Secrets and/or ConfigMaps to load as environment variables in bulk. Each entry references either a ConfigMap (via `configMap` name or `configMapRef.identifier`) or a Secret (via `secret` name or `secretRef.identifier`), with optional `prefix`. See the Environment Variables howto for detailed patterns.
+Secrets and/or ConfigMaps to load as environment variables in bulk. Each entry references either a ConfigMap (via `configMap` name or `configMapRef.identifier`), a Secret (via `secret` name or `secretRef.identifier`), or an ExternalSecret (via `externalSecretRef.identifier`), with optional `prefix`. See the Environment Variables howto for detailed patterns.
 
 #### resizePolicy
 

@@ -51,8 +51,29 @@ The `common` library chart follows a modular architecture:
 
 1. **Make changes** to template files in `charts/library/common/templates/`
 2. **Update/add tests** in `charts/library/common/test-chart/unittests/`
-3. **Run tests** via `just chart::test library/common`
+3. **Run unit tests** via `just chart::unit-test library/common`
+   (the deprecated `chart::test` alias remains available for compatibility).
 4. **Verify** all tests pass before committing
+
+### Resource and Schema Workflow
+
+- New schema files must use the current chart version in their `$id`, and all referenced files must be available at the versioned URL.
+- Resource renderers should avoid mutating user values or injecting provider-specific defaults unless the behavior is explicitly documented and tested.
+- When changing `charts/library/common/values.schema.json` or any file under `charts/library/common/schemas/**`, you MUST run exactly:
+  ```
+  just chart::generate-values library/common
+  just chart::check-values library/common
+  just docs::generate
+  ```
+- Review the generated `charts/library/common/values.yaml` and generated documentation, and do not commit stale generated artifacts.
+- Ensure the `helm-unittest` plugin is installed and run `helm dep update` in the test chart after template changes before running focused unit tests.
+
+## Defaulting and User Values
+
+- Distinguish absent keys from explicitly empty or partial values; a missing key is not the same as an empty value.
+- Use presence checks such as `hasKey` when absence has semantic meaning.
+- Preserve explicitly configured selectors and objects instead of overwriting them with derived or auto-detected values.
+- Test absent, explicit empty, `matchLabels`, `matchExpressions`, and templated values when relevant.
 
 ## Development Environment
 
@@ -96,12 +117,21 @@ All error messages in Helm templates MUST follow structured logging principles:
 
 ## Testing
 
-- Run all tests via: `just chart::test library/common`
-- Run specific tests via glob pattern: `just chart::test library/common "container/*_test.yaml"`
+- Run all unit tests via: `just chart::unit-test library/common`
+- Run specific unit tests via glob pattern: `just chart::unit-test library/common "container/*_test.yaml"`
   - Examples:
-    - `just chart::test library/common "container/*_test.yaml"` - Run all container tests
-    - `just chart::test library/common "pod/field_*_test.yaml"` - Run all pod field tests
-    - `just chart::test library/common "**/field_env_*_test.yaml"` - Run all env-related tests
+    - `just chart::unit-test library/common "container/*_test.yaml"` - Run all container tests
+    - `just chart::unit-test library/common "pod/field_*_test.yaml"` - Run all pod field tests
+    - `just chart::unit-test library/common "**/field_env_*_test.yaml"` - Run all env-related tests
+- `chart::test` is a deprecated compatibility alias for `chart::unit-test` and
+  forwards the same chart and glob arguments.
+- Run local chart integration validation via
+  `just chart::integration-test library/common`; it uses chart-testing 3.14.0's
+  `ct install` command (not `ct test`). Actually running it requires a
+  configured cluster; the recipe's dry-run and static checks do not require a
+  cluster.
+- Bats is unavailable in the development environment and is not required for
+  validation; use the documented Just dry-run and static checks instead.
 - All validation changes MUST include corresponding unit test updates
 - Error messages in tests should match exactly (use `errorMessage` not `errorPattern` when possible)
 

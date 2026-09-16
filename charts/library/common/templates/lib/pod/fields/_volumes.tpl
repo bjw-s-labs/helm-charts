@@ -83,6 +83,12 @@ Returns the value for volumes
           {{- fail (printf "Persistence '%s': No Secret found with identifier '%s'. Ensure a Secret with this identifier exists and is enabled under 'secrets.%s'." $identifier $persistenceValues.identifier $persistenceValues.identifier) -}}
         {{- end -}}
         {{- $objectName = $object.name -}}
+      {{- else if $persistenceValues.externalSecretRef -}}
+        {{- $object := (include "bjw-s.common.lib.externalSecret.getByIdentifier" (dict "rootContext" $rootContext "id" $persistenceValues.externalSecretRef) | fromYaml ) -}}
+        {{- if not $object -}}
+          {{- fail (printf "Persistence '%s': No ExternalSecret found with identifier '%s'. Ensure an ExternalSecret with this identifier exists and is enabled under 'externalSecrets.%s'." $identifier $persistenceValues.externalSecretRef $persistenceValues.externalSecretRef) -}}
+        {{- end -}}
+        {{- $objectName = include "bjw-s.common.lib.externalSecret.getSecretName" $object -}}
       {{- end -}}
       {{- $_ := set $volume "secret" dict -}}
       {{- $_ := set $volume.secret "secretName" $objectName -}}
@@ -144,6 +150,15 @@ Returns the value for volumes
       {{- $_ := set $volume "nfs" dict -}}
       {{- $_ := set $volume.nfs "server" (required "server not set" $persistenceValues.server) -}}
       {{- $_ := set $volume.nfs "path" (required "path not set" $persistenceValues.path) -}}
+
+    {{- /* projected persistence type */ -}}
+    {{- else if eq $persistenceValues.type "projected" -}}
+      {{- $_ := set $volume "projected" dict -}}
+      {{- $sources := required (printf "Persistence '%s': Projected volume sources are required. Specify 'persistence.%s.sources' with at least one source." $identifier $identifier) $persistenceValues.sources -}}
+      {{- $_ := set $volume.projected "sources" (tpl (toYaml $sources) $rootContext | fromYamlArray) -}}
+      {{- with $persistenceValues.defaultMode -}}
+        {{- $_ := set $volume.projected "defaultMode" . -}}
+      {{- end -}}
 
     {{- /* custom persistence type */ -}}
     {{- else if eq $persistenceValues.type "custom" -}}

@@ -1,0 +1,181 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.2.0/charts/library/common/schemas/listenerSet.json",
+  "$defs": {
+    "instance": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "definitions.json#/$defs/resourceIdentifier"
+        }
+      ],
+      "unevaluatedProperties": false,
+      "properties": {
+        "enabled": {
+          "description": "Set to false to disable the ListenerSet.",
+          "type": "boolean",
+          "default": true
+        },
+        "annotations": {
+          "$ref": "definitions.json#/$defs/annotations"
+        },
+        "labels": {
+          "$ref": "definitions.json#/$defs/labels"
+        },
+        "namespaceOverride": {
+          "description": "Override the namespace the ListenerSet is deployed to.",
+          "type": "string"
+        },
+        "parentRef": {
+          "description": "Reference to the Gateway this ListenerSet is attached to.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "group": {
+              "description": "Group of the referenced Gateway. Defaults to 'gateway.networking.k8s.io'.",
+              "type": "string"
+            },
+            "kind": {
+              "description": "Kind of the referenced Gateway. Defaults to 'Gateway'.",
+              "type": "string"
+            },
+            "name": {
+              "description": "Name of the referenced Gateway. This field is required.",
+              "type": "string"
+            },
+            "namespace": {
+              "description": "Namespace of the referenced Gateway. Defaults to the namespace the ListenerSet is deployed to.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "listeners": {
+          "description": "Listeners associated with this ListenerSet. Each listener defines how the attached Gateway listens for connections.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "description": "Name of the Listener. This name must be unique within the ListenerSet.",
+                "type": "string"
+              },
+              "hostname": {
+                "description": "Hostname specifies the virtual hostname to match for protocol types that define this concept.",
+                "type": "string"
+              },
+              "port": {
+                "description": "Port is the network port on which this listener listens.",
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 65535
+              },
+              "protocol": {
+                "description": "Protocol specifies the network protocol this listener expects to receive.",
+                "type": "string",
+                "enum": [
+                  "HTTP",
+                  "HTTPS",
+                  "TCP",
+                  "TLS",
+                  "UDP"
+                ]
+              },
+              "tls": {
+                "description": "TLS is the TLS configuration for the Listener. Required when the protocol is 'HTTPS' or 'TLS'. Additional TLS configuration fields (e.g. options, frontendValidation) are passed through as-is.",
+                "type": "object",
+                "additionalProperties": true,
+                "properties": {
+                  "mode": {
+                    "description": "Mode defines the TLS behavior for the listener. 'Terminate' terminates TLS at the Gateway, 'Passthrough' forwards the TLS session to the backend.",
+                    "type": "string",
+                    "enum": [
+                      "Terminate",
+                      "Passthrough"
+                    ]
+                  },
+                  "certificateRefs": {
+                    "description": "CertificateRefs contains a series of references to Kubernetes objects that contain TLS certificates and private keys.",
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "group": {
+                          "description": "Group is the group of the referenced object. Defaults to an empty string (core group).",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "description": "Kind is the kind of the referenced object. Defaults to 'Secret'.",
+                          "type": "string"
+                        },
+                        "name": {
+                          "description": "Name is the name of the referenced object.",
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "allowedRoutes": {
+                "description": "AllowedRoutes defines the types of routes that are allowed to attach to the Gateway listeners configured by this ListenerSet. Additional allowedRoutes fields are passed through as-is.",
+                "type": "object",
+                "additionalProperties": true,
+                "properties": {
+                  "namespaces": {
+                    "description": "Namespaces indicates from which namespaces Routes may attach to this listener.",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "from": {
+                        "description": "From defines which namespaces Routes may originate from. Defaults to 'Same'.",
+                        "type": "string",
+                        "enum": [
+                          "Same",
+                          "All",
+                          "Selector"
+                        ]
+                      },
+                      "selector": {
+                        "description": "Selector is a label selector used to select namespaces when 'from' is set to 'Selector'.",
+                        "type": "object",
+                        "additionalProperties": true
+                      }
+                    }
+                  },
+                  "kinds": {
+                    "description": "Kinds specifies groups and kinds of Routes that are allowed to attach to this listener.",
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "group": {
+                          "description": "Group of the Route kind. Defaults to 'gateway.networking.k8s.io'.",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "description": "Kind of the Route.",
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "name",
+              "port",
+              "protocol"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

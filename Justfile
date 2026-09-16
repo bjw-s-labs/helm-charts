@@ -1,6 +1,6 @@
 #!/usr/bin/env -S just --justfile
 
-set quiet := true
+set quiet
 set shell := ['bash', '-euo', 'pipefail', '-c']
 
 mod chart "charts"
@@ -12,4 +12,4 @@ default:
 
 [private]
 log lvl msg *args:
-  gum log -t rfc3339 -s -l "{{ lvl }}" "{{ msg }}" {{ args }}
+    gum log -t rfc3339 -s -l "{{ lvl }}" "{{ msg }}" {{ args }}

@@ -1,0 +1,152 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: route - fields - parentRefs identifier
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+  - ../_values/service_main_default.yaml
+set:
+  listenerSets.main:
+    parentRef:
+      name: main-gateway
+    listeners:
+      - name: http
+        port: 80
+        protocol: HTTP
+  route.main:
+    parentRefs:
+      - identifier: main
+tests:
+  - it: resolves name, kind and group from the ListenerSet identifier
+    capabilities:
+      apiVersions:
+        - gateway.networking.k8s.io/v1/ListenerSet
+    documentSelector:
+      path: $[?(@.kind == "HTTPRoute")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.parentRefs[0].name
+          value: release-name
+      - equal:
+          path: spec.parentRefs[0].kind
+          value: ListenerSet
+      - equal:
+          path: spec.parentRefs[0].group
+          value: gateway.networking.k8s.io
+      - notExists:
+          path: spec.parentRefs[0].namespace
+
+  - it: resolves the suffixed name when multiple ListenerSets are enabled
+    capabilities:
+      apiVersions:
+        - gateway.networking.k8s.io/v1/ListenerSet
+    set:
+      listenerSets.second:
+        parentRef:
+          name: second-gateway
+        listeners:
+          - name: https
+            port: 443
+            protocol: HTTPS
+    documentSelector:
+      path: $[?(@.kind == "HTTPRoute")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.parentRefs[0].name
+          value: release-name-main
+      - equal:
+          path: spec.parentRefs[0].kind
+          value: ListenerSet
+      - equal:
+          path: spec.parentRefs[0].group
+          value: gateway.networking.k8s.io
+
+  - it: honors sectionName and port on the parentRef
+    capabilities:
+      apiVersions:
+        - gateway.networking.k8s.io/v1/ListenerSet
+    set:
+      route.main.parentRefs:
+        - identifier: main
+          sectionName: http
+          port: 80
+    documentSelector:
+      path: $[?(@.kind == "HTTPRoute")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.parentRefs[0].name
+          value: release-name
+      - equal:
+          path: spec.parentRefs[0].sectionName
+          value: http
+      - equal:
+          path: spec.parentRefs[0].port
+          value: 80
+
+  - it: uses the ListenerSet namespace when it differs from the Route namespace
+    capabilities:
+      apiVersions:
+        - gateway.networking.k8s.io/v1/ListenerSet
+    set:
+      listenerSets.main.namespaceOverride: listener-ns
+    documentSelector:
+      path: $[?(@.kind == "HTTPRoute")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.parentRefs[0].namespace
+          value: listener-ns
+
+  - it: an explicit namespace wins over the ListenerSet namespace
+    capabilities:
+      apiVersions:
+        - gateway.networking.k8s.io/v1/ListenerSet
+    set:
+      listenerSets.main.namespaceOverride: listener-ns
+      route.main.parentRefs:
+        - identifier: main
+          namespace: explicit-ns
+    documentSelector:
+      path: $[?(@.kind == "HTTPRoute")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.parentRefs[0].namespace
+          value: explicit-ns
+
+  - it: fails when the ListenerSet identifier cannot be resolved
+    capabilities:
+      apiVersions:
+        - gateway.networking.k8s.io/v1/ListenerSet
+    set:
+      route.main.parentRefs:
+        - identifier: missing
+    asserts:
+      - failedTemplate:
+          errorMessage: "Route 'main': No enabled ListenerSet found with identifier 'missing'. Define and enable it under 'listenerSets.missing' or reference a parent Gateway by name."
+
+  - it: fails when the referenced ListenerSet is disabled
+    capabilities:
+      apiVersions:
+        - gateway.networking.k8s.io/v1/ListenerSet
+    set:
+      listenerSets.main.enabled: false
+    asserts:
+      - failedTemplate:
+          errorMessage: "Route 'main': No enabled ListenerSet found with identifier 'main'. Define and enable it under 'listenerSets.main' or reference a parent Gateway by name."
+
+  - it: name and identifier are mutually exclusive
+    capabilities:
+      apiVersions:
+        - gateway.networking.k8s.io/v1/ListenerSet
+    set:
+      route.main.parentRefs:
+        - name: gateway
+          identifier: main
+    asserts:
+      - failedTemplate:
+          errorPattern: "values don't meet the specifications of the schema"

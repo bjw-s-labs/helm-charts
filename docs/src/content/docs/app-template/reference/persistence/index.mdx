@@ -8,7 +8,7 @@ sidebar:
 import { Tabs, TabItem, Badge } from '@astrojs/starlight/components';
 
 Configure persistent storage and mount options. Each key is an identifier for a persistence item.
-Supported types: persistentVolumeClaim (default), configMap, secret, nfs, emptyDir, hostPath, image, custom.
+Supported types: persistentVolumeClaim (default), configMap, secret, nfs, emptyDir, hostPath, image, projected, custom.
 By default each item mounts to /&lt;identifier&gt;. Use globalMounts or advancedMounts to customize mount paths.
 
 ## Type
@@ -46,14 +46,28 @@ persistence:
 
 ```yaml
 persistence:
+  api-token:
+    type: projected
+    defaultMode: 0400
+    sources:
+      - serviceAccountToken:
+          audience: https://api.example.com
+          expirationSeconds: 3600
+          path: token
+    globalMounts:
+      - path: /var/run/secrets/tokens
+```
+
+<details>
+<summary>More examples (22)</summary>
+
+```yaml
+persistence:
   config:
     type: persistentVolumeClaim
     accessMode: ReadWriteOnce
     size: 1Gi
 ```
-
-<details>
-<summary>More examples (19)</summary>
 
 ```yaml
 persistence:
@@ -200,6 +214,33 @@ persistence:
 
 ```yaml
 persistence:
+  api-token:
+    type: projected
+    sources:
+      - serviceAccountToken:
+          audience: https://api.example.com
+          expirationSeconds: 3600
+          path: token
+```
+
+```yaml
+persistence:
+  bundle:
+    type: projected
+    defaultMode: 0400
+    sources:
+      - serviceAccountToken:
+          audience: vault
+          path: vault-token
+      - configMap:
+          name: ca-bundle
+          items:
+            - key: ca.crt
+              path: ca.crt
+```
+
+```yaml
+persistence:
   ceph:
     type: custom
     volumeSpec:
@@ -276,7 +317,7 @@ persistence:
 
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
-| `existingClaim` | `string` | **Yes** | - | The name of an existing PersistentVolumeClaim to use. Hel... |
+| `existingClaim` | `string` | **Yes** | - | The name of an existing PersistentVolumeClaim to use. Thi... |
 
   </TabItem>
   <TabItem label="configMap">
@@ -303,7 +344,7 @@ persistence:
   </TabItem>
   <TabItem label="secret">
 
-Mount a Secret as a volume. Use &#39;name&#39; for external Secrets, or &#39;identifier&#39; to reference one managed by this chart.
+Mount a Secret as a volume. Use &#39;name&#39; for an existing Secret, &#39;identifier&#39; for a Secret managed by this chart, or &#39;externalSecretRef&#39; for an ExternalSecret managed by this chart.
 
 
 ```yaml
@@ -318,6 +359,7 @@ persistence:
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
 | `defaultMode` | `integer` | No | - |  |
+| `externalSecretRef` | `string` | No | - |  |
 | `identifier` | `string` | No | - |  |
 | `items` | `array` | No | - |  |
 | `name` | `string` | **Yes** | - |  |
@@ -422,6 +464,30 @@ persistence:
 |----------|------|----------|---------|-------------|
 | `image` | `string / object` | **Yes** | - | OCI artifact reference to be used. |
 | `pullPolicy` | `string` | No | - | The image pull policy for the image persistence item. |
+
+  </TabItem>
+  <TabItem label="projected">
+
+Project one or more sources into a single volume. Sources may be ServiceAccount tokens, ConfigMaps or Secrets, all mounted into the same directory.
+
+
+```yaml
+persistence:
+  api-token:
+    type: projected
+    sources:
+      - serviceAccountToken:
+          audience: https://api.example.com
+          expirationSeconds: 3600
+          path: token
+```
+
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `defaultMode` | `integer` | No | - | Permissions applied to the projected files, in octal (for... |
+| `sources` | `array` | **Yes** | - | The list of volume projections to mount into this volume. |
 
   </TabItem>
   <TabItem label="custom">

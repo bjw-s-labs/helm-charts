@@ -1,0 +1,82 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: listenerSet - presence
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+capabilities:
+  apiVersions:
+    - gateway.networking.k8s.io/v1/ListenerSet
+tests:
+  - it: a ListenerSet is not created by default
+    asserts:
+      - not: true
+        containsDocument:
+          kind: ListenerSet
+          apiVersion: gateway.networking.k8s.io/v1
+          name: release-name
+          any: true
+
+  - it: a ListenerSet is not created when disabled
+    set:
+      listenerSets.main:
+        enabled: false
+        parentRef:
+          name: main-gateway
+        listeners:
+          - name: http
+            port: 80
+            protocol: HTTP
+    asserts:
+      - not: true
+        containsDocument:
+          kind: ListenerSet
+          apiVersion: gateway.networking.k8s.io/v1
+          name: release-name
+          any: true
+
+  - it: a ListenerSet is created when configured
+    set:
+      listenerSets.main:
+        parentRef:
+          name: main-gateway
+        listeners:
+          - name: http
+            port: 80
+            protocol: HTTP
+    asserts:
+      - containsDocument:
+          kind: ListenerSet
+          apiVersion: gateway.networking.k8s.io/v1
+          name: release-name
+          any: true
+
+  - it: multiple ListenerSets are created when configured
+    set:
+      listenerSets:
+        main:
+          parentRef:
+            name: main-gateway
+          listeners:
+            - name: http
+              port: 80
+              protocol: HTTP
+        second:
+          parentRef:
+            name: second-gateway
+          listeners:
+            - name: https
+              port: 443
+              protocol: HTTPS
+    asserts:
+      - containsDocument:
+          kind: ListenerSet
+          apiVersion: gateway.networking.k8s.io/v1
+          name: release-name-main
+          any: true
+      - containsDocument:
+          kind: ListenerSet
+          apiVersion: gateway.networking.k8s.io/v1
+          name: release-name-second
+          any: true

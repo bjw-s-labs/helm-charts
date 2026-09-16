@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.2.0/charts/library/common/schemas/networkpolicies.json",
+  "$defs": {
+    "instance": {
+      "description": "NetworkPolicy implementation to render. Supported type values are native, cilium, and ciliumClusterwide. Use native for a Kubernetes NetworkPolicy, cilium for a CiliumNetworkPolicy, or ciliumClusterwide for a cluster-scoped CiliumClusterwideNetworkPolicy rendered without metadata.namespace.",
+      "properties": {
+        "type": {
+          "description": "Resource implementation to render. Set type to native, cilium, or ciliumClusterwide.",
+          "type": "string",
+          "enum": [
+            "native",
+            "cilium",
+            "ciliumClusterwide"
+          ]
+        }
+      },
+      "oneOf": [
+        {
+          "$ref": "networkpolicy.json#/$defs/instance"
+        },
+        {
+          "$ref": "ciliumNetworkPolicy.json#/$defs/instance"
+        },
+        {
+          "$ref": "ciliumClusterwideNetworkPolicy.json#/$defs/instance"
+        }
+      ]
+    }
+  }
+}
