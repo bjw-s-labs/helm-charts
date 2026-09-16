@@ -33,8 +33,11 @@ See `git help commit`:
 
 ### Setting up a local development environment
 
-I rely on [mise-en-place](https://mise.jdx.dev) to set up my development environment. Once you have installed mise-en-place, you can run the `mise up` command which will then install all the required tools.
+I rely on [mise-en-place](https://mise.jdx.dev) to set up my development environment. Once you have installed mise-en-place, run `mise up` to install the declared development tools, including Helm.
 To see which tools are installed you can take a look at the [mise configuration](.mise.toml) file.
+The Just unit-test recipe installs and verifies Helm's `helm-unittest` plugin at the pinned version `v1.1.2`; it is not installed or upgraded by `mise install` or `mise upgrade`.
+
+Run unit tests with `just chart::unit-test library/common`, or use its glob form to target specific test files. Integration testing is separate and requires a configured cluster.
 
 ### Technical Requirements
 

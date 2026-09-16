@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.1.0/charts/library/common/schemas/containers.json",
+  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.2.0/charts/library/common/schemas/containers.json",
   "$defs": {
     "container": {
       "type": "object",
@@ -34,11 +34,11 @@
           ]
         },
         "env": {
-          "description": "Environment variables for the container. Supports multiple syntax styles: simple map (key: value), list of K8s v1.EnvVar entries, and valueFrom references (configMapKeyRef, secretKeyRef, fieldRef, resourceFieldRef). Helm templates can be used in values. See the Environment Variables howto for detailed patterns and examples.",
+          "description": "Environment variables for the container. Supports multiple syntax styles: simple map (key: value), list of K8s v1.EnvVar entries, and valueFrom references (configMapKeyRef, secretKeyRef, fieldRef, resourceFieldRef). See the Environment Variables howto for detailed patterns and examples.",
           "$ref": "#/$defs/env"
         },
         "envFrom": {
-          "description": "Secrets and/or ConfigMaps to load as environment variables in bulk. Each entry references either a ConfigMap (via `configMap` name or `configMapRef.identifier`) or a Secret (via `secret` name or `secretRef.identifier`), with optional `prefix`. See the Environment Variables howto for detailed patterns.",
+          "description": "Secrets and/or ConfigMaps to load as environment variables in bulk. Each entry references either a ConfigMap (via `configMap` name or `configMapRef.identifier`), a Secret (via `secret` name or `secretRef.identifier`), or an ExternalSecret (via `externalSecretRef.identifier`), with optional `prefix`. See the Environment Variables howto for detailed patterns.",
           "$ref": "#/$defs/envFrom"
         },
         "image": {
@@ -255,6 +255,21 @@
                   "identifier"
                 ]
               }
+            ]
+          },
+          "externalSecretRef": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "identifier": {
+                "type": "string"
+              },
+              "optional": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "identifier"
             ]
           }
         }

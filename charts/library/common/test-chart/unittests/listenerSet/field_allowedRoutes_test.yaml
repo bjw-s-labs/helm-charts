@@ -1,0 +1,117 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: listenerSet - fields - allowedRoutes
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+capabilities:
+  apiVersions:
+    - gateway.networking.k8s.io/v1/ListenerSet
+set:
+  listenerSets.main:
+    parentRef:
+      name: main-gateway
+    listeners:
+      - name: http
+        port: 80
+        protocol: HTTP
+tests:
+  - it: allowedRoutes is not emitted when not set
+    documentSelector:
+      path: $[?(@.kind == "ListenerSet")].metadata.name
+      value: release-name
+    asserts:
+      - notExists:
+          path: spec.listeners[0].allowedRoutes
+
+  - it: renders allowedRoutes.namespaces.from
+    set:
+      listenerSets.main.listeners:
+        - name: http
+          port: 80
+          protocol: HTTP
+          allowedRoutes:
+            namespaces:
+              from: All
+    documentSelector:
+      path: $[?(@.kind == "ListenerSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.listeners[0].allowedRoutes.namespaces
+          value:
+            from: All
+
+  - it: renders allowedRoutes.namespaces.selector
+    set:
+      listenerSets.main.listeners:
+        - name: http
+          port: 80
+          protocol: HTTP
+          allowedRoutes:
+            namespaces:
+              from: Selector
+              selector:
+                matchLabels:
+                  kubernetes.io/metadata.name: route-ns
+    documentSelector:
+      path: $[?(@.kind == "ListenerSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.listeners[0].allowedRoutes.namespaces
+          value:
+            from: Selector
+            selector:
+              matchLabels:
+                kubernetes.io/metadata.name: route-ns
+
+  - it: renders allowedRoutes.kinds
+    set:
+      listenerSets.main.listeners:
+        - name: http
+          port: 80
+          protocol: HTTP
+          allowedRoutes:
+            kinds:
+              - group: gateway.networking.k8s.io
+                kind: HTTPRoute
+              - group: gateway.networking.k8s.io
+                kind: GRPCRoute
+    documentSelector:
+      path: $[?(@.kind == "ListenerSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.listeners[0].allowedRoutes.kinds
+          value:
+            - group: gateway.networking.k8s.io
+              kind: HTTPRoute
+            - group: gateway.networking.k8s.io
+              kind: GRPCRoute
+
+  - it: passes through additional allowedRoutes fields
+    set:
+      listenerSets.main.listeners:
+        - name: http
+          port: 80
+          protocol: HTTP
+          allowedRoutes:
+            namespaces:
+              from: Same
+            kinds:
+              - group: gateway.networking.k8s.io
+                kind: HTTPRoute
+    documentSelector:
+      path: $[?(@.kind == "ListenerSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.listeners[0].allowedRoutes
+          value:
+            namespaces:
+              from: Same
+            kinds:
+              - group: gateway.networking.k8s.io
+                kind: HTTPRoute

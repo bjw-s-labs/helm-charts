@@ -1,0 +1,86 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: externalSecret - metadata
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+set:
+  defaultExternalSecretStoreRef:
+    name: provider-store
+  externalSecrets.main:
+    data:
+      - secretKey: password
+        remoteRef:
+          key: credentials
+tests:
+  - it: renders default metadata
+    documentSelector:
+      path: $[?(@.kind == "ExternalSecret")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: NAMESPACE
+      - equal:
+          path: metadata.labels
+          value:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: RELEASE-NAME
+            helm.sh/chart: common-test-1.0.0
+      - notExists:
+          path: metadata.annotations
+
+  - it: merges custom and global metadata
+    set:
+      global:
+        labels:
+          global-label: global
+        annotations:
+          global-annotation: global
+      externalSecrets.main:
+        labels:
+          external-secret-label: external-secret
+        annotations:
+          external-secret-annotation: external-secret
+    documentSelector:
+      path: $[?(@.kind == "ExternalSecret")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: metadata.labels
+          value:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: RELEASE-NAME
+            external-secret-label: external-secret
+            global-label: global
+            helm.sh/chart: common-test-1.0.0
+      - equal:
+          path: metadata.annotations
+          value:
+            external-secret-annotation: external-secret
+            global-annotation: global
+
+  - it: supports resource naming options
+    set:
+      externalSecrets.main:
+        prefix: external
+        suffix: credentials
+    asserts:
+      - containsDocument:
+          apiVersion: external-secrets.io/v1
+          kind: ExternalSecret
+          name: external-release-name-credentials
+          any: true
+
+  - it: supports forceRename with templates
+    set:
+      externalSecrets.main.forceRename: "{{ .Chart.Name }}"
+    asserts:
+      - containsDocument:
+          apiVersion: external-secrets.io/v1
+          kind: ExternalSecret
+          name: common-test
+          any: true

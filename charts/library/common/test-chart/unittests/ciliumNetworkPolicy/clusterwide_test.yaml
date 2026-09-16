@@ -1,0 +1,116 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: ciliumNetworkPolicy - clusterwide
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+tests:
+  - it: renders a CiliumClusterwideNetworkPolicy
+    set:
+      networkpolicies.main:
+        type: ciliumClusterwide
+        ingress:
+          - {}
+    documentSelector:
+      path: $[?(@.kind == "CiliumClusterwideNetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: apiVersion
+          value: cilium.io/v2
+      - equal:
+          path: kind
+          value: CiliumClusterwideNetworkPolicy
+
+  - it: renders nodeSelector under spec
+    set:
+      networkpolicies.main:
+        type: ciliumClusterwide
+        nodeSelector:
+          matchLabels:
+            kubernetes.io/os: linux
+        ingress:
+          - {}
+    documentSelector:
+      path: $[?(@.kind == "CiliumClusterwideNetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.nodeSelector
+          value:
+            matchLabels:
+              kubernetes.io/os: linux
+
+  - it: renders nodeSelector without controller or endpointSelector
+    set:
+      networkpolicies.main:
+        type: ciliumClusterwide
+        nodeSelector:
+          matchLabels:
+            kubernetes.io/os: linux
+        ingress:
+          - {}
+    documentSelector:
+      path: $[?(@.kind == "CiliumClusterwideNetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - notExists:
+          path: spec.controller
+      - notExists:
+          path: spec.endpointSelector
+
+  - it: omits metadata.namespace
+    set:
+      networkpolicies.main:
+        type: ciliumClusterwide
+        ingress:
+          - {}
+    documentSelector:
+      path: $[?(@.kind == "CiliumClusterwideNetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - notExists:
+          path: metadata.namespace
+
+  - it: rejects an invalid controller
+    set:
+      networkpolicies.main:
+        type: ciliumClusterwide
+        controller: missing
+        ingress:
+          - {}
+    asserts:
+      - failedTemplate:
+          errorMessage: "CiliumClusterwideNetworkPolicy 'main': No enabled controller found with identifier 'missing'. Available controllers: [main]"
+
+  - it: rejects nodeSelector with endpointSelector
+    set:
+      networkpolicies.main:
+        type: ciliumClusterwide
+        nodeSelector:
+          matchLabels:
+            kubernetes.io/os: linux
+        endpointSelector:
+          matchLabels:
+            app: example
+        ingress:
+          - {}
+    asserts:
+      - failedTemplate:
+          errorPattern: "'not' failed"
+
+  - it: rejects nodeSelector with controller
+    set:
+      networkpolicies.main:
+        type: ciliumClusterwide
+        nodeSelector:
+          matchLabels:
+            kubernetes.io/os: linux
+        controller:
+          - app: example
+        ingress:
+          - {}
+    asserts:
+      - failedTemplate:
+          errorPattern: "'not' failed"

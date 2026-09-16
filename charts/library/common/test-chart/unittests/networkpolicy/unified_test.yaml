@@ -1,0 +1,107 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: networkPolicy - unified map
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+tests:
+  - it: renders a native NetworkPolicy when type is omitted
+    set:
+      networkpolicies.main:
+        controller: main
+        policyTypes:
+          - Ingress
+        rules: {}
+    asserts:
+      - containsDocument:
+          apiVersion: networking.k8s.io/v1
+          kind: NetworkPolicy
+          name: release-name
+          any: true
+
+  - it: renders a CiliumNetworkPolicy when type is cilium
+    set:
+      networkpolicies.cilium:
+        type: cilium
+        controller: main
+        description: "Policy for {{ .Release.Name }}"
+        ingress:
+          - fromEntities:
+              - cluster
+        egressDeny:
+          - toEntities:
+              - world
+        enableDefaultDeny:
+          ingress: true
+          egress: false
+    documentSelector:
+      path: $[?(@.kind == "CiliumNetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.description
+          value: Policy for RELEASE-NAME
+      - equal:
+          path: spec.ingress
+          value:
+            - fromEntities:
+                - cluster
+      - equal:
+          path: spec.egressDeny
+          value:
+            - toEntities:
+                - world
+      - equal:
+          path: spec.enableDefaultDeny
+          value:
+            ingress: true
+            egress: false
+
+  - it: renders native and Cilium policies together from the unified map
+    set:
+      networkpolicies:
+        primary:
+          type: native
+          controller: main
+          policyTypes:
+            - Ingress
+          rules:
+            ingress:
+              - {}
+        cilium:
+          type: cilium
+          controller: main
+          ingress:
+            - fromEntities:
+                - cluster
+        disabled:
+          type: native
+          enabled: false
+          controller: main
+          policyTypes:
+            - Ingress
+          rules: {}
+    asserts:
+      - containsDocument:
+          apiVersion: networking.k8s.io/v1
+          kind: NetworkPolicy
+          name: release-name-primary
+          any: true
+      - containsDocument:
+          apiVersion: cilium.io/v2
+          kind: CiliumNetworkPolicy
+          name: release-name-cilium
+          any: true
+
+  - it: rejects an unsupported unified networkpolicy type
+    set:
+      networkpolicies.invalid:
+        type: unsupported
+        controller: main
+        policyTypes:
+          - Ingress
+        rules: {}
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema

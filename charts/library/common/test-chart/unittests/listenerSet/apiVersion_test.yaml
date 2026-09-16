@@ -1,0 +1,29 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: listenerSet - apiVersion
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+set:
+  listenerSets.main:
+    parentRef:
+      name: main-gateway
+    listeners:
+      - name: http
+        port: 80
+        protocol: HTTP
+tests:
+  - it: renders the standard v1 ListenerSet
+    asserts:
+      - containsDocument:
+          kind: ListenerSet
+          apiVersion: gateway.networking.k8s.io/v1
+          name: release-name
+          any: true
+      - documentSelector:
+          path: $[?(@.kind == "ListenerSet")].metadata.name
+          value: release-name
+        equal:
+          path: spec.parentRef.group
+          value: gateway.networking.k8s.io
