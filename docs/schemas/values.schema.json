@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.1.0/charts/library/common/values.schema.json",
+  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.2.0/charts/library/common/values.schema.json",
   "type": "object",
   "properties": {
     "global": {
@@ -32,7 +32,7 @@
           "default": false
         },
         "labels": {
-          "description": "Set additional global labels. Helm templates can be used.",
+          "description": "Set additional global labels.",
           "type": [
             "object",
             "null"
@@ -45,7 +45,7 @@
           }
         },
         "annotations": {
-          "description": "Set additional global annotations. Helm templates can be used.",
+          "description": "Set additional global annotations.",
           "type": [
             "object",
             "null"
@@ -79,7 +79,7 @@
       "properties": {
         "affinity": {
           "type": "object",
-          "description": "Set affinity constraint rules. Helm templates can be used.\nSee https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity",
+          "description": "Set affinity constraint rules.\nSee https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity",
           "additionalProperties": false,
           "properties": {
             "nodeAffinity": {
@@ -1683,14 +1683,14 @@
                                   "properties": {
                                     "path": {
                                       "type": "string",
-                                      "description": "The path where the volume should be mounted in the container. Helm templates are supported.\nIf not specified, the mount path will be set to /<identifier_of_the_peristence_item>."
+                                      "description": "The path where the volume should be mounted in the container.\nIf not specified, the mount path will be set to /<identifier_of_the_peristence_item>."
                                     },
                                     "readOnly": {
                                       "type": "boolean"
                                     },
                                     "subPath": {
                                       "type": "string",
-                                      "description": "The subPath within the volume to mount. Helm templates are supported.\nIf not specified, the entire volume will be mounted."
+                                      "description": "The subPath within the volume to mount.\nIf not specified, the entire volume will be mounted."
                                     },
                                     "subPathExpr": {
                                       "type": "string"
@@ -1765,14 +1765,14 @@
                                 "properties": {
                                   "path": {
                                     "type": "string",
-                                    "description": "The path where the volume should be mounted in the container. Helm templates are supported.\nIf not specified, the mount path will be set to /<identifier_of_the_peristence_item>."
+                                    "description": "The path where the volume should be mounted in the container.\nIf not specified, the mount path will be set to /<identifier_of_the_peristence_item>."
                                   },
                                   "readOnly": {
                                     "type": "boolean"
                                   },
                                   "subPath": {
                                     "type": "string",
-                                    "description": "The subPath within the volume to mount. Helm templates are supported.\nIf not specified, the entire volume will be mounted."
+                                    "description": "The subPath within the volume to mount.\nIf not specified, the entire volume will be mounted."
                                   },
                                   "subPathExpr": {
                                     "type": "string"
@@ -2036,7 +2036,7 @@
             "properties": {
               "affinity": {
                 "type": "object",
-                "description": "Set affinity constraint rules. Helm templates can be used.\nSee https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity",
+                "description": "Set affinity constraint rules.\nSee https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity",
                 "additionalProperties": false,
                 "properties": {
                   "nodeAffinity": {
@@ -4324,6 +4324,21 @@
                           ]
                         }
                       ]
+                    },
+                    "externalSecretRef": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "identifier": {
+                          "type": "string"
+                        },
+                        "optional": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "identifier"
+                      ]
                     }
                   }
                 }
@@ -5450,7 +5465,7 @@
                       }
                     }
                   ],
-                  "description": "Environment variables for the container. Supports multiple syntax styles: simple map (key: value), list of K8s v1.EnvVar entries, and valueFrom references (configMapKeyRef, secretKeyRef, fieldRef, resourceFieldRef). Helm templates can be used in values. See the Environment Variables howto for detailed patterns and examples."
+                  "description": "Environment variables for the container. Supports multiple syntax styles: simple map (key: value), list of K8s v1.EnvVar entries, and valueFrom references (configMapKeyRef, secretKeyRef, fieldRef, resourceFieldRef). See the Environment Variables howto for detailed patterns and examples."
                 },
                 "envFrom": {
                   "type": "array",
@@ -5523,10 +5538,25 @@
                             ]
                           }
                         ]
+                      },
+                      "externalSecretRef": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "identifier": {
+                            "type": "string"
+                          },
+                          "optional": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "identifier"
+                        ]
                       }
                     }
                   },
-                  "description": "Secrets and/or ConfigMaps to load as environment variables in bulk. Each entry references either a ConfigMap (via `configMap` name or `configMapRef.identifier`) or a Secret (via `secret` name or `secretRef.identifier`), with optional `prefix`. See the Environment Variables howto for detailed patterns."
+                  "description": "Secrets and/or ConfigMaps to load as environment variables in bulk. Each entry references either a ConfigMap (via `configMap` name or `configMapRef.identifier`), a Secret (via `secret` name or `secretRef.identifier`), or an ExternalSecret (via `externalSecretRef.identifier`), with optional `prefix`. See the Environment Variables howto for detailed patterns."
                 },
                 "image": {
                   "type": "object",
@@ -7721,7 +7751,7 @@
                       }
                     }
                   ],
-                  "description": "Environment variables for the container. Supports multiple syntax styles: simple map (key: value), list of K8s v1.EnvVar entries, and valueFrom references (configMapKeyRef, secretKeyRef, fieldRef, resourceFieldRef). Helm templates can be used in values. See the Environment Variables howto for detailed patterns and examples."
+                  "description": "Environment variables for the container. Supports multiple syntax styles: simple map (key: value), list of K8s v1.EnvVar entries, and valueFrom references (configMapKeyRef, secretKeyRef, fieldRef, resourceFieldRef). See the Environment Variables howto for detailed patterns and examples."
                 },
                 "envFrom": {
                   "type": "array",
@@ -7794,10 +7824,25 @@
                             ]
                           }
                         ]
+                      },
+                      "externalSecretRef": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "identifier": {
+                            "type": "string"
+                          },
+                          "optional": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "identifier"
+                        ]
                       }
                     }
                   },
-                  "description": "Secrets and/or ConfigMaps to load as environment variables in bulk. Each entry references either a ConfigMap (via `configMap` name or `configMapRef.identifier`) or a Secret (via `secret` name or `secretRef.identifier`), with optional `prefix`. See the Environment Variables howto for detailed patterns."
+                  "description": "Secrets and/or ConfigMaps to load as environment variables in bulk. Each entry references either a ConfigMap (via `configMap` name or `configMapRef.identifier`), a Secret (via `secret` name or `secretRef.identifier`), or an ExternalSecret (via `externalSecretRef.identifier`), with optional `prefix`. See the Environment Variables howto for detailed patterns."
                 },
                 "image": {
                   "type": "object",
@@ -9068,7 +9113,7 @@
             "type": "object",
             "properties": {
               "name": {
-                "description": "Reference a serviceAccount by its name. Helm templates are supported.",
+                "description": "Reference a serviceAccount by its name.",
                 "type": "string"
               },
               "identifier": {
@@ -9271,7 +9316,7 @@
             }
           },
           "data": {
-            "description": "ConfigMap data content. Helm templates are supported.",
+            "description": "ConfigMap data content.",
             "type": "object",
             "additionalProperties": {
               "type": "string"
@@ -9472,7 +9517,7 @@
             "type": "string"
           },
           "stringData": {
-            "description": "Secret stringData content. Helm templates are supported.",
+            "description": "Secret stringData content.",
             "type": "object",
             "additionalProperties": {
               "type": "string"
@@ -9482,6 +9527,226 @@
         "required": [
           "stringData"
         ]
+      }
+    },
+    "defaultExternalSecretStoreRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "description": "Kind of the SecretStore resource.",
+          "type": "string",
+          "enum": [
+            "SecretStore",
+            "ClusterSecretStore"
+          ]
+        },
+        "name": {
+          "description": "Name of the SecretStore resource.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "description": "Default SecretStore or ClusterSecretStore reference for ExternalSecret objects."
+    },
+    "externalSecrets": {
+      "description": "ExternalSecret objects to be generated by the chart. Each key is an ExternalSecret identifier.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "forceRename": {
+                "description": "Override the default resource name. Mutually exclusive with prefix and suffix.",
+                "type": "string"
+              },
+              "prefix": {
+                "description": "Prefix to prepend to the resource name. Mutually exclusive with forceRename.",
+                "type": "string",
+                "default": ""
+              },
+              "suffix": {
+                "description": "Suffix to append to the resource name. Defaults to the resource identifier if there are multiple items, otherwise empty. Mutually exclusive with forceRename.",
+                "type": "string"
+              }
+            },
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "forceRename",
+                    "suffix"
+                  ]
+                },
+                {
+                  "required": [
+                    "forceRename",
+                    "prefix"
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "unevaluatedProperties": false,
+        "properties": {
+          "enabled": {
+            "description": "Set to false to disable the ExternalSecret.",
+            "type": "boolean",
+            "default": true
+          },
+          "annotations": {
+            "description": "Annotations to set on the item.",
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "labels": {
+            "description": "Labels to set on the item.",
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "refreshPolicy": {
+            "description": "Policy controlling when the ExternalSecret is refreshed.",
+            "type": "string",
+            "enum": [
+              "CreatedOnce",
+              "Periodic",
+              "OnChange"
+            ]
+          },
+          "refreshInterval": {
+            "description": "Amount of time before values are read again from the SecretStore provider.",
+            "type": "string"
+          },
+          "secretStoreRef": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "description": "Kind of the SecretStore resource.",
+                "type": "string",
+                "enum": [
+                  "SecretStore",
+                  "ClusterSecretStore"
+                ]
+              },
+              "name": {
+                "description": "Name of the SecretStore resource.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "name"
+            ],
+            "description": "SecretStore or ClusterSecretStore to fetch secret data from. Values override defaultExternalSecretStoreRef."
+          },
+          "syncWindows": {
+            "description": "Time windows restricting when periodic refreshes may occur. See https://external-secrets.io/latest/api/externalsecret/ for details.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "description": "Whether the windows allow or deny periodic refreshes.",
+                "type": "string",
+                "enum": [
+                  "allow",
+                  "deny"
+                ]
+              },
+              "windows": {
+                "description": "Schedule and duration pairs defining the refresh windows.",
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "schedule": {
+                      "description": "Cron schedule evaluated in UTC.",
+                      "type": "string"
+                    },
+                    "duration": {
+                      "description": "Duration for which the window remains active.",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "schedule",
+                    "duration"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "kind",
+              "windows"
+            ]
+          },
+          "target": {
+            "description": "Target Secret configuration. For more details, see https://external-secrets.io/latest/api/externalsecret/.",
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "creationPolicy": {
+                "description": "Policy controlling how the target Secret is created.",
+                "type": "string",
+                "enum": [
+                  "Owner",
+                  "Orphan",
+                  "Merge",
+                  "None",
+                  "CreateOrMerge"
+                ]
+              },
+              "deletionPolicy": {
+                "description": "Policy controlling what happens to the target Secret when provider data is deleted. Defaults to Delete to clean up the target Secret when provider data is removed.",
+                "type": "string",
+                "enum": [
+                  "Delete",
+                  "Merge",
+                  "Retain"
+                ],
+                "default": "Delete"
+              }
+            }
+          },
+          "data": {
+            "description": "Mappings between Kubernetes Secret keys and provider data. See https://external-secrets.io/latest/api/externalsecret/ for details.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "dataFrom": {
+            "description": "Provider data sources whose values are merged into the target Secret. See https://external-secrets.io/latest/api/externalsecret/ for details.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        }
       }
     },
     "secretsFromFolder": {
@@ -9706,7 +9971,7 @@
               "additionalProperties": false,
               "properties": {
                 "host": {
-                  "description": "Set the host address. Helm templates are supported.",
+                  "description": "Set the host address.",
                   "type": "string"
                 },
                 "paths": {
@@ -9780,7 +10045,7 @@
               "additionalProperties": false,
               "properties": {
                 "hosts": {
-                  "description": "Set the hosts for the TLS entry. Helm templates are supported.",
+                  "description": "Set the hosts for the TLS entry.",
                   "type": "array",
                   "items": {
                     "type": [
@@ -9789,7 +10054,7 @@
                   }
                 },
                 "secretName": {
-                  "description": "Set the secretName for the TLS entry. Helm templates are supported.",
+                  "description": "Set the secretName for the TLS entry.",
                   "type": "string"
                 }
               },
@@ -9898,7 +10163,7 @@
             }
           },
           "hostnames": {
-            "description": "Host addresses for the Route. Helm templates are supported.",
+            "description": "Host addresses for the Route.",
             "type": "array",
             "items": {
               "type": "string"
@@ -9932,6 +10197,11 @@
                   "type": "string"
                 },
                 "name": {
+                  "description": "Name of the Gateway (or other parent resource) the Route attaches to. Mutually exclusive with identifier.",
+                  "type": "string"
+                },
+                "identifier": {
+                  "description": "Reference to a ListenerSet identifier defined within the chart values. The parent resource name, kind and group are resolved from the ListenerSet. Mutually exclusive with name.",
                   "type": "string"
                 },
                 "sectionName": {
@@ -9941,9 +10211,24 @@
                   "type": "integer"
                 }
               },
-              "required": [
-                "name"
-              ]
+              "oneOf": [
+                {
+                  "required": [
+                    "name"
+                  ]
+                },
+                {
+                  "required": [
+                    "identifier"
+                  ]
+                }
+              ],
+              "not": {
+                "required": [
+                  "name",
+                  "identifier"
+                ]
+              }
             }
           },
           "rules": {
@@ -11111,6 +11396,236 @@
         }
       }
     },
+    "listenerSets": {
+      "description": "Kubernetes Gateway API ListenerSet objects to be generated by the chart. Each key is a ListenerSet identifier. Routes can attach to a ListenerSet by referencing its identifier via the route parentRefs[].identifier key. See https://gateway-api.sigs.k8s.io/references/spec/ for the Gateway API specification.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "forceRename": {
+                "description": "Override the default resource name. Mutually exclusive with prefix and suffix.",
+                "type": "string"
+              },
+              "prefix": {
+                "description": "Prefix to prepend to the resource name. Mutually exclusive with forceRename.",
+                "type": "string",
+                "default": ""
+              },
+              "suffix": {
+                "description": "Suffix to append to the resource name. Defaults to the resource identifier if there are multiple items, otherwise empty. Mutually exclusive with forceRename.",
+                "type": "string"
+              }
+            },
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "forceRename",
+                    "suffix"
+                  ]
+                },
+                {
+                  "required": [
+                    "forceRename",
+                    "prefix"
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "unevaluatedProperties": false,
+        "properties": {
+          "enabled": {
+            "description": "Set to false to disable the ListenerSet.",
+            "type": "boolean",
+            "default": true
+          },
+          "annotations": {
+            "description": "Annotations to set on the item.",
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "labels": {
+            "description": "Labels to set on the item.",
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "namespaceOverride": {
+            "description": "Override the namespace the ListenerSet is deployed to.",
+            "type": "string"
+          },
+          "parentRef": {
+            "description": "Reference to the Gateway this ListenerSet is attached to.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "group": {
+                "description": "Group of the referenced Gateway. Defaults to 'gateway.networking.k8s.io'.",
+                "type": "string"
+              },
+              "kind": {
+                "description": "Kind of the referenced Gateway. Defaults to 'Gateway'.",
+                "type": "string"
+              },
+              "name": {
+                "description": "Name of the referenced Gateway. This field is required.",
+                "type": "string"
+              },
+              "namespace": {
+                "description": "Namespace of the referenced Gateway. Defaults to the namespace the ListenerSet is deployed to.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "name"
+            ]
+          },
+          "listeners": {
+            "description": "Listeners associated with this ListenerSet. Each listener defines how the attached Gateway listens for connections.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "description": "Name of the Listener. This name must be unique within the ListenerSet.",
+                  "type": "string"
+                },
+                "hostname": {
+                  "description": "Hostname specifies the virtual hostname to match for protocol types that define this concept.",
+                  "type": "string"
+                },
+                "port": {
+                  "description": "Port is the network port on which this listener listens.",
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 65535
+                },
+                "protocol": {
+                  "description": "Protocol specifies the network protocol this listener expects to receive.",
+                  "type": "string",
+                  "enum": [
+                    "HTTP",
+                    "HTTPS",
+                    "TCP",
+                    "TLS",
+                    "UDP"
+                  ]
+                },
+                "tls": {
+                  "description": "TLS is the TLS configuration for the Listener. Required when the protocol is 'HTTPS' or 'TLS'. Additional TLS configuration fields (e.g. options, frontendValidation) are passed through as-is.",
+                  "type": "object",
+                  "additionalProperties": true,
+                  "properties": {
+                    "mode": {
+                      "description": "Mode defines the TLS behavior for the listener. 'Terminate' terminates TLS at the Gateway, 'Passthrough' forwards the TLS session to the backend.",
+                      "type": "string",
+                      "enum": [
+                        "Terminate",
+                        "Passthrough"
+                      ]
+                    },
+                    "certificateRefs": {
+                      "description": "CertificateRefs contains a series of references to Kubernetes objects that contain TLS certificates and private keys.",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "group": {
+                            "description": "Group is the group of the referenced object. Defaults to an empty string (core group).",
+                            "type": "string"
+                          },
+                          "kind": {
+                            "description": "Kind is the kind of the referenced object. Defaults to 'Secret'.",
+                            "type": "string"
+                          },
+                          "name": {
+                            "description": "Name is the name of the referenced object.",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "allowedRoutes": {
+                  "description": "AllowedRoutes defines the types of routes that are allowed to attach to the Gateway listeners configured by this ListenerSet. Additional allowedRoutes fields are passed through as-is.",
+                  "type": "object",
+                  "additionalProperties": true,
+                  "properties": {
+                    "namespaces": {
+                      "description": "Namespaces indicates from which namespaces Routes may attach to this listener.",
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "from": {
+                          "description": "From defines which namespaces Routes may originate from. Defaults to 'Same'.",
+                          "type": "string",
+                          "enum": [
+                            "Same",
+                            "All",
+                            "Selector"
+                          ]
+                        },
+                        "selector": {
+                          "description": "Selector is a label selector used to select namespaces when 'from' is set to 'Selector'.",
+                          "type": "object",
+                          "additionalProperties": true
+                        }
+                      }
+                    },
+                    "kinds": {
+                      "description": "Kinds specifies groups and kinds of Routes that are allowed to attach to this listener.",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "group": {
+                            "description": "Group of the Route kind. Defaults to 'gateway.networking.k8s.io'.",
+                            "type": "string"
+                          },
+                          "kind": {
+                            "description": "Kind of the Route.",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "required": [
+                "name",
+                "port",
+                "protocol"
+              ]
+            }
+          }
+        }
+      }
+    },
     "service": {
       "description": "Kubernetes Service objects to be generated by the chart. Each key is a service identifier.",
       "type": "object",
@@ -11459,7 +11974,7 @@
             }
           },
           "jobLabel": {
-            "description": "The label to use to retrieve the job name from the target service's metadata. Defaults to 'app.kubernetes.io/name'. Helm templates can be used.",
+            "description": "The label to use to retrieve the job name from the target service's metadata. Defaults to 'app.kubernetes.io/name'.",
             "default": "app.kubernetes.io/name",
             "type": "string"
           },
@@ -11510,7 +12025,7 @@
             "description": "Service to monitor. Either 'serviceName' or 'service' must be specified.",
             "oneOf": [
               {
-                "description": "Reference to a Service name. Helm templates are supported.",
+                "description": "Reference to a Service name.",
                 "type": "object",
                 "additionalProperties": false,
                 "properties": {
@@ -11538,7 +12053,7 @@
             ]
           },
           "serviceName": {
-            "description": "Reference to a Service name to monitor. Helm templates are supported. Deprecated in favor of 'service'.",
+            "description": "Reference to a Service name to monitor. Deprecated in favor of 'service'.",
             "type": "string",
             "deprecated": true
           },
@@ -11650,7 +12165,7 @@
             }
           },
           "jobLabel": {
-            "description": "The label to use to retrieve the job name from the target pod's metadata. Defaults to 'app.kubernetes.io/name'. Helm templates can be used.",
+            "description": "The label to use to retrieve the job name from the target pod's metadata. Defaults to 'app.kubernetes.io/name'.",
             "default": "app.kubernetes.io/name",
             "type": "string"
           },
@@ -11738,442 +12253,1145 @@
       "description": "networkPolicy objects to be generated by the chart. Additional networkPolicies can be added by adding a dictionary key similar to the 'main' networkPolicy.",
       "type": "object",
       "additionalProperties": {
-        "type": "object",
-        "allOf": [
+        "description": "NetworkPolicy implementation to render. Supported type values are native, cilium, and ciliumClusterwide. Use native for a Kubernetes NetworkPolicy, cilium for a CiliumNetworkPolicy, or ciliumClusterwide for a cluster-scoped CiliumClusterwideNetworkPolicy rendered without metadata.namespace.",
+        "properties": {
+          "type": {
+            "description": "Resource implementation to render. Set type to native, cilium, or ciliumClusterwide.",
+            "type": "string",
+            "enum": [
+              "native",
+              "cilium",
+              "ciliumClusterwide"
+            ]
+          }
+        },
+        "oneOf": [
           {
             "type": "object",
+            "allOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "forceRename": {
+                    "description": "Override the default resource name. Mutually exclusive with prefix and suffix.",
+                    "type": "string"
+                  },
+                  "prefix": {
+                    "description": "Prefix to prepend to the resource name. Mutually exclusive with forceRename.",
+                    "type": "string",
+                    "default": ""
+                  },
+                  "suffix": {
+                    "description": "Suffix to append to the resource name. Defaults to the resource identifier if there are multiple items, otherwise empty. Mutually exclusive with forceRename.",
+                    "type": "string"
+                  }
+                },
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "forceRename",
+                        "suffix"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "forceRename",
+                        "prefix"
+                      ]
+                    }
+                  ]
+                }
+              }
+            ],
+            "unevaluatedProperties": false,
             "properties": {
-              "forceRename": {
-                "description": "Override the default resource name. Mutually exclusive with prefix and suffix.",
-                "type": "string"
+              "enabled": {
+                "description": "Set to false to disable the NetworkPolicy.",
+                "type": "boolean",
+                "default": true
               },
-              "prefix": {
-                "description": "Prefix to prepend to the resource name. Mutually exclusive with forceRename.",
+              "type": {
+                "description": "Resource implementation to render. Omit this field to render a native Kubernetes NetworkPolicy. Supported values: native and cilium. Set type to cilium to configure a CiliumNetworkPolicy.",
                 "type": "string",
-                "default": ""
+                "enum": [
+                  "native"
+                ]
               },
-              "suffix": {
-                "description": "Suffix to append to the resource name. Defaults to the resource identifier if there are multiple items, otherwise empty. Mutually exclusive with forceRename.",
+              "annotations": {
+                "description": "Annotations to set on the item.",
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "additionalProperties": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "controller": {
+                "description": "Controller this NetworkPolicy should target.",
                 "type": "string"
+              },
+              "extraSelectorLabels": {
+                "description": "Additional match labels to add to the pod selector. These are merged with labels derived from the controller identifier.",
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "labels": {
+                "description": "Labels to set on the item.",
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "additionalProperties": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "podSelector": {
+                "description": "Custom podSelector for the NetworkPolicy. Takes precedence over targeting a controller via the controller identifier."
+              },
+              "policyTypes": {
+                "description": "Policy types for the NetworkPolicy.",
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "Egress",
+                    "Ingress"
+                  ]
+                }
+              },
+              "rules": {
+                "description": "Ingress and egress rules for the NetworkPolicy. See https://kubernetes.io/docs/concepts/services-networking/network-policies/#networkpolicy-resource for details. Use `- {}` as an item to allow all traffic for that direction.",
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "ingress": {
+                    "description": "Ingress rules for this networkPolicy. An entry of `{}` allows all ingress traffic.",
+                    "type": "array",
+                    "items": {
+                      "description": "NetworkPolicyIngressRule describes a particular set of traffic that is allowed to the pods matched by a NetworkPolicySpec's podSelector. The traffic must match both ports and from.",
+                      "properties": {
+                        "from": {
+                          "description": "from is a list of sources which should be able to access the pods selected for this rule. Items in this list are combined using a logical OR operation. If this field is empty or missing, this rule matches all sources (traffic not restricted by source). If this field is present and contains at least one item, this rule allows traffic only if the traffic matches at least one item in the from list.",
+                          "items": {
+                            "description": "NetworkPolicyPeer describes a peer to allow traffic to/from. Only certain combinations of fields are allowed",
+                            "properties": {
+                              "ipBlock": {
+                                "description": "ipBlock defines policy on a particular IPBlock. If this field is set then neither of the other fields can be.",
+                                "properties": {
+                                  "cidr": {
+                                    "description": "cidr is a string representing the IPBlock Valid examples are \"192.168.1.0/24\" or \"2001:db8::/64\"",
+                                    "type": "string"
+                                  },
+                                  "except": {
+                                    "description": "except is a slice of CIDRs that should not be included within an IPBlock Valid examples are \"192.168.1.0/24\" or \"2001:db8::/64\" Except values will be rejected if they are outside the cidr range",
+                                    "items": {
+                                      "type": "string"
+                                    },
+                                    "type": "array"
+                                  }
+                                },
+                                "required": [
+                                  "cidr"
+                                ],
+                                "type": "object"
+                              },
+                              "namespaceSelector": {
+                                "type": "object",
+                                "description": "namespaceSelector selects namespaces using cluster-scoped labels. This field follows standard label selector semantics; if present but empty, it selects all namespaces.\n\nIf podSelector is also set, then the NetworkPolicyPeer as a whole selects the pods matching podSelector in the namespaces selected by namespaceSelector. Otherwise it selects all pods in the namespaces selected by namespaceSelector.",
+                                "additionalProperties": false,
+                                "properties": {
+                                  "matchExpressions": {
+                                    "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
+                                    "items": {
+                                      "type": "object",
+                                      "description": "A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.",
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "key": {
+                                          "description": "key is the label key that the selector applies to.",
+                                          "type": "string"
+                                        },
+                                        "operator": {
+                                          "description": "operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.",
+                                          "type": "string"
+                                        },
+                                        "values": {
+                                          "description": "values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.",
+                                          "items": {
+                                            "type": "string"
+                                          },
+                                          "type": "array"
+                                        }
+                                      },
+                                      "required": [
+                                        "key",
+                                        "operator"
+                                      ]
+                                    },
+                                    "type": "array"
+                                  },
+                                  "matchLabels": {
+                                    "additionalProperties": {
+                                      "type": "string"
+                                    },
+                                    "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is \"key\", the operator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
+                                    "type": "object"
+                                  }
+                                }
+                              },
+                              "podSelector": {
+                                "type": "object",
+                                "description": "podSelector is a label selector which selects pods. This field follows standard label selector semantics; if present but empty, it selects all pods.\n\nIf namespaceSelector is also set, then the NetworkPolicyPeer as a whole selects the pods matching podSelector in the Namespaces selected by NamespaceSelector. Otherwise it selects the pods matching podSelector in the policy's own namespace.",
+                                "additionalProperties": false,
+                                "properties": {
+                                  "matchExpressions": {
+                                    "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
+                                    "items": {
+                                      "type": "object",
+                                      "description": "A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.",
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "key": {
+                                          "description": "key is the label key that the selector applies to.",
+                                          "type": "string"
+                                        },
+                                        "operator": {
+                                          "description": "operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.",
+                                          "type": "string"
+                                        },
+                                        "values": {
+                                          "description": "values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.",
+                                          "items": {
+                                            "type": "string"
+                                          },
+                                          "type": "array"
+                                        }
+                                      },
+                                      "required": [
+                                        "key",
+                                        "operator"
+                                      ]
+                                    },
+                                    "type": "array"
+                                  },
+                                  "matchLabels": {
+                                    "additionalProperties": {
+                                      "type": "string"
+                                    },
+                                    "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is \"key\", the operator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
+                                    "type": "object"
+                                  }
+                                }
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "ports": {
+                          "description": "ports is a list of ports which should be made accessible on the pods selected for this rule. Each item in this list is combined using a logical OR. If this field is empty or missing, this rule matches all ports (traffic not restricted by port). If this field is present and contains at least one item, then this rule allows traffic only if the traffic matches at least one port in the list.",
+                          "items": {
+                            "description": "NetworkPolicyPort describes a port to allow traffic on",
+                            "properties": {
+                              "endPort": {
+                                "description": "endPort indicates that the range of ports from port to endPort if set, inclusive, should be allowed by the policy. This field cannot be defined if the port field is not defined or if the port field is defined as a named (string) port. The endPort must be equal or greater than port.",
+                                "format": "int32",
+                                "type": "integer"
+                              },
+                              "port": {
+                                "type": [
+                                  "string",
+                                  "integer"
+                                ],
+                                "description": "port represents the port on the given protocol. This can either be a numerical or named port on a pod. If this field is not provided, this matches all port names and numbers. If present, only traffic on the specified protocol AND port will be matched."
+                              },
+                              "protocol": {
+                                "description": "protocol represents the protocol (TCP, UDP, or SCTP) which traffic must match. If not specified, this field defaults to TCP.",
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "egress": {
+                    "description": "Egress rules for this networkPolicy. An entry of `{}` allows all egress traffic.",
+                    "type": "array",
+                    "items": {
+                      "description": "NetworkPolicyEgressRule describes a particular set of traffic that is allowed out of pods matched by a NetworkPolicySpec's podSelector. The traffic must match both ports and to. This type is beta-level in 1.8",
+                      "properties": {
+                        "ports": {
+                          "description": "ports is a list of destination ports for outgoing traffic. Each item in this list is combined using a logical OR. If this field is empty or missing, this rule matches all ports (traffic not restricted by port). If this field is present and contains at least one item, then this rule allows traffic only if the traffic matches at least one port in the list.",
+                          "items": {
+                            "description": "NetworkPolicyPort describes a port to allow traffic on",
+                            "properties": {
+                              "endPort": {
+                                "description": "endPort indicates that the range of ports from port to endPort if set, inclusive, should be allowed by the policy. This field cannot be defined if the port field is not defined or if the port field is defined as a named (string) port. The endPort must be equal or greater than port.",
+                                "format": "int32",
+                                "type": "integer"
+                              },
+                              "port": {
+                                "type": [
+                                  "string",
+                                  "integer"
+                                ],
+                                "description": "port represents the port on the given protocol. This can either be a numerical or named port on a pod. If this field is not provided, this matches all port names and numbers. If present, only traffic on the specified protocol AND port will be matched."
+                              },
+                              "protocol": {
+                                "description": "protocol represents the protocol (TCP, UDP, or SCTP) which traffic must match. If not specified, this field defaults to TCP.",
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "to": {
+                          "description": "to is a list of destinations for outgoing traffic of pods selected for this rule. Items in this list are combined using a logical OR operation. If this field is empty or missing, this rule matches all destinations (traffic not restricted by destination). If this field is present and contains at least one item, this rule allows traffic only if the traffic matches at least one item in the to list.",
+                          "items": {
+                            "description": "NetworkPolicyPeer describes a peer to allow traffic to/from. Only certain combinations of fields are allowed",
+                            "properties": {
+                              "ipBlock": {
+                                "description": "ipBlock defines policy on a particular IPBlock. If this field is set then neither of the other fields can be.",
+                                "properties": {
+                                  "cidr": {
+                                    "description": "cidr is a string representing the IPBlock Valid examples are \"192.168.1.0/24\" or \"2001:db8::/64\"",
+                                    "type": "string"
+                                  },
+                                  "except": {
+                                    "description": "except is a slice of CIDRs that should not be included within an IPBlock Valid examples are \"192.168.1.0/24\" or \"2001:db8::/64\" Except values will be rejected if they are outside the cidr range",
+                                    "items": {
+                                      "type": "string"
+                                    },
+                                    "type": "array"
+                                  }
+                                },
+                                "required": [
+                                  "cidr"
+                                ],
+                                "type": "object"
+                              },
+                              "namespaceSelector": {
+                                "type": "object",
+                                "description": "namespaceSelector selects namespaces using cluster-scoped labels. This field follows standard label selector semantics; if present but empty, it selects all namespaces.\n\nIf podSelector is also set, then the NetworkPolicyPeer as a whole selects the pods matching podSelector in the namespaces selected by namespaceSelector. Otherwise it selects all pods in the namespaces selected by namespaceSelector.",
+                                "additionalProperties": false,
+                                "properties": {
+                                  "matchExpressions": {
+                                    "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
+                                    "items": {
+                                      "type": "object",
+                                      "description": "A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.",
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "key": {
+                                          "description": "key is the label key that the selector applies to.",
+                                          "type": "string"
+                                        },
+                                        "operator": {
+                                          "description": "operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.",
+                                          "type": "string"
+                                        },
+                                        "values": {
+                                          "description": "values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.",
+                                          "items": {
+                                            "type": "string"
+                                          },
+                                          "type": "array"
+                                        }
+                                      },
+                                      "required": [
+                                        "key",
+                                        "operator"
+                                      ]
+                                    },
+                                    "type": "array"
+                                  },
+                                  "matchLabels": {
+                                    "additionalProperties": {
+                                      "type": "string"
+                                    },
+                                    "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is \"key\", the operator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
+                                    "type": "object"
+                                  }
+                                }
+                              },
+                              "podSelector": {
+                                "type": "object",
+                                "description": "podSelector is a label selector which selects pods. This field follows standard label selector semantics; if present but empty, it selects all pods.\n\nIf namespaceSelector is also set, then the NetworkPolicyPeer as a whole selects the pods matching podSelector in the Namespaces selected by NamespaceSelector. Otherwise it selects the pods matching podSelector in the policy's own namespace.",
+                                "additionalProperties": false,
+                                "properties": {
+                                  "matchExpressions": {
+                                    "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
+                                    "items": {
+                                      "type": "object",
+                                      "description": "A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.",
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "key": {
+                                          "description": "key is the label key that the selector applies to.",
+                                          "type": "string"
+                                        },
+                                        "operator": {
+                                          "description": "operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.",
+                                          "type": "string"
+                                        },
+                                        "values": {
+                                          "description": "values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.",
+                                          "items": {
+                                            "type": "string"
+                                          },
+                                          "type": "array"
+                                        }
+                                      },
+                                      "required": [
+                                        "key",
+                                        "operator"
+                                      ]
+                                    },
+                                    "type": "array"
+                                  },
+                                  "matchLabels": {
+                                    "additionalProperties": {
+                                      "type": "string"
+                                    },
+                                    "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is \"key\", the operator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
+                                    "type": "object"
+                                  }
+                                }
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "dependentSchemas": {
+              "podSelector": {
+                "not": {
+                  "required": [
+                    "controller"
+                  ]
+                }
+              },
+              "controller": {
+                "not": {
+                  "required": [
+                    "podSelector"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "policyTypes",
+              "rules"
+            ]
+          },
+          {
+            "description": "CiliumNetworkPolicy implementation to render.",
+            "type": "object",
+            "properties": {
+              "type": {
+                "const": "cilium"
               }
             },
             "not": {
-              "anyOf": [
-                {
-                  "required": [
-                    "forceRename",
-                    "suffix"
-                  ]
+              "required": [
+                "nodeSelector"
+              ]
+            },
+            "allOf": [
+              {
+                "type": "object",
+                "allOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "forceRename": {
+                        "description": "Override the default resource name. Mutually exclusive with prefix and suffix.",
+                        "type": "string"
+                      },
+                      "prefix": {
+                        "description": "Prefix to prepend to the resource name. Mutually exclusive with forceRename.",
+                        "type": "string",
+                        "default": ""
+                      },
+                      "suffix": {
+                        "description": "Suffix to append to the resource name. Defaults to the resource identifier if there are multiple items, otherwise empty. Mutually exclusive with forceRename.",
+                        "type": "string"
+                      }
+                    },
+                    "not": {
+                      "anyOf": [
+                        {
+                          "required": [
+                            "forceRename",
+                            "suffix"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "forceRename",
+                            "prefix"
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "unevaluatedProperties": false,
+                "properties": {
+                  "enabled": {
+                    "description": "Set to false to disable the CiliumNetworkPolicy.",
+                    "type": "boolean",
+                    "default": true
+                  },
+                  "type": {
+                    "description": "Resource implementation to render.",
+                    "type": "string"
+                  },
+                  "annotations": {
+                    "description": "Annotations to set on the item.",
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "additionalProperties": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "controller": {
+                    "description": "Controller this CiliumNetworkPolicy should target.",
+                    "type": "string"
+                  },
+                  "extraSelectorLabels": {
+                    "description": "Additional match labels to add to the endpoint selector. These are merged with labels derived from the controller identifier.",
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  },
+                  "labels": {
+                    "description": "Labels to set on the item.",
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "additionalProperties": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "endpointSelector": {
+                    "type": "object",
+                    "description": "Custom endpointSelector for the CiliumNetworkPolicy. Takes precedence over targeting a controller via the controller identifier.",
+                    "additionalProperties": false,
+                    "properties": {
+                      "matchExpressions": {
+                        "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
+                        "items": {
+                          "type": "object",
+                          "description": "A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.",
+                          "additionalProperties": false,
+                          "properties": {
+                            "key": {
+                              "description": "key is the label key that the selector applies to.",
+                              "type": "string"
+                            },
+                            "operator": {
+                              "description": "operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.",
+                              "type": "string"
+                            },
+                            "values": {
+                              "description": "values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.",
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            }
+                          },
+                          "required": [
+                            "key",
+                            "operator"
+                          ]
+                        },
+                        "type": "array"
+                      },
+                      "matchLabels": {
+                        "additionalProperties": {
+                          "type": "string"
+                        },
+                        "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is \"key\", the operator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "nodeSelector": {
+                    "type": "object",
+                    "description": "Node selector for a CiliumClusterwideNetworkPolicy.",
+                    "additionalProperties": false,
+                    "properties": {
+                      "matchExpressions": {
+                        "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
+                        "items": {
+                          "type": "object",
+                          "description": "A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.",
+                          "additionalProperties": false,
+                          "properties": {
+                            "key": {
+                              "description": "key is the label key that the selector applies to.",
+                              "type": "string"
+                            },
+                            "operator": {
+                              "description": "operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.",
+                              "type": "string"
+                            },
+                            "values": {
+                              "description": "values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.",
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            }
+                          },
+                          "required": [
+                            "key",
+                            "operator"
+                          ]
+                        },
+                        "type": "array"
+                      },
+                      "matchLabels": {
+                        "additionalProperties": {
+                          "type": "string"
+                        },
+                        "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is \"key\", the operator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "description": {
+                    "description": "Human-readable description of the policy.",
+                    "type": "string"
+                  },
+                  "ingress": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": true
+                    },
+                    "description": "Cilium ingress rules. See https://docs.cilium.io/en/stable/security/policy/language/ for details."
+                  },
+                  "ingressDeny": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": true
+                    },
+                    "description": "Cilium ingress deny rules. Deny rules take precedence over allow rules."
+                  },
+                  "egress": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": true
+                    },
+                    "description": "Cilium egress rules. See https://docs.cilium.io/en/stable/security/policy/language/ for details."
+                  },
+                  "egressDeny": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": true
+                    },
+                    "description": "Cilium egress deny rules. Deny rules take precedence over allow rules."
+                  },
+                  "enableDefaultDeny": {
+                    "description": "Configure whether the selected endpoints enter default-deny mode for ingress and egress traffic.",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "ingress": {
+                        "type": "boolean"
+                      },
+                      "egress": {
+                        "type": "boolean"
+                      }
+                    }
+                  },
+                  "log": {
+                    "description": "Free-form value included in Hubble flows matching this policy.",
+                    "type": "string",
+                    "maxLength": 32
+                  }
                 },
-                {
-                  "required": [
-                    "forceRename",
-                    "prefix"
-                  ]
-                }
-              ]
-            }
-          }
-        ],
-        "unevaluatedProperties": false,
-        "properties": {
-          "enabled": {
-            "description": "Set to false to disable the NetworkPolicy.",
-            "type": "boolean",
-            "default": true
+                "dependentSchemas": {
+                  "endpointSelector": {
+                    "not": {
+                      "required": [
+                        "controller"
+                      ]
+                    }
+                  },
+                  "controller": {
+                    "not": {
+                      "required": [
+                        "endpointSelector"
+                      ]
+                    }
+                  }
+                },
+                "anyOf": [
+                  {
+                    "properties": {
+                      "ingress": {
+                        "minItems": 1
+                      }
+                    },
+                    "required": [
+                      "ingress"
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "ingressDeny": {
+                        "minItems": 1
+                      }
+                    },
+                    "required": [
+                      "ingressDeny"
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "egress": {
+                        "minItems": 1
+                      }
+                    },
+                    "required": [
+                      "egress"
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "egressDeny": {
+                        "minItems": 1
+                      }
+                    },
+                    "required": [
+                      "egressDeny"
+                    ]
+                  }
+                ],
+                "required": [
+                  "type"
+                ],
+                "examples": [
+                  "networkpolicies:\n  cilium:\n    type: cilium\n    endpointSelector:\n      matchLabels:\n        app.kubernetes.io/name: example\n    description: Allow DNS and HTTPS traffic\n    ingress:\n      - fromEntities:\n          - cluster\n    ingressDeny:\n      - fromEntities:\n          - world\n    egress:\n      - toEntities:\n          - cluster\n    egressDeny:\n      - toEntities:\n          - world\n    enableDefaultDeny:\n      ingress: true\n      egress: true\n    log: example-policy"
+                ]
+              }
+            ]
           },
-          "annotations": {
-            "description": "Annotations to set on the item.",
-            "type": [
-              "object",
-              "null"
-            ],
-            "additionalProperties": {
-              "type": [
-                "string",
-                "null"
-              ]
-            }
-          },
-          "controller": {
-            "description": "Controller this NetworkPolicy should target.",
-            "type": "string"
-          },
-          "extraSelectorLabels": {
-            "description": "Additional match labels to add to the pod selector. These are merged with labels derived from the controller identifier.",
+          {
+            "description": "Cluster-scoped CiliumClusterwideNetworkPolicy implementation to render. The resource is rendered without metadata.namespace.",
             "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          },
-          "labels": {
-            "description": "Labels to set on the item.",
-            "type": [
-              "object",
-              "null"
-            ],
-            "additionalProperties": {
-              "type": [
-                "string",
-                "null"
-              ]
-            }
-          },
-          "podSelector": {
-            "description": "Custom podSelector for the NetworkPolicy. Takes precedence over targeting a controller via the controller identifier."
-          },
-          "policyTypes": {
-            "description": "Policy types for the NetworkPolicy.",
-            "type": "array",
-            "minItems": 1,
-            "items": {
-              "type": "string",
-              "enum": [
-                "Egress",
-                "Ingress"
-              ]
-            }
-          },
-          "rules": {
-            "description": "Ingress and egress rules for the NetworkPolicy. See https://kubernetes.io/docs/concepts/services-networking/network-policies/#networkpolicy-resource for details. Use `- {}` as an item to allow all traffic for that direction.",
-            "type": "object",
-            "additionalProperties": false,
             "properties": {
-              "ingress": {
-                "description": "Ingress rules for this networkPolicy. An entry of `{}` allows all ingress traffic.",
-                "type": "array",
-                "items": {
-                  "description": "NetworkPolicyIngressRule describes a particular set of traffic that is allowed to the pods matched by a NetworkPolicySpec's podSelector. The traffic must match both ports and from.",
-                  "properties": {
-                    "from": {
-                      "description": "from is a list of sources which should be able to access the pods selected for this rule. Items in this list are combined using a logical OR operation. If this field is empty or missing, this rule matches all sources (traffic not restricted by source). If this field is present and contains at least one item, this rule allows traffic only if the traffic matches at least one item in the from list.",
-                      "items": {
-                        "description": "NetworkPolicyPeer describes a peer to allow traffic to/from. Only certain combinations of fields are allowed",
-                        "properties": {
-                          "ipBlock": {
-                            "description": "ipBlock defines policy on a particular IPBlock. If this field is set then neither of the other fields can be.",
-                            "properties": {
-                              "cidr": {
-                                "description": "cidr is a string representing the IPBlock Valid examples are \"192.168.1.0/24\" or \"2001:db8::/64\"",
-                                "type": "string"
-                              },
-                              "except": {
-                                "description": "except is a slice of CIDRs that should not be included within an IPBlock Valid examples are \"192.168.1.0/24\" or \"2001:db8::/64\" Except values will be rejected if they are outside the cidr range",
-                                "items": {
-                                  "type": "string"
-                                },
-                                "type": "array"
-                              }
-                            },
-                            "required": [
-                              "cidr"
-                            ],
-                            "type": "object"
-                          },
-                          "namespaceSelector": {
-                            "type": "object",
-                            "description": "namespaceSelector selects namespaces using cluster-scoped labels. This field follows standard label selector semantics; if present but empty, it selects all namespaces.\n\nIf podSelector is also set, then the NetworkPolicyPeer as a whole selects the pods matching podSelector in the namespaces selected by namespaceSelector. Otherwise it selects all pods in the namespaces selected by namespaceSelector.",
-                            "additionalProperties": false,
-                            "properties": {
-                              "matchExpressions": {
-                                "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
-                                "items": {
-                                  "type": "object",
-                                  "description": "A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.",
-                                  "additionalProperties": false,
-                                  "properties": {
-                                    "key": {
-                                      "description": "key is the label key that the selector applies to.",
-                                      "type": "string"
-                                    },
-                                    "operator": {
-                                      "description": "operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.",
-                                      "type": "string"
-                                    },
-                                    "values": {
-                                      "description": "values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.",
-                                      "items": {
-                                        "type": "string"
-                                      },
-                                      "type": "array"
-                                    }
-                                  },
-                                  "required": [
-                                    "key",
-                                    "operator"
-                                  ]
-                                },
-                                "type": "array"
-                              },
-                              "matchLabels": {
-                                "additionalProperties": {
-                                  "type": "string"
-                                },
-                                "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is \"key\", the operator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
-                                "type": "object"
-                              }
-                            }
-                          },
-                          "podSelector": {
-                            "type": "object",
-                            "description": "podSelector is a label selector which selects pods. This field follows standard label selector semantics; if present but empty, it selects all pods.\n\nIf namespaceSelector is also set, then the NetworkPolicyPeer as a whole selects the pods matching podSelector in the Namespaces selected by NamespaceSelector. Otherwise it selects the pods matching podSelector in the policy's own namespace.",
-                            "additionalProperties": false,
-                            "properties": {
-                              "matchExpressions": {
-                                "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
-                                "items": {
-                                  "type": "object",
-                                  "description": "A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.",
-                                  "additionalProperties": false,
-                                  "properties": {
-                                    "key": {
-                                      "description": "key is the label key that the selector applies to.",
-                                      "type": "string"
-                                    },
-                                    "operator": {
-                                      "description": "operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.",
-                                      "type": "string"
-                                    },
-                                    "values": {
-                                      "description": "values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.",
-                                      "items": {
-                                        "type": "string"
-                                      },
-                                      "type": "array"
-                                    }
-                                  },
-                                  "required": [
-                                    "key",
-                                    "operator"
-                                  ]
-                                },
-                                "type": "array"
-                              },
-                              "matchLabels": {
-                                "additionalProperties": {
-                                  "type": "string"
-                                },
-                                "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is \"key\", the operator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
-                                "type": "object"
-                              }
-                            }
-                          }
-                        },
-                        "type": "object"
-                      },
-                      "type": "array"
-                    },
-                    "ports": {
-                      "description": "ports is a list of ports which should be made accessible on the pods selected for this rule. Each item in this list is combined using a logical OR. If this field is empty or missing, this rule matches all ports (traffic not restricted by port). If this field is present and contains at least one item, then this rule allows traffic only if the traffic matches at least one port in the list.",
-                      "items": {
-                        "description": "NetworkPolicyPort describes a port to allow traffic on",
-                        "properties": {
-                          "endPort": {
-                            "description": "endPort indicates that the range of ports from port to endPort if set, inclusive, should be allowed by the policy. This field cannot be defined if the port field is not defined or if the port field is defined as a named (string) port. The endPort must be equal or greater than port.",
-                            "format": "int32",
-                            "type": "integer"
-                          },
-                          "port": {
-                            "type": [
-                              "string",
-                              "integer"
-                            ],
-                            "description": "port represents the port on the given protocol. This can either be a numerical or named port on a pod. If this field is not provided, this matches all port names and numbers. If present, only traffic on the specified protocol AND port will be matched."
-                          },
-                          "protocol": {
-                            "description": "protocol represents the protocol (TCP, UDP, or SCTP) which traffic must match. If not specified, this field defaults to TCP.",
-                            "type": "string"
-                          }
-                        },
-                        "type": "object"
-                      },
-                      "type": "array"
-                    }
-                  },
-                  "type": "object"
-                }
+              "type": {
+                "const": "ciliumClusterwide"
               },
-              "egress": {
-                "description": "Egress rules for this networkPolicy. An entry of `{}` allows all egress traffic.",
-                "type": "array",
-                "items": {
-                  "description": "NetworkPolicyEgressRule describes a particular set of traffic that is allowed out of pods matched by a NetworkPolicySpec's podSelector. The traffic must match both ports and to. This type is beta-level in 1.8",
-                  "properties": {
-                    "ports": {
-                      "description": "ports is a list of destination ports for outgoing traffic. Each item in this list is combined using a logical OR. If this field is empty or missing, this rule matches all ports (traffic not restricted by port). If this field is present and contains at least one item, then this rule allows traffic only if the traffic matches at least one port in the list.",
-                      "items": {
-                        "description": "NetworkPolicyPort describes a port to allow traffic on",
-                        "properties": {
-                          "endPort": {
-                            "description": "endPort indicates that the range of ports from port to endPort if set, inclusive, should be allowed by the policy. This field cannot be defined if the port field is not defined or if the port field is defined as a named (string) port. The endPort must be equal or greater than port.",
-                            "format": "int32",
-                            "type": "integer"
-                          },
-                          "port": {
-                            "type": [
-                              "string",
-                              "integer"
-                            ],
-                            "description": "port represents the port on the given protocol. This can either be a numerical or named port on a pod. If this field is not provided, this matches all port names and numbers. If present, only traffic on the specified protocol AND port will be matched."
-                          },
-                          "protocol": {
-                            "description": "protocol represents the protocol (TCP, UDP, or SCTP) which traffic must match. If not specified, this field defaults to TCP.",
+              "nodeSelector": {
+                "type": "object",
+                "description": "Node selector for a CiliumClusterwideNetworkPolicy.",
+                "additionalProperties": false,
+                "properties": {
+                  "matchExpressions": {
+                    "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
+                    "items": {
+                      "type": "object",
+                      "description": "A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.",
+                      "additionalProperties": false,
+                      "properties": {
+                        "key": {
+                          "description": "key is the label key that the selector applies to.",
+                          "type": "string"
+                        },
+                        "operator": {
+                          "description": "operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.",
+                          "type": "string"
+                        },
+                        "values": {
+                          "description": "values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.",
+                          "items": {
                             "type": "string"
-                          }
-                        },
-                        "type": "object"
+                          },
+                          "type": "array"
+                        }
                       },
-                      "type": "array"
+                      "required": [
+                        "key",
+                        "operator"
+                      ]
                     },
-                    "to": {
-                      "description": "to is a list of destinations for outgoing traffic of pods selected for this rule. Items in this list are combined using a logical OR operation. If this field is empty or missing, this rule matches all destinations (traffic not restricted by destination). If this field is present and contains at least one item, this rule allows traffic only if the traffic matches at least one item in the to list.",
-                      "items": {
-                        "description": "NetworkPolicyPeer describes a peer to allow traffic to/from. Only certain combinations of fields are allowed",
-                        "properties": {
-                          "ipBlock": {
-                            "description": "ipBlock defines policy on a particular IPBlock. If this field is set then neither of the other fields can be.",
-                            "properties": {
-                              "cidr": {
-                                "description": "cidr is a string representing the IPBlock Valid examples are \"192.168.1.0/24\" or \"2001:db8::/64\"",
-                                "type": "string"
-                              },
-                              "except": {
-                                "description": "except is a slice of CIDRs that should not be included within an IPBlock Valid examples are \"192.168.1.0/24\" or \"2001:db8::/64\" Except values will be rejected if they are outside the cidr range",
-                                "items": {
-                                  "type": "string"
-                                },
-                                "type": "array"
-                              }
-                            },
-                            "required": [
-                              "cidr"
-                            ],
-                            "type": "object"
-                          },
-                          "namespaceSelector": {
-                            "type": "object",
-                            "description": "namespaceSelector selects namespaces using cluster-scoped labels. This field follows standard label selector semantics; if present but empty, it selects all namespaces.\n\nIf podSelector is also set, then the NetworkPolicyPeer as a whole selects the pods matching podSelector in the namespaces selected by namespaceSelector. Otherwise it selects all pods in the namespaces selected by namespaceSelector.",
-                            "additionalProperties": false,
-                            "properties": {
-                              "matchExpressions": {
-                                "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
-                                "items": {
-                                  "type": "object",
-                                  "description": "A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.",
-                                  "additionalProperties": false,
-                                  "properties": {
-                                    "key": {
-                                      "description": "key is the label key that the selector applies to.",
-                                      "type": "string"
-                                    },
-                                    "operator": {
-                                      "description": "operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.",
-                                      "type": "string"
-                                    },
-                                    "values": {
-                                      "description": "values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.",
-                                      "items": {
-                                        "type": "string"
-                                      },
-                                      "type": "array"
-                                    }
-                                  },
-                                  "required": [
-                                    "key",
-                                    "operator"
-                                  ]
-                                },
-                                "type": "array"
-                              },
-                              "matchLabels": {
-                                "additionalProperties": {
-                                  "type": "string"
-                                },
-                                "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is \"key\", the operator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
-                                "type": "object"
-                              }
-                            }
-                          },
-                          "podSelector": {
-                            "type": "object",
-                            "description": "podSelector is a label selector which selects pods. This field follows standard label selector semantics; if present but empty, it selects all pods.\n\nIf namespaceSelector is also set, then the NetworkPolicyPeer as a whole selects the pods matching podSelector in the Namespaces selected by NamespaceSelector. Otherwise it selects the pods matching podSelector in the policy's own namespace.",
-                            "additionalProperties": false,
-                            "properties": {
-                              "matchExpressions": {
-                                "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
-                                "items": {
-                                  "type": "object",
-                                  "description": "A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.",
-                                  "additionalProperties": false,
-                                  "properties": {
-                                    "key": {
-                                      "description": "key is the label key that the selector applies to.",
-                                      "type": "string"
-                                    },
-                                    "operator": {
-                                      "description": "operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.",
-                                      "type": "string"
-                                    },
-                                    "values": {
-                                      "description": "values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.",
-                                      "items": {
-                                        "type": "string"
-                                      },
-                                      "type": "array"
-                                    }
-                                  },
-                                  "required": [
-                                    "key",
-                                    "operator"
-                                  ]
-                                },
-                                "type": "array"
-                              },
-                              "matchLabels": {
-                                "additionalProperties": {
-                                  "type": "string"
-                                },
-                                "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is \"key\", the operator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
-                                "type": "object"
-                              }
-                            }
-                          }
-                        },
-                        "type": "object"
-                      },
-                      "type": "array"
-                    }
+                    "type": "array"
                   },
-                  "type": "object"
+                  "matchLabels": {
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is \"key\", the operator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
+                    "type": "object"
+                  }
                 }
               }
-            }
+            },
+            "examples": [
+              "networkpolicies:\n  ciliumClusterwide:\n    type: ciliumClusterwide\n    nodeSelector:\n      matchLabels:\n        kubernetes.io/os: linux\n    ingress:\n      - fromEntities:\n          - cluster"
+            ],
+            "allOf": [
+              {
+                "type": "object",
+                "allOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "forceRename": {
+                        "description": "Override the default resource name. Mutually exclusive with prefix and suffix.",
+                        "type": "string"
+                      },
+                      "prefix": {
+                        "description": "Prefix to prepend to the resource name. Mutually exclusive with forceRename.",
+                        "type": "string",
+                        "default": ""
+                      },
+                      "suffix": {
+                        "description": "Suffix to append to the resource name. Defaults to the resource identifier if there are multiple items, otherwise empty. Mutually exclusive with forceRename.",
+                        "type": "string"
+                      }
+                    },
+                    "not": {
+                      "anyOf": [
+                        {
+                          "required": [
+                            "forceRename",
+                            "suffix"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "forceRename",
+                            "prefix"
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "unevaluatedProperties": false,
+                "properties": {
+                  "enabled": {
+                    "description": "Set to false to disable the CiliumNetworkPolicy.",
+                    "type": "boolean",
+                    "default": true
+                  },
+                  "type": {
+                    "description": "Resource implementation to render.",
+                    "type": "string"
+                  },
+                  "annotations": {
+                    "description": "Annotations to set on the item.",
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "additionalProperties": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "controller": {
+                    "description": "Controller this CiliumNetworkPolicy should target.",
+                    "type": "string"
+                  },
+                  "extraSelectorLabels": {
+                    "description": "Additional match labels to add to the endpoint selector. These are merged with labels derived from the controller identifier.",
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  },
+                  "labels": {
+                    "description": "Labels to set on the item.",
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "additionalProperties": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "endpointSelector": {
+                    "type": "object",
+                    "description": "Custom endpointSelector for the CiliumNetworkPolicy. Takes precedence over targeting a controller via the controller identifier.",
+                    "additionalProperties": false,
+                    "properties": {
+                      "matchExpressions": {
+                        "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
+                        "items": {
+                          "type": "object",
+                          "description": "A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.",
+                          "additionalProperties": false,
+                          "properties": {
+                            "key": {
+                              "description": "key is the label key that the selector applies to.",
+                              "type": "string"
+                            },
+                            "operator": {
+                              "description": "operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.",
+                              "type": "string"
+                            },
+                            "values": {
+                              "description": "values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.",
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            }
+                          },
+                          "required": [
+                            "key",
+                            "operator"
+                          ]
+                        },
+                        "type": "array"
+                      },
+                      "matchLabels": {
+                        "additionalProperties": {
+                          "type": "string"
+                        },
+                        "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is \"key\", the operator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "nodeSelector": {
+                    "type": "object",
+                    "description": "Node selector for a CiliumClusterwideNetworkPolicy.",
+                    "additionalProperties": false,
+                    "properties": {
+                      "matchExpressions": {
+                        "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
+                        "items": {
+                          "type": "object",
+                          "description": "A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.",
+                          "additionalProperties": false,
+                          "properties": {
+                            "key": {
+                              "description": "key is the label key that the selector applies to.",
+                              "type": "string"
+                            },
+                            "operator": {
+                              "description": "operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.",
+                              "type": "string"
+                            },
+                            "values": {
+                              "description": "values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.",
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            }
+                          },
+                          "required": [
+                            "key",
+                            "operator"
+                          ]
+                        },
+                        "type": "array"
+                      },
+                      "matchLabels": {
+                        "additionalProperties": {
+                          "type": "string"
+                        },
+                        "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is \"key\", the operator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "description": {
+                    "description": "Human-readable description of the policy.",
+                    "type": "string"
+                  },
+                  "ingress": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": true
+                    },
+                    "description": "Cilium ingress rules. See https://docs.cilium.io/en/stable/security/policy/language/ for details."
+                  },
+                  "ingressDeny": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": true
+                    },
+                    "description": "Cilium ingress deny rules. Deny rules take precedence over allow rules."
+                  },
+                  "egress": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": true
+                    },
+                    "description": "Cilium egress rules. See https://docs.cilium.io/en/stable/security/policy/language/ for details."
+                  },
+                  "egressDeny": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": true
+                    },
+                    "description": "Cilium egress deny rules. Deny rules take precedence over allow rules."
+                  },
+                  "enableDefaultDeny": {
+                    "description": "Configure whether the selected endpoints enter default-deny mode for ingress and egress traffic.",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "ingress": {
+                        "type": "boolean"
+                      },
+                      "egress": {
+                        "type": "boolean"
+                      }
+                    }
+                  },
+                  "log": {
+                    "description": "Free-form value included in Hubble flows matching this policy.",
+                    "type": "string",
+                    "maxLength": 32
+                  }
+                },
+                "dependentSchemas": {
+                  "endpointSelector": {
+                    "not": {
+                      "required": [
+                        "controller"
+                      ]
+                    }
+                  },
+                  "controller": {
+                    "not": {
+                      "required": [
+                        "endpointSelector"
+                      ]
+                    }
+                  }
+                },
+                "anyOf": [
+                  {
+                    "properties": {
+                      "ingress": {
+                        "minItems": 1
+                      }
+                    },
+                    "required": [
+                      "ingress"
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "ingressDeny": {
+                        "minItems": 1
+                      }
+                    },
+                    "required": [
+                      "ingressDeny"
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "egress": {
+                        "minItems": 1
+                      }
+                    },
+                    "required": [
+                      "egress"
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "egressDeny": {
+                        "minItems": 1
+                      }
+                    },
+                    "required": [
+                      "egressDeny"
+                    ]
+                  }
+                ],
+                "required": [
+                  "type"
+                ],
+                "examples": [
+                  "networkpolicies:\n  cilium:\n    type: cilium\n    endpointSelector:\n      matchLabels:\n        app.kubernetes.io/name: example\n    description: Allow DNS and HTTPS traffic\n    ingress:\n      - fromEntities:\n          - cluster\n    ingressDeny:\n      - fromEntities:\n          - world\n    egress:\n      - toEntities:\n          - cluster\n    egressDeny:\n      - toEntities:\n          - world\n    enableDefaultDeny:\n      ingress: true\n      egress: true\n    log: example-policy"
+                ]
+              },
+              {
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "nodeSelector",
+                        "endpointSelector"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "nodeSelector",
+                        "controller"
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
           }
-        },
-        "dependentSchemas": {
-          "podSelector": {
-            "not": {
-              "required": [
-                "controller"
-              ]
-            }
-          },
-          "controller": {
-            "not": {
-              "required": [
-                "podSelector"
-              ]
-            }
-          }
-        },
-        "required": [
-          "policyTypes",
-          "rules"
         ]
       }
     },
     "persistence": {
-      "description": "Configure persistent storage and mount options. Each key is an identifier for a persistence item.\nSupported types: persistentVolumeClaim (default), configMap, secret, nfs, emptyDir, hostPath, image, custom.\nBy default each item mounts to /<identifier>. Use globalMounts or advancedMounts to customize mount paths.",
+      "description": "Configure persistent storage and mount options. Each key is an identifier for a persistence item.\nSupported types: persistentVolumeClaim (default), configMap, secret, nfs, emptyDir, hostPath, image, projected, custom.\nBy default each item mounts to /<identifier>. Use globalMounts or advancedMounts to customize mount paths.",
       "type": "object",
       "additionalProperties": {
         "properties": {
@@ -12194,14 +13412,14 @@
               "properties": {
                 "path": {
                   "type": "string",
-                  "description": "The path where the volume should be mounted in the container. Helm templates are supported.\nIf not specified, the mount path will be set to /<identifier_of_the_peristence_item>."
+                  "description": "The path where the volume should be mounted in the container.\nIf not specified, the mount path will be set to /<identifier_of_the_peristence_item>."
                 },
                 "readOnly": {
                   "type": "boolean"
                 },
                 "subPath": {
                   "type": "string",
-                  "description": "The subPath within the volume to mount. Helm templates are supported.\nIf not specified, the entire volume will be mounted."
+                  "description": "The subPath within the volume to mount.\nIf not specified, the entire volume will be mounted."
                 },
                 "subPathExpr": {
                   "type": "string"
@@ -12226,14 +13444,14 @@
                   "properties": {
                     "path": {
                       "type": "string",
-                      "description": "The path where the volume should be mounted in the container. Helm templates are supported.\nIf not specified, the mount path will be set to /<identifier_of_the_peristence_item>."
+                      "description": "The path where the volume should be mounted in the container.\nIf not specified, the mount path will be set to /<identifier_of_the_peristence_item>."
                     },
                     "readOnly": {
                       "type": "boolean"
                     },
                     "subPath": {
                       "type": "string",
-                      "description": "The subPath within the volume to mount. Helm templates are supported.\nIf not specified, the entire volume will be mounted."
+                      "description": "The subPath within the volume to mount.\nIf not specified, the entire volume will be mounted."
                     },
                     "subPathExpr": {
                       "type": "string"
@@ -12402,7 +13620,7 @@
               },
               "existingClaim": {
                 "type": "string",
-                "description": "The name of an existing PersistentVolumeClaim to use. Helm templates are supported.\nThis will not create a new PVC, but use the existing one instead."
+                "description": "The name of an existing PersistentVolumeClaim to use.\nThis will not create a new PVC, but use the existing one instead."
               }
             }
           },
@@ -12482,7 +13700,7 @@
           },
           {
             "type": "object",
-            "description": "Mount a Secret as a volume. Use 'name' for external Secrets, or 'identifier' to reference one managed by this chart.",
+            "description": "Mount a Secret as a volume. Use 'name' for an existing Secret, 'identifier' for a Secret managed by this chart, or 'externalSecretRef' for an ExternalSecret managed by this chart.",
             "examples": [
               "persistence:\n  credentials:\n    type: secret\n    name: my-secret",
               "persistence:\n  tls:\n    type: secret\n    name: app-tls-cert\n    globalMounts:\n      - path: /etc/ssl/certs\n        readOnly: true"
@@ -12490,7 +13708,7 @@
             "required": [
               "type"
             ],
-            "$comment": "oneOf enforces that at least one of name/identifier is present. dependentSchemas enforces mutual exclusion with a targeted error when both are set. Both are needed — do not simplify to oneOf alone.",
+            "$comment": "oneOf enforces that at least one of name/identifier/externalSecretRef is present. dependentSchemas enforces mutual exclusion. Both are needed — do not simplify to oneOf alone.",
             "oneOf": [
               {
                 "required": [
@@ -12501,20 +13719,59 @@
                 "required": [
                   "identifier"
                 ]
+              },
+              {
+                "required": [
+                  "externalSecretRef"
+                ]
               }
             ],
             "dependentSchemas": {
               "name": {
                 "not": {
-                  "required": [
-                    "identifier"
+                  "anyOf": [
+                    {
+                      "required": [
+                        "identifier"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "externalSecretRef"
+                      ]
+                    }
                   ]
                 }
               },
               "identifier": {
                 "not": {
-                  "required": [
-                    "name"
+                  "anyOf": [
+                    {
+                      "required": [
+                        "name"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "externalSecretRef"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "externalSecretRef": {
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "name"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "identifier"
+                      ]
+                    }
                   ]
                 }
               }
@@ -12527,6 +13784,9 @@
                 "type": "string"
               },
               "identifier": {
+                "type": "string"
+              },
+              "externalSecretRef": {
                 "type": "string"
               },
               "defaultMode": {
@@ -12710,6 +13970,163 @@
           },
           {
             "type": "object",
+            "description": "Project one or more sources into a single volume. Sources may be ServiceAccount tokens, ConfigMaps or Secrets, all mounted into the same directory.",
+            "examples": [
+              "persistence:\n  api-token:\n    type: projected\n    sources:\n      - serviceAccountToken:\n          audience: https://api.example.com\n          expirationSeconds: 3600\n          path: token",
+              "persistence:\n  bundle:\n    type: projected\n    defaultMode: 0400\n    sources:\n      - serviceAccountToken:\n          audience: vault\n          path: vault-token\n      - configMap:\n          name: ca-bundle\n          items:\n            - key: ca.crt\n              path: ca.crt"
+            ],
+            "required": [
+              "type",
+              "sources"
+            ],
+            "properties": {
+              "type": {
+                "const": "projected"
+              },
+              "defaultMode": {
+                "type": "integer",
+                "description": "Permissions applied to the projected files, in octal (for example 0400). Individual items may override this."
+              },
+              "sources": {
+                "type": "array",
+                "description": "The list of volume projections to mount into this volume.",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "description": "A single projection source. Exactly one of serviceAccountToken, configMap or secret must be set.",
+                  "additionalProperties": false,
+                  "oneOf": [
+                    {
+                      "required": [
+                        "serviceAccountToken"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "configMap"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "secret"
+                      ]
+                    }
+                  ],
+                  "properties": {
+                    "serviceAccountToken": {
+                      "type": "object",
+                      "description": "Project a ServiceAccount token into the volume.",
+                      "required": [
+                        "path"
+                      ],
+                      "properties": {
+                        "audience": {
+                          "type": "string",
+                          "description": "The intended audience of the token. A recipient of the token must identify itself with this identifier, otherwise it should reject the token. Defaults to the API server's identifier."
+                        },
+                        "expirationSeconds": {
+                          "type": "integer",
+                          "description": "The requested duration of validity of the token, in seconds. The kubelet starts rotating the token once it is older than 80% of this value, or after 24 hours, whichever is sooner."
+                        },
+                        "path": {
+                          "type": "string",
+                          "description": "The path relative to the mount point of the file to project the token into."
+                        }
+                      }
+                    },
+                    "configMap": {
+                      "type": "object",
+                      "description": "Project a ConfigMap into the volume.",
+                      "required": [
+                        "name"
+                      ],
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "The name of the ConfigMap to project."
+                        },
+                        "optional": {
+                          "type": "boolean",
+                          "description": "Whether the ConfigMap must be defined for the pod to start."
+                        },
+                        "items": {
+                          "type": "array",
+                          "description": "Map specific keys to specific paths within the volume.",
+                          "items": {
+                            "type": "object",
+                            "description": "Maps a key from a ConfigMap or Secret to a path within the volume.",
+                            "required": [
+                              "key",
+                              "path"
+                            ],
+                            "properties": {
+                              "key": {
+                                "type": "string",
+                                "description": "The key to project."
+                              },
+                              "path": {
+                                "type": "string",
+                                "description": "The relative path of the file to map the key to."
+                              },
+                              "mode": {
+                                "type": "integer",
+                                "description": "Permissions applied to this file, in octal (for example 0400)."
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "secret": {
+                      "type": "object",
+                      "description": "Project a Secret into the volume.",
+                      "required": [
+                        "name"
+                      ],
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "The name of the Secret to project."
+                        },
+                        "optional": {
+                          "type": "boolean",
+                          "description": "Whether the Secret must be defined for the pod to start."
+                        },
+                        "items": {
+                          "type": "array",
+                          "description": "Map specific keys to specific paths within the volume.",
+                          "items": {
+                            "type": "object",
+                            "description": "Maps a key from a ConfigMap or Secret to a path within the volume.",
+                            "required": [
+                              "key",
+                              "path"
+                            ],
+                            "properties": {
+                              "key": {
+                                "type": "string",
+                                "description": "The key to project."
+                              },
+                              "path": {
+                                "type": "string",
+                                "description": "The relative path of the file to map the key to."
+                              },
+                              "mode": {
+                                "type": "integer",
+                                "description": "Permissions applied to this file, in octal (for example 0400)."
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
             "description": "Specify a custom volume type not covered by the built-in types. The volumeSpec is passed through directly to the pod spec.",
             "examples": [
               "persistence:\n  ceph:\n    type: custom\n    volumeSpec:\n      cephfs:\n        monitors:\n          - 10.0.0.1:6789\n        user: admin\n        secretRef:\n          name: ceph-secret",
@@ -12732,7 +14149,8 @@
         ]
       },
       "examples": [
-        "persistence:\n  config:\n    type: persistentVolumeClaim\n    accessMode: ReadWriteOnce\n    size: 1Gi\n    globalMounts:\n      - path: /config\n  tmp:\n    type: emptyDir"
+        "persistence:\n  config:\n    type: persistentVolumeClaim\n    accessMode: ReadWriteOnce\n    size: 1Gi\n    globalMounts:\n      - path: /config\n  tmp:\n    type: emptyDir",
+        "persistence:\n  api-token:\n    type: projected\n    defaultMode: 0400\n    sources:\n      - serviceAccountToken:\n          audience: https://api.example.com\n          expirationSeconds: 3600\n          path: token\n    globalMounts:\n      - path: /var/run/secrets/tokens"
       ]
     },
     "rbac": {
@@ -12926,7 +14344,7 @@
                   },
                   "name": {
                     "type": "string",
-                    "description": "Reference a Role or ClusterRole by its name. Helm template enabled."
+                    "description": "Reference a Role or ClusterRole by its name."
                   },
                   "kind": {
                     "type": "string",
