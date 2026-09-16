@@ -43,6 +43,33 @@
           "description": "When true (default), automatically create a dedicated ServiceAccount using the release name as the identifier if no serviceAccount is explicitly configured. If any serviceAccount entries are present, the default is not created and user configuration takes precedence.",
           "type": "boolean",
           "default": true
+        },
+        "templateEvaluation": {
+          "description": "Configure global string template evaluation.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "passes": {
+              "description": "Maximum number of times each string is evaluated. Increase this to evaluate templates produced by templated values.",
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "excludePaths": {
+              "description": "Paths excluded from global template evaluation. Each path is a list of map keys or array indexes represented as strings. Matching paths and their descendants are left unchanged.",
+              "type": "array",
+              "default": [],
+              "examples": [
+                "excludePaths:\n  - [controllers, main, containers, main, env, VPN_PORT_FORWARDING_UP_COMMAND]"
+              ],
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
         }
       }
     },

@@ -33,6 +33,9 @@ annotations:
         Added support for templateable annotation/label keys
     - kind: added
       description: |-
+        Added configurable recursive string template evaluation with path exclusions
+    - kind: added
+      description: |-
         Added support for referencing controller in cillium(Cluster)NetworkPolicy rules
     - kind: added
       description: |-
