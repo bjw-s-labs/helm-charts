@@ -21,34 +21,8 @@ within the common library.
   {{- else if (hasKey $ciliumNetworkPolicyObject "endpointSelector") -}}
     {{- $endpointSelector = $ciliumNetworkPolicyObject.endpointSelector -}}
   {{- else -}}
-    {{- /* Determine the controller identifier to use */ -}}
-    {{- $controllerIdentifier := "" -}}
-    {{- if and (hasKey $ciliumNetworkPolicyObject "controller") $ciliumNetworkPolicyObject.controller -}}
-      {{- $controllerIdentifier = $ciliumNetworkPolicyObject.controller -}}
-    {{- else -}}
-      {{- /* Auto-detect: if only one controller exists, use it */ -}}
-      {{- $enabledControllers := (include "bjw-s.common.lib.controller.enabledControllers" (dict "rootContext" $rootContext) | fromYaml) -}}
-      {{- if eq (len $enabledControllers) 1 -}}
-        {{- $controllerIdentifier = keys $enabledControllers | first -}}
-      {{- end -}}
-    {{- end -}}
-
-    {{- /* Build the endpoint selector */ -}}
-    {{- $selectorLabels := dict "app.kubernetes.io/controller" $controllerIdentifier -}}
-    {{- /* Add global selector labels first */ -}}
-    {{- $selectorLabels = merge
-      (include "bjw-s.common.lib.metadata.selectorLabels" $rootContext | fromYaml)
-      $selectorLabels
-    -}}
-    {{- /* Add extra selector labels last (takes precedence) */ -}}
-    {{- if hasKey $ciliumNetworkPolicyObject "extraSelectorLabels" -}}
-      {{- $selectorLabels = mergeOverwrite
-        (dict)
-        $selectorLabels
-        ($ciliumNetworkPolicyObject.extraSelectorLabels | default dict)
-      -}}
-    {{- end -}}
-    {{- $endpointSelector = dict "matchLabels" $selectorLabels -}}
+    {{- $resourceKind := ternary "CiliumClusterwideNetworkPolicy" "CiliumNetworkPolicy" $clusterwide -}}
+    {{- $endpointSelector = include "bjw-s.common.lib.networkpolicy.controllerSelector" (dict "rootContext" $rootContext "object" $ciliumNetworkPolicyObject "resourceKind" $resourceKind) | fromYaml -}}
   {{- end -}}
 ---
 apiVersion: cilium.io/v2

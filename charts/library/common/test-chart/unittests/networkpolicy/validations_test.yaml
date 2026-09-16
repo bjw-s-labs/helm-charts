@@ -22,7 +22,7 @@ tests:
           rules: {}
     asserts:
       - failedTemplate:
-          errorMessage: "NetworkPolicy 'main': controller or podSelector field is required because automatic controller detection is not possible (found 2 enabled controllers). Please specify which controller this NetworkPolicy should reference."
+          errorMessage: "NetworkPolicy 'main': controller, controllers, or podSelector field is required because automatic controller detection is not possible (found 2 enabled controllers). Please specify which controllers this NetworkPolicy should reference."
 
   - it: networkpolicy auto-detects single controller when controller not specified
     set:
@@ -56,3 +56,28 @@ tests:
           rules: {}
     asserts:
       - failedTemplate: {}
+
+  - it: networkpolicy validates every controller reference
+    set:
+      networkpolicies.main:
+        controllers:
+          - main
+          - missing
+        policyTypes:
+          - Ingress
+        rules: {}
+    asserts:
+      - failedTemplate:
+          errorMessage: "NetworkPolicy 'main': Controller reference 'missing' matched no enabled controllers. Update 'networkpolicies.main.controllers' to match one of: [main]."
+
+  - it: networkpolicy rejects controller regular expressions without matches
+    set:
+      networkpolicies.main:
+        controllers:
+          - worker-.*
+        policyTypes:
+          - Ingress
+        rules: {}
+    asserts:
+      - failedTemplate:
+          errorMessage: "NetworkPolicy 'main': Controller reference 'worker-.*' matched no enabled controllers. Update 'networkpolicies.main.controllers' to match one of: [main]."

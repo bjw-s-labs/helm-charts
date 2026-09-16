@@ -35,6 +35,12 @@
                   "nodeSelector",
                   "controller"
                 ]
+              },
+              {
+                "required": [
+                  "nodeSelector",
+                  "controllers"
+                ]
               }
             ]
           }
