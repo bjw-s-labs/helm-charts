@@ -190,6 +190,26 @@ jobs:
           }}
         run: exit 1
 
+  lint-workflows:
+    name: Lint workflows
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Install Mise and required tools
+        uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
+        with:
+          cache_key: "mise-v1-{{file_hash}}"
+
+      - name: Run zizmor
+        run: zizmor .github/workflows
+
+      - name: Run actionlint
+        run: actionlint .github/workflows/*.{yml,yaml}
+
   lint-chart:
     if: ${{ needs.prepare.outputs.chartsToLint != '[]' && needs.prepare.outputs.chartsToLint != '' }}
     name: Lint chart
@@ -221,6 +241,7 @@ jobs:
     needs:
       - prepare
       - lint-chart
+      - lint-workflows
     if: ${{ !cancelled() }}
     name: Lint successful
     runs-on: ubuntu-latest
@@ -228,8 +249,11 @@ jobs:
       - name: Check matrix status
         if: >-
           ${{
-              (needs.prepare.outputs.chartsToLint != '' && needs.prepare.outputs.chartsToLint != '[]') &&
-              contains(needs.*.result, 'failure')
+              (
+                (needs.prepare.outputs.chartsToLint != '' && needs.prepare.outputs.chartsToLint != '[]') &&
+                contains(needs.*.result, 'failure')
+              ) ||
+              needs.lint-workflows.result == 'failure'
           }}
         run: exit 1
 
