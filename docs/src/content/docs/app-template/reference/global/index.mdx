@@ -23,6 +23,7 @@ Allows for configuring chart-wide settings
 | `labels` | `object / null` | No | - | Set additional global labels. |
 | `nameOverride` | `string / null` | No | - | Set the chart name |
 | `propagateGlobalMetadataToPods` | `boolean` | No | `false` | Set to true to propagate global metadata to Pod labels. |
+| [`templateEvaluation`](./templateevaluation/) | `object` | No | - | Configure global string template evaluation. |
 
 ### Property Details
 
@@ -33,3 +34,8 @@ Always append identifier slugs to resource names, regardless of the enabled reso
 #### createDefaultServiceAccount
 
 When true (default), automatically create a dedicated ServiceAccount using the release name as the identifier if no serviceAccount is explicitly configured. If any serviceAccount entries are present, the default is not created and user configuration takes precedence.
+
+## Related Pages
+
+
+- [`templateEvaluation`](./templateevaluation/)
