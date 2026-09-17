@@ -58,33 +58,33 @@ metadata:
   {{- with $labels }}
   labels:
     {{- range $key, $value := . }}
-      {{- printf "%s: %s" $key (tpl $value $rootContext | toYaml ) | nindent 4 }}
+      {{- printf "%s: %s" $key (include "bjw-s.common.lib.common.renderString" (dict "value" $value "rootContext" $rootContext) | toYaml ) | nindent 4 }}
     {{- end }}
   {{- end }}
   {{- with $annotations }}
   annotations:
     {{- range $key, $value := . }}
-      {{- printf "%s: %s" $key (tpl $value $rootContext | toYaml ) | nindent 4 }}
+      {{- printf "%s: %s" $key (include "bjw-s.common.lib.common.renderString" (dict "value" $value "rootContext" $rootContext) | toYaml ) | nindent 4 }}
     {{- end }}
   {{- end }}
   {{ if not $clusterwide }}namespace: {{ $rootContext.Release.Namespace }}{{ end }}
 spec:
-  {{ if hasKey $ciliumNetworkPolicyObject "nodeSelector" }}nodeSelector: {{ tpl (toYaml $ciliumNetworkPolicyObject.nodeSelector) $rootContext | nindent 4 }}
+  {{ if hasKey $ciliumNetworkPolicyObject "nodeSelector" }}nodeSelector: {{ include "bjw-s.common.lib.common.renderString" (dict "value" (toYaml $ciliumNetworkPolicyObject.nodeSelector) "rootContext" $rootContext) | nindent 4 }}
   {{ else }}endpointSelector: {{ toYaml $endpointSelector | nindent 4 }}{{ end }}
   {{- with $ciliumNetworkPolicyObject.description }}
-  description: {{ tpl . $rootContext | quote }}
+  description: {{ include "bjw-s.common.lib.common.renderString" (dict "value" . "rootContext" $rootContext) | quote }}
   {{- end }}
   {{- with $ciliumNetworkPolicyObject.ingress }}
-  ingress: {{- tpl (toYaml .) $rootContext | nindent 4 -}}
+  ingress: {{- include "bjw-s.common.lib.common.renderString" (dict "value" (toYaml .) "rootContext" $rootContext) | nindent 4 -}}
   {{- end }}
   {{- with $ciliumNetworkPolicyObject.ingressDeny }}
-  ingressDeny: {{- tpl (toYaml .) $rootContext | nindent 4 -}}
+  ingressDeny: {{- include "bjw-s.common.lib.common.renderString" (dict "value" (toYaml .) "rootContext" $rootContext) | nindent 4 -}}
   {{- end }}
   {{- with $ciliumNetworkPolicyObject.egress }}
-  egress: {{- tpl (toYaml .) $rootContext | nindent 4 -}}
+  egress: {{- include "bjw-s.common.lib.common.renderString" (dict "value" (toYaml .) "rootContext" $rootContext) | nindent 4 -}}
   {{- end }}
   {{- with $ciliumNetworkPolicyObject.egressDeny }}
-  egressDeny: {{- tpl (toYaml .) $rootContext | nindent 4 -}}
+  egressDeny: {{- include "bjw-s.common.lib.common.renderString" (dict "value" (toYaml .) "rootContext" $rootContext) | nindent 4 -}}
   {{- end }}
   {{- with $ciliumNetworkPolicyObject.enableDefaultDeny }}
   enableDefaultDeny: {{- toYaml . | nindent 4 }}

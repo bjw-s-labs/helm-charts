@@ -23,13 +23,13 @@ metadata:
   {{- with $labels }}
   labels:
     {{- range $key, $value := . }}
-      {{- printf "%s: %s" $key (tpl $value $rootContext | toYaml ) | nindent 4 }}
+      {{- printf "%s: %s" $key (include "bjw-s.common.lib.common.renderString" (dict "value" $value "rootContext" $rootContext) | toYaml ) | nindent 4 }}
     {{- end }}
   {{- end }}
   {{- with $annotations }}
   annotations:
     {{- range $key, $value := . }}
-      {{- printf "%s: %s" $key (tpl $value $rootContext | toYaml ) | nindent 4 }}
+      {{- printf "%s: %s" $key (include "bjw-s.common.lib.common.renderString" (dict "value" $value "rootContext" $rootContext) | toYaml ) | nindent 4 }}
     {{- end }}
   {{- end }}
   namespace: {{ $rootContext.Release.Namespace }}
@@ -63,7 +63,7 @@ spec:
     {{- if kindIs "map" . }}
       {{- $serviceName = (include "bjw-s.common.lib.service.getByIdentifier" (dict "rootContext" $rootContext "id" .identifier) | fromYaml ).name }}
     {{- else }}
-      {{- $serviceName = tpl . $rootContext }}
+      {{- $serviceName = include "bjw-s.common.lib.common.renderString" (dict "value" . "rootContext" $rootContext) }}
     {{- end }}
   {{- end }}
   serviceName: {{ $serviceName }}

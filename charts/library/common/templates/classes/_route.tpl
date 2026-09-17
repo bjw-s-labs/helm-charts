@@ -30,13 +30,13 @@ metadata:
   {{- with $labels }}
   labels:
     {{- range $key, $value := . }}
-    {{- printf "%s: %s" $key (tpl $value $rootContext | toYaml ) | nindent 4 }}
+    {{- printf "%s: %s" $key (include "bjw-s.common.lib.common.renderString" (dict "value" $value "rootContext" $rootContext) | toYaml ) | nindent 4 }}
     {{- end }}
   {{- end }}
   {{- with $annotations }}
   annotations:
     {{- range $key, $value := . }}
-    {{- printf "%s: %s" $key (tpl $value $rootContext | toYaml ) | nindent 4 }}
+    {{- printf "%s: %s" $key (include "bjw-s.common.lib.common.renderString" (dict "value" $value "rootContext" $rootContext) | toYaml ) | nindent 4 }}
     {{- end }}
   {{- end }}
   namespace: {{ $routeObject.namespaceOverride | default $rootContext.Release.Namespace }}
@@ -81,13 +81,13 @@ spec:
   {{- if and (ne $routeKind "TCPRoute") (ne $routeKind "UDPRoute") $routeObject.hostnames }}
   hostnames:
     {{- range $routeObject.hostnames }}
-    - {{ tpl . $rootContext | quote }}
+    - {{ include "bjw-s.common.lib.common.renderString" (dict "value" . "rootContext" $rootContext) | quote }}
     {{- end }}
   {{- end }}
   rules:
   {{- range $routeObject.rules }}
     - {{ with .name -}}
-        name: {{ tpl . $rootContext }}
+        name: {{ include "bjw-s.common.lib.common.renderString" (dict "value" . "rootContext" $rootContext) }}
       {{ end -}}
       backendRefs:
       {{- if empty .backendRefs }}
@@ -98,7 +98,7 @@ spec:
           {{- $serviceName := "" -}}
           {{- $servicePort := 0 -}}
           {{- if .name -}}
-            {{- $serviceName = tpl .name $rootContext -}}
+            {{- $serviceName = include "bjw-s.common.lib.common.renderString" (dict "value" .name "rootContext" $rootContext) -}}
           {{- else if .identifier -}}
             {{- $service = (include "bjw-s.common.lib.service.getByIdentifier" (dict "rootContext" $rootContext "id" .identifier) | fromYaml ) -}}
             {{- if not $service -}}

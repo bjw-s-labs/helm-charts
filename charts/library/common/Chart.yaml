@@ -3,7 +3,7 @@ apiVersion: v2
 name: common
 description: Function library for Helm charts
 type: library
-version: 5.2.0
+version: 5.2.1
 kubeVersion: ">=1.31.0-0"
 keywords:
   - common
@@ -16,27 +16,6 @@ sources:
   - https://github.com/bjw-s-labs/helm-charts
 annotations:
   artifacthub.io/changes: |-
-    - kind: added
-      description: |-
-        Added support for ExternalSecret resources
-    - kind: added
-      description: |-
-        Added support for CiliumNetworkPolicy resources
-    - kind: added
-      description: |-
-        Added support for CiliumClusterwideNetworkPolicy resources
     - kind: fixed
       description: |-
-        Fixed NetworkPolicy extraSelectorLabels precedence over generated selector labels
-    - kind: added
-      description: |-
-        Added initial support for ListenerSet resources
-    - kind: added
-      description: |-
-        Added default selectors to topologySpreadConstraints to the same controller
-    - kind: added
-      description: |-
-        Added native support for `projected` persistence items
-    - kind: added
-      description: |-
-        Added global support for templating string fields
+        Fixed template rendering issues

@@ -21,7 +21,7 @@ Probes used by the container.
       {{- $probeDefinition := dict -}}
 
       {{- if $probeValues.custom -}}
-        {{- $parsedProbeSpec := tpl ($probeValues.spec | toYaml) $rootContext -}}
+        {{- $parsedProbeSpec := include "bjw-s.common.lib.common.renderString" (dict "value" ($probeValues.spec | toYaml) "rootContext" $rootContext) -}}
         {{- $probeDefinition = $parsedProbeSpec | fromYaml -}}
       {{- else -}}
         {{- $probeSpec := dig "spec" dict $probeValues -}}
@@ -75,7 +75,7 @@ Probes used by the container.
           {{- if kindIs "float64" $probeValues.port -}}
             {{- $_ := set (index $probeDefinition $probeHeader) "port" $probeValues.port -}}
           {{- else if kindIs "string" $probeValues.port -}}
-            {{- $_ := set (index $probeDefinition $probeHeader) "port" (tpl ( $probeValues.port | toString ) $rootContext) -}}
+            {{- $_ := set (index $probeDefinition $probeHeader) "port" (include "bjw-s.common.lib.common.renderString" (dict "value" ( $probeValues.port | toString ) "rootContext" $rootContext)) -}}
           {{- end -}}
         {{- else if $primaryServiceDefaultPort.targetPort -}}
           {{- $_ := set (index $probeDefinition $probeHeader) "port" $primaryServiceDefaultPort.targetPort -}}

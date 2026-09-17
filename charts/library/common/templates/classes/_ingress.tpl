@@ -23,13 +23,13 @@ metadata:
   {{- with $labels }}
   labels:
     {{- range $key, $value := . }}
-      {{- printf "%s: %s" $key (tpl $value $rootContext | toYaml ) | nindent 4 }}
+      {{- printf "%s: %s" $key (include "bjw-s.common.lib.common.renderString" (dict "value" $value "rootContext" $rootContext) | toYaml ) | nindent 4 }}
     {{- end }}
   {{- end }}
   {{- with $annotations }}
   annotations:
     {{- range $key, $value := . }}
-      {{- printf "%s: %s" $key (tpl $value $rootContext | toYaml ) | nindent 4 }}
+      {{- printf "%s: %s" $key (include "bjw-s.common.lib.common.renderString" (dict "value" $value "rootContext" $rootContext) | toYaml ) | nindent 4 }}
     {{- end }}
   {{- end }}
   namespace: {{ $rootContext.Release.Namespace }}
@@ -42,9 +42,9 @@ spec:
     {{- range $ingressObject.tls }}
     - hosts:
         {{- range .hosts }}
-        - {{ tpl . $rootContext | quote }}
+        - {{ include "bjw-s.common.lib.common.renderString" (dict "value" . "rootContext" $rootContext) | quote }}
         {{- end }}
-      {{- $secretName := tpl (default "" .secretName) $rootContext }}
+      {{- $secretName := include "bjw-s.common.lib.common.renderString" (dict "value" (default "" .secretName) "rootContext" $rootContext) }}
       {{- if $secretName }}
       secretName: {{ $secretName | quote}}
       {{- end }}
@@ -55,11 +55,11 @@ spec:
   {{- else }}
   rules:
   {{- range $ingressObject.hosts }}
-    - host: {{ tpl .host $rootContext | quote }}
+    - host: {{ include "bjw-s.common.lib.common.renderString" (dict "value" .host "rootContext" $rootContext) | quote }}
       http:
         paths:
           {{- range .paths }}
-          - path: {{ tpl .path $rootContext | quote }}
+          - path: {{ include "bjw-s.common.lib.common.renderString" (dict "value" .path "rootContext" $rootContext) | quote }}
             pathType: {{ default "Prefix" .pathType }}
             backend:
               service:
@@ -68,7 +68,7 @@ spec:
                 {{ $servicePort := 0 -}}
 
                 {{ if .service.name -}}
-                  {{ $serviceName = tpl .service.name $rootContext -}}
+                  {{ $serviceName = include "bjw-s.common.lib.common.renderString" (dict "value" .service.name "rootContext" $rootContext) -}}
                 {{ else if .service.identifier -}}
                   {{ $service = (include "bjw-s.common.lib.service.getByIdentifier" (dict "rootContext" $rootContext "id" .service.identifier) | fromYaml ) -}}
                   {{ if not $service -}}

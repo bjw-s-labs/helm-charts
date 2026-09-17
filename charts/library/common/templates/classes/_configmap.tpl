@@ -22,22 +22,22 @@ metadata:
   {{- with $labels }}
   labels:
     {{- range $key, $value := . }}
-      {{- printf "%s: %s" $key (tpl $value $rootContext | toYaml ) | nindent 4 }}
+      {{- printf "%s: %s" $key (include "bjw-s.common.lib.common.renderString" (dict "value" $value "rootContext" $rootContext) | toYaml ) | nindent 4 }}
     {{- end }}
   {{- end }}
   {{- with $annotations }}
   annotations:
     {{- range $key, $value := . }}
-      {{- printf "%s: %s" $key (tpl $value $rootContext | toYaml ) | nindent 4 }}
+      {{- printf "%s: %s" $key (include "bjw-s.common.lib.common.renderString" (dict "value" $value "rootContext" $rootContext) | toYaml ) | nindent 4 }}
     {{- end }}
   {{- end }}
   namespace: {{ $rootContext.Release.Namespace }}
 {{- with $configMapObject.data }}
 data:
-    {{- tpl (toYaml .) $rootContext | nindent 2 }}
+    {{- include "bjw-s.common.lib.common.renderString" (dict "value" (toYaml .) "rootContext" $rootContext "render" ($configMapObject.renderFileContent | default false)) | nindent 2 }}
 {{- end }}
 {{- with $configMapObject.binaryData }}
 binaryData:
-    {{- tpl (toYaml .) $rootContext | nindent 2 }}
+    {{- include "bjw-s.common.lib.common.renderString" (dict "value" (toYaml .) "rootContext" $rootContext "render" ($configMapObject.renderFileContent | default false)) | nindent 2 }}
 {{- end }}
 {{- end -}}

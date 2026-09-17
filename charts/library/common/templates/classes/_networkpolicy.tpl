@@ -55,13 +55,13 @@ metadata:
   {{- with $labels }}
   labels:
     {{- range $key, $value := . }}
-      {{- printf "%s: %s" $key (tpl $value $rootContext | toYaml ) | nindent 4 }}
+      {{- printf "%s: %s" $key (include "bjw-s.common.lib.common.renderString" (dict "value" $value "rootContext" $rootContext) | toYaml ) | nindent 4 }}
     {{- end }}
   {{- end }}
   {{- with $annotations }}
   annotations:
     {{- range $key, $value := . }}
-      {{- printf "%s: %s" $key (tpl $value $rootContext | toYaml ) | nindent 4 }}
+      {{- printf "%s: %s" $key (include "bjw-s.common.lib.common.renderString" (dict "value" $value "rootContext" $rootContext) | toYaml ) | nindent 4 }}
     {{- end }}
   {{- end }}
   namespace: {{ $rootContext.Release.Namespace }}
@@ -71,9 +71,9 @@ spec:
   policyTypes: {{- toYaml . | nindent 4 -}}
   {{- end }}
   {{- with $networkPolicyObject.rules.ingress }}
-  ingress: {{- tpl (toYaml .) $rootContext | nindent 4 -}}
+  ingress: {{- include "bjw-s.common.lib.common.renderString" (dict "value" (toYaml .) "rootContext" $rootContext) | nindent 4 -}}
   {{- end }}
   {{- with $networkPolicyObject.rules.egress }}
-  egress: {{- tpl (toYaml .) $rootContext | nindent 4 -}}
+  egress: {{- include "bjw-s.common.lib.common.renderString" (dict "value" (toYaml .) "rootContext" $rootContext) | nindent 4 -}}
   {{- end }}
 {{- end -}}

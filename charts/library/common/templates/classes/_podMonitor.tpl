@@ -27,13 +27,13 @@ metadata:
   {{- with $labels }}
   labels:
     {{- range $key, $value := . }}
-      {{- printf "%s: %s" $key (tpl $value $rootContext | toYaml ) | nindent 4 }}
+      {{- printf "%s: %s" $key (include "bjw-s.common.lib.common.renderString" (dict "value" $value "rootContext" $rootContext) | toYaml ) | nindent 4 }}
     {{- end }}
   {{- end }}
   {{- with $annotations }}
   annotations:
     {{- range $key, $value := . }}
-      {{- printf "%s: %s" $key (tpl $value $rootContext | toYaml ) | nindent 4 }}
+      {{- printf "%s: %s" $key (include "bjw-s.common.lib.common.renderString" (dict "value" $value "rootContext" $rootContext) | toYaml ) | nindent 4 }}
     {{- end }}
   {{- end }}
   namespace: {{ $rootContext.Release.Namespace }}
@@ -44,13 +44,13 @@ spec:
       - {{ $rootContext.Release.Namespace }}
   selector:
     {{- if $podMonitorObject.selector -}}
-      {{- tpl ($podMonitorObject.selector | toYaml) $rootContext | nindent 4}}
+      {{- include "bjw-s.common.lib.common.renderString" (dict "value" ($podMonitorObject.selector | toYaml) "rootContext" $rootContext) | nindent 4}}
     {{- else }}
     matchLabels:
       app.kubernetes.io/controller: {{ $controllerIdentifier }}
       {{- include "bjw-s.common.lib.metadata.selectorLabels" $rootContext | nindent 6 }}
     {{- end }}
-  podMetricsEndpoints: {{- tpl (toYaml $podMonitorObject.podMetricsEndpoints) $rootContext | nindent 4 }}
+  podMetricsEndpoints: {{- include "bjw-s.common.lib.common.renderString" (dict "value" (toYaml $podMonitorObject.podMetricsEndpoints) "rootContext" $rootContext) | nindent 4 }}
   {{- if not (empty $podMonitorObject.podTargetLabels) }}
   podTargetLabels:
     {{- toYaml $podMonitorObject.podTargetLabels | nindent 4 }}

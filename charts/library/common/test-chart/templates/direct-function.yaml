@@ -1,0 +1,14 @@
+{{- $variables := .Values.variables | default dict -}}
+{{- if $variables.directFunctionTest -}}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: direct-function
+data:
+  image: {{ include "bjw-s.common.lib.imageSpecificationToImage" (dict "rootContext" $ "imageSpec" (dict "repository" "{{ .Values.variables.repository }}" "tag" "{{ .Values.variables.tag }}")) | quote }}
+{{- end -}}
+{{- if $variables.directClassTest -}}
+---
+{{- include "bjw-s.common.class.configMap" (dict "rootContext" $ "object" (dict "name" "direct-class" "data" (dict "value" "{{ .Values.variables.value }}"))) }}
+{{- end -}}

@@ -57,7 +57,7 @@ Convert container values to an object
     {{- end -}}
 
     {{- /* Process any templates in the digest */ -}}
-    {{- $imageDigest = tpl $imageDigest $rootContext -}}
+    {{- $imageDigest = include "bjw-s.common.lib.common.renderString" (dict "value" $imageDigest "rootContext" $rootContext) -}}
 
     {{- $_ := set $objectValues.image "digest" $imageDigest -}}
   {{- end -}}

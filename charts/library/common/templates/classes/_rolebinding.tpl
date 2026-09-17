@@ -61,13 +61,13 @@ metadata:
   {{- with $labels }}
   labels:
     {{- range $key, $value := . }}
-      {{- printf "%s: %s" $key (tpl $value $rootContext | toYaml ) | nindent 4 }}
+      {{- printf "%s: %s" $key (include "bjw-s.common.lib.common.renderString" (dict "value" $value "rootContext" $rootContext) | toYaml ) | nindent 4 }}
     {{- end }}
   {{- end }}
   {{- with $annotations }}
   annotations:
     {{- range $key, $value := . }}
-      {{- printf "%s: %s" $key (tpl $value $rootContext | toYaml ) | nindent 4 }}
+      {{- printf "%s: %s" $key (include "bjw-s.common.lib.common.renderString" (dict "value" $value "rootContext" $rootContext) | toYaml ) | nindent 4 }}
     {{- end }}
   {{- end }}
   {{ if eq $roleBindingObject.type "RoleBinding" -}}
@@ -78,7 +78,7 @@ roleRef:
   name: {{ $role.name }}
   apiGroup: rbac.authorization.k8s.io
 {{ with $subjects -}}
-subjects: {{- tpl . $rootContext | nindent 2 }}
+subjects: {{- include "bjw-s.common.lib.common.renderString" (dict "value" . "rootContext" $rootContext) | nindent 2 }}
 
 {{- end -}}
 

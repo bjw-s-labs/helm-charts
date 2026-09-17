@@ -1,0 +1,29 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: common - direct function consumers
+templates:
+  - direct-function.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+tests:
+  - it: renders strings when invoked without the loader context
+    set:
+      variables:
+        directFunctionTest: true
+        repository: ghcr.io/example/application
+        tag: v1.2.3
+    asserts:
+      - equal:
+          path: data.image
+          value: ghcr.io/example/application:v1.2.3
+
+  - it: renders class data when invoked without the loader context
+    set:
+      global: {}
+      variables:
+        directClassTest: true
+        value: rendered-value
+    asserts:
+      - equal:
+          path: data.value
+          value: rendered-value
