@@ -43,7 +43,7 @@ Returns the value for volumes
       {{- $pvcName := (include "bjw-s.common.lib.chart.names.fullname" $rootContext) -}}
       {{- if $persistenceValues.existingClaim -}}
         {{- /* Always prefer an existingClaim if that is set */ -}}
-        {{- $pvcName = tpl $persistenceValues.existingClaim  $rootContext -}}
+        {{- $pvcName = include "bjw-s.common.lib.common.renderString" (dict "value" $persistenceValues.existingClaim "rootContext" $rootContext) -}}
       {{- else -}}
         {{- /* Otherwise refer to the PVC name */ -}}
         {{- $object := (include "bjw-s.common.lib.pvc.getByIdentifier" (dict "rootContext" $rootContext "id" $identifier) | fromYaml) -}}
@@ -55,7 +55,7 @@ Returns the value for volumes
     {{- else if eq $persistenceValues.type "configMap" -}}
       {{- $objectName := "" -}}
       {{- if $persistenceValues.name -}}
-        {{- $objectName = tpl $persistenceValues.name $rootContext -}}
+        {{- $objectName = include "bjw-s.common.lib.common.renderString" (dict "value" $persistenceValues.name "rootContext" $rootContext) -}}
       {{- else if $persistenceValues.identifier -}}
         {{- $object := (include "bjw-s.common.lib.configMap.getByIdentifier" (dict "rootContext" $rootContext "id" $persistenceValues.identifier) | fromYaml ) -}}
         {{- if not $object -}}
@@ -76,7 +76,7 @@ Returns the value for volumes
     {{- else if eq $persistenceValues.type "secret" -}}
       {{- $objectName := "" -}}
       {{- if $persistenceValues.name -}}
-        {{- $objectName = tpl $persistenceValues.name $rootContext -}}
+        {{- $objectName = include "bjw-s.common.lib.common.renderString" (dict "value" $persistenceValues.name "rootContext" $rootContext) -}}
       {{- else if $persistenceValues.identifier -}}
         {{- $object := (include "bjw-s.common.lib.secret.getByIdentifier" (dict "rootContext" $rootContext "id" $persistenceValues.identifier) | fromYaml ) -}}
         {{- if not $object -}}
@@ -155,7 +155,7 @@ Returns the value for volumes
     {{- else if eq $persistenceValues.type "projected" -}}
       {{- $_ := set $volume "projected" dict -}}
       {{- $sources := required (printf "Persistence '%s': Projected volume sources are required. Specify 'persistence.%s.sources' with at least one source." $identifier $identifier) $persistenceValues.sources -}}
-      {{- $_ := set $volume.projected "sources" (tpl (toYaml $sources) $rootContext | fromYamlArray) -}}
+      {{- $_ := set $volume.projected "sources" (include "bjw-s.common.lib.common.renderString" (dict "value" (toYaml $sources) "rootContext" $rootContext) | fromYamlArray) -}}
       {{- with $persistenceValues.defaultMode -}}
         {{- $_ := set $volume.projected "defaultMode" . -}}
       {{- end -}}

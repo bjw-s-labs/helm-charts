@@ -153,6 +153,20 @@ tests:
                 key: "RELEASE-NAME-key"
                 name: "RELEASE-NAME-secret"
 
+  - it: Nested templated values are kept after rendering
+    set:
+      controllers.main.containers.main.env:
+        VPN_PORT_FORWARDING_UP_COMMAND: 'command --port {{`{{PORTS}}`}}'
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[0]
+          value:
+            name: VPN_PORT_FORWARDING_UP_COMMAND
+            value: 'command --port {{PORTS}}'
+
   - it: Combined KeyValue with Explicit ValueFrom should pass
     set:
       controllers.main.containers.main.env:

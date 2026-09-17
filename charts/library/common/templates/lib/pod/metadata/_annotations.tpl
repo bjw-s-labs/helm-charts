@@ -46,7 +46,7 @@ Returns the value for annotations
     {{- end -}}
     {{- $configMapChecksumAddToController := or (empty $includeChecksumInControllers) (has $controllerObject.identifier $includeChecksumInControllers) -}}
     {{- if and $configMapEnabled $configMapIncludeInChecksum $configMapChecksumAddToController -}}
-      {{- $_ := set $configMapsFound $name (tpl (toYaml $configmap.data) $rootContext | sha256sum) -}}
+      {{- $_ := set $configMapsFound $name (include "bjw-s.common.lib.common.renderString" (dict "value" (toYaml $configmap.data) "rootContext" $rootContext "render" ($configmap.renderFileContent | default false)) | sha256sum) -}}
     {{- end -}}
   {{- end -}}
   {{- if $configMapsFound -}}
@@ -74,7 +74,7 @@ Returns the value for annotations
     {{- end -}}
     {{- $secretChecksumAddToController := or (empty $includeChecksumInControllers) (has $controllerObject.identifier $includeChecksumInControllers) -}}
     {{- if and $secretEnabled $secretIncludeInChecksum $secretChecksumAddToController -}}
-      {{- $_ := set $secretsFound $name (tpl (toYaml $secret.stringData) $rootContext | sha256sum) -}}
+      {{- $_ := set $secretsFound $name (include "bjw-s.common.lib.common.renderString" (dict "value" (toYaml $secret.stringData) "rootContext" $rootContext "render" ($secret.renderFileContent | default false)) | sha256sum) -}}
     {{- end -}}
   {{- end -}}
   {{- if $secretsFound -}}
@@ -85,6 +85,6 @@ Returns the value for annotations
   {{- end -}}
 
   {{- if not (empty $annotations) -}}
-    {{- tpl (toYaml $annotations) $rootContext -}}
+    {{- include "bjw-s.common.lib.common.renderString" (dict "value" (toYaml $annotations) "rootContext" $rootContext) -}}
   {{- end -}}
 {{- end -}}

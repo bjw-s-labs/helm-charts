@@ -18,7 +18,7 @@ Name used by the container.
   {{- end -}}
 
   {{- /* Parse any templates */ -}}
-  {{- $name = tpl $name $rootContext -}}
+  {{- $name = include "bjw-s.common.lib.common.renderString" (dict "value" $name "rootContext" $rootContext) -}}
 
   {{- $name | toYaml -}}
 {{- end -}}

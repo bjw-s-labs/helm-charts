@@ -13,9 +13,9 @@
   {{ $service := dict -}}
   {{ $serviceName := "" -}}
   {{ if $serviceMonitorObject.serviceName -}}
-    {{ $serviceName = tpl $serviceMonitorObject.serviceName $rootContext -}}
+    {{ $serviceName = include "bjw-s.common.lib.common.renderString" (dict "value" $serviceMonitorObject.serviceName "rootContext" $rootContext) -}}
   {{ else if not (empty (dig "service" "name" nil $serviceMonitorObject)) -}}
-    {{ $serviceName = tpl $serviceMonitorObject.service.name $rootContext -}}
+    {{ $serviceName = include "bjw-s.common.lib.common.renderString" (dict "value" $serviceMonitorObject.service.name "rootContext" $rootContext) -}}
   {{ else if not (empty (dig "service" "identifier" nil $serviceMonitorObject)) -}}
     {{ $service = (include "bjw-s.common.lib.service.getByIdentifier" (dict "rootContext" $rootContext "id" $serviceMonitorObject.service.identifier) | fromYaml ) -}}
     {{ if not $service -}}
@@ -31,13 +31,13 @@ metadata:
   {{- with $labels }}
   labels:
     {{- range $key, $value := . }}
-      {{- printf "%s: %s" $key (tpl $value $rootContext | toYaml ) | nindent 4 }}
+      {{- printf "%s: %s" $key (include "bjw-s.common.lib.common.renderString" (dict "value" $value "rootContext" $rootContext) | toYaml ) | nindent 4 }}
     {{- end }}
   {{- end }}
   {{- with $annotations }}
   annotations:
     {{- range $key, $value := . }}
-      {{- printf "%s: %s" $key (tpl $value $rootContext | toYaml ) | nindent 4 }}
+      {{- printf "%s: %s" $key (include "bjw-s.common.lib.common.renderString" (dict "value" $value "rootContext" $rootContext) | toYaml ) | nindent 4 }}
     {{- end }}
   {{- end }}
   namespace: {{ $rootContext.Release.Namespace }}
@@ -48,13 +48,13 @@ spec:
       - {{ $rootContext.Release.Namespace }}
   selector:
     {{- if $serviceMonitorObject.selector -}}
-      {{- tpl ($serviceMonitorObject.selector | toYaml) $rootContext | nindent 4}}
+      {{- include "bjw-s.common.lib.common.renderString" (dict "value" ($serviceMonitorObject.selector | toYaml) "rootContext" $rootContext) | nindent 4}}
     {{- else }}
     matchLabels:
       app.kubernetes.io/service: {{ $serviceName }}
       {{- include "bjw-s.common.lib.metadata.selectorLabels" $rootContext | nindent 6 }}
     {{- end }}
-  endpoints: {{- tpl (toYaml $serviceMonitorObject.endpoints) $rootContext | nindent 4 }}
+  endpoints: {{- include "bjw-s.common.lib.common.renderString" (dict "value" (toYaml $serviceMonitorObject.endpoints) "rootContext" $rootContext) | nindent 4 }}
   {{- if not (empty $serviceMonitorObject.targetLabels )}}
   targetLabels:
     {{- toYaml $serviceMonitorObject.targetLabels | nindent 4 }}

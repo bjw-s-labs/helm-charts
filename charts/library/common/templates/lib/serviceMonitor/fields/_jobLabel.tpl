@@ -7,7 +7,7 @@ Returns the value for serviceMonitor jobLabel
   {{- $serviceMonitorObject := $ctx.serviceMonitorObject -}}
 
   {{- if $serviceMonitorObject.jobLabel -}}
-    {{- tpl $serviceMonitorObject.jobLabel $rootContext -}}
+    {{- include "bjw-s.common.lib.common.renderString" (dict "value" $serviceMonitorObject.jobLabel "rootContext" $rootContext) -}}
   {{- else -}}
     app.kubernetes.io/name
   {{- end -}}

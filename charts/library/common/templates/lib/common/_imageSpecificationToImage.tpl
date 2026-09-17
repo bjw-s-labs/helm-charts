@@ -6,9 +6,9 @@ Translate an imageSpecification to an image string.
   {{- $rootContext := .rootContext -}}
   {{- $imageSpec := .imageSpec -}}
 
-  {{- $imageRepo := tpl $imageSpec.repository $rootContext -}}
-  {{- $imageTag := tpl (default "" $imageSpec.tag) $rootContext -}}
-  {{- $imageDigest := tpl (default "" $imageSpec.digest) $rootContext -}}
+  {{- $imageRepo := include "bjw-s.common.lib.common.renderString" (dict "value" $imageSpec.repository "rootContext" $rootContext) -}}
+  {{- $imageTag := include "bjw-s.common.lib.common.renderString" (dict "value" (default "" $imageSpec.tag) "rootContext" $rootContext) -}}
+  {{- $imageDigest := include "bjw-s.common.lib.common.renderString" (dict "value" (default "" $imageSpec.digest) "rootContext" $rootContext) -}}
 
   {{- $image := $imageRepo -}}
   {{- if $imageTag -}}

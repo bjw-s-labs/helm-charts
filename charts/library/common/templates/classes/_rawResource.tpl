@@ -28,7 +28,7 @@ kind: {{ $manifest.kind }}
 metadata:
   name: {{ $internalData.name }}
   {{- if not (empty (dig "metadata" "namespace" nil $manifest)) }}
-  namespace: {{ tpl $manifest.metadata.namespace $rootContext | quote }}
+  namespace: {{ include "bjw-s.common.lib.common.renderString" (dict "value" $manifest.metadata.namespace "rootContext" $rootContext) | quote }}
   {{- end }}
   {{- with $labels }}
   labels:
@@ -38,5 +38,5 @@ metadata:
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
-{{- tpl (toYaml $manifestWithoutMetadata) $rootContext | nindent 0 }}
+{{- include "bjw-s.common.lib.common.renderString" (dict "value" (toYaml $manifestWithoutMetadata) "rootContext" $rootContext) | nindent 0 }}
 {{- end -}}

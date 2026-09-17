@@ -22,13 +22,13 @@ metadata:
   {{- with $labels }}
   labels:
     {{- range $key, $value := . }}
-    {{- printf "%s: %s" $key (tpl $value $rootContext | toYaml ) | nindent 4 }}
+    {{- printf "%s: %s" $key (include "bjw-s.common.lib.common.renderString" (dict "value" $value "rootContext" $rootContext) | toYaml ) | nindent 4 }}
     {{- end }}
   {{- end }}
   {{- with $annotations }}
   annotations:
     {{- range $key, $value := . }}
-    {{- printf "%s: %s" $key (tpl $value $rootContext | toYaml ) | nindent 4 }}
+    {{- printf "%s: %s" $key (include "bjw-s.common.lib.common.renderString" (dict "value" $value "rootContext" $rootContext) | toYaml ) | nindent 4 }}
     {{- end }}
   {{- end }}
   namespace: {{ $listenerSetObject.namespaceOverride | default $rootContext.Release.Namespace }}
@@ -44,7 +44,7 @@ spec:
   {{- range $listenerSetObject.listeners }}
     - name: {{ .name }}
       {{- if .hostname }}
-      hostname: {{ tpl .hostname $rootContext | quote }}
+      hostname: {{ include "bjw-s.common.lib.common.renderString" (dict "value" .hostname "rootContext" $rootContext) | quote }}
       {{- end }}
       port: {{ .port }}
       protocol: {{ .protocol }}

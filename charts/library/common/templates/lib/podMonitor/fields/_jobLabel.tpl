@@ -7,7 +7,7 @@ Returns the value for podMonitor jobLabel
   {{- $podMonitorObject := $ctx.podMonitorObject -}}
 
   {{- if $podMonitorObject.jobLabel -}}
-    {{- tpl $podMonitorObject.jobLabel $rootContext -}}
+    {{- include "bjw-s.common.lib.common.renderString" (dict "value" $podMonitorObject.jobLabel "rootContext" $rootContext) -}}
   {{- else -}}
     app.kubernetes.io/name
   {{- end -}}

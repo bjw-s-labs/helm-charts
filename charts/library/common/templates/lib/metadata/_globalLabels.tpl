@@ -2,7 +2,7 @@
   {{- with .Values.global.labels }}
     {{- range $k, $v := . }}
       {{- $name := $k }}
-      {{- $value := tpl $v $ }}
+      {{- $value := include "bjw-s.common.lib.common.renderString" (dict "value" $v "rootContext" $) }}
 {{ $name }}: {{ quote $value }}
     {{- end }}
   {{- end }}

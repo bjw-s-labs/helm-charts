@@ -47,6 +47,7 @@ Renders configMap objects required by the chart from a folder in the repo's path
     {{- range $folder, $entry := $collected -}}
       {{- $configMapValues := dict
         "enabled" true
+        "renderFileContent" true
         "forceRename" $entry.forceRename
         "labels" $entry.labels
         "annotations" $entry.annotations
