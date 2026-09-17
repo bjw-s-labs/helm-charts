@@ -9,7 +9,7 @@ How to deploy qBittorrent with a gluetun VPN sidecar.
 
 ```yaml
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/app-template-5.1.0/charts/other/app-template/values.schema.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/app-template-5.2.0/charts/other/app-template/values.schema.json
 
 # Configure options applied to all pods
 defaultPodOptions:

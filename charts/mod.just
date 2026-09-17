@@ -20,7 +20,9 @@ lint CHART:
   if [[ -n "${COMMON_LIBRARY_LOCATION:-}" ]]; then
     ( cd "$CHART_DIR" && bash "$REPO_ROOT/.ci/scripts/use-local-common.sh" )
   fi
-  schematools-cli process dereference "$CHART_DIR/values.schema.json" --to-file "$CHART_DIR/values.schema.json"
+  if [[ -f "$CHART_DIR/values.schema.json" ]]; then
+    schematools-cli process dereference "$CHART_DIR/values.schema.json" --to-file "$CHART_DIR/values.schema.json"
+  fi
   ( cd "$REPO_ROOT" && ct lint --config .ci/ct/ct.yaml --charts "charts/{{CHART}}" )
 
 [doc('Run helm unittest -f "unittests/GLOB" against the chart test harness')]
@@ -42,7 +44,9 @@ unit-test CHART GLOB="**/*_test.yaml":
   if [[ -n "${COMMON_LIBRARY_LOCATION:-}" ]]; then
     ( cd "$TEST_CHART" && bash "$REPO_ROOT/.ci/scripts/use-local-common.sh" )
   fi
-  schematools-cli process dereference "$CHART_DIR/values.schema.json" --to-file "$CHART_DIR/values.schema.json"
+  if [[ -f "$CHART_DIR/values.schema.json" ]]; then
+    schematools-cli process dereference "$CHART_DIR/values.schema.json" --to-file "$CHART_DIR/values.schema.json"
+  fi
   if ! helm plugin list | awk -v version="$PLUGIN_VERSION" '$1 == "unittest" && $2 == version { found=1 } END { exit !found }'; then
     helm plugin uninstall unittest || true
     helm plugin install https://github.com/helm-unittest/helm-unittest.git --version "v${PLUGIN_VERSION}" --verify=false
@@ -68,7 +72,9 @@ integration-test CHART:
   if [[ -n "${COMMON_LIBRARY_LOCATION:-}" ]]; then
     ( cd "$TEST_CHART" && bash "$REPO_ROOT/.ci/scripts/use-local-common.sh" )
   fi
-  schematools-cli process dereference "$CHART_DIR/values.schema.json" --to-file "$CHART_DIR/values.schema.json"
+  if [[ -f "$CHART_DIR/values.schema.json" ]]; then
+    schematools-cli process dereference "$CHART_DIR/values.schema.json" --to-file "$CHART_DIR/values.schema.json"
+  fi
   ( cd "$REPO_ROOT" && ct install --config .ci/ct/ct.yaml --charts "$TEST_CHART_RELATIVE" )
 
 [doc('Render a chart with helm template')]
@@ -89,7 +95,9 @@ template CHART *ARGS:
   if [[ -n "${COMMON_LIBRARY_LOCATION:-}" ]]; then
     ( cd "$TEST_CHART" && bash "$REPO_ROOT/.ci/scripts/use-local-common.sh" )
   fi
-  schematools-cli process dereference "$CHART_DIR/values.schema.json" --to-file "$CHART_DIR/values.schema.json"
+  if [[ -f "$CHART_DIR/values.schema.json" ]]; then
+    schematools-cli process dereference "$CHART_DIR/values.schema.json" --to-file "$CHART_DIR/values.schema.json"
+  fi
   ( cd "$TEST_CHART" && helm dep update )
   ( cd "$TEST_CHART" && helm template {{ARGS}} . )
 
