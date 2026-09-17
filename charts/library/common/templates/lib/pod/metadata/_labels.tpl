@@ -38,6 +38,6 @@ Returns the value for labels
   {{- end -}}
 
   {{- if not (empty $labels) -}}
-    {{- tpl (toYaml $labels) $rootContext -}}
+    {{- include "bjw-s.common.lib.common.renderString" (dict "value" (toYaml $labels) "rootContext" $rootContext) -}}
   {{- end -}}
 {{- end -}}

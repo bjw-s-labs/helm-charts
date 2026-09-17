@@ -65,14 +65,14 @@ Env field used by the container.
     {{- range $envList -}}
       {{- if hasKey . "value" -}}
         {{- if kindIs "string" .value -}}
-          {{- $output = append $output (dict "name" .name "value" (tpl .value $rootContext)) -}}
+          {{- $output = append $output (dict "name" .name "value" (include "bjw-s.common.lib.common.renderString" (dict "value" .value "rootContext" $rootContext))) -}}
         {{- else if or (kindIs "float64" .value) (kindIs "bool" .value) -}}
           {{- $output = append $output (dict "name" .name "value" (.value | toString)) -}}
         {{- else -}}
           {{- $output = append $output (dict "name" .name "value" .value) -}}
         {{- end -}}
       {{- else if hasKey . "valueFrom" -}}
-        {{- $parsedValue := (tpl (.valueFrom | toYaml) $rootContext) | fromYaml -}}
+        {{- $parsedValue := (include "bjw-s.common.lib.common.renderString" (dict "value" (.valueFrom | toYaml) "rootContext" $rootContext)) | fromYaml -}}
         {{- $output = append $output (dict "name" .name "valueFrom" $parsedValue) -}}
       {{- else -}}
         {{- $output = append $output (dict "name" .name "valueFrom" (omit . "name")) -}}

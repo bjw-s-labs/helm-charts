@@ -23,10 +23,10 @@ spec:
   storageClassName: {{ if (eq "-" $values.storageClass) }}""{{- else }}{{ $values.storageClass | quote }}{{- end }}
   {{- end }}
   {{- with $values.dataSource }}
-  dataSource: {{- tpl (toYaml .) $rootContext | nindent 10 }}
+  dataSource: {{- include "bjw-s.common.lib.common.renderString" (dict "value" (toYaml .) "rootContext" $rootContext) | nindent 10 }}
   {{- end }}
   {{- with $values.dataSourceRef }}
-  dataSourceRef: {{- tpl (toYaml .) $rootContext | nindent 10 }}
+  dataSourceRef: {{- include "bjw-s.common.lib.common.renderString" (dict "value" (toYaml .) "rootContext" $rootContext) | nindent 10 }}
   {{- end }}
 {{- end -}}
 

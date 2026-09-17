@@ -6,27 +6,29 @@ Secondary entrypoint and primary loader for the common chart
 
   {{- /* Single-pass evaluation against the post-merge root context. */ -}}
   {{- $evaluatedValues := include "bjw-s.common.values.evaluateTemplate" (dict "rootContext" $rootContext "value" (deepCopy $rootContext.Values)) | fromJson -}}
-  {{- $_ := set $rootContext "Values" (index $evaluatedValues "value") -}}
+  {{- $renderContext := merge (dict) $rootContext -}}
+  {{- $_ := set $renderContext "Values" (index $evaluatedValues "value") -}}
+  {{- $_ := set $renderContext "TemplateRendering" (dict "valuesRendered" true) -}}
 
   {{- /* Run global chart validations */ -}}
-  {{- include "bjw-s.common.lib.chart.validate" $rootContext -}}
+  {{- include "bjw-s.common.lib.chart.validate" $renderContext -}}
 
   {{- /* Build the templates */ -}}
-  {{- include "bjw-s.common.render.pvcs" $rootContext | nindent 0 -}}
-  {{- include "bjw-s.common.render.serviceAccount" $rootContext | nindent 0 -}}
-  {{- include "bjw-s.common.render.configMaps.fromFolder" $rootContext | nindent 0 -}}
-  {{- include "bjw-s.common.render.configMaps" $rootContext | nindent 0 -}}
-  {{- include "bjw-s.common.render.secrets.fromFolder" $rootContext | nindent 0 -}}
-  {{- include "bjw-s.common.render.controllers" $rootContext | nindent 0 -}}
-  {{- include "bjw-s.common.render.services" $rootContext | nindent 0 -}}
-  {{- include "bjw-s.common.render.ingresses" $rootContext | nindent 0 -}}
-  {{- include "bjw-s.common.render.serviceMonitors" $rootContext | nindent 0 -}}
-  {{- include "bjw-s.common.render.podMonitors" $rootContext | nindent 0 -}}
-  {{- include "bjw-s.common.render.listenerSets" $rootContext | nindent 0 -}}
-  {{- include "bjw-s.common.render.routes" $rootContext | nindent 0 -}}
-  {{- include "bjw-s.common.render.secrets" $rootContext | nindent 0 -}}
-  {{- include "bjw-s.common.render.externalSecrets" $rootContext | nindent 0 -}}
-  {{- include "bjw-s.common.render.networkpolicies" $rootContext | nindent 0 -}}
-  {{- include "bjw-s.common.render.rawResources" $rootContext | nindent 0 -}}
-  {{- include "bjw-s.common.render.rbac" $rootContext | nindent 0 -}}
+  {{- include "bjw-s.common.render.pvcs" $renderContext | nindent 0 -}}
+  {{- include "bjw-s.common.render.serviceAccount" $renderContext | nindent 0 -}}
+  {{- include "bjw-s.common.render.configMaps.fromFolder" $renderContext | nindent 0 -}}
+  {{- include "bjw-s.common.render.configMaps" $renderContext | nindent 0 -}}
+  {{- include "bjw-s.common.render.secrets.fromFolder" $renderContext | nindent 0 -}}
+  {{- include "bjw-s.common.render.controllers" $renderContext | nindent 0 -}}
+  {{- include "bjw-s.common.render.services" $renderContext | nindent 0 -}}
+  {{- include "bjw-s.common.render.ingresses" $renderContext | nindent 0 -}}
+  {{- include "bjw-s.common.render.serviceMonitors" $renderContext | nindent 0 -}}
+  {{- include "bjw-s.common.render.podMonitors" $renderContext | nindent 0 -}}
+  {{- include "bjw-s.common.render.listenerSets" $renderContext | nindent 0 -}}
+  {{- include "bjw-s.common.render.routes" $renderContext | nindent 0 -}}
+  {{- include "bjw-s.common.render.secrets" $renderContext | nindent 0 -}}
+  {{- include "bjw-s.common.render.externalSecrets" $renderContext | nindent 0 -}}
+  {{- include "bjw-s.common.render.networkpolicies" $renderContext | nindent 0 -}}
+  {{- include "bjw-s.common.render.rawResources" $renderContext | nindent 0 -}}
+  {{- include "bjw-s.common.render.rbac" $renderContext | nindent 0 -}}
 {{- end -}}

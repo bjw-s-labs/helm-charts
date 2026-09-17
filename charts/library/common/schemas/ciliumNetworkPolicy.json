@@ -1,11 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.2.0/charts/library/common/schemas/ciliumNetworkPolicy.json",
+  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.2.1/charts/library/common/schemas/ciliumNetworkPolicy.json",
   "$defs": {
     "base": {
       "type": "object",
       "allOf": [
-        { "$ref": "definitions.json#/$defs/resourceIdentifier" }
+        {
+          "$ref": "definitions.json#/$defs/resourceIdentifier"
+        }
       ],
       "unevaluatedProperties": false,
       "properties": {
@@ -140,7 +142,9 @@
           ]
         }
       ],
-      "required": ["type"],
+      "required": [
+        "type"
+      ],
       "examples": [
         "networkpolicies:\n  cilium:\n    type: cilium\n    endpointSelector:\n      matchLabels:\n        app.kubernetes.io/name: example\n    description: Allow DNS and HTTPS traffic\n    ingress:\n      - fromEntities:\n          - cluster\n    ingressDeny:\n      - fromEntities:\n          - world\n    egress:\n      - toEntities:\n          - cluster\n    egressDeny:\n      - toEntities:\n          - world\n    enableDefaultDeny:\n      ingress: true\n      egress: true\n    log: example-policy"
       ]
@@ -149,13 +153,19 @@
       "description": "CiliumNetworkPolicy implementation to render.",
       "type": "object",
       "properties": {
-        "type": { "const": "cilium" }
+        "type": {
+          "const": "cilium"
+        }
       },
       "not": {
-        "required": ["nodeSelector"]
+        "required": [
+          "nodeSelector"
+        ]
       },
       "allOf": [
-        { "$ref": "#/$defs/base" }
+        {
+          "$ref": "#/$defs/base"
+        }
       ]
     },
     "rules": {

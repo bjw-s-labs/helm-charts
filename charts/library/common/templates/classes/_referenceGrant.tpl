@@ -35,7 +35,7 @@ It returns empty output when no cross-namespace reference is detected.
           {{- $serviceName := "" -}}
           {{- $serviceNamespace := "" -}}
           {{- if .name -}}
-            {{- $serviceName = tpl .name $rootContext -}}
+            {{- $serviceName = include "bjw-s.common.lib.common.renderString" (dict "value" .name "rootContext" $rootContext) -}}
             {{- $serviceNamespace = .namespace | default $rootContext.Release.Namespace -}}
           {{- else if .identifier -}}
             {{- $service := (include "bjw-s.common.lib.service.getByIdentifier" (dict "rootContext" $rootContext "id" .identifier) | fromYaml ) -}}
@@ -72,13 +72,13 @@ metadata:
   {{- with $labels }}
   labels:
     {{- range $key, $value := . }}
-    {{- printf "%s: %s" $key (tpl $value $rootContext | toYaml ) | nindent 4 }}
+    {{- printf "%s: %s" $key (include "bjw-s.common.lib.common.renderString" (dict "value" $value "rootContext" $rootContext) | toYaml ) | nindent 4 }}
     {{- end }}
   {{- end }}
   {{- with $annotations }}
   annotations:
     {{- range $key, $value := . }}
-    {{- printf "%s: %s" $key (tpl $value $rootContext | toYaml ) | nindent 4 }}
+    {{- printf "%s: %s" $key (include "bjw-s.common.lib.common.renderString" (dict "value" $value "rootContext" $rootContext) | toYaml ) | nindent 4 }}
     {{- end }}
   {{- end }}
 spec:

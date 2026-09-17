@@ -14,7 +14,7 @@ envFrom field used by the container.
 
       {{- if hasKey . "configMap" -}}
         {{- $configMap := include "bjw-s.common.lib.configMap.getByIdentifier" (dict "rootContext" $rootContext "id" .configMap) | fromYaml -}}
-        {{- $configMapName := default (tpl .configMap $rootContext) $configMap.name -}}
+        {{- $configMapName := default (include "bjw-s.common.lib.common.renderString" (dict "value" .configMap "rootContext" $rootContext)) $configMap.name -}}
         {{- $_ := set $item "configMapRef" (dict "name" $configMapName) -}}
       {{- else if hasKey . "configMapRef" -}}
         {{- if not (empty (dig "identifier" nil .configMapRef)) -}}
@@ -25,14 +25,14 @@ envFrom field used by the container.
 
           {{- $_ := set $item "configMapRef" (dict "name" $configMap.name) -}}
         {{- else -}}
-          {{- $_ := set $item "configMapRef" (dict "name" (tpl .configMapRef.name $rootContext)) -}}
+          {{- $_ := set $item "configMapRef" (dict "name" (include "bjw-s.common.lib.common.renderString" (dict "value" .configMapRef.name "rootContext" $rootContext))) -}}
         {{- end -}}
         {{- if not (empty (dig "optional" nil .configMapRef)) -}}
           {{- $_ := set $item.configMapRef "optional" .configMapRef.optional -}}
         {{- end -}}
       {{- else if hasKey . "secret" -}}
         {{- $secret := include "bjw-s.common.lib.secret.getByIdentifier" (dict "rootContext" $rootContext "id" .secret) | fromYaml -}}
-        {{- $secretName := default (tpl .secret $rootContext) $secret.name -}}
+        {{- $secretName := default (include "bjw-s.common.lib.common.renderString" (dict "value" .secret "rootContext" $rootContext)) $secret.name -}}
         {{- $_ := set $item "secretRef" (dict "name" $secretName) -}}
       {{- else if hasKey . "externalSecretRef" -}}
         {{- $secret := include "bjw-s.common.lib.externalSecret.getByIdentifier" (dict "rootContext" $rootContext "id" .externalSecretRef.identifier) | fromYaml -}}
@@ -54,7 +54,7 @@ envFrom field used by the container.
 
           {{- $_ := set $item "secretRef" (dict "name" $secret.name) -}}
         {{- else -}}
-          {{- $_ := set $item "secretRef" (dict "name" (tpl .secretRef.name $rootContext)) -}}
+          {{- $_ := set $item "secretRef" (dict "name" (include "bjw-s.common.lib.common.renderString" (dict "value" .secretRef.name "rootContext" $rootContext))) -}}
         {{- end -}}
         {{- if not (empty (dig "optional" nil .secretRef)) -}}
           {{- $_ := set $item.secretRef "optional" .secretRef.optional -}}

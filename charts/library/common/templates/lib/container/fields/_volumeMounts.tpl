@@ -75,13 +75,13 @@ volumeMounts used by the container.
 
         {{- /* Use the specified mountPath if provided */ -}}
         {{- with .path -}}
-          {{- $mountPath = (tpl . $rootContext) -}}
+          {{- $mountPath = (include "bjw-s.common.lib.common.renderString" (dict "value" . "rootContext" $rootContext)) -}}
         {{- end -}}
         {{- $_ := set $volumeMount "mountPath" $mountPath -}}
 
         {{- /* Use the specified subPath if provided */ -}}
         {{- with .subPath -}}
-          {{- $_ := set $volumeMount "subPath" (tpl . $rootContext) -}}
+          {{- $_ := set $volumeMount "subPath" (include "bjw-s.common.lib.common.renderString" (dict "value" . "rootContext" $rootContext)) -}}
         {{- end -}}
 
         {{- /* Use the specified subPathExpr if provided */ -}}

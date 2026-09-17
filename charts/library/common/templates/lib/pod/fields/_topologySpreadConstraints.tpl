@@ -7,7 +7,7 @@ Returns topologySpreadConstraints, defaulting selectors to the controller.
   {{- $controllerObject := $ctx.controllerObject -}}
 
   {{- with (include "bjw-s.common.lib.pod.getOption" (dict "ctx" $ctx "option" "topologySpreadConstraints")) -}}
-    {{- $constraints := tpl . $rootContext | fromYamlArray -}}
+    {{- $constraints := include "bjw-s.common.lib.common.renderString" (dict "value" . "rootContext" $rootContext) | fromYamlArray -}}
     {{- range $constraint := $constraints -}}
       {{- if not (hasKey $constraint "labelSelector") -}}
         {{- $matchLabels := include "bjw-s.common.lib.metadata.selectorLabels" $rootContext | fromYaml -}}

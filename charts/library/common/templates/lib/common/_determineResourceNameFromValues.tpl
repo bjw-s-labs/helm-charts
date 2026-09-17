@@ -10,10 +10,10 @@ Determine a recourse name based on Helm values
   {{- $objectName := (include "bjw-s.common.lib.chart.names.fullname" $rootContext) -}}
 
   {{- if $objectValues.forceRename -}}
-    {{- $objectName = tpl $objectValues.forceRename $rootContext -}}
+    {{- $objectName = include "bjw-s.common.lib.common.renderString" (dict "value" $objectValues.forceRename "rootContext" $rootContext) -}}
   {{- else -}}
     {{- if not (empty $objectValues.prefix) -}}
-      {{- $renderedPrefix := (tpl $objectValues.prefix $rootContext) -}}
+      {{- $renderedPrefix := (include "bjw-s.common.lib.common.renderString" (dict "value" $objectValues.prefix "rootContext" $rootContext)) -}}
       {{- if not (eq $objectName $renderedPrefix) -}}
         {{- $objectName = printf "%s-%s" $renderedPrefix $objectName -}}
       {{- end -}}
@@ -31,7 +31,7 @@ Determine a recourse name based on Helm values
     {{- end -}}
 
     {{- if not (empty $objectValues.suffix) -}}
-      {{- $renderedSuffix := (tpl $objectValues.suffix $rootContext) -}}
+      {{- $renderedSuffix := (include "bjw-s.common.lib.common.renderString" (dict "value" $objectValues.suffix "rootContext" $rootContext)) -}}
       {{- if not (hasSuffix (printf "-%s" $renderedSuffix) $objectName) -}}
         {{- $objectName = printf "%s-%s" $objectName $renderedSuffix -}}
       {{- end -}}
