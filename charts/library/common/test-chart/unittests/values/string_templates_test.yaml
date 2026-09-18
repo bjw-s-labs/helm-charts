@@ -66,6 +66,60 @@ tests:
           path: spec.template.metadata.annotations.integerText
           value: "7"
 
+  - it: evaluates annotation and label map keys
+    set:
+      controllers:
+        main:
+          annotations:
+            "controller-{{ .Release.Name }}": controller
+          labels:
+            "controller-{{ .Release.Name }}": controller
+          pod:
+            annotations:
+              "pod-{{ .Release.Name }}": pod
+            labels:
+              "pod-{{ .Release.Name }}": pod
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - isSubset:
+          path: metadata.annotations
+          content:
+            controller-RELEASE-NAME: controller
+      - isSubset:
+          path: metadata.labels
+          content:
+            controller-RELEASE-NAME: controller
+      - isSubset:
+          path: spec.template.metadata.annotations
+          content:
+            pod-RELEASE-NAME: pod
+      - isSubset:
+          path: spec.template.metadata.labels
+          content:
+            pod-RELEASE-NAME: pod
+
+  - it: evaluates default pod option annotation and label map keys
+    set:
+      defaultPodOptions:
+        annotations:
+          "default-pod-{{ .Release.Name }}": default
+        labels:
+          "default-pod-{{ .Release.Name }}": default
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - isSubset:
+          path: spec.template.metadata.annotations
+          content:
+            default-pod-RELEASE-NAME: default
+      - isSubset:
+          path: spec.template.metadata.labels
+          content:
+            default-pod-RELEASE-NAME: default
+
   - it: defers ExternalSecret target template data expressions
     set:
       externalSecrets:

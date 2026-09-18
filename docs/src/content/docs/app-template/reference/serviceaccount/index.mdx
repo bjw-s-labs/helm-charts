@@ -32,16 +32,20 @@ Available properties:
 
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
-| `annotations` | `object / null` | No | - | Annotations to set on the item. |
+| `annotations` | `object / null` | No | - | Annotations to set on the item. Keys and values support H... |
 | `automountServiceAccountToken` | `boolean` | No | - | Set to false to prevent the ServiceAccount token from bei... |
 | `enabled` | `boolean` | No | `true` | Set to false to disable the ServiceAccount. |
 | `forceRename` | `string` | No | - | Override the default resource name. Mutually exclusive wi... |
-| `labels` | `object / null` | No | - | Labels to set on the item. |
+| `labels` | `object / null` | No | - | Labels to set on the item. Keys and values support Helm t... |
 | `prefix` | `string` | No | `` | Prefix to prepend to the resource name. Mutually exclusiv... |
 | `staticToken` | `boolean` | No | `false` | Set to true to create a long-lived static token for the S... |
 | `suffix` | `string` | No | - | Suffix to append to the resource name. Defaults to the re... |
 
 ### Property Details
+
+#### annotations
+
+Annotations to set on the item. Keys and values support Helm templating.
 
 #### automountServiceAccountToken
 
@@ -50,6 +54,10 @@ Set to false to prevent the ServiceAccount token from being automatically mounte
 #### forceRename
 
 Override the default resource name. Mutually exclusive with prefix and suffix.
+
+#### labels
+
+Labels to set on the item. Keys and values support Helm templating.
 
 #### prefix
 

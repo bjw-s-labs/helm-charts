@@ -16,18 +16,26 @@ HorizontalPodAutoscaler configuration for this controller. Only supported for de
 
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
-| `annotations` | `object / null` | No | - | Annotations to set on the item. |
+| `annotations` | `object / null` | No | - | Annotations to set on the item. Keys and values support H... |
 | `behavior` | `object` | No | - | Scaling behavior configuration. Passed through directly t... |
-| `labels` | `object / null` | No | - | Labels to set on the item. |
+| `labels` | `object / null` | No | - | Labels to set on the item. Keys and values support Helm t... |
 | `maxReplicas` | `integer` | **Yes** | - | Maximum number of replicas. |
 | `metrics` | `array` | No | - | Metrics to use for scaling. Passed through directly to th... |
 | `minReplicas` | `integer / null` | No | - | Minimum number of replicas. Set to 0 to enable scale-to-z... |
 
 ### Property Details
 
+#### annotations
+
+Annotations to set on the item. Keys and values support Helm templating.
+
 #### behavior
 
 Scaling behavior configuration. Passed through directly to the autoscaling/v2 HPA spec.
+
+#### labels
+
+Labels to set on the item. Keys and values support Helm templating.
 
 #### metrics
 

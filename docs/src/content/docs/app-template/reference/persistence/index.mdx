@@ -288,11 +288,11 @@ persistence:
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
 | `accessMode` | `string` | **Yes** | - | AccessMode for the persistent volume. Make sure to select... |
-| `annotations` | `object / null` | No | - | Annotations to set on the item. |
+| `annotations` | `object / null` | No | - | Annotations to set on the item. Keys and values support H... |
 | `dataSource` | `object` | No | - | The optional data source for the persistentVolumeClaim. S... |
 | `dataSourceRef` | `object` | No | - | The optional volume populator for the persistentVolumeCla... |
 | `forceRename` | `string` | No | - | Override the default resource name. Mutually exclusive wi... |
-| `labels` | `object / null` | No | - | Labels to set on the item. |
+| `labels` | `object / null` | No | - | Labels to set on the item. Keys and values support Helm t... |
 | `prefix` | `string` | No | `` | Prefix to prepend to the resource name. Mutually exclusiv... |
 | `retain` | `boolean` | No | - | Set to true to retain the PVC upon helm uninstall. |
 | `size` | `string` | **Yes** | - | The amount of storage that is requested for the persisten... |
@@ -525,13 +525,13 @@ Common properties:
 |----------|------|----------|---------|-------------|
 | `accessMode` | `string` | **Yes** | - | AccessMode for the persistent volume. Make sure to select... |
 | `advancedMounts` | `object` | No | - | Explicitly configure mounts for specific controllers and ... |
-| `annotations` | `object / null` | No | - | Annotations to set on the item. |
+| `annotations` | `object / null` | No | - | Annotations to set on the item. Keys and values support H... |
 | [`dataSource`](./datasource/) | `object` | No | - | The optional data source for the persistentVolumeClaim. S... |
 | [`dataSourceRef`](./datasourceref/) | `object` | No | - | The optional volume populator for the persistentVolumeCla... |
 | `enabled` | `boolean` | No | `true` | Set to false to disable the persistence item. |
 | `forceRename` | `string` | No | - | Override the default resource name. Mutually exclusive wi... |
 | `globalMounts` | `array` | No | - | Configure mounts to all controllers and containers. By de... |
-| `labels` | `object / null` | No | - | Labels to set on the item. |
+| `labels` | `object / null` | No | - | Labels to set on the item. Keys and values support Helm t... |
 | `prefix` | `string` | No | `` | Prefix to prepend to the resource name. Mutually exclusiv... |
 | `retain` | `boolean` | No | - | Set to true to retain the PVC upon helm uninstall. |
 | `size` | `string` | **Yes** | - | The amount of storage that is requested for the persisten... |
@@ -553,6 +553,10 @@ Explicitly configure mounts for specific controllers and containers.
 Structure: advancedMounts.&lt;controller_name&gt;.&lt;container_name&gt;[].path
 Use this instead of globalMounts when different controllers need different mount configurations.
 
+#### annotations
+
+Annotations to set on the item. Keys and values support Helm templating.
+
 #### forceRename
 
 Override the default resource name. Mutually exclusive with prefix and suffix.
@@ -562,6 +566,10 @@ Override the default resource name. Mutually exclusive with prefix and suffix.
 Configure mounts to all controllers and containers.
 By default the persistence item will be mounted to /&lt;name_of_the_persistence_item&gt;.
 Each entry supports: path, readOnly, subPath, subPathExpr, and mountPropagation.
+
+#### labels
+
+Labels to set on the item. Keys and values support Helm templating.
 
 #### prefix
 
