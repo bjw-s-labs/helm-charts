@@ -72,11 +72,11 @@ func (g *Generator) Generate(schemaBytes []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	g.order.BindCompiledSchema(schema)
 	var entries []*Entry
 	if schema.Properties != nil {
 		requiredSet := schemautil.MakeSet(schema.Required)
-		entries, err = g.buildEntries(*schema.Properties, requiredSet, "", 0)
+		entries, err = g.buildEntries(*schema.Properties, requiredSet, "", 0, schema)
 		if err != nil {
 			return nil, err
 		}
@@ -95,8 +95,9 @@ func (g *Generator) buildEntries(
 	requiredSet map[string]bool,
 	schemaPath string,
 	depth int,
+	parent *jsonschema.Schema,
 ) ([]*Entry, error) {
-	keys := g.order.OrderKeys(schemaPath+"/properties", slices.Collect(maps.Keys(props)))
+	keys := g.order.OrderKeysForSchema(parent, schemaPath+"/properties", slices.Collect(maps.Keys(props)))
 	entries := make([]*Entry, 0, len(keys))
 	for _, key := range keys {
 		prop := props[key]
@@ -212,7 +213,7 @@ func (g *Generator) fillObject(e *Entry, prop *jsonschema.Schema, fc fieldCtx) (
 	if fc.depth >= 1 && !fc.required && prop.Default == nil {
 		e.Value = "{}"
 		requiredSet := schemautil.MakeSet(schemautil.CollectAllRequired(prop))
-		children, err := g.buildEntries(allProps, requiredSet, fc.path, fc.depth+1)
+		children, err := g.buildEntries(allProps, requiredSet, fc.path, fc.depth+1, prop)
 		if err != nil {
 			return false, err
 		}
@@ -225,7 +226,7 @@ func (g *Generator) fillObject(e *Entry, prop *jsonschema.Schema, fc fieldCtx) (
 	}
 
 	requiredSet := schemautil.MakeSet(schemautil.CollectAllRequired(prop))
-	children, err := g.buildEntries(allProps, requiredSet, fc.path, fc.depth+1)
+	children, err := g.buildEntries(allProps, requiredSet, fc.path, fc.depth+1, prop)
 	if err != nil {
 		return false, err
 	}
@@ -236,7 +237,7 @@ func (g *Generator) fillObject(e *Entry, prop *jsonschema.Schema, fc fieldCtx) (
 func (g *Generator) buildMapExample(itemSchema *jsonschema.Schema, itemSchemaPath string, depth int) ([]*Entry, error) {
 	allProps := schemautil.CollectAllProperties(itemSchema)
 	requiredSet := schemautil.MakeSet(schemautil.CollectAllRequired(itemSchema))
-	children, err := g.buildEntries(allProps, requiredSet, itemSchemaPath, depth+1)
+	children, err := g.buildEntries(allProps, requiredSet, itemSchemaPath, depth+1, itemSchema)
 	if err != nil {
 		return nil, err
 	}

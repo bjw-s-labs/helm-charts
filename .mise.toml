@@ -6,20 +6,19 @@ experimental = true
 pipx.uvx = true
 
 [tools]
-rust = "1.94.1"                      # Required for schematools
-go = "1.26.2"                       # Required for helm-schema-tools
-node = "24"                         # Required for Astro (>=22.12.0)
+actionlint = "1.7.12"
 bun = "latest"                      # Required for docs site
-k3d = "5.8.3"
-"aqua:astral-sh/uv" = "0.11.2"
-"aqua:casey/just" = "1.48.1"
-"aqua:charmbracelet/gum" = "0.17.0"
-"aqua:google/yamlfmt" = "0.21.0"
-"aqua:helm" = "4.1.3"
+go = "1.27.1"                       # Required for helm-schema-tools
+gum = "2.0.1"
+helm = "4.3.0"
+just = "1.58.0"
+node = "26"                         # Required for Astro (>=22.12.0)
+k3d = "5.9.0"
+uv = "0.12.15"
+yamllint = "1.38.0"
+yamlfmt = "0.21.0"
+yq = "4.53.6"
+zizmor = "1.30.1"
+
 "aqua:helm/chart-testing" = "3.14.0"
-"aqua:mikefarah/yq" = "4.52.5"
-"aqua:rhysd/actionlint" = "1.7.12"
-"aqua:zizmorcore/zizmor" = "1.30.1"
-"cargo:schematools-cli" = "0.22.0"
-"pipx:yamllint" = "1.38.0"
-"pipx:yamale" = "6.1.0"
+"pipx:yamale" = "6.1.0"          # Required by chart-testing
