@@ -37,7 +37,7 @@
       }
     },
     "annotations": {
-      "description": "Annotations to set on the item.",
+      "description": "Annotations to set on the item. Keys and values support Helm templating.",
       "type": [
         "object",
         "null"
@@ -50,7 +50,7 @@
       }
     },
     "labels": {
-      "description": "Labels to set on the item.",
+      "description": "Labels to set on the item. Keys and values support Helm templating.",
       "type": [
         "object",
         "null"

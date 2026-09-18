@@ -32,10 +32,10 @@ Available properties:
 
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
-| `annotations` | `object / null` | No | - | Annotations to set on the item. |
+| `annotations` | `object / null` | No | - | Annotations to set on the item. Keys and values support H... |
 | `enabled` | `boolean` | No | `true` | Set to false to disable the RoleBinding or ClusterRoleBin... |
 | `forceRename` | `string` | No | - | Override the default resource name. Mutually exclusive wi... |
-| `labels` | `object / null` | No | - | Labels to set on the item. |
+| `labels` | `object / null` | No | - | Labels to set on the item. Keys and values support Helm t... |
 | `prefix` | `string` | No | `` | Prefix to prepend to the resource name. Mutually exclusiv... |
 | [`roleRef`](./roleref/) | `object` | **Yes** | - | Reference the Role or ClusterRole to bind to. |
 | `subjects` | `array` | **Yes** | - | Set the subjects for the RoleBinding or ClusterRoleBinding. |
@@ -44,6 +44,10 @@ Available properties:
 
 ### Property Details
 
+#### annotations
+
+Annotations to set on the item. Keys and values support Helm templating.
+
 #### enabled
 
 Set to false to disable the RoleBinding or ClusterRoleBinding.
@@ -51,6 +55,10 @@ Set to false to disable the RoleBinding or ClusterRoleBinding.
 #### forceRename
 
 Override the default resource name. Mutually exclusive with prefix and suffix.
+
+#### labels
+
+Labels to set on the item. Keys and values support Helm templating.
 
 #### prefix
 

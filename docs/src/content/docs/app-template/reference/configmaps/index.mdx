@@ -32,18 +32,22 @@ Available properties:
 
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
-| `annotations` | `object / null` | No | - | Annotations to set on the item. |
+| `annotations` | `object / null` | No | - | Annotations to set on the item. Keys and values support H... |
 | `binaryData` | `object` | No | - | ConfigMap binaryData content. |
 | `data` | `object` | **Yes** | - | ConfigMap data content. |
 | `enabled` | `boolean` | No | `true` | Set to false to disable the ConfigMap. |
 | `forceRename` | `string` | No | - | Override the default resource name. Mutually exclusive wi... |
 | `includeChecksumInControllers` | `array` | No | - | Specify a list of controller identifiers for which to inc... |
 | `includeInChecksum` | `boolean` | No | `true` | Set to true to include this ConfigMap in the checksum cal... |
-| `labels` | `object / null` | No | - | Labels to set on the item. |
+| `labels` | `object / null` | No | - | Labels to set on the item. Keys and values support Helm t... |
 | `prefix` | `string` | No | `` | Prefix to prepend to the resource name. Mutually exclusiv... |
 | `suffix` | `string` | No | - | Suffix to append to the resource name. Defaults to the re... |
 
 ### Property Details
+
+#### annotations
+
+Annotations to set on the item. Keys and values support Helm templating.
 
 #### forceRename
 
@@ -56,6 +60,10 @@ Specify a list of controller identifiers for which to include this ConfigMap in 
 #### includeInChecksum
 
 Set to true to include this ConfigMap in the checksum calculation for rolling updates.
+
+#### labels
+
+Labels to set on the item. Keys and values support Helm templating.
 
 #### prefix
 

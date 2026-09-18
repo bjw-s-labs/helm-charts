@@ -29,10 +29,20 @@ Available properties:
 
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
-| `annotations` | `object / null` | No | - | Annotations to set on the item. |
+| `annotations` | `object / null` | No | - | Annotations to set on the item. Keys and values support H... |
 | [`fileAttributeOverrides`](./fileattributeoverrides/) | `object` | No | - |  |
 | `forceRename` | `string / null` | No | - |  |
-| `labels` | `object / null` | No | - | Labels to set on the item. |
+| `labels` | `object / null` | No | - | Labels to set on the item. Keys and values support Helm t... |
+
+### Property Details
+
+#### annotations
+
+Annotations to set on the item. Keys and values support Helm templating.
+
+#### labels
+
+Labels to set on the item. Keys and values support Helm templating.
 
 ## Related Pages
 

@@ -32,10 +32,10 @@ Available properties:
 
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
-| `annotations` | `object / null` | No | - | Annotations to set on the item. |
+| `annotations` | `object / null` | No | - | Annotations to set on the item. Keys and values support H... |
 | `enabled` | `boolean` | No | `true` | Set to false to disable the ListenerSet. |
 | `forceRename` | `string` | No | - | Override the default resource name. Mutually exclusive wi... |
-| `labels` | `object / null` | No | - | Labels to set on the item. |
+| `labels` | `object / null` | No | - | Labels to set on the item. Keys and values support Helm t... |
 | `listeners` | `array` | No | - | Listeners associated with this ListenerSet. Each listener... |
 | `namespaceOverride` | `string` | No | - | Override the namespace the ListenerSet is deployed to. |
 | [`parentRef`](./parentref/) | `object` | No | - | Reference to the Gateway this ListenerSet is attached to. |
@@ -44,9 +44,17 @@ Available properties:
 
 ### Property Details
 
+#### annotations
+
+Annotations to set on the item. Keys and values support Helm templating.
+
 #### forceRename
 
 Override the default resource name. Mutually exclusive with prefix and suffix.
+
+#### labels
+
+Labels to set on the item. Keys and values support Helm templating.
 
 #### listeners
 

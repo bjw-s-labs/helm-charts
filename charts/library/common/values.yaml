@@ -96,7 +96,7 @@ defaultPodOptions:
       # elements, the lists of nodes corresponding to each podAffinityTerm are
       # intersected, i.e. all terms must be satisfied.
       # requiredDuringSchedulingIgnoredDuringExecution: []
-  # -- Annotations to set on the item.
+  # -- Annotations to set on the item. Keys and values support Helm templating.
   annotations: {}
   # -- Set to true to automatically mount the service account token.
   automountServiceAccountToken: false
@@ -140,7 +140,7 @@ defaultPodOptions:
   # hostname:
   # -- Set image pull secrets.
   imagePullSecrets: []
-  # -- Labels to set on the item.
+  # -- Labels to set on the item. Keys and values support Helm templating.
   labels: {}
   # -- Node selection constraint. See
   # https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
@@ -303,9 +303,9 @@ controllers: {}
     # -- Controller type. Supported values: deployment, daemonset, statefulset,
     # cronjob, job.
     # type: deployment
-    # -- Annotations to set on the item.
+    # -- Annotations to set on the item. Keys and values support Helm templating.
     # annotations: {}
-    # -- Labels to set on the item.
+    # -- Labels to set on the item. Keys and values support Helm templating.
     # labels: {}
     # -- Pod-level options for this controller.
     # pod: {}
@@ -374,7 +374,7 @@ controllers: {}
         # elements, the lists of nodes corresponding to each podAffinityTerm are
         # intersected, i.e. all terms must be satisfied.
         # requiredDuringSchedulingIgnoredDuringExecution: []
-    # -- Annotations to set on the item.
+    # -- Annotations to set on the item. Keys and values support Helm templating.
     # annotations: {}
     # -- Set to true to automatically mount the service account token.
     # automountServiceAccountToken: false
@@ -418,7 +418,7 @@ controllers: {}
     # hostname:
     # -- Set image pull secrets.
     # imagePullSecrets: []
-    # -- Labels to set on the item.
+    # -- Labels to set on the item. Keys and values support Helm templating.
     # labels: {}
     # -- Node selection constraint. See
     # https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
@@ -1762,12 +1762,12 @@ controllers: {}
     # https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/ for
     # details.
     # horizontalPodAutoscaler: {}
-    # -- Annotations to set on the item.
+    # -- Annotations to set on the item. Keys and values support Helm templating.
     # annotations: {}
     # -- Scaling behavior configuration. Passed through directly to the
     # autoscaling/v2 HPA spec.
     # behavior: {}
-    # -- Labels to set on the item.
+    # -- Labels to set on the item. Keys and values support Helm templating.
     # labels: {}
     # -- Maximum number of replicas.
     # maxReplicas: 0
@@ -1813,9 +1813,9 @@ serviceAccount: {}
   # main:
     # -- Set to false to disable the ServiceAccount.
     # enabled: true
-    # -- Annotations to set on the item.
+    # -- Annotations to set on the item. Keys and values support Helm templating.
     # annotations: {}
-    # -- Labels to set on the item.
+    # -- Labels to set on the item. Keys and values support Helm templating.
     # labels: {}
     # -- Set to true to create a long-lived static token for the ServiceAccount.
     # staticToken: false
@@ -1847,9 +1847,9 @@ configMaps: {}
     # -- Specify a list of controller identifiers for which to include this
     # ConfigMap in the checksum calculation for rolling updates.
     # includeChecksumInControllers: []
-    # -- Annotations to set on the item.
+    # -- Annotations to set on the item. Keys and values support Helm templating.
     # annotations: {}
-    # -- Labels to set on the item.
+    # -- Labels to set on the item. Keys and values support Helm templating.
     # labels: {}
     # -- ConfigMap data content.
     # data: {}
@@ -1878,9 +1878,9 @@ configMapsFromFolder:
     # main:
       # -- (string)
       # forceRename: null
-      # -- Annotations to set on the item.
+      # -- Annotations to set on the item. Keys and values support Helm templating.
       # annotations: {}
-      # -- Labels to set on the item.
+      # -- Labels to set on the item. Keys and values support Helm templating.
       # labels: {}
       # @default -- See below
       # fileAttributeOverrides: {}
@@ -1907,9 +1907,9 @@ secrets: {}
     # -- Specify a list of controller identifiers for which to include this Secret
     # in the checksum calculation for rolling updates.
     # includeChecksumInControllers: []
-    # -- Annotations to set on the item.
+    # -- Annotations to set on the item. Keys and values support Helm templating.
     # annotations: {}
-    # -- Labels to set on the item.
+    # -- Labels to set on the item. Keys and values support Helm templating.
     # labels: {}
     # -- (string) Secret type.
     # type:
@@ -1942,9 +1942,9 @@ externalSecrets: {}
   # main:
     # -- Set to false to disable the ExternalSecret.
     # enabled: true
-    # -- Annotations to set on the item.
+    # -- Annotations to set on the item. Keys and values support Helm templating.
     # annotations: {}
-    # -- Labels to set on the item.
+    # -- Labels to set on the item. Keys and values support Helm templating.
     # labels: {}
     # -- (string) Policy controlling when the ExternalSecret is refreshed.
     # refreshPolicy:
@@ -2002,9 +2002,9 @@ secretsFromFolder:
     # main:
       # -- (string)
       # forceRename: null
-      # -- Annotations to set on the item.
+      # -- Annotations to set on the item. Keys and values support Helm templating.
       # annotations: {}
-      # -- Labels to set on the item.
+      # -- Labels to set on the item. Keys and values support Helm templating.
       # labels: {}
       # @default -- See below
       # fileAttributeOverrides: {}
@@ -2035,9 +2035,9 @@ ingress: {}
   # main:
     # -- Set to false to disable the Ingress.
     # enabled: true
-    # -- Annotations to set on the item.
+    # -- Annotations to set on the item. Keys and values support Helm templating.
     # annotations: {}
-    # -- Labels to set on the item.
+    # -- Labels to set on the item. Keys and values support Helm templating.
     # labels: {}
     # -- (string) Set the ingressClass used for this Ingress.
     # className:
@@ -2095,9 +2095,9 @@ route: {}
   # main:
     # -- Set to false to disable the Route.
     # enabled: true
-    # -- Annotations to set on the item.
+    # -- Annotations to set on the item. Keys and values support Helm templating.
     # annotations: {}
-    # -- Labels to set on the item.
+    # -- Labels to set on the item. Keys and values support Helm templating.
     # labels: {}
     # -- (string) Override the namespace the Route is deployed to. When set to a
     # different namespace than the release namespace, a ReferenceGrant is
@@ -2141,9 +2141,9 @@ listenerSets: {}
   # main:
     # -- Set to false to disable the ListenerSet.
     # enabled: true
-    # -- Annotations to set on the item.
+    # -- Annotations to set on the item. Keys and values support Helm templating.
     # annotations: {}
-    # -- Labels to set on the item.
+    # -- Labels to set on the item. Keys and values support Helm templating.
     # labels: {}
     # -- (string) Override the namespace the ListenerSet is deployed to.
     # namespaceOverride:
@@ -2188,9 +2188,9 @@ service: {}
   # main:
     # -- Set to false to disable the Service.
     # enabled: true
-    # -- Annotations to set on the item.
+    # -- Annotations to set on the item. Keys and values support Helm templating.
     # annotations: {}
-    # -- Labels to set on the item.
+    # -- Labels to set on the item. Keys and values support Helm templating.
     # labels: {}
     # -- (string) Service type. Supported values: ClusterIP, NodePort, LoadBalancer,
     # ExternalName.
@@ -2286,9 +2286,9 @@ serviceMonitor: {}
   # main:
     # -- Set to false to disable the ServiceMonitor.
     # enabled: true
-    # -- Annotations to set on the item.
+    # -- Annotations to set on the item. Keys and values support Helm templating.
     # annotations: {}
-    # -- Labels to set on the item.
+    # -- Labels to set on the item. Keys and values support Helm templating.
     # labels: {}
     # -- The label to use to retrieve the job name from the target service's
     # metadata. Defaults to 'app.kubernetes.io/name'.
@@ -2328,9 +2328,9 @@ podMonitor: {}
   # main:
     # -- Set to false to disable the PodMonitor.
     # enabled: true
-    # -- Annotations to set on the item.
+    # -- Annotations to set on the item. Keys and values support Helm templating.
     # annotations: {}
-    # -- Labels to set on the item.
+    # -- Labels to set on the item. Keys and values support Helm templating.
     # labels: {}
     # -- The label to use to retrieve the job name from the target pod's metadata.
     # Defaults to 'app.kubernetes.io/name'.
@@ -2387,7 +2387,7 @@ networkpolicies: {}
     # -- (string) Resource implementation to render. Set type to native, cilium, or
     # ciliumClusterwide.
     # type:
-    # -- Annotations to set on the item.
+    # -- Annotations to set on the item. Keys and values support Helm templating.
     # annotations: {}
     # -- (string) Controller this NetworkPolicy should target.
     # controller:
@@ -2399,7 +2399,7 @@ networkpolicies: {}
     # -- (string) Override the default resource name. Mutually exclusive with prefix
     # and suffix.
     # forceRename:
-    # -- Labels to set on the item.
+    # -- Labels to set on the item. Keys and values support Helm templating.
     # labels: {}
     # -- Custom podSelector for the NetworkPolicy. Takes precedence over targeting a
     # controller via the controller identifier.
@@ -2488,7 +2488,7 @@ persistence: {}
     # that is supported by your storage provider! See
     # https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes
     # accessMode: ""
-    # -- Annotations to set on the item.
+    # -- Annotations to set on the item. Keys and values support Helm templating.
     # annotations: {}
     # -- The optional data source for the persistentVolumeClaim. See
     # https://kubernetes.io/docs/concepts/storage/persistent-volumes/#volume-populators-and-data-sources
@@ -2507,7 +2507,7 @@ persistence: {}
     # -- (string) Override the default resource name. Mutually exclusive with prefix
     # and suffix.
     # forceRename:
-    # -- Labels to set on the item.
+    # -- Labels to set on the item. Keys and values support Helm templating.
     # labels: {}
     # -- Prefix to prepend to the resource name. Mutually exclusive with
     # forceRename.
@@ -2540,9 +2540,9 @@ rbac:
       # enabled: true
       # -- Set the type of RBAC resource. Supported values: Role, ClusterRole.
       # type: Role
-      # -- Annotations to set on the item.
+      # -- Annotations to set on the item. Keys and values support Helm templating.
       # annotations: {}
-      # -- Labels to set on the item.
+      # -- Labels to set on the item. Keys and values support Helm templating.
       # labels: {}
       # -- Set the rules for the Role or ClusterRole.
       # rules: []
@@ -2566,9 +2566,9 @@ rbac:
       # -- Set the type of RBAC binding. Supported values: RoleBinding,
       # ClusterRoleBinding.
       # type: RoleBinding
-      # -- Annotations to set on the item.
+      # -- Annotations to set on the item. Keys and values support Helm templating.
       # annotations: {}
-      # -- Labels to set on the item.
+      # -- Labels to set on the item. Keys and values support Helm templating.
       # labels: {}
       # -- Reference the Role or ClusterRole to bind to.
       # roleRef:
@@ -2610,9 +2610,9 @@ rawResources: {}
       # metadata: {}
       # -- (string) Namespace of the resource.
       # namespace:
-      # -- Labels to set on the item.
+      # -- Labels to set on the item. Keys and values support Helm templating.
       # labels: {}
-      # -- Annotations to set on the item.
+      # -- Annotations to set on the item. Keys and values support Helm templating.
       # annotations: {}
     # -- (string) Override the default resource name. Mutually exclusive with prefix
     # and suffix.
