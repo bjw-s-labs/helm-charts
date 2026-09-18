@@ -580,13 +580,13 @@ controllers: {}
     # envFrom: []
     # image: {}
       # -- (string)
-      # pullPolicy:
-      # -- (string)
-      # digest:
-      # -- (string)
       # repository:
       # -- (string/float)
       # tag:
+      # -- (string)
+      # digest:
+      # -- (string)
+      # pullPolicy:
     # -- ResourceRequirements describes the compute resource requirements.
     # resources: {}
       # -- Claims lists the names of resources, defined in spec.resourceClaims, that
@@ -713,13 +713,13 @@ controllers: {}
       # -- Image configuration for the container.
       # image: {}
       # -- (string)
-      # pullPolicy:
-      # -- (string)
-      # digest:
-      # -- (string)
       # repository:
       # -- (string/float)
       # tag:
+      # -- (string)
+      # digest:
+      # -- (string)
+      # pullPolicy:
       # -- Lifecycle event hooks (postStart, preStop) for the container. See
       # https://kubernetes.io/docs/tasks/configure-pod-container/attach-handler-lifecycle-event/
       # and
@@ -1241,13 +1241,13 @@ controllers: {}
       # -- Image configuration for the container.
       # image: {}
       # -- (string)
-      # pullPolicy:
-      # -- (string)
-      # digest:
-      # -- (string)
       # repository:
       # -- (string/float)
       # tag:
+      # -- (string)
+      # digest:
+      # -- (string)
+      # pullPolicy:
       # -- Lifecycle event hooks (postStart, preStop) for the container. See
       # https://kubernetes.io/docs/tasks/configure-pod-container/attach-handler-lifecycle-event/
       # and
@@ -1764,19 +1764,19 @@ controllers: {}
     # horizontalPodAutoscaler: {}
     # -- Annotations to set on the item.
     # annotations: {}
-    # -- Scaling behavior configuration. Passed through directly to the
-    # autoscaling/v2 HPA spec.
-    # behavior: {}
     # -- Labels to set on the item.
     # labels: {}
+    # -- (int) Minimum number of replicas. Set to 0 to enable scale-to-zero when the
+    # HPAScaleToZero feature gate is enabled.
+    # minReplicas: null
     # -- Maximum number of replicas.
     # maxReplicas: 0
     # -- Metrics to use for scaling. Passed through directly to the autoscaling/v2
     # HPA spec.
     # metrics: []
-    # -- (int) Minimum number of replicas. Set to 0 to enable scale-to-zero when the
-    # HPAScaleToZero feature gate is enabled.
-    # minReplicas: null
+    # -- Scaling behavior configuration. Passed through directly to the
+    # autoscaling/v2 HPA spec.
+    # behavior: {}
     # -- Prefix to prepend to the resource name. Mutually exclusive with
     # forceRename.
     # prefix: ""
@@ -1786,19 +1786,19 @@ controllers: {}
     # key takes priority. The shorthand keys are deprecated and Will be removed in
     # v6.0.
     # rollingUpdate: {}
-    # -- (int/string) Maximum number of pods that can be created over the desired
-    # replicas during the update.
-    # maxSurge:
-    # -- (int/string) Maximum number of pods that can be unavailable during the
-    # update.
-    # maxUnavailable:
+    # -- (int/string) Deprecated: use `maxUnavailable` instead. Will be removed in
+    # v6.0. Maximum number of pods that can be unavailable during the update.
+    # unavailable:
     # -- (int/string) Deprecated: use `maxSurge` instead. Will be removed in v6.0.
     # Maximum number of pods that can be created over the desired replicas during
     # the update.
     # surge:
-    # -- (int/string) Deprecated: use `maxUnavailable` instead. Will be removed in
-    # v6.0. Maximum number of pods that can be unavailable during the update.
-    # unavailable:
+    # -- (int/string) Maximum number of pods that can be unavailable during the
+    # update.
+    # maxUnavailable:
+    # -- (int/string) Maximum number of pods that can be created over the desired
+    # replicas during the update.
+    # maxSurge:
     # -- Controller upgrade strategy. Valid values: `Recreate` or `RollingUpdate`.
     # strategy: Recreate
     # -- (string) Suffix to append to the resource name. Defaults to the resource
@@ -2384,6 +2384,8 @@ podMonitor: {}
 networkpolicies: {}
   # Example entry - rename as needed
   # main:
+    # -- Set to false to disable the NetworkPolicy.
+    # enabled: true
     # -- (string) Resource implementation to render. Set type to native, cilium, or
     # ciliumClusterwide.
     # type:
@@ -2391,14 +2393,9 @@ networkpolicies: {}
     # annotations: {}
     # -- (string) Controller this NetworkPolicy should target.
     # controller:
-    # -- Set to false to disable the NetworkPolicy.
-    # enabled: true
     # -- Additional match labels to add to the pod selector. These are merged with
     # labels derived from the controller identifier.
     # extraSelectorLabels: {}
-    # -- (string) Override the default resource name. Mutually exclusive with prefix
-    # and suffix.
-    # forceRename:
     # -- Labels to set on the item.
     # labels: {}
     # -- Custom podSelector for the NetworkPolicy. Takes precedence over targeting a
@@ -2406,19 +2403,22 @@ networkpolicies: {}
     # podSelector: null
     # -- Policy types for the NetworkPolicy.
     # policyTypes: []
-    # -- Prefix to prepend to the resource name. Mutually exclusive with
-    # forceRename.
-    # prefix: ""
     # -- Ingress and egress rules for the NetworkPolicy. See
     # https://kubernetes.io/docs/concepts/services-networking/network-policies/#networkpolicy-resource
     # for details. Use `- {}` as an item to allow all traffic for that direction.
     # rules:
-      # -- Egress rules for this networkPolicy. An entry of `{}` allows all egress
-      # traffic.
-      # egress: []
       # -- Ingress rules for this networkPolicy. An entry of `{}` allows all ingress
       # traffic.
       # ingress: []
+      # -- Egress rules for this networkPolicy. An entry of `{}` allows all egress
+      # traffic.
+      # egress: []
+    # -- (string) Override the default resource name. Mutually exclusive with prefix
+    # and suffix.
+    # forceRename:
+    # -- Prefix to prepend to the resource name. Mutually exclusive with
+    # forceRename.
+    # prefix: ""
     # -- (string) Suffix to append to the resource name. Defaults to the resource
     # identifier if there are multiple items, otherwise empty. Mutually exclusive
     # with forceRename.
@@ -2459,31 +2459,7 @@ networkpolicies: {}
 persistence: {}
   # Example entry - rename as needed
   # main:
-    # -- Set to false to disable the persistence item.
-    # enabled: true
-    # -- Configure mounts to all controllers and containers. By default the
-    # persistence item will be mounted to /<name_of_the_persistence_item>. Each
-    # entry supports: path, readOnly, subPath, subPathExpr, and mountPropagation.
-    #   globalMounts:
-    #     - path: /config
-    #   globalMounts:
-    #     - path: /data
-    #       readOnly: true
-    #     - path: /data/subdir
-    #       subPath: subdir
-    # globalMounts: []
-    # -- Explicitly configure mounts for specific controllers and containers.
-    # Structure: advancedMounts.<controller_name>.<container_name>[].path Use this
-    # instead of globalMounts when different controllers need different mount
-    # configurations.
-    #   advancedMounts:
-    #     main:
-    #       main:
-    #         - path: /config
-    #       sidecar:
-    #         - path: /shared
-    #           readOnly: true
-    # advancedMounts: {}
+    # type: persistentVolumeClaim
     # -- AccessMode for the persistent volume. Make sure to select an access mode
     # that is supported by your storage provider! See
     # https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes
@@ -2504,14 +2480,8 @@ persistence: {}
     # apiGroup:
     # kind: ""
     # name: ""
-    # -- (string) Override the default resource name. Mutually exclusive with prefix
-    # and suffix.
-    # forceRename:
     # -- Labels to set on the item.
     # labels: {}
-    # -- Prefix to prepend to the resource name. Mutually exclusive with
-    # forceRename.
-    # prefix: ""
     # -- (bool) Set to true to retain the PVC upon helm uninstall.
     # retain:
     # -- The amount of storage that is requested for the persistent volume.
@@ -2521,13 +2491,43 @@ persistence: {}
     # used. If undefined (the default) or set to null, no storageClassName spec is
     # set, choosing the default provisioner.
     # storageClass:
+    # -- (string)
+    # volumeName:
+    # -- Explicitly configure mounts for specific controllers and containers.
+    # Structure: advancedMounts.<controller_name>.<container_name>[].path Use this
+    # instead of globalMounts when different controllers need different mount
+    # configurations.
+    #   advancedMounts:
+    #     main:
+    #       main:
+    #         - path: /config
+    #       sidecar:
+    #         - path: /shared
+    #           readOnly: true
+    # advancedMounts: {}
+    # -- Set to false to disable the persistence item.
+    # enabled: true
+    # -- (string) Override the default resource name. Mutually exclusive with prefix
+    # and suffix.
+    # forceRename:
+    # -- Configure mounts to all controllers and containers. By default the
+    # persistence item will be mounted to /<name_of_the_persistence_item>. Each
+    # entry supports: path, readOnly, subPath, subPathExpr, and mountPropagation.
+    #   globalMounts:
+    #     - path: /config
+    #   globalMounts:
+    #     - path: /data
+    #       readOnly: true
+    #     - path: /data/subdir
+    #       subPath: subdir
+    # globalMounts: []
+    # -- Prefix to prepend to the resource name. Mutually exclusive with
+    # forceRename.
+    # prefix: ""
     # -- (string) Suffix to append to the resource name. Defaults to the resource
     # identifier if there are multiple items, otherwise empty. Mutually exclusive
     # with forceRename.
     # suffix:
-    # type: persistentVolumeClaim
-    # -- (string)
-    # volumeName:
 
 # -- Configure the Roles and Role Bindings for the chart here
 rbac:
@@ -2598,6 +2598,16 @@ rbac:
 rawResources: {}
   # Example entry - rename as needed
   # main:
+    # -- (string) Override the default resource name. Mutually exclusive with prefix
+    # and suffix.
+    # forceRename:
+    # -- Prefix to prepend to the resource name. Mutually exclusive with
+    # forceRename.
+    # prefix: ""
+    # -- (string) Suffix to append to the resource name. Defaults to the resource
+    # identifier if there are multiple items, otherwise empty. Mutually exclusive
+    # with forceRename.
+    # suffix:
     # -- Set to false to disable the resource.
     # enabled: true
     # -- The raw K8s resource manifest to be rendered. apiVersion and kind are
@@ -2614,13 +2624,3 @@ rawResources: {}
       # labels: {}
       # -- Annotations to set on the item.
       # annotations: {}
-    # -- (string) Override the default resource name. Mutually exclusive with prefix
-    # and suffix.
-    # forceRename:
-    # -- Prefix to prepend to the resource name. Mutually exclusive with
-    # forceRename.
-    # prefix: ""
-    # -- (string) Suffix to append to the resource name. Defaults to the resource
-    # identifier if there are multiple items, otherwise empty. Mutually exclusive
-    # with forceRename.
-    # suffix:
