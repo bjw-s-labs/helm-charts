@@ -2,13 +2,19 @@
 package schema
 
 import (
-	"errors"
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"io"
 	"maps"
-	"os/exec"
+	"net/url"
+	"os"
+	"path/filepath"
 	"slices"
+	"strings"
 
 	"github.com/kaptinlin/jsonschema"
+	"gopkg.in/yaml.v3"
 )
 
 // maxCollectDepth guards against stack overflow from circular schema references.
@@ -160,23 +166,565 @@ func Compile(schemaBytes []byte) (*jsonschema.Schema, error) {
 	return s, nil
 }
 
-// schematoolsBinary is the external CLI that resolves $ref entries in a schema.
-const schematoolsBinary = "schematools-cli"
+type localSchemaRegistry struct {
+	// schemas contains one source document per canonical resource ID. The
+	// compiler uses these IDs to resolve cross-document references without
+	// contacting the network.
+	schemas map[string][]byte
+	// documents maps resource URLs to local files for references to documents
+	// without an explicit $id and for the compiler's loader fallback.
+	documents       map[string]string
+	sourceDocuments map[string][]byte
+	rootID          string
+}
 
-// DereferenceSchema uses schematools-cli to dereference $refs in a schema.
-// If the binary is not on PATH, the error hints at the canonical install
-// method for this repo so the caller can fix their environment quickly.
-func DereferenceSchema(inputPath string) ([]byte, error) {
-	cmd := exec.Command(schematoolsBinary, "process", "dereference", inputPath) //nolint:gosec // inputPath is a local file path from CLI flags
-	output, err := cmd.Output()
-	if err != nil {
-		if exitErr, ok := errors.AsType[*exec.ExitError](err); ok {
-			return nil, fmt.Errorf("%s failed: %s", schematoolsBinary, string(exitErr.Stderr))
-		}
-		if errors.Is(err, exec.ErrNotFound) {
-			return nil, fmt.Errorf("%s not found in PATH (install via `mise install` or `cargo install schematools-cli`): %w", schematoolsBinary, err)
-		}
-		return nil, fmt.Errorf("failed to run %s: %w", schematoolsBinary, err)
+// kaptinlin treats URIs with a host as absolute references. A file URI has an
+// empty host, so its relative-reference handling would otherwise leave refs
+// such as "schemas/definitions.json" unresolved. Use a synthetic HTTPS URI
+// only inside the compiler; source JSON and generated output retain the real
+// file URI.
+func normalizeCompilerURI(raw string) string {
+	parsed, err := url.Parse(raw)
+	if err != nil || parsed.Scheme != "file" || parsed.Host != "" {
+		return raw
 	}
-	return output, nil
+	parsed.Scheme = "https"
+	parsed.Host = "helm-schema-tools.local"
+	return parsed.String()
+}
+
+func pointerPathSegment(segment string) string {
+	return strings.NewReplacer("~", "~0", "/", "~1").Replace(segment)
+}
+
+func collectPropertyOrdersByPath(node *yaml.Node, path string, orders map[string][]string) {
+	if node == nil {
+		return
+	}
+	if node.Kind == yaml.DocumentNode {
+		for _, child := range node.Content {
+			collectPropertyOrdersByPath(child, path, orders)
+		}
+		return
+	}
+	if node.Kind == yaml.SequenceNode {
+		for index, child := range node.Content {
+			collectPropertyOrdersByPath(child, path+"/"+fmt.Sprint(index), orders)
+		}
+		return
+	}
+	if node.Kind != yaml.MappingNode {
+		return
+	}
+	for i := 0; i < len(node.Content); i += 2 {
+		keyNode := node.Content[i]
+		valueNode := node.Content[i+1]
+		key := keyNode.Value
+		childPath := path + "/" + pointerPathSegment(key)
+		if key == "properties" && valueNode.Kind == yaml.MappingNode {
+			propertyNames := make([]string, 0, len(valueNode.Content)/2)
+			for j := 0; j < len(valueNode.Content); j += 2 {
+				propertyNames = append(propertyNames, valueNode.Content[j].Value)
+			}
+			orders[childPath] = propertyNames
+		}
+		collectPropertyOrdersByPath(valueNode, childPath, orders)
+	}
+}
+
+// collectLocalSchemaResources maps schema IDs and local file URIs to source
+// documents next to the root schema. The JSON Schema compiler, rather than
+// this package, owns reference parsing and resolution.
+func collectLocalSchemaResources(inputPath string) (*localSchemaRegistry, error) {
+	root := filepath.Dir(inputPath)
+	registry := &localSchemaRegistry{
+		schemas:         make(map[string][]byte),
+		documents:       make(map[string]string),
+		sourceDocuments: make(map[string][]byte),
+	}
+	rootAbsolute, err := filepath.Abs(inputPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to resolve root schema path: %w", err)
+	}
+
+	err = filepath.WalkDir(root, func(path string, entry os.DirEntry, walkErr error) error {
+		if walkErr != nil {
+			return walkErr
+		}
+		if entry.IsDir() || filepath.Ext(path) != ".json" {
+			return nil
+		}
+
+		contents, err := os.ReadFile(path) //nolint:gosec // path is rooted at the user-provided schema path
+		if err != nil {
+			return err
+		}
+		var resource any
+		if err := json.Unmarshal(contents, &resource); err != nil {
+			// Ignore unrelated or malformed JSON files in the schema directory.
+			return nil
+		}
+		absolutePath, err := filepath.Abs(path)
+		if err != nil {
+			return err
+		}
+		fileURI := (&url.URL{Scheme: "file", Path: absolutePath}).String()
+		registry.documents[fileURI] = absolutePath
+
+		resourceID := fileURI
+		if resourceObject, ok := resource.(map[string]any); ok {
+			if id, ok := resourceObject["$id"].(string); ok && id != "" {
+				resourceID = id
+			}
+		}
+		registry.schemas[resourceID] = contents
+		registry.sourceDocuments[resourceID] = contents
+		registry.documents[resourceID] = absolutePath
+		if absolutePath == rootAbsolute {
+			registry.rootID = resourceID
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to collect local schema resources: %w", err)
+	}
+
+	if registry.rootID == "" {
+		return nil, fmt.Errorf("root schema %q was not found in its directory", inputPath)
+	}
+
+	// kaptinlin's relative URI implementation requires a URI host. Normalize
+	// local file IDs and any absolute file references for compiler use while
+	// retaining the original source documents for serialization.
+	rawSchemas := registry.schemas
+	rawSources := registry.sourceDocuments
+	registry.schemas = make(map[string][]byte, len(rawSchemas))
+	registry.sourceDocuments = make(map[string][]byte, len(rawSources))
+	normalizedIDs := make(map[string]string, len(rawSchemas))
+	for resourceID := range rawSchemas {
+		normalizedIDs[resourceID] = normalizeCompilerURI(resourceID)
+	}
+	for resourceID, contents := range rawSchemas {
+		normalizedID := normalizedIDs[resourceID]
+		normalizedContents := contents
+		for rawID, compilerID := range normalizedIDs {
+			if rawID != compilerID {
+				normalizedContents = bytes.ReplaceAll(normalizedContents, []byte(rawID), []byte(compilerID))
+			}
+		}
+		registry.schemas[normalizedID] = normalizedContents
+		registry.sourceDocuments[normalizedID] = rawSources[resourceID]
+		registry.documents[normalizedID] = registry.documents[resourceID]
+		if registry.rootID == resourceID {
+			registry.rootID = normalizedID
+		}
+	}
+	for documentURL, documentPath := range registry.documents {
+		normalizedURL := normalizeCompilerURI(documentURL)
+		registry.documents[normalizedURL] = documentPath
+	}
+
+	// A document without $id is identified by the URI used to load it. Add
+	// aliases under the root document's URL so relative references can still be
+	// loaded locally when their target has no explicit identifier.
+	rootURL, err := url.Parse(registry.rootID)
+	if err == nil {
+		for documentURL, documentPath := range registry.documents {
+			if documentURL == registry.rootID {
+				continue
+			}
+			relativePath, relativeErr := filepath.Rel(root, documentPath)
+			if relativeErr != nil {
+				continue
+			}
+			alias := rootURL.ResolveReference(&url.URL{Path: filepath.ToSlash(relativePath)}).String()
+			registry.documents[alias] = documentPath
+		}
+	}
+
+	return registry, nil
+}
+
+func (r *localSchemaRegistry) load(uri string) (io.ReadCloser, error) {
+	documentURL, err := url.Parse(uri)
+	if err != nil {
+		return nil, fmt.Errorf("invalid schema URI %q: %w", uri, err)
+	}
+	documentURL.Fragment = ""
+	path, ok := r.documents[documentURL.String()]
+	if !ok {
+		return nil, fmt.Errorf("schema URI %q is not available in the local schema tree", documentURL.String())
+	}
+	file, err := os.Open(path) //nolint:gosec // path is selected from the local schema tree
+	if err != nil {
+		return nil, fmt.Errorf("open local schema %q: %w", path, err)
+	}
+	return file, nil
+}
+
+func newLocalCompiler(registry *localSchemaRegistry) *jsonschema.Compiler {
+	compiler := jsonschema.NewCompiler().SetPreserveExtra(true)
+	loader := func(uri string) (io.ReadCloser, error) { return registry.load(uri) }
+	// Keep resolution offline and deterministic. These replace kaptinlin's
+	// default network loaders with the local schema tree collected above.
+	compiler.RegisterLoader("file", loader)
+	compiler.RegisterLoader("http", loader)
+	compiler.RegisterLoader("https", loader)
+	return compiler
+}
+
+func copyReferenceStack(stack map[*jsonschema.Schema]bool, schema *jsonschema.Schema) map[*jsonschema.Schema]bool {
+	next := make(map[*jsonschema.Schema]bool, len(stack)+1)
+	maps.Copy(next, stack)
+	next[schema] = true
+	return next
+}
+
+type orderedObject struct {
+	order  []string
+	values map[string]any
+}
+
+func (o orderedObject) MarshalJSON() ([]byte, error) {
+	keys := make([]string, 0, len(o.values))
+	seen := make(map[string]bool, len(o.values))
+	for _, key := range o.order {
+		if _, exists := o.values[key]; exists && !seen[key] {
+			keys = append(keys, key)
+			seen[key] = true
+		}
+	}
+	remaining := make([]string, 0, len(o.values)-len(keys))
+	for key := range o.values {
+		if !seen[key] {
+			remaining = append(remaining, key)
+		}
+	}
+	slices.Sort(remaining)
+	keys = append(keys, remaining...)
+
+	var output bytes.Buffer
+	output.WriteByte('{')
+	for index, key := range keys {
+		if index > 0 {
+			output.WriteByte(',')
+		}
+		encodedKey, err := json.Marshal(key)
+		if err != nil {
+			return nil, err
+		}
+		encodedValue, err := json.Marshal(o.values[key])
+		if err != nil {
+			return nil, err
+		}
+		output.Write(encodedKey)
+		output.WriteByte(':')
+		output.Write(encodedValue)
+	}
+	output.WriteByte('}')
+	return output.Bytes(), nil
+}
+
+func decodeJSONDocument(contents []byte) (any, error) {
+	decoder := json.NewDecoder(bytes.NewReader(contents))
+	decoder.UseNumber()
+	var document any
+	if err := decoder.Decode(&document); err != nil {
+		return nil, err
+	}
+	return document, nil
+}
+
+type sourceSchemaNode struct {
+	object        map[string]any
+	propertyOrder []string
+}
+
+func bindSourceSchema(
+	s *jsonschema.Schema,
+	source any,
+	path string,
+	nodes map[*jsonschema.Schema]sourceSchemaNode,
+	propertyOrders map[string][]string,
+	visited map[*jsonschema.Schema]bool,
+) {
+	if s == nil || visited[s] || s.Boolean != nil {
+		return
+	}
+	object, ok := source.(map[string]any)
+	if !ok {
+		return
+	}
+	visited[s] = true
+	nodes[s] = sourceSchemaNode{
+		object:        object,
+		propertyOrder: append([]string(nil), propertyOrders[path+"/properties"]...),
+	}
+
+	bindSourceSchemaSlice := func(key string, children []*jsonschema.Schema) {
+		sourceItems, ok := object[key].([]any)
+		if !ok {
+			return
+		}
+		for index, child := range children {
+			if index < len(sourceItems) {
+				bindSourceSchema(child, sourceItems[index], path+"/"+pointerPathSegment(key)+"/"+fmt.Sprint(index), nodes, propertyOrders, visited)
+			}
+		}
+	}
+	bindSourceSchemaMap := func(key string, children map[string]*jsonschema.Schema) {
+		sourceMap, ok := object[key].(map[string]any)
+		if !ok {
+			return
+		}
+		for name, child := range children {
+			if sourceChild, exists := sourceMap[name]; exists {
+				bindSourceSchema(child, sourceChild, path+"/"+pointerPathSegment(key)+"/"+pointerPathSegment(name), nodes, propertyOrders, visited)
+			}
+		}
+	}
+	bindSourceSchemaChild := func(key string, child *jsonschema.Schema) {
+		if sourceChild, exists := object[key]; exists {
+			bindSourceSchema(child, sourceChild, path+"/"+pointerPathSegment(key), nodes, propertyOrders, visited)
+		}
+	}
+
+	bindSourceSchemaSlice("allOf", s.AllOf)
+	bindSourceSchemaSlice("anyOf", s.AnyOf)
+	bindSourceSchemaSlice("oneOf", s.OneOf)
+	bindSourceSchemaSlice("prefixItems", s.PrefixItems)
+	for key, child := range map[string]*jsonschema.Schema{
+		"not":                   s.Not,
+		"if":                    s.If,
+		"then":                  s.Then,
+		"else":                  s.Else,
+		"items":                 s.Items,
+		"contains":              s.Contains,
+		"additionalProperties":  s.AdditionalProperties,
+		"propertyNames":         s.PropertyNames,
+		"unevaluatedItems":      s.UnevaluatedItems,
+		"unevaluatedProperties": s.UnevaluatedProperties,
+		"contentSchema":         s.ContentSchema,
+	} {
+		bindSourceSchemaChild(key, child)
+	}
+	bindSourceSchemaMap("$defs", s.Defs)
+	bindSourceSchemaMap("properties", schemaMapValues(s.Properties))
+	bindSourceSchemaMap("patternProperties", schemaMapValues(s.PatternProperties))
+	bindSourceSchemaMap("dependentSchemas", s.DependentSchemas)
+}
+
+func materializeChild(out map[string]any, key string, child *jsonschema.Schema, stack map[*jsonschema.Schema]bool, sources map[*jsonschema.Schema]sourceSchemaNode) error {
+	if child == nil {
+		return nil
+	}
+	value, err := materializeSchema(child, stack, sources)
+	if err != nil {
+		return fmt.Errorf("materialize %s: %w", key, err)
+	}
+	out[key] = value
+	return nil
+}
+
+func materializeChildSlice(out map[string]any, key string, children []*jsonschema.Schema, stack map[*jsonschema.Schema]bool, sources map[*jsonschema.Schema]sourceSchemaNode) error {
+	if len(children) == 0 {
+		return nil
+	}
+	values := make([]any, len(children))
+	for i, child := range children {
+		value, err := materializeSchema(child, stack, sources)
+		if err != nil {
+			return fmt.Errorf("materialize %s[%d]: %w", key, i, err)
+		}
+		values[i] = value
+	}
+	out[key] = values
+	return nil
+}
+
+func materializeChildMap(out map[string]any, key string, children map[string]*jsonschema.Schema, order []string, stack map[*jsonschema.Schema]bool, sources map[*jsonschema.Schema]sourceSchemaNode) error {
+	if len(children) == 0 {
+		return nil
+	}
+	values := make(map[string]any, len(children))
+	for name, child := range children {
+		value, err := materializeSchema(child, stack, sources)
+		if err != nil {
+			return fmt.Errorf("materialize %s.%s: %w", key, name, err)
+		}
+		values[name] = value
+	}
+	if key == "properties" {
+		out[key] = orderedObject{order: order, values: values}
+	} else {
+		out[key] = values
+	}
+	return nil
+}
+
+func materializeSchemaChildren(s *jsonschema.Schema, out map[string]any, stack map[*jsonschema.Schema]bool, sources map[*jsonschema.Schema]sourceSchemaNode) error {
+	if err := materializeChildSlice(out, "allOf", s.AllOf, stack, sources); err != nil {
+		return err
+	}
+	if err := materializeChildSlice(out, "anyOf", s.AnyOf, stack, sources); err != nil {
+		return err
+	}
+	if err := materializeChildSlice(out, "oneOf", s.OneOf, stack, sources); err != nil {
+		return err
+	}
+	if err := materializeChildSlice(out, "prefixItems", s.PrefixItems, stack, sources); err != nil {
+		return err
+	}
+	for key, child := range map[string]*jsonschema.Schema{
+		"not":                   s.Not,
+		"if":                    s.If,
+		"then":                  s.Then,
+		"else":                  s.Else,
+		"items":                 s.Items,
+		"contains":              s.Contains,
+		"additionalProperties":  s.AdditionalProperties,
+		"propertyNames":         s.PropertyNames,
+		"unevaluatedItems":      s.UnevaluatedItems,
+		"unevaluatedProperties": s.UnevaluatedProperties,
+		"contentSchema":         s.ContentSchema,
+	} {
+		if err := materializeChild(out, key, child, stack, sources); err != nil {
+			return err
+		}
+	}
+	if err := materializeChildMap(out, "$defs", s.Defs, nil, stack, sources); err != nil {
+		return err
+	}
+	propertyOrder := sources[s].propertyOrder
+	if err := materializeChildMap(out, "properties", schemaMapValues(s.Properties), propertyOrder, stack, sources); err != nil {
+		return err
+	}
+	if err := materializeChildMap(out, "patternProperties", schemaMapValues(s.PatternProperties), nil, stack, sources); err != nil {
+		return err
+	}
+	return materializeChildMap(out, "dependentSchemas", s.DependentSchemas, nil, stack, sources)
+}
+
+func schemaMapValues(value *jsonschema.SchemaMap) map[string]*jsonschema.Schema {
+	if value == nil {
+		return nil
+	}
+	return map[string]*jsonschema.Schema(*value)
+}
+
+// materializeSchema expands ordinary $ref edges using kaptinlin's resolved
+// schema graph. Recursive edges remain as $ref so recursive schemas stay
+// finite. Dynamic references are deliberately retained: their target depends
+// on dynamic scope and replacing them with the fallback target would change
+// schema semantics.
+func materializeSchema(s *jsonschema.Schema, stack map[*jsonschema.Schema]bool, sources map[*jsonschema.Schema]sourceSchemaNode) (any, error) {
+	if s == nil {
+		return nil, fmt.Errorf("nil schema")
+	}
+	if s.Boolean != nil {
+		return *s.Boolean, nil
+	}
+
+	source, ok := sources[s]
+	if ok {
+		out := maps.Clone(source.object)
+		return materializeSchemaObject(s, out, stack, sources)
+	} else {
+		encoded, err := json.Marshal(s)
+		if err != nil {
+			return nil, fmt.Errorf("encode schema: %w", err)
+		}
+		var out map[string]any
+		if err := json.Unmarshal(encoded, &out); err != nil {
+			return nil, fmt.Errorf("decode schema: %w", err)
+		}
+		return materializeSchemaObject(s, out, stack, sources)
+	}
+}
+
+func materializeSchemaObject(s *jsonschema.Schema, out map[string]any, stack map[*jsonschema.Schema]bool, sources map[*jsonschema.Schema]sourceSchemaNode) (any, error) {
+
+	if s.Ref != "" {
+		if s.ResolvedRef == nil {
+			return nil, fmt.Errorf("unresolved $ref %q", s.Ref)
+		}
+		if !stack[s.ResolvedRef] {
+			target, err := materializeSchema(s.ResolvedRef, copyReferenceStack(stack, s), sources)
+			if err != nil {
+				return nil, fmt.Errorf("resolve $ref %q: %w", s.Ref, err)
+			}
+			if targetObject, ok := target.(map[string]any); ok {
+				delete(out, "$ref")
+				if err := materializeSchemaChildren(s, out, copyReferenceStack(stack, s), sources); err != nil {
+					return nil, err
+				}
+				merged := make(map[string]any, len(targetObject)+len(out))
+				maps.Copy(merged, targetObject)
+				maps.Copy(merged, out)
+				out = merged
+			} else if targetBool, ok := target.(bool); ok {
+				if !targetBool {
+					return false, nil
+				}
+				delete(out, "$ref")
+				if err := materializeSchemaChildren(s, out, copyReferenceStack(stack, s), sources); err != nil {
+					return nil, err
+				}
+			}
+		}
+		if stack[s.ResolvedRef] {
+			return out, nil
+		}
+		return out, nil
+	}
+	if s.DynamicRef != "" && s.ResolvedDynamicRef == nil {
+		return nil, fmt.Errorf("unresolved $dynamicRef %q", s.DynamicRef)
+	}
+
+	if err := materializeSchemaChildren(s, out, copyReferenceStack(stack, s), sources); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// DereferenceSchema resolves local JSON Schema references and emits a single
+// schema document. Local sibling keywords override referenced keywords, which
+// preserves the JSON Schema 2020-12 semantics used by this repository.
+func DereferenceSchema(inputPath string) ([]byte, error) {
+	registry, err := collectLocalSchemaResources(inputPath)
+	if err != nil {
+		return nil, err
+	}
+	compiler := newLocalCompiler(registry)
+	compiled, err := compiler.CompileBatch(registry.schemas)
+	if err != nil {
+		return nil, fmt.Errorf("failed to compile schema resources: %w", err)
+	}
+	rootSchema, ok := compiled[registry.rootID]
+	if !ok {
+		return nil, fmt.Errorf("compiled root schema %q was not found", registry.rootID)
+	}
+	sources := make(map[*jsonschema.Schema]sourceSchemaNode)
+	visited := make(map[*jsonschema.Schema]bool)
+	for resourceID, resourceBytes := range registry.sourceDocuments {
+		compiledSchema, exists := compiled[resourceID]
+		if !exists {
+			continue
+		}
+		source, decodeErr := decodeJSONDocument(resourceBytes)
+		if decodeErr != nil {
+			return nil, fmt.Errorf("failed to decode source schema %q: %w", resourceID, decodeErr)
+		}
+		var orderedDocument yaml.Node
+		propertyOrders := make(map[string][]string)
+		if decodeErr := yaml.Unmarshal(resourceBytes, &orderedDocument); decodeErr == nil {
+			collectPropertyOrdersByPath(&orderedDocument, "", propertyOrders)
+		}
+		bindSourceSchema(compiledSchema, source, "", sources, propertyOrders, visited)
+	}
+	resolved, err := materializeSchema(rootSchema, nil, sources)
+	if err != nil {
+		return nil, fmt.Errorf("failed to materialize schema: %w", err)
+	}
+	return json.Marshal(resolved)
 }

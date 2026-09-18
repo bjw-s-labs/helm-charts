@@ -20,10 +20,42 @@ func main() {
 	}
 
 	rootCmd.AddCommand(generateCmd())
+	rootCmd.AddCommand(dereferenceCmd())
 
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
+}
+
+func dereferenceCmd() *cobra.Command {
+	var schemaPath, outputPath string
+
+	cmd := &cobra.Command{
+		Use:   "dereference",
+		Short: "Resolve local JSON Schema $ref entries",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runDereference(schemaPath, outputPath)
+		},
+	}
+
+	cmd.Flags().StringVarP(&schemaPath, "schema", "s", "", "Path to the root JSON Schema file (required)")
+	cmd.Flags().StringVarP(&outputPath, "output", "o", "", "Output path for the dereferenced schema (required)")
+
+	_ = cmd.MarkFlagRequired("schema")
+	_ = cmd.MarkFlagRequired("output")
+
+	return cmd
+}
+
+func runDereference(schemaPath, outputPath string) error {
+	schemaBytes, err := schema.DereferenceSchema(schemaPath)
+	if err != nil {
+		return fmt.Errorf("failed to dereference schema: %w", err)
+	}
+	if err := os.WriteFile(outputPath, schemaBytes, 0o600); err != nil {
+		return fmt.Errorf("failed to write dereferenced schema: %w", err)
+	}
+	return nil
 }
 
 func generateCmd() *cobra.Command {
@@ -145,7 +177,7 @@ func generateValuesCmd() *cobra.Command {
 		Short: "Generate commented values.yaml from JSON schema",
 		Long: `Generate a values.yaml file with comments derived from JSON Schema descriptions.
 
-The schema is first dereferenced using schematools-cli to resolve all $ref references,
+The schema is first dereferenced by helm-schema-tools to resolve all $ref references,
 then converted to YAML with comments from the 'description' field of each property.
 
 Example:

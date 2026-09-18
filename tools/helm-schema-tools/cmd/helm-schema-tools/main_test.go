@@ -2,23 +2,11 @@ package main
 
 import (
 	"os"
-	"os/exec"
 	"path/filepath"
 	"testing"
 )
 
-// requireSchematoolsCLI skips the test when the external dereferencer is not on
-// PATH. These end-to-end tests shell out to schematools-cli (installed via
-// `mise install` in this repo) and would otherwise fail in bare environments.
-func requireSchematoolsCLI(t *testing.T) {
-	t.Helper()
-	if _, err := exec.LookPath("schematools-cli"); err != nil {
-		t.Skip("schematools-cli not found in PATH; run `mise install` to install")
-	}
-}
-
 func TestRunGenerateValues_Success(t *testing.T) {
-	requireSchematoolsCLI(t)
 	// Create a temp directory with a test schema
 	tmpDir := t.TempDir()
 	schemaPath := filepath.Join(tmpDir, "test.schema.json")
@@ -88,7 +76,6 @@ func TestRunGenerateValues_MissingSchema(t *testing.T) {
 }
 
 func TestRunGenerateDocs_Success(t *testing.T) {
-	requireSchematoolsCLI(t)
 	tmpDir := t.TempDir()
 	schemaPath := filepath.Join(tmpDir, "test.schema.json")
 	outputDir := filepath.Join(tmpDir, "docs")
