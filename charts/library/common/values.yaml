@@ -1764,7 +1764,7 @@ controllers: {}
     # horizontalPodAutoscaler: {}
     # -- Annotations to set on the item. Keys and values support Helm templating.
     # annotations: {}
-    # -- Labels to set on the item.
+    # -- Labels to set on the item. Keys and values support Helm templating.
     # labels: {}
     # -- (int) Minimum number of replicas. Set to 0 to enable scale-to-zero when the
     # HPAScaleToZero feature gate is enabled.
@@ -2396,7 +2396,7 @@ networkpolicies: {}
     # -- Additional match labels to add to the pod selector. These are merged with
     # labels derived from the controller identifier.
     # extraSelectorLabels: {}
-    # -- Labels to set on the item.
+    # -- Labels to set on the item. Keys and values support Helm templating.
     # labels: {}
     # -- Custom podSelector for the NetworkPolicy. Takes precedence over targeting a
     # controller via the controller identifier.
@@ -2480,7 +2480,7 @@ persistence: {}
     # apiGroup:
     # kind: ""
     # name: ""
-    # -- Labels to set on the item.
+    # -- Labels to set on the item. Keys and values support Helm templating.
     # labels: {}
     # -- (bool) Set to true to retain the PVC upon helm uninstall.
     # retain:
