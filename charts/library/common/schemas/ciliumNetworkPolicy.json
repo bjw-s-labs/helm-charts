@@ -24,11 +24,19 @@
           "$ref": "definitions.json#/$defs/annotations"
         },
         "controller": {
-          "description": "Controller this CiliumNetworkPolicy should target.",
+          "description": "Controller this CiliumNetworkPolicy should target. Mutually exclusive with controllers and endpointSelector.",
           "type": "string"
         },
+        "controllers": {
+          "description": "Controllers this CiliumNetworkPolicy should target. Each entry can be an exact controller identifier or a regular expression. Mutually exclusive with controller and endpointSelector.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
         "extraSelectorLabels": {
-          "description": "Additional match labels to add to the endpoint selector. These are merged with labels derived from the controller identifier.",
+          "description": "Additional match labels to add to the endpoint selector. These are merged with labels derived from the controller selection.",
           "type": "object",
           "additionalProperties": {
             "type": "string"
@@ -38,7 +46,7 @@
           "$ref": "definitions.json#/$defs/labels"
         },
         "endpointSelector": {
-          "description": "Custom endpointSelector for the CiliumNetworkPolicy. Takes precedence over targeting a controller via the controller identifier.",
+          "description": "Custom endpointSelector for the CiliumNetworkPolicy. Mutually exclusive with controller and controllers.",
           "$ref": "k8s-api.json#/$defs/meta.v1.LabelSelector"
         },
         "nodeSelector": {
@@ -84,21 +92,27 @@
           "maxLength": 32
         }
       },
-      "dependentSchemas": {
-        "endpointSelector": {
-          "not": {
+      "not": {
+        "anyOf": [
+          {
             "required": [
-              "controller"
+              "controller",
+              "controllers"
             ]
-          }
-        },
-        "controller": {
-          "not": {
+          },
+          {
             "required": [
+              "controller",
+              "endpointSelector"
+            ]
+          },
+          {
+            "required": [
+              "controllers",
               "endpointSelector"
             ]
           }
-        }
+        ]
       },
       "anyOf": [
         {

@@ -82,7 +82,7 @@ tests:
           - {}
     asserts:
       - failedTemplate:
-          errorMessage: "CiliumClusterwideNetworkPolicy 'main': No enabled controller found with identifier 'missing'. Available controllers: [main]"
+          errorMessage: "CiliumClusterwideNetworkPolicy 'main': No enabled controller found with identifier 'missing'. Update 'networkpolicies.main.controller' or enable the controller under 'controllers.missing'. Available controllers: [main]."
 
   - it: rejects nodeSelector with endpointSelector
     set:
@@ -107,8 +107,50 @@ tests:
         nodeSelector:
           matchLabels:
             kubernetes.io/os: linux
-        controller:
-          - app: example
+        controller: main
+        ingress:
+          - {}
+    asserts:
+      - failedTemplate:
+          errorPattern: "'not' failed"
+
+  - it: supports multiple controllers for endpoint policies
+    set:
+      controllers.secondary:
+        containers:
+          main:
+            image:
+              repository: nginx
+              tag: latest
+      networkpolicies.main:
+        type: ciliumClusterwide
+        controllers:
+          - main
+          - secondary
+        ingress:
+          - {}
+    documentSelector:
+      path: $[?(@.kind == "CiliumClusterwideNetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.endpointSelector.matchExpressions[0]
+          value:
+            key: app.kubernetes.io/controller
+            operator: In
+            values:
+              - main
+              - secondary
+
+  - it: rejects nodeSelector with controllers
+    set:
+      networkpolicies.main:
+        type: ciliumClusterwide
+        nodeSelector:
+          matchLabels:
+            kubernetes.io/os: linux
+        controllers:
+          - main
         ingress:
           - {}
     asserts:

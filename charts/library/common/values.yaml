@@ -2389,20 +2389,25 @@ networkpolicies: {}
     # type:
     # -- Annotations to set on the item.
     # annotations: {}
-    # -- (string) Controller this NetworkPolicy should target.
+    # -- (string) Controller this NetworkPolicy should target. Mutually exclusive
+    # with controllers and podSelector.
     # controller:
+    # -- Controllers this NetworkPolicy should target. Each entry can be an exact
+    # controller identifier or a regular expression. Mutually exclusive with
+    # controller and podSelector.
+    # controllers: []
     # -- Set to false to disable the NetworkPolicy.
     # enabled: true
     # -- Additional match labels to add to the pod selector. These are merged with
-    # labels derived from the controller identifier.
+    # labels derived from the controller selection.
     # extraSelectorLabels: {}
     # -- (string) Override the default resource name. Mutually exclusive with prefix
     # and suffix.
     # forceRename:
     # -- Labels to set on the item.
     # labels: {}
-    # -- Custom podSelector for the NetworkPolicy. Takes precedence over targeting a
-    # controller via the controller identifier.
+    # -- Custom podSelector for the NetworkPolicy. Mutually exclusive with
+    # controller and controllers.
     # podSelector: null
     # -- Policy types for the NetworkPolicy.
     # policyTypes: []

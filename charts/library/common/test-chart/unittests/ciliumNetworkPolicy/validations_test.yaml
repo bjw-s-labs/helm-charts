@@ -20,7 +20,7 @@ tests:
           - {}
     asserts:
       - failedTemplate:
-          errorMessage: "CiliumNetworkPolicy 'main': controller or endpointSelector field is required because automatic controller detection is not possible (found 2 enabled controllers). Please specify which controller this CiliumNetworkPolicy should reference."
+          errorMessage: "CiliumNetworkPolicy 'main': controller, controllers, or endpointSelector field is required because automatic controller detection is not possible (found 2 enabled controllers). Please specify which controllers this CiliumNetworkPolicy should reference."
 
   - it: validates controller references
     set:
@@ -31,7 +31,7 @@ tests:
           - {}
     asserts:
       - failedTemplate:
-          errorMessage: "CiliumNetworkPolicy 'main': No enabled controller found with identifier 'missing'. Available controllers: [main]"
+          errorMessage: "CiliumNetworkPolicy 'main': No enabled controller found with identifier 'missing'. Update 'networkpolicies.main.controller' or enable the controller under 'controllers.missing'. Available controllers: [main]."
 
   - it: rejects controller and endpointSelector together
     set:
@@ -69,3 +69,16 @@ tests:
     asserts:
       - failedTemplate:
           errorPattern: values don't meet the specifications of the schema
+
+  - it: validates every controller reference
+    set:
+      networkpolicies.main:
+        type: cilium
+        controllers:
+          - main
+          - missing
+        ingress:
+          - {}
+    asserts:
+      - failedTemplate:
+          errorMessage: "CiliumNetworkPolicy 'main': Controller reference 'missing' matched no enabled controllers. Update 'networkpolicies.main.controllers' to match one of: [main]."
