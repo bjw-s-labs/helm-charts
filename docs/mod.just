@@ -35,8 +35,9 @@ generate CHART="library/common":
 
     echo "Dereferencing schema to public/schemas..."
     mkdir -p "$SCHEMA_DIR"
-    schematools-cli process dereference "$CHART_DIR/values.schema.json" \
-      --to-file "$SCHEMA_DIR/values.schema.json"
+    "$TOOL" dereference \
+      --schema "$CHART_DIR/values.schema.json" \
+      --output "$SCHEMA_DIR/values.schema.json"
 
     echo "Generating reference docs..."
     "$TOOL" generate docs \
