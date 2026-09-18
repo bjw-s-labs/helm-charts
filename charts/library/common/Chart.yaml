@@ -19,3 +19,6 @@ annotations:
     - kind: fixed
       description: |-
         Fixed template rendering issues
+    - kind: added
+      description: |-
+        Added configurable recursive string template evaluation with path exclusions

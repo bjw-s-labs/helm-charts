@@ -20,6 +20,17 @@ global:
   # configured. If any serviceAccount entries are present, the default is not
   # created and user configuration takes precedence.
   createDefaultServiceAccount: true
+  # -- Configure global string template evaluation.
+  templateEvaluation: {}
+    # -- Maximum number of times each string is evaluated. Increase this to evaluate
+    # templates produced by templated values.
+    # passes: 1
+    # -- Paths excluded from global template evaluation. Each path is a list of map
+    # keys or array indexes represented as strings. Matching paths and their
+    # descendants are left unchanged.
+    #   excludePaths:
+    #     - [controllers, main, containers, main, env, VPN_PORT_FORWARDING_UP_COMMAND]
+    # excludePaths: []
 
 # -- Set the strategy for the default pod options. Defaults to overwrite.
 # overwrite: If pod-level options are set, use those instead of the defaults.

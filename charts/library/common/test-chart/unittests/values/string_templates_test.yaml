@@ -66,6 +66,87 @@ tests:
           path: spec.template.metadata.annotations.integerText
           value: "7"
 
+  - it: evaluates nested templates progressively
+    set:
+      global.templateEvaluation.passes: 5
+      global.labels:
+        first: "{{ .Values.global.labels.second }}"
+        second: "{{ .Values.global.labels.third }}"
+        third: "{{ .Release.Name }}"
+      controllers.main.pod.annotations:
+        nested: "{{ .Values.global.labels.first }}"
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.metadata.annotations.nested
+          value: RELEASE-NAME
+
+  - it: limits evaluation to the configured number of passes
+    set:
+      global.templateEvaluation.passes: 2
+      global.labels:
+        first: "{{ .Values.global.labels.second }}"
+        second: "{{ .Values.global.labels.third }}"
+        third: "{{ .Release.Name }}"
+      controllers.main.pod.annotations:
+        nested: "{{ .Values.global.labels.first }}"
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.metadata.annotations.nested
+          value: "{{ .Values.global.labels.third }}"
+
+  - it: excludes paths from template evaluation
+    set:
+      global.templateEvaluation:
+        excludePaths:
+          - [controllers, main, containers, main, env, VPN_PORT_FORWARDING_UP_COMMAND]
+      controllers.main.containers.main.env:
+        VPN_PORT_FORWARDING_UP_COMMAND: "command --port {{PORTS}}"
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[0]
+          value:
+            name: VPN_PORT_FORWARDING_UP_COMMAND
+            value: "command --port {{PORTS}}"
+
+  - it: excludes descendants of a non-leaf path
+    set:
+      global.templateEvaluation:
+        excludePaths:
+          - [controllers, main, pod, annotations]
+      controllers.main.pod.annotations:
+        app.example.com/template: "{{VALUE}}"
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.metadata.annotations["app.example.com/template"]
+          value: "{{VALUE}}"
+
+  - it: excludes paths containing list indexes
+    set:
+      global.templateEvaluation:
+        excludePaths:
+          - [controllers, main, pod, imagePullSecrets, "0", name]
+      controllers.main.pod.imagePullSecrets:
+        - name: '{{SECRET_NAME}}'
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.imagePullSecrets[0].name
+          value: '{{SECRET_NAME}}'
+
   - it: defers ExternalSecret target template data expressions
     set:
       externalSecrets:
