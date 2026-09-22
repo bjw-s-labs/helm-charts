@@ -21,6 +21,15 @@ global:
   # created and user configuration takes precedence.
   createDefaultServiceAccount: true
 
+# -- Configure the creation of the Helm release namespace.
+namespace:
+  # -- Set to true to create the Helm release namespace.
+  create: false
+  # -- Annotations to set on the item.
+  annotations: {}
+  # -- Labels to set on the item.
+  labels: {}
+
 # -- Set the strategy for the default pod options. Defaults to overwrite.
 # overwrite: If pod-level options are set, use those instead of the defaults.
 # merge: If pod-level options are set, merge them with the defaults.

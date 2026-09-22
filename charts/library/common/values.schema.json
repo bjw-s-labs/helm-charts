@@ -46,6 +46,24 @@
         }
       }
     },
+    "namespace": {
+      "description": "Configure the creation of the Helm release namespace.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "create": {
+          "description": "Set to true to create the Helm release namespace.",
+          "type": "boolean",
+          "default": false
+        },
+        "annotations": {
+          "$ref": "schemas/definitions.json#/$defs/annotations"
+        },
+        "labels": {
+          "$ref": "schemas/definitions.json#/$defs/labels"
+        }
+      }
+    },
     "defaultPodOptionsStrategy": {
       "description": "Set the strategy for the default pod options. Defaults to overwrite.\noverwrite: If pod-level options are set, use those instead of the defaults.\nmerge: If pod-level options are set, merge them with the defaults.",
       "type": "string",

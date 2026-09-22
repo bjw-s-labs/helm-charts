@@ -14,6 +14,7 @@ Secondary entrypoint and primary loader for the common chart
   {{- include "bjw-s.common.lib.chart.validate" $renderContext -}}
 
   {{- /* Build the templates */ -}}
+  {{- include "bjw-s.common.render.namespace" $renderContext | nindent 0 -}}
   {{- include "bjw-s.common.render.pvcs" $renderContext | nindent 0 -}}
   {{- include "bjw-s.common.render.serviceAccount" $renderContext | nindent 0 -}}
   {{- include "bjw-s.common.render.configMaps.fromFolder" $renderContext | nindent 0 -}}

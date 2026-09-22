@@ -37,6 +37,9 @@ annotations:
     - kind: added
       description: |-
         Added support for referencing controller in networkPolicy rules
+    - kind: added
+      description: |-
+        Added support for creating the Helm release namespace
     - kind: changed
       description: |-
         Improve cilliumNetworkPolicy schema validation
