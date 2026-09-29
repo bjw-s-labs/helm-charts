@@ -16,6 +16,6 @@ sources:
   - https://github.com/bjw-s-labs/helm-charts
 annotations:
   artifacthub.io/changes: |-
-    - kind: added
+    - kind: fixed
       description: |-
-        <tbd>
+        Render clusterIP in LoadBalancer and NodePort Services
