@@ -21,7 +21,7 @@ jobs:
     name: Prepare data required for workflow
     runs-on: ubuntu-24.04
     outputs:
-      addedOrModifiedFiles: ${{ steps.added-modified-files.outputs.changed_files }}
+      addedOrModifiedFiles: ${{ steps.added-modified-files.outputs.all_changed_files }}
       chartsToLint: ${{ steps.charts-to-lint.outputs.filteredCharts }}
       chartsToInstall: ${{ steps.charts-to-install.outputs.filteredCharts }}
     steps:
@@ -43,21 +43,27 @@ jobs:
 
       - name: Get all added or modified files
         id: added-modified-files
-        uses: bjw-s-labs/action-changed-files@015416e33c709af88f84a4496f4030c1f0ef212e # v0.5.0
+        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
+        with:
+          json: true
+          escape_json: false
 
       - name: Get all added or modified charts
         id: changed-charts
-        uses: bjw-s-labs/action-changed-files@015416e33c709af88f84a4496f4030c1f0ef212e # v0.5.0
+        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
         with:
           path: charts
-          include_only_directories: true
-          max_depth: 2
+          dir_names: true
+          dir_names_exclude_current_dir: true
+          dir_names_max_depth: 2
+          json: true
+          escape_json: false
 
       - name: Determine charts to lint
         id: charts-to-lint
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
         env:
-          CHANGED_CHARTS: ${{ steps.changed-charts.outputs.changed_files }}
+          CHANGED_CHARTS: ${{ steps.changed-charts.outputs.all_changed_files }}
           REPO_SETTINGS: ${{ steps.repo-config.outputs.config }}
         with:
           script: |
@@ -73,7 +79,7 @@ jobs:
         id: charts-to-install
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
         env:
-          CHANGED_CHARTS: ${{ steps.changed-charts.outputs.changed_files }}
+          CHANGED_CHARTS: ${{ steps.changed-charts.outputs.all_changed_files }}
           REPO_SETTINGS: ${{ steps.repo-config.outputs.config }}
         with:
           script: |
