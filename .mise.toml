@@ -14,7 +14,7 @@ helm = "4.3.0"
 just = "1.58.0"
 node = "26"                         # Required for Astro (>=22.12.0)
 k3d = "5.9.0"
-uv = "0.12.15"
+uv = "0.12.17"
 yamllint = "1.38.0"
 yamlfmt = "0.21.0"
 yq = "4.53.6"
