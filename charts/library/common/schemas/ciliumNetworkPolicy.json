@@ -1,6 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.3.0/charts/library/common/schemas/ciliumNetworkPolicy.json",
+  "$comment": "These are direct top-level cilium.io/v2 rule-item allowlists based on Cilium v1.20.2: https://raw.githubusercontent.com/cilium/cilium/v1.20.2/pkg/k8s/apis/cilium.io/client/crds/v2/ciliumnetworkpolicies.yaml. Nested allowed values remain intentionally permissive.",
   "$defs": {
     "base": {
       "type": "object",
@@ -50,20 +51,20 @@
           "type": "string"
         },
         "ingress": {
-          "description": "Cilium ingress rules. See https://docs.cilium.io/en/stable/security/policy/language/ for details.",
-          "$ref": "#/$defs/rules"
+          "description": "Ingress allow rules. At most one peer selector may be set. toPorts may be combined with a peer selector; icmps may not.",
+          "$ref": "#/$defs/ingressRules"
         },
         "ingressDeny": {
-          "description": "Cilium ingress deny rules. Deny rules take precedence over allow rules.",
-          "$ref": "#/$defs/rules"
+          "description": "Ingress deny rules. At most one peer selector may be set. toPorts may be combined with a peer selector; icmps may not.",
+          "$ref": "#/$defs/ingressDenyRules"
         },
         "egress": {
-          "description": "Cilium egress rules. See https://docs.cilium.io/en/stable/security/policy/language/ for details.",
-          "$ref": "#/$defs/rules"
+          "description": "Egress allow rules. At most one peer selector may be set. toPorts may be combined with a peer selector; icmps may not.",
+          "$ref": "#/$defs/egressRules"
         },
         "egressDeny": {
-          "description": "Cilium egress deny rules. Deny rules take precedence over allow rules.",
-          "$ref": "#/$defs/rules"
+          "description": "Egress deny rules. At most one peer selector may be set. toPorts may be combined with a peer selector; icmps may not.",
+          "$ref": "#/$defs/egressDenyRules"
         },
         "enableDefaultDeny": {
           "description": "Configure whether the selected endpoints enter default-deny mode for ingress and egress traffic.",
@@ -168,11 +169,465 @@
         }
       ]
     },
-    "rules": {
+    "noIcmpsWithToPorts": {
+      "not": {
+        "required": [
+          "icmps",
+          "toPorts"
+        ]
+      }
+    },
+    "presenceIngressAllowPeerExclusivity": {
+      "description": "At most one peer selector may be present. Other rule fields such as toPorts may coexist.",
+      "oneOf": [
+        {
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "fromEndpoints"
+                ]
+              },
+              {
+                "required": [
+                  "fromCIDR"
+                ]
+              },
+              {
+                "required": [
+                  "fromCIDRSet"
+                ]
+              },
+              {
+                "required": [
+                  "fromEntities"
+                ]
+              },
+              {
+                "required": [
+                  "fromGroups"
+                ]
+              },
+              {
+                "required": [
+                  "fromNodes"
+                ]
+              },
+              {
+                "required": [
+                  "fromController"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "required": [
+            "fromEndpoints"
+          ]
+        },
+        {
+          "required": [
+            "fromCIDR"
+          ]
+        },
+        {
+          "required": [
+            "fromCIDRSet"
+          ]
+        },
+        {
+          "required": [
+            "fromEntities"
+          ]
+        },
+        {
+          "required": [
+            "fromGroups"
+          ]
+        },
+        {
+          "required": [
+            "fromNodes"
+          ]
+        },
+        {
+          "required": [
+            "fromController"
+          ]
+        }
+      ]
+    },
+    "presenceIngressDenyPeerExclusivity": {
+      "description": "At most one peer selector may be present. Other rule fields such as toPorts may coexist.",
+      "oneOf": [
+        {
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "fromEndpoints"
+                ]
+              },
+              {
+                "required": [
+                  "fromCIDR"
+                ]
+              },
+              {
+                "required": [
+                  "fromCIDRSet"
+                ]
+              },
+              {
+                "required": [
+                  "fromEntities"
+                ]
+              },
+              {
+                "required": [
+                  "fromGroups"
+                ]
+              },
+              {
+                "required": [
+                  "fromNodes"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "required": [
+            "fromEndpoints"
+          ]
+        },
+        {
+          "required": [
+            "fromCIDR"
+          ]
+        },
+        {
+          "required": [
+            "fromCIDRSet"
+          ]
+        },
+        {
+          "required": [
+            "fromEntities"
+          ]
+        },
+        {
+          "required": [
+            "fromGroups"
+          ]
+        },
+        {
+          "required": [
+            "fromNodes"
+          ]
+        }
+      ]
+    },
+    "presenceEgressAllowPeerExclusivity": {
+      "description": "At most one peer selector may be present. Other rule fields such as toPorts may coexist.",
+      "oneOf": [
+        {
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "toEndpoints"
+                ]
+              },
+              {
+                "required": [
+                  "toCIDR"
+                ]
+              },
+              {
+                "required": [
+                  "toCIDRSet"
+                ]
+              },
+              {
+                "required": [
+                  "toEntities"
+                ]
+              },
+              {
+                "required": [
+                  "toServices"
+                ]
+              },
+              {
+                "required": [
+                  "toGroups"
+                ]
+              },
+              {
+                "required": [
+                  "toNodes"
+                ]
+              },
+              {
+                "required": [
+                  "toFQDNs"
+                ]
+              },
+              {
+                "required": [
+                  "toController"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "required": [
+            "toEndpoints"
+          ]
+        },
+        {
+          "required": [
+            "toCIDR"
+          ]
+        },
+        {
+          "required": [
+            "toCIDRSet"
+          ]
+        },
+        {
+          "required": [
+            "toEntities"
+          ]
+        },
+        {
+          "required": [
+            "toServices"
+          ]
+        },
+        {
+          "required": [
+            "toGroups"
+          ]
+        },
+        {
+          "required": [
+            "toNodes"
+          ]
+        },
+        {
+          "required": [
+            "toFQDNs"
+          ]
+        },
+        {
+          "required": [
+            "toController"
+          ]
+        }
+      ]
+    },
+    "presenceEgressDenyPeerExclusivity": {
+      "description": "At most one peer selector may be present. Other rule fields such as toPorts may coexist.",
+      "oneOf": [
+        {
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "toEndpoints"
+                ]
+              },
+              {
+                "required": [
+                  "toCIDR"
+                ]
+              },
+              {
+                "required": [
+                  "toCIDRSet"
+                ]
+              },
+              {
+                "required": [
+                  "toEntities"
+                ]
+              },
+              {
+                "required": [
+                  "toServices"
+                ]
+              },
+              {
+                "required": [
+                  "toGroups"
+                ]
+              },
+              {
+                "required": [
+                  "toNodes"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "required": [
+            "toEndpoints"
+          ]
+        },
+        {
+          "required": [
+            "toCIDR"
+          ]
+        },
+        {
+          "required": [
+            "toCIDRSet"
+          ]
+        },
+        {
+          "required": [
+            "toEntities"
+          ]
+        },
+        {
+          "required": [
+            "toServices"
+          ]
+        },
+        {
+          "required": [
+            "toGroups"
+          ]
+        },
+        {
+          "required": [
+            "toNodes"
+          ]
+        }
+      ]
+    },
+    "ingressRules": {
+      "description": "Ingress allow rules accept these direct Cilium 1.20.2 keys: fromEndpoints, fromRequires, fromCIDR, fromCIDRSet, fromEntities, fromGroups, fromNodes, toPorts, icmps, and authentication. Peer selector keys are mutually exclusive by presence, with fromController treated as fromEndpoints; icmps and toPorts are mutually exclusive by presence. Nested values remain permissive, but unknown direct fields are rejected. authentication is composable.",
       "type": "array",
       "items": {
         "type": "object",
-        "additionalProperties": true
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "$ref": "#/$defs/presenceIngressAllowPeerExclusivity"
+          },
+          {
+            "$ref": "#/$defs/noIcmpsWithToPorts"
+          }
+        ],
+        "properties": {
+          "fromEndpoints": {},
+          "fromRequires": {},
+          "fromCIDR": {},
+          "fromCIDRSet": {},
+          "fromEntities": {},
+          "fromGroups": {},
+          "fromNodes": {},
+          "toPorts": {},
+          "icmps": {},
+          "authentication": {},
+          "fromController": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ingressDenyRules": {
+      "description": "Ingress deny rules accept these direct Cilium 1.20.2 keys: fromEndpoints, fromRequires, fromCIDR, fromCIDRSet, fromEntities, fromGroups, fromNodes, toPorts, and icmps. Peer keys are mutually exclusive by presence, and icmps and toPorts are mutually exclusive by presence. Nested values remain permissive, but unknown direct fields are rejected. Deny rules do not support fromController or authentication.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "$ref": "#/$defs/presenceIngressDenyPeerExclusivity"
+          },
+          {
+            "$ref": "#/$defs/noIcmpsWithToPorts"
+          }
+        ],
+        "properties": {
+          "fromEndpoints": {},
+          "fromRequires": {},
+          "fromCIDR": {},
+          "fromCIDRSet": {},
+          "fromEntities": {},
+          "fromGroups": {},
+          "fromNodes": {},
+          "toPorts": {},
+          "icmps": {}
+        }
+      }
+    },
+    "egressRules": {
+      "description": "Egress allow rules accept these direct Cilium 1.20.2 keys: toEndpoints, toRequires, toCIDR, toCIDRSet, toEntities, toServices, toGroups, toNodes, toPorts, toFQDNs, icmps, and authentication. Peer selector keys are mutually exclusive by presence, with toController treated as toEndpoints; icmps and toPorts are mutually exclusive by presence. Nested values remain permissive, but unknown direct fields are rejected. authentication is composable.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "$ref": "#/$defs/presenceEgressAllowPeerExclusivity"
+          },
+          {
+            "$ref": "#/$defs/noIcmpsWithToPorts"
+          }
+        ],
+        "properties": {
+          "toEndpoints": {},
+          "toRequires": {},
+          "toCIDR": {},
+          "toCIDRSet": {},
+          "toEntities": {},
+          "toServices": {},
+          "toGroups": {},
+          "toNodes": {},
+          "toPorts": {},
+          "toFQDNs": {},
+          "icmps": {},
+          "authentication": {},
+          "toController": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "egressDenyRules": {
+      "description": "Egress deny rules accept these direct Cilium 1.20.2 keys: toEndpoints, toRequires, toCIDR, toCIDRSet, toEntities, toServices, toGroups, toNodes, toPorts, and icmps. Peer keys are mutually exclusive by presence, and icmps and toPorts are mutually exclusive by presence. Nested values remain permissive, but unknown direct fields are rejected. Deny rules do not support toController or authentication.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "$ref": "#/$defs/presenceEgressDenyPeerExclusivity"
+          },
+          {
+            "$ref": "#/$defs/noIcmpsWithToPorts"
+          }
+        ],
+        "properties": {
+          "toEndpoints": {},
+          "toRequires": {},
+          "toCIDR": {},
+          "toCIDRSet": {},
+          "toEntities": {},
+          "toServices": {},
+          "toGroups": {},
+          "toNodes": {},
+          "toPorts": {},
+          "icmps": {}
+        }
       }
     }
   }

@@ -71,9 +71,9 @@ spec:
   policyTypes: {{- toYaml . | nindent 4 -}}
   {{- end }}
   {{- with $networkPolicyObject.rules.ingress }}
-  ingress: {{- include "bjw-s.common.lib.common.renderString" (dict "value" (toYaml .) "rootContext" $rootContext) | nindent 4 -}}
+  ingress: {{- include "bjw-s.common.lib.common.renderString" (dict "value" (include "bjw-s.common.lib.networkpolicy.rules" (dict "rootContext" $rootContext "rules" . "direction" "ingress")) "rootContext" $rootContext) | nindent 4 -}}
   {{- end }}
   {{- with $networkPolicyObject.rules.egress }}
-  egress: {{- include "bjw-s.common.lib.common.renderString" (dict "value" (toYaml .) "rootContext" $rootContext) | nindent 4 -}}
+  egress: {{- include "bjw-s.common.lib.common.renderString" (dict "value" (include "bjw-s.common.lib.networkpolicy.rules" (dict "rootContext" $rootContext "rules" . "direction" "egress")) "rootContext" $rootContext) | nindent 4 -}}
   {{- end }}
 {{- end -}}

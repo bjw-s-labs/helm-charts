@@ -56,3 +56,16 @@ tests:
           rules: {}
     asserts:
       - failedTemplate: {}
+
+  - it: networkpolicy fails validation for an unknown rule peer controller
+    set:
+      networkpolicies.main:
+        controller: main
+        policyTypes: [Ingress]
+        rules:
+          ingress:
+            - from:
+                - controller: missing
+    asserts:
+      - failedTemplate:
+          errorMessage: "NetworkPolicy 'main': Ingress rule references controller 'missing', but no enabled controller exists with that identifier. Enable 'controllers.missing' or choose an enabled controller."

@@ -31,3 +31,59 @@ tests:
           path: spec.egress
           value:
             - {}
+
+  - it: networkpolicy ingress controller peer becomes a pod selector and retains ports
+    set:
+      networkpolicies.main:
+        controller: main
+        policyTypes: [Ingress]
+        rules:
+          ingress:
+            - from:
+                - controller: main
+              ports:
+                - port: 8080
+    documentSelector:
+      path: $[?(@.kind == "NetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.ingress
+          value:
+            - from:
+                - podSelector:
+                    matchLabels:
+                      app.kubernetes.io/controller: main
+                      app.kubernetes.io/instance: RELEASE-NAME
+                      app.kubernetes.io/name: RELEASE-NAME
+              ports:
+                - port: 8080
+
+  - it: networkpolicy egress controller peer becomes a pod selector and retains ports
+    set:
+      networkpolicies.main:
+        controller: main
+        policyTypes: [Egress]
+        rules:
+          egress:
+            - to:
+                - controller: main
+              ports:
+                - port: 53
+                  protocol: UDP
+    documentSelector:
+      path: $[?(@.kind == "NetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.egress
+          value:
+            - to:
+                - podSelector:
+                    matchLabels:
+                      app.kubernetes.io/controller: main
+                      app.kubernetes.io/instance: RELEASE-NAME
+                      app.kubernetes.io/name: RELEASE-NAME
+              ports:
+                - port: 53
+                  protocol: UDP

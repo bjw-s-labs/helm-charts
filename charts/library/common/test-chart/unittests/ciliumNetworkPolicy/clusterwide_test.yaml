@@ -114,3 +114,353 @@ tests:
     asserts:
       - failedTemplate:
           errorPattern: "'not' failed"
+
+  - it: translates toController rules for a CiliumClusterwideNetworkPolicy
+    set:
+      controllers.secondary:
+        containers:
+          main:
+            image:
+              repository: nginx
+              tag: latest
+      networkpolicies.main:
+        type: ciliumClusterwide
+        nodeSelector:
+          matchLabels:
+            kubernetes.io/os: linux
+        egress:
+          - toController: secondary
+    documentSelector:
+      path: $[?(@.kind == "CiliumClusterwideNetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.egress[0].toEndpoints[0].matchLabels
+          value:
+            app.kubernetes.io/controller: secondary
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: RELEASE-NAME
+
+  - it: translates fromController rules for a CiliumClusterwideNetworkPolicy
+    set:
+      controllers.secondary:
+        containers:
+          main:
+            image:
+              repository: nginx
+              tag: latest
+      networkpolicies.main:
+        type: ciliumClusterwide
+        nodeSelector:
+          matchLabels:
+            kubernetes.io/os: linux
+        ingress:
+          - fromController: secondary
+    documentSelector:
+      path: $[?(@.kind == "CiliumClusterwideNetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.ingress[0].fromEndpoints[0].matchLabels
+          value:
+            app.kubernetes.io/controller: secondary
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: RELEASE-NAME
+
+  - it: rejects clusterwide ingress toController as a wrong-direction shorthand
+    set:
+      controllers.secondary:
+        containers:
+          main:
+            image:
+              repository: nginx
+              tag: latest
+      networkpolicies.main:
+        type: ciliumClusterwide
+        ingress:
+          - toController: secondary
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects clusterwide egress fromController as a wrong-direction shorthand
+    set:
+      controllers.secondary:
+        containers:
+          main:
+            image:
+              repository: nginx
+              tag: latest
+      networkpolicies.main:
+        type: ciliumClusterwide
+        egress:
+          - fromController: secondary
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects clusterwide ingress fromController with explicit fromEndpoints
+    set:
+      controllers.secondary:
+        containers:
+          main:
+            image:
+              repository: nginx
+              tag: latest
+      networkpolicies.main:
+        type: ciliumClusterwide
+        ingress:
+          - fromController: secondary
+            fromEndpoints:
+              - matchLabels:
+                  role: explicitly-selected
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects clusterwide egress toController with explicit toEndpoints
+    set:
+      controllers.secondary:
+        containers:
+          main:
+            image:
+              repository: nginx
+              tag: latest
+      networkpolicies.main:
+        type: ciliumClusterwide
+        egress:
+          - toController: secondary
+            toEndpoints:
+              - matchLabels:
+                  role: explicitly-selected
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: renders all clusterwide rule lists and keeps the policy cluster-scoped
+    set:
+      networkpolicies.main:
+        type: ciliumClusterwide
+        ingress:
+          - fromEntities:
+              - cluster
+        ingressDeny:
+          - fromCIDR:
+              - 10.0.0.0/8
+        egress:
+          - toFQDNs:
+              - matchName: api.example.com
+            toPorts:
+              - ports:
+                  - port: "443"
+                    protocol: TCP
+        egressDeny:
+          - toEntities:
+              - world
+    documentSelector:
+      path: $[?(@.kind == "CiliumClusterwideNetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - notExists:
+          path: metadata.namespace
+      - equal:
+          path: spec.ingressDeny[0].fromCIDR[0]
+          value: 10.0.0.0/8
+      - equal:
+          path: spec.egress[0].toFQDNs[0].matchName
+          value: api.example.com
+      - equal:
+          path: spec.egressDeny[0].toEntities[0]
+          value: world
+
+  - it: rejects unknown direct clusterwide ingress rule fields
+    set:
+      networkpolicies.main:
+        type: ciliumClusterwide
+        ingress:
+          - unknownDirectField: true
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects unknown direct clusterwide ingress deny rule fields
+    set:
+      networkpolicies.main:
+        type: ciliumClusterwide
+        ingressDeny:
+          - unknownDirectField: true
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects unknown direct clusterwide egress rule fields
+    set:
+      networkpolicies.main:
+        type: ciliumClusterwide
+        egress:
+          - unknownDirectField: true
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects unknown direct clusterwide egress deny rule fields
+    set:
+      networkpolicies.main:
+        type: ciliumClusterwide
+        egressDeny:
+          - unknownDirectField: true
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: permits same-field peer entries, empty peers, and peers with toPorts
+    set:
+      networkpolicies.main:
+        type: ciliumClusterwide
+        ingress:
+          - fromEndpoints: []
+            toPorts:
+              - ports: [{port: "443", protocol: TCP}]
+          - fromEntities: [cluster, world]
+        egress:
+          - toEndpoints: [one, two]
+            toPorts:
+              - ports: [{port: "53", protocol: UDP}]
+    documentSelector:
+      path: $[?(@.kind == "CiliumClusterwideNetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.ingress[0].fromEndpoints
+          value: []
+      - equal:
+          path: spec.ingress[1].fromEntities
+          value: [cluster, world]
+      - equal:
+          path: spec.egress[0].toEndpoints
+          value: [one, two]
+
+  - it: rejects mixed non-empty clusterwide ingress peer selectors
+    set:
+      networkpolicies.main:
+        type: ciliumClusterwide
+        ingress:
+          - fromCIDRSet: [10.0.0.0/8]
+            fromNodes: [node-a]
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects a clusterwide ingress controller shorthand with an empty value and another peer
+    set:
+      networkpolicies.main:
+        type: ciliumClusterwide
+        ingress:
+          - fromController: ""
+            fromEntities: [cluster]
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects empty icmps and toPorts keys together in a clusterwide egress rule
+    set:
+      networkpolicies.main:
+        type: ciliumClusterwide
+        egress:
+          - icmps: []
+            toPorts: []
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects an empty icmps key with a non-empty toPorts key in a clusterwide egress rule
+    set:
+      networkpolicies.main:
+        type: ciliumClusterwide
+        egress:
+          - icmps: []
+            toPorts:
+              - ports: [{port: "443", protocol: TCP}]
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects a non-empty icmps key with an empty toPorts key in a clusterwide egress rule
+    set:
+      networkpolicies.main:
+        type: ciliumClusterwide
+        egress:
+          - icmps:
+              - fields: [{type: 8}]
+            toPorts: []
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects non-empty icmps with toPorts in a clusterwide egress allow rule
+    set:
+      networkpolicies.main:
+        type: ciliumClusterwide
+        egress:
+          - toEntities: [cluster]
+            toPorts:
+              - ports: [{port: "443", protocol: TCP}]
+            icmps:
+              - fields: [{type: 8}]
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects a clusterwide egress toController with another peer key
+    set:
+      controllers.secondary:
+        containers:
+          main:
+            image:
+              repository: nginx
+              tag: latest
+      networkpolicies.main:
+        type: ciliumClusterwide
+        egress:
+          - toController: secondary
+            toEntities: [cluster]
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects an empty clusterwide egress toController with another peer key
+    set:
+      networkpolicies.main:
+        type: ciliumClusterwide
+        egress:
+          - toController: ""
+            toEntities: [cluster]
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects icmps with toPorts in a clusterwide ingress allow rule
+    set:
+      networkpolicies.main:
+        type: ciliumClusterwide
+        ingress:
+          - icmps:
+              - fields: [{type: 8}]
+            toPorts:
+              - ports: [{port: "443", protocol: TCP}]
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects icmps with toPorts in a clusterwide ingress deny rule
+    set:
+      networkpolicies.main:
+        type: ciliumClusterwide
+        ingressDeny:
+          - icmps:
+              - fields: [{type: 8}]
+            toPorts:
+              - ports: [{port: "443", protocol: TCP}]
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema

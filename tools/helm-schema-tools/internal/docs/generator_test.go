@@ -435,7 +435,8 @@ func TestGenerator_Generate_OneOfSchema(t *testing.T) {
 						{
 							"properties": {
 								"type": {"type": "string", "const": "pvc", "description": "Type of persistence"},
-								"enabled": {"type": "boolean", "description": "Enable persistence"}
+								"enabled": {"type": "boolean", "description": "Enable persistence"},
+								"longDescription": {"type": "string", "description": "This complete variant property description is deliberately longer than the compact table summary limit and must remain fully readable below the table"}
 							}
 						}
 					]
@@ -469,6 +470,14 @@ func TestGenerator_Generate_OneOfSchema(t *testing.T) {
 	// Properties from the variant should be listed.
 	if !strings.Contains(contentStr, "| `enabled`") {
 		t.Error("Missing enabled property from oneOf variant")
+	}
+	// Variant property tables stay compact, while long descriptions are exposed
+	// in a details block below the table.
+	if !strings.Contains(contentStr, "| `longDescription` | `string` | No | - | This complete variant property description is deliberatel... |") {
+		t.Error("Missing truncated longDescription row from oneOf variant")
+	}
+	if !strings.Contains(contentStr, "<details>") || !strings.Contains(contentStr, "This complete variant property description is deliberately longer than the compact table summary limit and must remain fully readable below the table") {
+		t.Error("Missing full longDescription details block for oneOf variant")
 	}
 }
 

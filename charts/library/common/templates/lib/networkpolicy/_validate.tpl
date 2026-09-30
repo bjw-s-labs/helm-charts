@@ -28,4 +28,19 @@ Validate networkPolicy values
       {{- fail (printf "NetworkPolicy '%s': No enabled controller found with identifier '%s'. Available controllers: [%s]" $networkpolicyObject.identifier $networkpolicyObject.controller (join ", " $availableControllers)) -}}
     {{- end -}}
   {{- end -}}
+
+  {{- range $direction := list "ingress" "egress" -}}
+    {{- $peerField := ternary "from" "to" (eq $direction "ingress") -}}
+    {{- range $rule := (get ($networkpolicyObject.rules | default dict) $direction | default list) -}}
+      {{- range $peer := (get $rule $peerField | default list) -}}
+        {{- if hasKey $peer "controller" -}}
+          {{- $controllerIdentifier := get $peer "controller" -}}
+          {{- $controller := include "bjw-s.common.lib.controller.getByIdentifier" (dict "rootContext" $rootContext "id" $controllerIdentifier) -}}
+          {{- if empty $controller -}}
+            {{- fail (printf "NetworkPolicy '%s': %s rule references controller '%s', but no enabled controller exists with that identifier. Enable 'controllers.%s' or choose an enabled controller." $networkpolicyObject.identifier (title $direction) $controllerIdentifier $controllerIdentifier) -}}
+          {{- end -}}
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
 {{- end -}}

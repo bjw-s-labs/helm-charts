@@ -89,6 +89,27 @@ Keys are identifiers for `{{ .ParentName }}` instances.
 {{- range .Properties }}
 | `{{ .Key }}` | `{{ typeString .Schema }}` | {{ if .Required }}**Yes**{{ else }}No{{ end }} | {{ defaultVal .Schema }} | {{ descWithExtras .Schema 60 }} |
 {{- end }}
+{{- $hasVariantDetails := false }}
+{{- range .Properties }}
+{{- if gt (len (description .Schema)) 60 }}
+{{- $hasVariantDetails = true }}
+{{- end }}
+{{- end }}
+{{- if $hasVariantDetails }}
+
+<details>
+<summary>Property details</summary>
+
+{{- range .Properties }}
+{{- if gt (len (description .Schema)) 60 }}
+#### `{{ .Key }}`
+
+{{ description .Schema }}
+
+{{- end }}
+{{- end }}
+</details>
+{{- end }}
 {{- end }}
 
   </TabItem>

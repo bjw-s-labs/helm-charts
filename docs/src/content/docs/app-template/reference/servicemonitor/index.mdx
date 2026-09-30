@@ -40,7 +40,7 @@ Available properties:
 | `labels` | `object / null` | No | - | Labels to set on the item. Keys and values support Helm t... |
 | `prefix` | `string` | No | `` | Prefix to prepend to the resource name. Mutually exclusiv... |
 | [`selector`](./selector/) | `object` | No | - | Selector to select Endpoints objects. |
-| `service` | `object` | No | - | Service to monitor. Either &#39;serviceName&#39; or &#39;... |
+| [`service`](./service/) | `object` | No | - | Service to monitor. Either &#39;serviceName&#39; or &#39;... |
 | `serviceName` | `string` | No | - | Reference to a Service name to monitor. Deprecated in fav... |
 | `suffix` | `string` | No | - | Suffix to append to the resource name. Defaults to the re... |
 | `targetLabels` | `array` | No | - | Transfers labels from the Kubernetes Service onto the cre... |
@@ -67,14 +67,6 @@ Labels to set on the item. Keys and values support Helm templating.
 
 Prefix to prepend to the resource name. Mutually exclusive with forceRename.
 
-#### service
-
-Service to monitor. Either &#39;serviceName&#39; or &#39;service&#39; must be specified.
-
-| Property | Type | Required | Default | Description |
-|----------|------|----------|---------|-------------|
-| `name` | `string` | **Yes** | - |  |
-
 #### serviceName
 
 Reference to a Service name to monitor. Deprecated in favor of &#39;service&#39;.
@@ -91,3 +83,4 @@ Transfers labels from the Kubernetes Service onto the created metrics. See https
 
 
 - [`selector`](./selector/)
+- [`service`](./service/)

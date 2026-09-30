@@ -75,13 +75,13 @@ spec:
   description: {{ include "bjw-s.common.lib.common.renderString" (dict "value" . "rootContext" $rootContext) | quote }}
   {{- end }}
   {{- with $ciliumNetworkPolicyObject.ingress }}
-  ingress: {{- include "bjw-s.common.lib.common.renderString" (dict "value" (toYaml .) "rootContext" $rootContext) | nindent 4 -}}
+  ingress: {{- include "bjw-s.common.lib.common.renderString" (dict "value" (include "bjw-s.common.lib.ciliumNetworkPolicy.rules" (dict "rootContext" $rootContext "rules" . "direction" "ingress")) "rootContext" $rootContext) | nindent 4 -}}
   {{- end }}
   {{- with $ciliumNetworkPolicyObject.ingressDeny }}
   ingressDeny: {{- include "bjw-s.common.lib.common.renderString" (dict "value" (toYaml .) "rootContext" $rootContext) | nindent 4 -}}
   {{- end }}
   {{- with $ciliumNetworkPolicyObject.egress }}
-  egress: {{- include "bjw-s.common.lib.common.renderString" (dict "value" (toYaml .) "rootContext" $rootContext) | nindent 4 -}}
+  egress: {{- include "bjw-s.common.lib.common.renderString" (dict "value" (include "bjw-s.common.lib.ciliumNetworkPolicy.rules" (dict "rootContext" $rootContext "rules" . "direction" "egress")) "rootContext" $rootContext) | nindent 4 -}}
   {{- end }}
   {{- with $ciliumNetworkPolicyObject.egressDeny }}
   egressDeny: {{- include "bjw-s.common.lib.common.renderString" (dict "value" (toYaml .) "rootContext" $rootContext) | nindent 4 -}}
