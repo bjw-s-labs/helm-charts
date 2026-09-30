@@ -55,7 +55,7 @@ CiliumNetworkPolicy implementation to render.
 
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
-| `annotations` | `object / null` | No | - | Annotations to set on the item. |
+| `annotations` | `object / null` | No | - | Annotations to set on the item. Keys and values support H... |
 | `controller` | `string` | No | - | Controller this CiliumNetworkPolicy should target. |
 | `description` | `string` | No | - | Human-readable description of the policy. |
 | `egress` | `array` | No | - | Cilium egress rules. See https://docs.cilium.io/en/stable... |
@@ -67,7 +67,7 @@ CiliumNetworkPolicy implementation to render.
 | `forceRename` | `string` | No | - | Override the default resource name. Mutually exclusive wi... |
 | `ingress` | `array` | **Yes** | - | Cilium ingress rules. See https://docs.cilium.io/en/stabl... |
 | `ingressDeny` | `array` | No | - | Cilium ingress deny rules. Deny rules take precedence ove... |
-| `labels` | `object / null` | No | - | Labels to set on the item. |
+| `labels` | `object / null` | No | - | Labels to set on the item. Keys and values support Helm t... |
 | `log` | `string` | No | - | Free-form value included in Hubble flows matching this po... |
 | `nodeSelector` | `object` | No | - | Node selector for a CiliumClusterwideNetworkPolicy. |
 | `prefix` | `string` | No | `` | Prefix to prepend to the resource name. Mutually exclusiv... |
@@ -95,7 +95,7 @@ networkpolicies:
 
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
-| `annotations` | `object / null` | No | - | Annotations to set on the item. |
+| `annotations` | `object / null` | No | - | Annotations to set on the item. Keys and values support H... |
 | `controller` | `string` | No | - | Controller this CiliumNetworkPolicy should target. |
 | `description` | `string` | No | - | Human-readable description of the policy. |
 | `egress` | `array` | No | - | Cilium egress rules. See https://docs.cilium.io/en/stable... |
@@ -107,7 +107,7 @@ networkpolicies:
 | `forceRename` | `string` | No | - | Override the default resource name. Mutually exclusive wi... |
 | `ingress` | `array` | **Yes** | - | Cilium ingress rules. See https://docs.cilium.io/en/stabl... |
 | `ingressDeny` | `array` | No | - | Cilium ingress deny rules. Deny rules take precedence ove... |
-| `labels` | `object / null` | No | - | Labels to set on the item. |
+| `labels` | `object / null` | No | - | Labels to set on the item. Keys and values support Helm t... |
 | `log` | `string` | No | - | Free-form value included in Hubble flows matching this po... |
 | `nodeSelector` | `object` | No | - | Node selector for a CiliumClusterwideNetworkPolicy. |
 | `prefix` | `string` | No | `` | Prefix to prepend to the resource name. Mutually exclusiv... |
@@ -122,12 +122,12 @@ Common properties:
 
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
-| `annotations` | `object / null` | No | - | Annotations to set on the item. |
+| `annotations` | `object / null` | No | - | Annotations to set on the item. Keys and values support H... |
 | `controller` | `string` | No | - | Controller this NetworkPolicy should target. |
 | `enabled` | `boolean` | No | `true` | Set to false to disable the NetworkPolicy. |
 | `extraSelectorLabels` | `object` | No | - | Additional match labels to add to the pod selector. These... |
 | `forceRename` | `string` | No | - | Override the default resource name. Mutually exclusive wi... |
-| `labels` | `object / null` | No | - | Labels to set on the item. |
+| `labels` | `object / null` | No | - | Labels to set on the item. Keys and values support Helm t... |
 | `podSelector` | `any` | No | - | Custom podSelector for the NetworkPolicy. Takes precedenc... |
 | `policyTypes` | `array` | **Yes** | - | Policy types for the NetworkPolicy. |
 | `prefix` | `string` | No | `` | Prefix to prepend to the resource name. Mutually exclusiv... |
@@ -137,6 +137,10 @@ Common properties:
 
 ### Property Details
 
+#### annotations
+
+Annotations to set on the item. Keys and values support Helm templating.
+
 #### extraSelectorLabels
 
 Additional match labels to add to the pod selector. These are merged with labels derived from the controller identifier.
@@ -144,6 +148,10 @@ Additional match labels to add to the pod selector. These are merged with labels
 #### forceRename
 
 Override the default resource name. Mutually exclusive with prefix and suffix.
+
+#### labels
+
+Labels to set on the item. Keys and values support Helm templating.
 
 #### podSelector
 

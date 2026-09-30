@@ -18,7 +18,7 @@ Useful for setting node selectors, tolerations, security contexts, or service ac
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
 | [`affinity`](./affinity/) | `object` | No | - | Set affinity constraint rules. See https://kubernetes.io/... |
-| `annotations` | `object / null` | No | - | Annotations to set on the item. |
+| `annotations` | `object / null` | No | - | Annotations to set on the item. Keys and values support H... |
 | `automountServiceAccountToken` | `boolean` | No | `false` | Set to true to automatically mount the service account to... |
 | [`dnsConfig`](./dnsconfig/) | `object` | No | - | Specifies the DNS parameters of a pod. Parameters specifi... |
 | `dnsPolicy` | `string` | No | - | Configure the Pod DNS policy. Defaults to &#39;ClusterFir... |
@@ -30,7 +30,7 @@ Useful for setting node selectors, tolerations, security contexts, or service ac
 | `hostUsers` | `boolean / null` | No | - | Set to false to create a new userns for the Pod. (Require... |
 | `hostname` | `string` | No | - | Set the Pod&#39;s hostname. |
 | `imagePullSecrets` | `array` | No | - | Set image pull secrets. |
-| `labels` | `object / null` | No | - | Labels to set on the item. |
+| `labels` | `object / null` | No | - | Labels to set on the item. Keys and values support Helm t... |
 | `nodeSelector` | `object` | No | - | Node selection constraint. See https://kubernetes.io/docs... |
 | `priorityClassName` | `string` | No | - | Custom priority class for different treatment by the sche... |
 | `resizePolicy` | `array` | No | - | Pod-level resize policy for controlling container restart... |
@@ -47,6 +47,10 @@ Useful for setting node selectors, tolerations, security contexts, or service ac
 | `topologySpreadConstraints` | `array` | No | - | Defines topologySpreadConstraint rules. See https://kuber... |
 
 ### Property Details
+
+#### annotations
+
+Annotations to set on the item. Keys and values support Helm templating.
 
 #### automountServiceAccountToken
 
@@ -73,6 +77,10 @@ Set to false to disable host networking on the Pod. When using hostNetwork, make
 #### hostUsers
 
 Set to false to create a new userns for the Pod. (Requires Kubernetes 1.29 or newer)
+
+#### labels
+
+Labels to set on the item. Keys and values support Helm templating.
 
 #### nodeSelector
 

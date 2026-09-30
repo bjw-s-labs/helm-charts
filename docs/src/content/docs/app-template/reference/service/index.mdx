@@ -45,7 +45,7 @@ Available properties:
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
 | `allocateLoadBalancerNodePorts` | `boolean` | No | - |  |
-| `annotations` | `object / null` | No | - | Annotations to set on the item. |
+| `annotations` | `object / null` | No | - | Annotations to set on the item. Keys and values support H... |
 | `clusterIP` | `string` | No | - |  |
 | `controller` | `string` | No | - | Controller this Service should target. |
 | `enabled` | `boolean` | No | `true` | Set to false to disable the Service. |
@@ -57,7 +57,7 @@ Available properties:
 | `internalTrafficPolicy` | `string` | No | - | internalTrafficPolicy for the Service. Supported values: ... |
 | `ipFamilies` | `array` | No | - | IP families for the Service. Supported values: IPv4, IPv6. |
 | `ipFamilyPolicy` | `string` | No | - | ipFamilyPolicy for the Service. Supported values: SingleS... |
-| `labels` | `object / null` | No | - | Labels to set on the item. |
+| `labels` | `object / null` | No | - | Labels to set on the item. Keys and values support Helm t... |
 | `loadBalancerClass` | `string` | No | - |  |
 | `loadBalancerIP` | `string` | No | - |  |
 | `loadBalancerSourceRanges` | `array` | No | - |  |
@@ -72,6 +72,10 @@ Available properties:
 | `type` | `string` | No | - | Service type. Supported values: ClusterIP, NodePort, Load... |
 
 ### Property Details
+
+#### annotations
+
+Annotations to set on the item. Keys and values support Helm templating.
 
 #### externalTrafficPolicy
 
@@ -96,6 +100,10 @@ See https://kubernetes.io/docs/concepts/services-networking/service-traffic-poli
 ipFamilyPolicy for the Service. Supported values: SingleStack, PreferDualStack, RequireDualStack.
 
 **Allowed values:** `SingleStack`, `PreferDualStack`, `RequireDualStack`
+
+#### labels
+
+Labels to set on the item. Keys and values support Helm templating.
 
 #### prefix
 

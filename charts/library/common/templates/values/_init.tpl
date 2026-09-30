@@ -3,6 +3,7 @@ Merge the local chart values and the common chart defaults
 */}}
 {{/*
 String evaluation is a single pass against the post-merge root context.
+Annotation and label keys are evaluated because they are user-defined metadata.
 ExternalSecret target template data is intentionally deferred for downstream evaluation.
 */}}
 {{- define "bjw-s.common.values.evaluateTemplate" -}}
@@ -13,7 +14,16 @@ ExternalSecret target template data is intentionally deferred for downstream eva
   {{- $result := $value -}}
   {{- if kindIs "map" $value -}}
     {{- $result = dict -}}
+    {{- $renderMapKeys := and
+      (not $deferTpl)
+      (gt (len $path) 0)
+      (has (last $path) (list "annotations" "labels"))
+    -}}
     {{- range $key, $item := $value -}}
+      {{- $resultKey := toString $key -}}
+      {{- if and $renderMapKeys (contains "{{" $resultKey) -}}
+        {{- $resultKey = tpl $resultKey $rootContext -}}
+      {{- end -}}
       {{- $itemPath := append $path (toString $key) -}}
       {{- $itemDeferTpl := $deferTpl -}}
       {{- /* ExternalSecret target.template.data is evaluated later by ESO with fetched keys such as .username and .password, so preserve its expressions. */ -}}
@@ -21,7 +31,7 @@ ExternalSecret target template data is intentionally deferred for downstream eva
         {{- $itemDeferTpl = true -}}
       {{- end -}}
       {{- $itemResult := include "bjw-s.common.values.evaluateTemplate" (dict "rootContext" $rootContext "value" $item "path" $itemPath "deferTpl" $itemDeferTpl) | fromJson -}}
-      {{- $_ := set $result $key (index $itemResult "value") -}}
+      {{- $_ := set $result $resultKey (index $itemResult "value") -}}
     {{- end -}}
   {{- else if kindIs "slice" $value -}}
     {{- $result = list -}}
