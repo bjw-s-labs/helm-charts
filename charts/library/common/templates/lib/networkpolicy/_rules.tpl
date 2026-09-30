@@ -13,10 +13,8 @@
         {{- $renderedPeer := deepCopy $peer -}}
         {{- if hasKey $renderedPeer "controller" -}}
           {{- $controllerIdentifier := get $renderedPeer "controller" -}}
-          {{- $selectorLabels := mergeOverwrite
-            (include "bjw-s.common.lib.metadata.selectorLabels" $rootContext | fromYaml)
-            (dict "app.kubernetes.io/controller" $controllerIdentifier)
-          -}}
+          {{- $controllerObject := include "bjw-s.common.lib.controller.getByIdentifier" (dict "rootContext" $rootContext "id" $controllerIdentifier) | fromYaml -}}
+          {{- $selectorLabels := include "bjw-s.common.lib.controller.metadata.selectorLabels" (dict "rootContext" $rootContext "controllerObject" $controllerObject) | fromYaml -}}
           {{- $_ := set $renderedPeer "podSelector" (dict "matchLabels" $selectorLabels) -}}
           {{- $_ := unset $renderedPeer "controller" -}}
         {{- end -}}

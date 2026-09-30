@@ -10,8 +10,7 @@ Returns topologySpreadConstraints, defaulting selectors to the controller.
     {{- $constraints := include "bjw-s.common.lib.common.renderString" (dict "value" . "rootContext" $rootContext) | fromYamlArray -}}
     {{- range $constraint := $constraints -}}
       {{- if not (hasKey $constraint "labelSelector") -}}
-        {{- $matchLabels := include "bjw-s.common.lib.metadata.selectorLabels" $rootContext | fromYaml -}}
-        {{- $_ := set $matchLabels "app.kubernetes.io/controller" $controllerObject.identifier -}}
+        {{- $matchLabels := include "bjw-s.common.lib.controller.metadata.selectorLabels" (dict "rootContext" $rootContext "controllerObject" $controllerObject) | fromYaml -}}
         {{- $_ := set $constraint "labelSelector" (dict "matchLabels" $matchLabels) -}}
       {{- end -}}
     {{- end -}}

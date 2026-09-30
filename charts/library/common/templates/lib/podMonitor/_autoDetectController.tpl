@@ -8,7 +8,7 @@ Autodetects the controller for a PodMonitor object
 
   {{- if eq 1 (len $enabledControllers) -}}
     {{- if and
-        (empty (dig "selector" nil $podMonitorObject))
+        (not (hasKey $podMonitorObject "selector"))
         (empty (dig "controller" "identifier" nil $podMonitorObject))
     -}}
       {{- $_ := set $podMonitorObject "controller" (dict "identifier" ($enabledControllers | keys | first)) -}}

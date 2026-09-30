@@ -25,3 +25,63 @@ tests:
           value:
             matchLabels:
               app: my-app
+
+  - it: an auto-detected controller includes its extra selector labels
+    set:
+      controllers.main.extraSelectorLabels:
+        component: app
+      podMonitor.main:
+        podMetricsEndpoints:
+          - port: http
+    documentSelector:
+      path: $[?(@.kind == "PodMonitor")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/controller: main
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: RELEASE-NAME
+            component: app
+
+  - it: an explicitly empty selector is preserved without requiring a controller
+    set:
+      controllers.main.enabled: false
+      podMonitor.main:
+        selector: {}
+        podMetricsEndpoints:
+          - port: http
+    documentSelector:
+      path: $[?(@.kind == "PodMonitor")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.selector
+          value: {}
+
+  - it: a templated expression selector is preserved when controller extras are present
+    set:
+      controllers.main.extraSelectorLabels:
+        component: app
+      podMonitor.main:
+        selector:
+          matchExpressions:
+            - key: app
+              operator: In
+              values:
+                - "{{ .Release.Name }}"
+        podMetricsEndpoints:
+          - port: http
+    documentSelector:
+      path: $[?(@.kind == "PodMonitor")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.selector
+          value:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - RELEASE-NAME

@@ -125,10 +125,10 @@ spec:
       {{- end }}
     {{- end }}
   {{- end -}}
+  {{- $controllerObject := include "bjw-s.common.lib.controller.getByIdentifier" (dict "rootContext" $rootContext "id" $serviceObject.controller) | fromYaml -}}
   {{- with (merge
     ($serviceObject.extraSelectorLabels | default dict)
-    (dict "app.kubernetes.io/controller" $serviceObject.controller)
-    (include "bjw-s.common.lib.metadata.selectorLabels" $rootContext | fromYaml)
+    (include "bjw-s.common.lib.controller.metadata.selectorLabels" (dict "rootContext" $rootContext "controllerObject" $controllerObject) | fromYaml)
   ) }}
   selector: {{- toYaml . | nindent 4 }}
   {{- end }}

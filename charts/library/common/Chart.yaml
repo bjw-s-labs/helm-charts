@@ -16,6 +16,12 @@ sources:
   - https://github.com/bjw-s-labs/helm-charts
 annotations:
   artifacthub.io/changes: |-
+    - kind: added
+      description: |-
+        Added controller extraSelectorLabels and a shared controller selector labels helper
+    - kind: changed
+      description: |-
+        Use controller selector labels consistently for pod labels and generated pod selectors
     - kind: fixed
       description: |-
         Render clusterIP in LoadBalancer and NodePort Services

@@ -52,6 +52,7 @@ Available properties:
 | [`defaultContainerOptions`](./defaultcontaineroptions/) | `object` | No | - | Default options for all (init)Containers. Each can be ove... |
 | `defaultContainerOptionsStrategy` | `string` | No | `overwrite` | Strategy for default container options. overwrite: use co... |
 | `enabled` | `boolean` | No | `true` | Set to false to disable the controller. |
+| `extraSelectorLabels` | `object` | No | - | Additional labels identifying this controller&#39;s pods.... |
 | `forceRename` | `string` | No | - | Override the default resource name. Mutually exclusive wi... |
 | [`horizontalPodAutoscaler`](./horizontalpodautoscaler/) | `object` | No | - | HorizontalPodAutoscaler configuration for this controller... |
 | [`initContainers`](./initcontainers/) | `object` | No | - | InitContainers as dictionary items. |
@@ -80,6 +81,10 @@ overwrite: use container-level options if set.
 merge: merge container-level options with defaults.
 
 **Allowed values:** `overwrite`, `merge`
+
+#### extraSelectorLabels
+
+Additional labels identifying this controller&#39;s pods. Included in pod labels and generated selectors for workloads, Services, policies, PodMonitors, disruption budgets and default topology spread constraints. Keys and values support Helm templating. These labels override the standard selector labels and take precedence over regular pod labels. Resource-specific extraSelectorLabels apply only to that resource&#39;s selector. Changing controller selector labels on an existing workload may require recreating it because workload selectors are immutable.
 
 #### forceRename
 

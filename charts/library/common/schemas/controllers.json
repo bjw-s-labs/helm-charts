@@ -53,6 +53,18 @@
         "labels": {
           "$ref": "definitions.json#/$defs/labels"
         },
+        "extraSelectorLabels": {
+          "description": "Additional labels identifying this controller's pods. Included in pod labels and generated selectors for workloads, Services, policies, PodMonitors, disruption budgets and default topology spread constraints. Keys and values support Helm templating. These labels override the standard selector labels and take precedence over regular pod labels. Resource-specific extraSelectorLabels apply only to that resource's selector. Changing controller selector labels on an existing workload may require recreating it because workload selectors are immutable.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "examples": [
+            {
+              "app.kubernetes.io/component": "backend"
+            }
+          ]
+        },
         "pod": {
           "description": "Pod-level options for this controller.",
           "$ref": "pod.json#/$defs/options"

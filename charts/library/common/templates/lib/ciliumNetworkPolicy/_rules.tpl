@@ -11,11 +11,9 @@ Render Cilium rules, expanding the direction-specific controller shorthand into 
   {{- range $rule := $rules -}}
     {{- $renderedRule := deepCopy $rule -}}
     {{- if hasKey $renderedRule $controllerField -}}
-      {{- $controller := get $renderedRule $controllerField -}}
-      {{- $selectorLabels := mergeOverwrite
-        (include "bjw-s.common.lib.metadata.selectorLabels" $rootContext | fromYaml)
-        (dict "app.kubernetes.io/controller" $controller)
-      -}}
+      {{- $controllerIdentifier := get $renderedRule $controllerField -}}
+      {{- $controllerObject := include "bjw-s.common.lib.controller.getByIdentifier" (dict "rootContext" $rootContext "id" $controllerIdentifier) | fromYaml -}}
+      {{- $selectorLabels := include "bjw-s.common.lib.controller.metadata.selectorLabels" (dict "rootContext" $rootContext "controllerObject" $controllerObject) | fromYaml -}}
       {{- $endpoint := dict "matchLabels" $selectorLabels -}}
       {{- $endpoints := list $endpoint -}}
       {{- if hasKey $renderedRule $endpointField -}}

@@ -56,8 +56,7 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-      app.kubernetes.io/controller: {{ $statefulsetObject.identifier }}
-      {{- include "bjw-s.common.lib.metadata.selectorLabels" $rootContext | nindent 6 }}
+      {{- include "bjw-s.common.lib.controller.metadata.selectorLabels" (dict "rootContext" $rootContext "controllerObject" $statefulsetObject) | nindent 6 }}
   {{- $serviceName := include "bjw-s.common.lib.chart.names.fullname" $rootContext }}
   {{- with (dig "statefulset" "serviceName" nil $statefulsetObject) }}
     {{- if kindIs "map" . }}

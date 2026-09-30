@@ -3,7 +3,7 @@ Merge the local chart values and the common chart defaults
 */}}
 {{/*
 String evaluation is a single pass against the post-merge root context.
-Annotation and label keys are evaluated because they are user-defined metadata.
+Annotation, label and extra selector label keys are evaluated because they are user-defined labels and metadata.
 ExternalSecret target template data is intentionally deferred for downstream evaluation.
 */}}
 {{- define "bjw-s.common.values.evaluateTemplate" -}}
@@ -17,7 +17,7 @@ ExternalSecret target template data is intentionally deferred for downstream eva
     {{- $renderMapKeys := and
       (not $deferTpl)
       (gt (len $path) 0)
-      (has (last $path) (list "annotations" "labels"))
+      (has (last $path) (list "annotations" "labels" "extraSelectorLabels"))
     -}}
     {{- range $key, $item := $value -}}
       {{- $resultKey := toString $key -}}
