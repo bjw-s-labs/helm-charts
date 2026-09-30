@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/bjw-s-labs/helm-charts/tools/helm-schema-tools/internal/docs"
+	"github.com/bjw-s-labs/helm-charts/tools/helm-schema-tools/internal/fileutil"
 	"github.com/bjw-s-labs/helm-charts/tools/helm-schema-tools/internal/schema"
 	"github.com/bjw-s-labs/helm-charts/tools/helm-schema-tools/internal/values"
 	"github.com/spf13/cobra"
@@ -52,7 +53,7 @@ func runDereference(schemaPath, outputPath string) error {
 	if err != nil {
 		return fmt.Errorf("failed to dereference schema: %w", err)
 	}
-	if err := os.WriteFile(outputPath, schemaBytes, 0o600); err != nil {
+	if err := fileutil.WriteFileAtomically(outputPath, schemaBytes, 0o600); err != nil {
 		return fmt.Errorf("failed to write dereferenced schema: %w", err)
 	}
 	return nil
@@ -223,7 +224,7 @@ func runGenerateValues(schemaPath, outputPath, schemaRef string) error {
 		return fmt.Errorf("failed to generate YAML: %w", err)
 	}
 
-	if err := os.WriteFile(outputPath, yamlBytes, 0o600); err != nil {
+	if err := fileutil.WriteFileAtomically(outputPath, yamlBytes, 0o600); err != nil {
 		return fmt.Errorf("failed to write output: %w", err)
 	}
 

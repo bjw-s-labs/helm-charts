@@ -14,7 +14,7 @@ The common library chart provides template functions for Deployments, StatefulSe
 
 ## Values Reference
 {{- range .Properties }}
-- [{{ .Name }}]({{ $.BaseURL }}/app-template/reference/{{ lower .Name }}/): {{ .Description }}
+- [{{ .Name }}]({{ $.BaseURL }}/app-template/reference/{{ slug .Name }}/): {{ .Description }}
 {{- end }}
 
 ## Optional

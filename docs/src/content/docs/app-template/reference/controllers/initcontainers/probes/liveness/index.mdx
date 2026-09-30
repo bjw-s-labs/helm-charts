@@ -16,19 +16,20 @@ Liveness probe configuration.
 
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
+| `command` | `array` | No | - | Command to execute for `COMMAND` probes. |
 | `custom` | `boolean` | No | `false` | Set to `true` to use the raw `spec` object as-is instead ... |
 | `enabled` | `boolean` | No | `false` | Enable/disable this probe. |
 | `path` | `string` | No | - | HTTP path for HTTP/HTTPS probes. |
 | `port` | `number / string` | No | - | Port for the probe. Can be a port number or a named port. |
 | `service` | `string` | No | - | Identifier of a container port or service to probe. When ... |
 | [`spec`](./spec/) | `object` | No | - | Raw probe spec. When `custom: true`, this is used as-is. ... |
-| `type` | `string` | No | - | Probe type. Defaults to `TCP` for liveness, readiness and... |
+| `type` | `string` | No | - | Probe type. Defaults to `COMMAND` when command is configu... |
 
 ### Property Details
 
 #### custom
 
-Set to `true` to use the raw `spec` object as-is instead of deriving probe details from `type`/`path`/`port`.
+Set to `true` to use the raw `spec` object as-is instead of deriving probe details from `type`/`command`/`path`/`port`.
 
 #### service
 
@@ -36,9 +37,9 @@ Identifier of a container port or service to probe. When unset, the probe uses t
 
 #### type
 
-Probe type. Defaults to `TCP` for liveness, readiness and startup probes. `AUTO` attempts to infer the probe type from the container&#39;s ports.
+Probe type. Defaults to `COMMAND` when command is configured, otherwise `TCP`. `AUTO` attempts to infer the probe type from the configured command or the container&#39;s ports.
 
-**Allowed values:** `TCP`, `HTTP`, `HTTPS`, `GRPC`, `AUTO`
+**Allowed values:** `TCP`, `HTTP`, `HTTPS`, `GRPC`, `COMMAND`, `AUTO`
 
 ## Related Pages
 

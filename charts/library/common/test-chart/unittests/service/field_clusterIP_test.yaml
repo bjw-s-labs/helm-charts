@@ -1,0 +1,64 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: service - fields - clusterIP
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+  - ../_values/service_main_default.yaml
+tests:
+  - it: clusterIP can be configured for ClusterIP service
+    set:
+      service:
+        main:
+          type: ClusterIP
+          clusterIP: 10.0.0.10
+    documentSelector:
+      path: $[?(@.kind == "Service")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.clusterIP
+          value: 10.0.0.10
+
+  - it: clusterIP can be configured for NodePort service
+    set:
+      service:
+        main:
+          type: NodePort
+          clusterIP: 10.0.0.11
+    documentSelector:
+      path: $[?(@.kind == "Service")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.clusterIP
+          value: 10.0.0.11
+
+  - it: clusterIP can be configured for LoadBalancer service
+    set:
+      service:
+        main:
+          type: LoadBalancer
+          clusterIP: 10.0.0.12
+    documentSelector:
+      path: $[?(@.kind == "Service")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.clusterIP
+          value: 10.0.0.12
+
+  - it: clusterIP is omitted for ExternalName service
+    set:
+      service:
+        main:
+          type: ExternalName
+          clusterIP: 10.0.0.13
+          externalName: my.database.example.com
+    documentSelector:
+      path: $[?(@.kind == "Service")].metadata.name
+      value: release-name
+    asserts:
+      - notExists:
+          path: spec.clusterIP

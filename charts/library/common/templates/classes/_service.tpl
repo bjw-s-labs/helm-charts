@@ -38,9 +38,6 @@ metadata:
 spec:
   {{- if (eq $svcType "ClusterIP") }}
   type: ClusterIP
-  {{- if $serviceObject.clusterIP }}
-  clusterIP: {{ $serviceObject.clusterIP }}
-  {{end}}
   {{- else if eq $svcType "LoadBalancer" }}
   type: {{ $svcType }}
   {{- if $serviceObject.loadBalancerIP }}
@@ -60,6 +57,9 @@ spec:
   {{- end }}
   {{- else }}
   type: {{ $svcType }}
+  {{- end }}
+  {{- if and (ne $svcType "ExternalName") $serviceObject.clusterIP }}
+  clusterIP: {{ $serviceObject.clusterIP }}
   {{- end }}
   {{- if $serviceObject.internalTrafficPolicy }}
   internalTrafficPolicy: {{ $serviceObject.internalTrafficPolicy }}

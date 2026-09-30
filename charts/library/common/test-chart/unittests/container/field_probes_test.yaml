@@ -327,6 +327,119 @@ tests:
             timeoutSeconds: 1
             failureThreshold: 3
 
+  - it: COMMAND type probes can be configured without service
+    set:
+      service.main.enabled: false
+      controllers.main.containers.main.probes:
+        liveness:
+          enabled: true
+          type: COMMAND
+          command:
+            - /bin/sh
+            - -c
+            - test -f /tmp/healthy
+        readiness:
+          enabled: true
+          type: COMMAND
+          command:
+            - /bin/check-ready
+        startup:
+          enabled: true
+          type: COMMAND
+          command:
+            - /bin/check-started
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe
+          value:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - test -f /tmp/healthy
+            failureThreshold: 3
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 1
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe
+          value:
+            exec:
+              command:
+                - /bin/check-ready
+            failureThreshold: 3
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 1
+      - equal:
+          path: spec.template.spec.containers[0].startupProbe
+          value:
+            exec:
+              command:
+                - /bin/check-started
+            failureThreshold: 3
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 1
+
+  - it: command selects COMMAND when type is not configured
+    set:
+      controllers.main.containers.main.probes:
+        liveness:
+          enabled: true
+          command:
+            - /bin/check
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe
+          value:
+            exec:
+              command:
+                - /bin/check
+            failureThreshold: 3
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 1
+
+  - it: AUTO type uses COMMAND when command is configured
+    set:
+      controllers.main.containers.main.probes:
+        liveness:
+          enabled: true
+          type: AUTO
+          command:
+            - /bin/check
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe
+          value:
+            exec:
+              command:
+                - /bin/check
+            failureThreshold: 3
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 1
+
+  - it: COMMAND type probe requires a command
+    set:
+      controllers.main.containers.main.probes:
+        liveness:
+          enabled: true
+          type: COMMAND
+    asserts:
+      - failedTemplate:
+          errorMessage: "Container 'main': Command is required for liveness COMMAND probe. Specify 'controllers.main.containers.main.probes.liveness.command'."
+
   - it: custom liveness probe can be configured
     set:
       controllers.main.containers.main.probes:

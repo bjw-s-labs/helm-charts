@@ -4,12 +4,14 @@ import (
 	"bytes"
 	"embed"
 	"fmt"
+	"maps"
 	"os"
 	"path/filepath"
 	"slices"
 	"strings"
 	"text/template"
 
+	"github.com/bjw-s-labs/helm-charts/tools/helm-schema-tools/internal/fileutil"
 	schemautil "github.com/bjw-s-labs/helm-charts/tools/helm-schema-tools/internal/schema"
 	"github.com/kaptinlin/jsonschema"
 )
@@ -58,11 +60,13 @@ func (g *Generator) Generate(schemaBytes []byte) error {
 		return fmt.Errorf("failed to generate index: %w", err)
 	}
 
-	if schema.Properties != nil {
-		keys := schemautil.SortedKeys(*schema.Properties)
+	rootProperties := schemautil.CollectAllProperties(schema)
+	if len(rootProperties) > 0 {
+		keys := schemautil.SortedKeys(rootProperties)
+		generatedPaths := make(map[string]string)
 		for _, name := range keys {
-			prop := (*schema.Properties)[name]
-			if err := g.generatePropertyPageRecursive(name, prop, "", 1); err != nil {
+			prop := rootProperties[name]
+			if err := g.generatePropertyPageRecursive(name, prop, "", 1, generatedPaths); err != nil {
 				return fmt.Errorf("failed to generate page for %s: %w", name, err)
 			}
 		}
@@ -79,10 +83,11 @@ func (g *Generator) GenerateLlmsTxt(schemaBytes []byte, outputPath, baseURL stri
 	}
 
 	ctx := LlmsTxtContext{BaseURL: baseURL}
-	if schema.Properties != nil {
-		keys := schemautil.SortedKeys(*schema.Properties)
+	rootProperties := schemautil.CollectAllProperties(schema)
+	if len(rootProperties) > 0 {
+		keys := schemautil.SortedKeys(rootProperties)
 		for _, key := range keys {
-			prop := (*schema.Properties)[key]
+			prop := rootProperties[key]
 			desc := ""
 			if prop.Description != nil {
 				d := *prop.Description
@@ -106,8 +111,8 @@ func (g *Generator) generateIndex(schema *jsonschema.Schema) error {
 	ctx := IndexContext{
 		Description: description(schema),
 	}
-	if schema.Properties != nil {
-		props := *schema.Properties
+	props := schemautil.CollectAllProperties(schema)
+	if len(props) > 0 {
 		keys := schemautil.SortedKeys(props)
 		for _, key := range keys {
 			ctx.Properties = append(ctx.Properties, &NamedProperty{
@@ -120,28 +125,35 @@ func (g *Generator) generateIndex(schema *jsonschema.Schema) error {
 }
 
 // generatePropertyPageRecursive walks the schema tree, generating a page for
-// each property and recursing into nested objects. Depth is capped at
-// maxRecursionDepth as a safety net against cyclic schemas.
-func (g *Generator) generatePropertyPageRecursive(name string, prop *jsonschema.Schema, parentPath string, depth int) error {
+// each property and recursing into nested objects. The depth limit is a
+// safety net against pathological schemas; exceeding it is an error so the
+// generated documentation is never silently incomplete.
+func (g *Generator) generatePropertyPageRecursive(name string, prop *jsonschema.Schema, parentPath string, depth int, generatedPaths map[string]string) error {
 	if depth > maxRecursionDepth {
-		return nil
+		return fmt.Errorf("schema nesting exceeds the supported documentation depth of %d at %q", maxRecursionDepth, name)
 	}
 
-	// Use lowercase directory names to match Starlight's slug normalization.
-	dirName := strings.ToLower(name)
+	dirName := documentationSlug(name)
 	currentPath := dirName
 	if parentPath != "" {
 		currentPath = parentPath + "/" + dirName
 	}
 
 	childPages := collectChildPages(prop)
-	ctx := g.buildPageContext(name, prop, childPages)
+	ctx, err := g.buildPageContext(name, prop, childPages)
+	if err != nil {
+		return err
+	}
 	outDir := filepath.Join(g.OutputDir, currentPath)
 
 	// Guard against path traversal from untrusted schema property names.
 	if !isSubPath(g.OutputDir, outDir) {
 		return fmt.Errorf("property name %q escapes output directory", name)
 	}
+	if previousName, exists := generatedPaths[currentPath]; exists {
+		return fmt.Errorf("properties %q and %q map to the same documentation path %q", previousName, name, currentPath)
+	}
+	generatedPaths[currentPath] = name
 
 	if err := os.MkdirAll(outDir, 0o750); err != nil {
 		return err
@@ -150,12 +162,13 @@ func (g *Generator) generatePropertyPageRecursive(name string, prop *jsonschema.
 		return err
 	}
 
-	if prop.Properties != nil {
-		subKeys := schemautil.SortedKeys(*prop.Properties)
+	properties := schemautil.CollectAllProperties(prop)
+	if len(properties) > 0 {
+		subKeys := schemautil.SortedKeys(properties)
 		for _, subName := range subKeys {
-			subProp := (*prop.Properties)[subName]
+			subProp := properties[subName]
 			if hasNestedContent(subProp) {
-				if err := g.generatePropertyPageRecursive(subName, subProp, currentPath, depth+1); err != nil {
+				if err := g.generatePropertyPageRecursive(subName, subProp, currentPath, depth+1, generatedPaths); err != nil {
 					return fmt.Errorf("failed to generate sub-page for %s: %w", subName, err)
 				}
 			}
@@ -166,9 +179,12 @@ func (g *Generator) generatePropertyPageRecursive(name string, prop *jsonschema.
 		allProps := schemautil.CollectAllProperties(prop.AdditionalProperties)
 		subKeys := schemautil.SortedKeys(allProps)
 		for _, subName := range subKeys {
+			if _, alreadyHandled := properties[subName]; alreadyHandled {
+				continue
+			}
 			subProp := allProps[subName]
 			if hasNestedContent(subProp) {
-				if err := g.generatePropertyPageRecursive(subName, subProp, currentPath, depth+1); err != nil {
+				if err := g.generatePropertyPageRecursive(subName, subProp, currentPath, depth+1, generatedPaths); err != nil {
 					return fmt.Errorf("failed to generate sub-page for %s: %w", subName, err)
 				}
 			}
@@ -258,7 +274,7 @@ func extractTypeVariant(branch *jsonschema.Schema) *TypeVariant {
 }
 
 // buildPageContext constructs the template data for a property page.
-func (g *Generator) buildPageContext(name string, prop *jsonschema.Schema, childPages []string) PageContext {
+func (g *Generator) buildPageContext(name string, prop *jsonschema.Schema, childPages []string) (PageContext, error) {
 	ctx := PageContext{
 		Name:        name,
 		Description: description(prop),
@@ -266,7 +282,8 @@ func (g *Generator) buildPageContext(name string, prop *jsonschema.Schema, child
 		ChildPages:  childPages,
 	}
 
-	if prop.AdditionalProperties != nil && prop.Properties == nil {
+	allProps := schemautil.CollectAllProperties(prop)
+	if prop.AdditionalProperties != nil && len(allProps) == 0 {
 		ctx.IsMap = true
 		ctx.ParentName = name
 		ctx.Variants = g.collectVariants(prop.AdditionalProperties)
@@ -284,50 +301,57 @@ func (g *Generator) buildPageContext(name string, prop *jsonschema.Schema, child
 				HasSubPage: hasPage,
 			}
 			if !hasPage {
-				np.SubProperties = collectSubProperties(allProps[key])
+				var err error
+				np.SubProperties, err = collectSubProperties(allProps[key])
+				if err != nil {
+					return PageContext{}, err
+				}
 			}
 			ctx.Properties = append(ctx.Properties, np)
 		}
-		return ctx
+		return ctx, nil
 	}
 
-	if prop.Properties != nil {
-		props := *prop.Properties
-		keys := schemautil.SortedKeys(props)
+	if len(allProps) > 0 {
+		keys := schemautil.SortedKeys(allProps)
 		requiredSet := schemautil.MakeSet(schemautil.CollectAllRequired(prop))
 		for _, key := range keys {
 			hasPage := len(childPages) > 0 && slices.Contains(childPages, key)
 			np := &NamedProperty{
 				Key:        key,
-				Schema:     props[key],
+				Schema:     allProps[key],
 				Required:   requiredSet[key],
 				HasSubPage: hasPage,
 			}
 			if !hasPage {
-				np.SubProperties = collectSubProperties(props[key])
+				var err error
+				np.SubProperties, err = collectSubProperties(allProps[key])
+				if err != nil {
+					return PageContext{}, err
+				}
 			}
 			ctx.Properties = append(ctx.Properties, np)
 		}
 	}
 
-	return ctx
+	return ctx, nil
 }
 
 // collectSubProperties recursively flattens all descendant properties of a
 // schema for inline display. Nested keys use dotted paths (e.g.
 // "spec.exec.command"). This ensures deep K8s API fields are visible even
 // when the page depth limit prevents generating sub-pages for them.
-func collectSubProperties(schema *jsonschema.Schema) []*NamedProperty {
+func collectSubProperties(schema *jsonschema.Schema) ([]*NamedProperty, error) {
 	return flattenProperties(schema, "", 0)
 }
 
-func flattenProperties(schema *jsonschema.Schema, prefix string, depth int) []*NamedProperty {
+func flattenProperties(schema *jsonschema.Schema, prefix string, depth int) ([]*NamedProperty, error) {
 	if depth > maxRecursionDepth {
-		return nil
+		return nil, fmt.Errorf("schema nesting exceeds the supported documentation depth of %d below %q", maxRecursionDepth, prefix)
 	}
 	allProps := schemautil.CollectAllProperties(schema)
 	if len(allProps) == 0 {
-		return nil
+		return nil, nil
 	}
 	allRequired := schemautil.CollectAllRequired(schema)
 	requiredSet := schemautil.MakeSet(allRequired)
@@ -342,7 +366,11 @@ func flattenProperties(schema *jsonschema.Schema, prefix string, depth int) []*N
 		childProps := schemautil.CollectAllProperties(child)
 		if len(childProps) > 0 {
 			// Has nested properties — flatten them instead of showing as "object".
-			props = append(props, flattenProperties(child, fullKey, depth+1)...)
+			nested, err := flattenProperties(child, fullKey, depth+1)
+			if err != nil {
+				return nil, err
+			}
+			props = append(props, nested...)
 		} else {
 			props = append(props, &NamedProperty{
 				Key:      fullKey,
@@ -351,29 +379,26 @@ func flattenProperties(schema *jsonschema.Schema, prefix string, depth int) []*N
 			})
 		}
 	}
-	return props
+	return props, nil
 }
 
 // collectChildPages returns a sorted list of child property names that warrant sub-pages.
 func collectChildPages(prop *jsonschema.Schema) []string {
-	var children []string
-	if prop.Properties != nil {
-		for subName, subProp := range *prop.Properties {
-			if hasNestedContent(subProp) {
-				children = append(children, subName)
-			}
+	children := make(map[string]struct{})
+	for subName, subProp := range schemautil.CollectAllProperties(prop) {
+		if hasNestedContent(subProp) {
+			children[subName] = struct{}{}
 		}
 	}
 	if prop.AdditionalProperties != nil {
 		allProps := schemautil.CollectAllProperties(prop.AdditionalProperties)
 		for subName, subProp := range allProps {
 			if hasNestedContent(subProp) {
-				children = append(children, subName)
+				children[subName] = struct{}{}
 			}
 		}
 	}
-	slices.Sort(children)
-	return children
+	return slices.Sorted(maps.Keys(children))
 }
 
 // renderToFile executes a named template and writes the result to path.
@@ -382,7 +407,7 @@ func (g *Generator) renderToFile(path, tmplName string, data any) error {
 	if err := g.tmpl.ExecuteTemplate(&buf, tmplName, data); err != nil {
 		return fmt.Errorf("template %s: %w", tmplName, err)
 	}
-	return os.WriteFile(path, buf.Bytes(), 0o600)
+	return fileutil.WriteFileAtomically(path, buf.Bytes(), 0o600)
 }
 
 // isSubPath returns true if child is rooted under parent.
