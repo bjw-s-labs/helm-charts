@@ -19,3 +19,6 @@ annotations:
     - kind: fixed
       description: |-
         Render clusterIP in LoadBalancer and NodePort Services
+    - kind: fixed
+      description: |-
+        Added direct support for `COMMAND` container probes

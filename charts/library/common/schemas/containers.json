@@ -303,9 +303,17 @@
           "default": false
         },
         "custom": {
-          "description": "Set to `true` to use the raw `spec` object as-is instead of deriving probe details from `type`/`path`/`port`.",
+          "description": "Set to `true` to use the raw `spec` object as-is instead of deriving probe details from `type`/`command`/`path`/`port`.",
           "type": "boolean",
           "default": false
+        },
+        "command": {
+          "description": "Command to execute for `COMMAND` probes.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
         },
         "path": {
           "description": "HTTP path for HTTP/HTTPS probes.",
@@ -323,17 +331,18 @@
           "type": "string"
         },
         "spec": {
-          "description": "Raw probe spec. When `custom: true`, this is used as-is. Otherwise merged with values derived from `type`/`path`/`port`. Typical fields include `initialDelaySeconds`, `periodSeconds`, `timeoutSeconds`, `failureThreshold`.",
+          "description": "Raw probe spec. When `custom: true`, this is used as-is. Otherwise merged with values derived from `type`/`command`/`path`/`port`. Typical fields include `initialDelaySeconds`, `periodSeconds`, `timeoutSeconds`, `failureThreshold`.",
           "$ref": "k8s-api.json#/$defs/core.v1.Probe"
         },
         "type": {
-          "description": "Probe type. Defaults to `TCP` for liveness, readiness and startup probes. `AUTO` attempts to infer the probe type from the container's ports.",
+          "description": "Probe type. Defaults to `COMMAND` when command is configured, otherwise `TCP`. `AUTO` attempts to infer the probe type from the configured command or the container's ports.",
           "type": "string",
           "enum": [
             "TCP",
             "HTTP",
             "HTTPS",
             "GRPC",
+            "COMMAND",
             "AUTO"
           ]
         }

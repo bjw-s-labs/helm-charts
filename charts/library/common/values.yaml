@@ -830,8 +830,10 @@ controllers: {}
         # -- Enable/disable this probe.
         # enabled: false
         # -- Set to `true` to use the raw `spec` object as-is instead of deriving probe
-        # details from `type`/`path`/`port`.
+        # details from `type`/`command`/`path`/`port`.
         # custom: false
+        # -- (list) Command to execute for `COMMAND` probes.
+        # command:
         # -- (string) HTTP path for HTTP/HTTPS probes.
         # path:
         # -- (float/string) Port for the probe. Can be a port number or a named port.
@@ -840,8 +842,9 @@ controllers: {}
         # the probe uses the container's primary port.
         # service:
         # -- Raw probe spec. When `custom: true`, this is used as-is. Otherwise merged
-        # with values derived from `type`/`path`/`port`. Typical fields include
-        # `initialDelaySeconds`, `periodSeconds`, `timeoutSeconds`, `failureThreshold`.
+        # with values derived from `type`/`command`/`path`/`port`. Typical fields
+        # include `initialDelaySeconds`, `periodSeconds`, `timeoutSeconds`,
+        # `failureThreshold`.
         # spec: {}
           # -- Exec specifies the action to take.
           # exec: {}
@@ -912,16 +915,19 @@ controllers: {}
           # second. Minimum value is 1. More info:
           # https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
           # timeoutSeconds: null
-        # -- (string) Probe type. Defaults to `TCP` for liveness, readiness and startup
-        # probes. `AUTO` attempts to infer the probe type from the container's ports.
+        # -- (string) Probe type. Defaults to `COMMAND` when command is configured,
+        # otherwise `TCP`. `AUTO` attempts to infer the probe type from the configured
+        # command or the container's ports.
         # type:
       # -- Readiness probe configuration.
       # readiness: {}
         # -- Enable/disable this probe.
         # enabled: false
         # -- Set to `true` to use the raw `spec` object as-is instead of deriving probe
-        # details from `type`/`path`/`port`.
+        # details from `type`/`command`/`path`/`port`.
         # custom: false
+        # -- (list) Command to execute for `COMMAND` probes.
+        # command:
         # -- (string) HTTP path for HTTP/HTTPS probes.
         # path:
         # -- (float/string) Port for the probe. Can be a port number or a named port.
@@ -930,8 +936,9 @@ controllers: {}
         # the probe uses the container's primary port.
         # service:
         # -- Raw probe spec. When `custom: true`, this is used as-is. Otherwise merged
-        # with values derived from `type`/`path`/`port`. Typical fields include
-        # `initialDelaySeconds`, `periodSeconds`, `timeoutSeconds`, `failureThreshold`.
+        # with values derived from `type`/`command`/`path`/`port`. Typical fields
+        # include `initialDelaySeconds`, `periodSeconds`, `timeoutSeconds`,
+        # `failureThreshold`.
         # spec: {}
           # -- Exec specifies the action to take.
           # exec: {}
@@ -1002,16 +1009,19 @@ controllers: {}
           # second. Minimum value is 1. More info:
           # https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
           # timeoutSeconds: null
-        # -- (string) Probe type. Defaults to `TCP` for liveness, readiness and startup
-        # probes. `AUTO` attempts to infer the probe type from the container's ports.
+        # -- (string) Probe type. Defaults to `COMMAND` when command is configured,
+        # otherwise `TCP`. `AUTO` attempts to infer the probe type from the configured
+        # command or the container's ports.
         # type:
       # -- Startup probe configuration.
       # startup: {}
         # -- Enable/disable this probe.
         # enabled: false
         # -- Set to `true` to use the raw `spec` object as-is instead of deriving probe
-        # details from `type`/`path`/`port`.
+        # details from `type`/`command`/`path`/`port`.
         # custom: false
+        # -- (list) Command to execute for `COMMAND` probes.
+        # command:
         # -- (string) HTTP path for HTTP/HTTPS probes.
         # path:
         # -- (float/string) Port for the probe. Can be a port number or a named port.
@@ -1020,8 +1030,9 @@ controllers: {}
         # the probe uses the container's primary port.
         # service:
         # -- Raw probe spec. When `custom: true`, this is used as-is. Otherwise merged
-        # with values derived from `type`/`path`/`port`. Typical fields include
-        # `initialDelaySeconds`, `periodSeconds`, `timeoutSeconds`, `failureThreshold`.
+        # with values derived from `type`/`command`/`path`/`port`. Typical fields
+        # include `initialDelaySeconds`, `periodSeconds`, `timeoutSeconds`,
+        # `failureThreshold`.
         # spec: {}
           # -- Exec specifies the action to take.
           # exec: {}
@@ -1092,8 +1103,9 @@ controllers: {}
           # second. Minimum value is 1. More info:
           # https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
           # timeoutSeconds: null
-        # -- (string) Probe type. Defaults to `TCP` for liveness, readiness and startup
-        # probes. `AUTO` attempts to infer the probe type from the container's ports.
+        # -- (string) Probe type. Defaults to `COMMAND` when command is configured,
+        # otherwise `TCP`. `AUTO` attempts to infer the probe type from the configured
+        # command or the container's ports.
         # type:
       # -- Resource requests and limits for the container.
       # resources: {}
@@ -1358,8 +1370,10 @@ controllers: {}
         # -- Enable/disable this probe.
         # enabled: false
         # -- Set to `true` to use the raw `spec` object as-is instead of deriving probe
-        # details from `type`/`path`/`port`.
+        # details from `type`/`command`/`path`/`port`.
         # custom: false
+        # -- (list) Command to execute for `COMMAND` probes.
+        # command:
         # -- (string) HTTP path for HTTP/HTTPS probes.
         # path:
         # -- (float/string) Port for the probe. Can be a port number or a named port.
@@ -1368,8 +1382,9 @@ controllers: {}
         # the probe uses the container's primary port.
         # service:
         # -- Raw probe spec. When `custom: true`, this is used as-is. Otherwise merged
-        # with values derived from `type`/`path`/`port`. Typical fields include
-        # `initialDelaySeconds`, `periodSeconds`, `timeoutSeconds`, `failureThreshold`.
+        # with values derived from `type`/`command`/`path`/`port`. Typical fields
+        # include `initialDelaySeconds`, `periodSeconds`, `timeoutSeconds`,
+        # `failureThreshold`.
         # spec: {}
           # -- Exec specifies the action to take.
           # exec: {}
@@ -1440,16 +1455,19 @@ controllers: {}
           # second. Minimum value is 1. More info:
           # https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
           # timeoutSeconds: null
-        # -- (string) Probe type. Defaults to `TCP` for liveness, readiness and startup
-        # probes. `AUTO` attempts to infer the probe type from the container's ports.
+        # -- (string) Probe type. Defaults to `COMMAND` when command is configured,
+        # otherwise `TCP`. `AUTO` attempts to infer the probe type from the configured
+        # command or the container's ports.
         # type:
       # -- Readiness probe configuration.
       # readiness: {}
         # -- Enable/disable this probe.
         # enabled: false
         # -- Set to `true` to use the raw `spec` object as-is instead of deriving probe
-        # details from `type`/`path`/`port`.
+        # details from `type`/`command`/`path`/`port`.
         # custom: false
+        # -- (list) Command to execute for `COMMAND` probes.
+        # command:
         # -- (string) HTTP path for HTTP/HTTPS probes.
         # path:
         # -- (float/string) Port for the probe. Can be a port number or a named port.
@@ -1458,8 +1476,9 @@ controllers: {}
         # the probe uses the container's primary port.
         # service:
         # -- Raw probe spec. When `custom: true`, this is used as-is. Otherwise merged
-        # with values derived from `type`/`path`/`port`. Typical fields include
-        # `initialDelaySeconds`, `periodSeconds`, `timeoutSeconds`, `failureThreshold`.
+        # with values derived from `type`/`command`/`path`/`port`. Typical fields
+        # include `initialDelaySeconds`, `periodSeconds`, `timeoutSeconds`,
+        # `failureThreshold`.
         # spec: {}
           # -- Exec specifies the action to take.
           # exec: {}
@@ -1530,16 +1549,19 @@ controllers: {}
           # second. Minimum value is 1. More info:
           # https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
           # timeoutSeconds: null
-        # -- (string) Probe type. Defaults to `TCP` for liveness, readiness and startup
-        # probes. `AUTO` attempts to infer the probe type from the container's ports.
+        # -- (string) Probe type. Defaults to `COMMAND` when command is configured,
+        # otherwise `TCP`. `AUTO` attempts to infer the probe type from the configured
+        # command or the container's ports.
         # type:
       # -- Startup probe configuration.
       # startup: {}
         # -- Enable/disable this probe.
         # enabled: false
         # -- Set to `true` to use the raw `spec` object as-is instead of deriving probe
-        # details from `type`/`path`/`port`.
+        # details from `type`/`command`/`path`/`port`.
         # custom: false
+        # -- (list) Command to execute for `COMMAND` probes.
+        # command:
         # -- (string) HTTP path for HTTP/HTTPS probes.
         # path:
         # -- (float/string) Port for the probe. Can be a port number or a named port.
@@ -1548,8 +1570,9 @@ controllers: {}
         # the probe uses the container's primary port.
         # service:
         # -- Raw probe spec. When `custom: true`, this is used as-is. Otherwise merged
-        # with values derived from `type`/`path`/`port`. Typical fields include
-        # `initialDelaySeconds`, `periodSeconds`, `timeoutSeconds`, `failureThreshold`.
+        # with values derived from `type`/`command`/`path`/`port`. Typical fields
+        # include `initialDelaySeconds`, `periodSeconds`, `timeoutSeconds`,
+        # `failureThreshold`.
         # spec: {}
           # -- Exec specifies the action to take.
           # exec: {}
@@ -1620,8 +1643,9 @@ controllers: {}
           # second. Minimum value is 1. More info:
           # https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
           # timeoutSeconds: null
-        # -- (string) Probe type. Defaults to `TCP` for liveness, readiness and startup
-        # probes. `AUTO` attempts to infer the probe type from the container's ports.
+        # -- (string) Probe type. Defaults to `COMMAND` when command is configured,
+        # otherwise `TCP`. `AUTO` attempts to infer the probe type from the configured
+        # command or the container's ports.
         # type:
       # -- Resource requests and limits for the container.
       # resources: {}
