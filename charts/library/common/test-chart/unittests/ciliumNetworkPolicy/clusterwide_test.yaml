@@ -107,15 +107,57 @@ tests:
         nodeSelector:
           matchLabels:
             kubernetes.io/os: linux
-        controller:
-          - app: example
+        controller: main
         ingress:
           - {}
     asserts:
       - failedTemplate:
           errorPattern: "'not' failed"
 
-  - it: translates toController rules for a CiliumClusterwideNetworkPolicy
+  - it: supports multiple controllers for endpoint policies
+    set:
+      controllers.secondary:
+        containers:
+          main:
+            image:
+              repository: nginx
+              tag: latest
+      networkpolicies.main:
+        type: ciliumClusterwide
+        controllers:
+          - main
+          - secondary
+        ingress:
+          - {}
+    documentSelector:
+      path: $[?(@.kind == "CiliumClusterwideNetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.endpointSelector.matchExpressions[0]
+          value:
+            key: app.kubernetes.io/controller
+            operator: In
+            values:
+              - main
+              - secondary
+
+  - it: rejects nodeSelector with controllers
+    set:
+      networkpolicies.main:
+        type: ciliumClusterwide
+        nodeSelector:
+          matchLabels:
+            kubernetes.io/os: linux
+        controllers:
+          - main
+        ingress:
+          - {}
+    asserts:
+      - failedTemplate:
+          errorPattern: "'not' failed"
+
+  - it: translates toControllers rules for a CiliumClusterwideNetworkPolicy
     set:
       controllers.secondary:
         containers:
@@ -129,7 +171,7 @@ tests:
           matchLabels:
             kubernetes.io/os: linux
         egress:
-          - toController: secondary
+          - toControllers: [secondary]
     documentSelector:
       path: $[?(@.kind == "CiliumClusterwideNetworkPolicy")].metadata.name
       value: release-name
@@ -141,7 +183,7 @@ tests:
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/name: RELEASE-NAME
 
-  - it: translates fromController rules for a CiliumClusterwideNetworkPolicy
+  - it: translates fromControllers rules for a CiliumClusterwideNetworkPolicy
     set:
       controllers.secondary:
         containers:
@@ -155,7 +197,7 @@ tests:
           matchLabels:
             kubernetes.io/os: linux
         ingress:
-          - fromController: secondary
+          - fromControllers: [secondary]
     documentSelector:
       path: $[?(@.kind == "CiliumClusterwideNetworkPolicy")].metadata.name
       value: release-name
@@ -167,7 +209,7 @@ tests:
             app.kubernetes.io/instance: RELEASE-NAME
             app.kubernetes.io/name: RELEASE-NAME
 
-  - it: rejects clusterwide ingress toController as a wrong-direction shorthand
+  - it: rejects clusterwide ingress toControllers as a wrong-direction shorthand
     set:
       controllers.secondary:
         containers:
@@ -178,12 +220,12 @@ tests:
       networkpolicies.main:
         type: ciliumClusterwide
         ingress:
-          - toController: secondary
+          - toControllers: [secondary]
     asserts:
       - failedTemplate:
           errorPattern: values don't meet the specifications of the schema
 
-  - it: rejects clusterwide egress fromController as a wrong-direction shorthand
+  - it: rejects clusterwide egress fromControllers as a wrong-direction shorthand
     set:
       controllers.secondary:
         containers:
@@ -194,12 +236,12 @@ tests:
       networkpolicies.main:
         type: ciliumClusterwide
         egress:
-          - fromController: secondary
+          - fromControllers: [secondary]
     asserts:
       - failedTemplate:
           errorPattern: values don't meet the specifications of the schema
 
-  - it: rejects clusterwide ingress fromController with explicit fromEndpoints
+  - it: rejects clusterwide ingress fromControllers with explicit fromEndpoints
     set:
       controllers.secondary:
         containers:
@@ -210,7 +252,7 @@ tests:
       networkpolicies.main:
         type: ciliumClusterwide
         ingress:
-          - fromController: secondary
+          - fromControllers: [secondary]
             fromEndpoints:
               - matchLabels:
                   role: explicitly-selected
@@ -218,7 +260,7 @@ tests:
       - failedTemplate:
           errorPattern: values don't meet the specifications of the schema
 
-  - it: rejects clusterwide egress toController with explicit toEndpoints
+  - it: rejects clusterwide egress toControllers with explicit toEndpoints
     set:
       controllers.secondary:
         containers:
@@ -229,7 +271,7 @@ tests:
       networkpolicies.main:
         type: ciliumClusterwide
         egress:
-          - toController: secondary
+          - toControllers: [secondary]
             toEndpoints:
               - matchLabels:
                   role: explicitly-selected
@@ -356,7 +398,7 @@ tests:
       networkpolicies.main:
         type: ciliumClusterwide
         ingress:
-          - fromController: ""
+          - fromControllers: []
             fromEntities: [cluster]
     asserts:
       - failedTemplate:
@@ -411,7 +453,7 @@ tests:
       - failedTemplate:
           errorPattern: values don't meet the specifications of the schema
 
-  - it: rejects a clusterwide egress toController with another peer key
+  - it: rejects a clusterwide egress toControllers with another peer key
     set:
       controllers.secondary:
         containers:
@@ -422,18 +464,18 @@ tests:
       networkpolicies.main:
         type: ciliumClusterwide
         egress:
-          - toController: secondary
+          - toControllers: [secondary]
             toEntities: [cluster]
     asserts:
       - failedTemplate:
           errorPattern: values don't meet the specifications of the schema
 
-  - it: rejects an empty clusterwide egress toController with another peer key
+  - it: rejects an empty clusterwide egress toControllers with another peer key
     set:
       networkpolicies.main:
         type: ciliumClusterwide
         egress:
-          - toController: ""
+          - toControllers: []
             toEntities: [cluster]
     asserts:
       - failedTemplate:

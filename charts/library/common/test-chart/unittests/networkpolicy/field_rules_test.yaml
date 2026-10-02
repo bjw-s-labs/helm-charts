@@ -32,7 +32,7 @@ tests:
           value:
             - {}
 
-  - it: networkpolicy ingress controller peer becomes a pod selector and retains ports
+  - it: networkpolicy ingress controllers peer becomes a pod selector and retains ports
     set:
       networkpolicies.main:
         controller: main
@@ -40,7 +40,7 @@ tests:
         rules:
           ingress:
             - from:
-                - controller: main
+                - controllers: [main]
               ports:
                 - port: 8080
     documentSelector:
@@ -59,7 +59,7 @@ tests:
               ports:
                 - port: 8080
 
-  - it: networkpolicy egress controller peer becomes a pod selector and retains ports
+  - it: networkpolicy egress controllers peer becomes a pod selector and retains ports
     set:
       networkpolicies.main:
         controller: main
@@ -67,7 +67,7 @@ tests:
         rules:
           egress:
             - to:
-                - controller: main
+                - controllers: [main]
               ports:
                 - port: 53
                   protocol: UDP
@@ -87,3 +87,81 @@ tests:
               ports:
                 - port: 53
                   protocol: UDP
+
+  - it: networkpolicy ingress controllers peer accepts a regular expression
+    set:
+      controllers:
+        worker-low:
+          extraSelectorLabels:
+            tier: low
+          containers:
+            main:
+              image:
+                repository: nginx
+                tag: latest
+        worker-high:
+          extraSelectorLabels:
+            tier: high
+          containers:
+            main:
+              image:
+                repository: nginx
+                tag: latest
+      networkpolicies.main:
+        controller: main
+        policyTypes: [Ingress]
+        rules:
+          ingress:
+            - from:
+                - controllers: [worker-.*]
+    documentSelector:
+      path: $[?(@.kind == "NetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.ingress[0].from[0].podSelector
+          value:
+            matchLabels:
+              app.kubernetes.io/instance: RELEASE-NAME
+              app.kubernetes.io/name: RELEASE-NAME
+            matchExpressions:
+              - key: app.kubernetes.io/controller
+                operator: In
+                values:
+                  - worker-high
+                  - worker-low
+
+  - it: networkpolicy egress controllers peer combines exact references
+    set:
+      controllers.secondary:
+        containers:
+          main:
+            image:
+              repository: nginx
+              tag: latest
+      networkpolicies.main:
+        controller: main
+        policyTypes: [Egress]
+        rules:
+          egress:
+            - to:
+                - controllers: [secondary, main]
+              ports:
+                - port: 53
+    documentSelector:
+      path: $[?(@.kind == "NetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.egress[0].to[0].podSelector
+          value:
+            matchLabels:
+              app.kubernetes.io/instance: RELEASE-NAME
+              app.kubernetes.io/name: RELEASE-NAME
+            matchExpressions:
+              - key: app.kubernetes.io/controller
+                operator: In
+                values: [main, secondary]
+      - equal:
+          path: spec.egress[0].ports[0].port
+          value: 53

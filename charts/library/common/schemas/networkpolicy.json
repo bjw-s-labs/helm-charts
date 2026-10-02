@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.3.0/charts/library/common/schemas/networkpolicy.json",
   "$defs": {
-    "controllerPeer": {
+    "controllersPeer": {
       "allOf": [
         {
           "$ref": "k8s-api.json#/$defs/networking.v1.NetworkPolicyPeer"
@@ -10,15 +10,18 @@
         {
           "type": "object",
           "properties": {
-            "controller": {
-              "description": "Controller whose pods this peer selects.",
-              "type": "string"
+            "controllers": {
+              "description": "Controllers whose pods this peer selects. Each entry is an exact identifier or regular expression.",
+              "type": "array",
+              "minItems": 1,
+              "items": { "type": "string" }
             }
           },
           "not": {
             "anyOf": [
-              { "required": ["controller", "podSelector"] },
-              { "required": ["controller", "ipBlock"] }
+              { "required": ["controller"] },
+              { "required": ["controllers", "podSelector"] },
+              { "required": ["controllers", "ipBlock"] }
             ]
           }
         }
@@ -31,7 +34,7 @@
           "properties": {
             "from": {
               "type": "array",
-              "items": { "$ref": "#/$defs/controllerPeer" }
+              "items": { "$ref": "#/$defs/controllersPeer" }
             }
           }
         }
@@ -44,7 +47,7 @@
           "properties": {
             "to": {
               "type": "array",
-              "items": { "$ref": "#/$defs/controllerPeer" }
+              "items": { "$ref": "#/$defs/controllersPeer" }
             }
           }
         }
@@ -75,11 +78,19 @@
           "$ref": "definitions.json#/$defs/annotations"
         },
         "controller": {
-          "description": "Controller this NetworkPolicy should target.",
+          "description": "Controller this NetworkPolicy should target. Mutually exclusive with controllers and podSelector.",
           "type": "string"
         },
+        "controllers": {
+          "description": "Controllers this NetworkPolicy should target. Each entry can be an exact controller identifier or a regular expression. Mutually exclusive with controller and podSelector.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
         "extraSelectorLabels": {
-          "description": "Additional match labels to add to the pod selector. These are merged with labels derived from the controller identifier.",
+          "description": "Additional match labels to add to the pod selector. These are merged with labels derived from the controller selection.",
           "type": "object",
           "additionalProperties": {
             "type": "string"
@@ -89,7 +100,7 @@
           "$ref": "definitions.json#/$defs/labels"
         },
         "podSelector": {
-          "description": "Custom podSelector for the NetworkPolicy. Takes precedence over targeting a controller via the controller identifier."
+          "description": "Custom podSelector for the NetworkPolicy. Mutually exclusive with controller and controllers."
         },
         "policyTypes": {
           "description": "Policy types for the NetworkPolicy.",
@@ -125,21 +136,27 @@
           }
         }
       },
-      "dependentSchemas": {
-        "podSelector": {
-          "not": {
+      "not": {
+        "anyOf": [
+          {
             "required": [
-              "controller"
+              "controller",
+              "controllers"
             ]
-          }
-        },
-        "controller": {
-          "not": {
+          },
+          {
             "required": [
+              "controller",
+              "podSelector"
+            ]
+          },
+          {
+            "required": [
+              "controllers",
               "podSelector"
             ]
           }
-        }
+        ]
       },
       "required": [
         "policyTypes",

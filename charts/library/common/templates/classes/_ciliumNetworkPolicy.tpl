@@ -15,35 +15,25 @@ within the common library.
     (include "bjw-s.common.lib.metadata.globalAnnotations" $rootContext | fromYaml)
   -}}
   {{- $clusterwide := eq ($ciliumNetworkPolicyObject.type | default "cilium") "ciliumClusterwide" -}}
+  {{- $resourceKind := ternary "CiliumClusterwideNetworkPolicy" "CiliumNetworkPolicy" $clusterwide -}}
   {{- $endpointSelector := dict -}}
   {{- if hasKey $ciliumNetworkPolicyObject "nodeSelector" -}}
     {{- /* CiliumClusterwideNetworkPolicy node selectors replace endpoint selectors. */ -}}
   {{- else if (hasKey $ciliumNetworkPolicyObject "endpointSelector") -}}
     {{- $endpointSelector = $ciliumNetworkPolicyObject.endpointSelector -}}
   {{- else -}}
-    {{- /* Determine the controller identifier to use */ -}}
-    {{- $controllerIdentifier := "" -}}
-    {{- if and (hasKey $ciliumNetworkPolicyObject "controller") $ciliumNetworkPolicyObject.controller -}}
-      {{- $controllerIdentifier = $ciliumNetworkPolicyObject.controller -}}
+    {{- $controllerIdentifiers := list -}}
+    {{- if $ciliumNetworkPolicyObject.controllers -}}
+      {{- $controllerIdentifiers = include "bjw-s.common.lib.controller.resolveReferences" (dict "rootContext" $rootContext "references" $ciliumNetworkPolicyObject.controllers "resourceKind" $resourceKind "policyIdentifier" $ciliumNetworkPolicyObject.identifier "referencePath" (printf "networkpolicies.%s.controllers" $ciliumNetworkPolicyObject.identifier)) | fromYamlArray -}}
+    {{- else if $ciliumNetworkPolicyObject.controller -}}
+      {{- $controllerIdentifiers = list $ciliumNetworkPolicyObject.controller -}}
     {{- else -}}
-      {{- /* Auto-detect: if only one controller exists, use it */ -}}
-      {{- $enabledControllers := (include "bjw-s.common.lib.controller.enabledControllers" (dict "rootContext" $rootContext) | fromYaml) -}}
+      {{- $enabledControllers := include "bjw-s.common.lib.controller.enabledControllers" (dict "rootContext" $rootContext) | fromYaml -}}
       {{- if eq (len $enabledControllers) 1 -}}
-        {{- $controllerIdentifier = keys $enabledControllers | first -}}
+        {{- $controllerIdentifiers = keys $enabledControllers -}}
       {{- end -}}
     {{- end -}}
-
-    {{- $controllerObject := include "bjw-s.common.lib.controller.getByIdentifier" (dict "rootContext" $rootContext "id" $controllerIdentifier) | fromYaml -}}
-    {{- $selectorLabels := include "bjw-s.common.lib.controller.metadata.selectorLabels" (dict "rootContext" $rootContext "controllerObject" $controllerObject) | fromYaml -}}
-    {{- /* Add extra selector labels last (takes precedence) */ -}}
-    {{- if hasKey $ciliumNetworkPolicyObject "extraSelectorLabels" -}}
-      {{- $selectorLabels = mergeOverwrite
-        (dict)
-        $selectorLabels
-        ($ciliumNetworkPolicyObject.extraSelectorLabels | default dict)
-      -}}
-    {{- end -}}
-    {{- $endpointSelector = dict "matchLabels" $selectorLabels -}}
+    {{- $endpointSelector = include "bjw-s.common.lib.networkpolicy.controllerSelector" (dict "rootContext" $rootContext "controllerIdentifiers" $controllerIdentifiers "extraSelectorLabels" $ciliumNetworkPolicyObject.extraSelectorLabels) | fromYaml -}}
   {{- end -}}
 ---
 apiVersion: cilium.io/v2
@@ -70,13 +60,13 @@ spec:
   description: {{ include "bjw-s.common.lib.common.renderString" (dict "value" . "rootContext" $rootContext) | quote }}
   {{- end }}
   {{- with $ciliumNetworkPolicyObject.ingress }}
-  ingress: {{- include "bjw-s.common.lib.common.renderString" (dict "value" (include "bjw-s.common.lib.ciliumNetworkPolicy.rules" (dict "rootContext" $rootContext "rules" . "direction" "ingress")) "rootContext" $rootContext) | nindent 4 -}}
+  ingress: {{- include "bjw-s.common.lib.common.renderString" (dict "value" (include "bjw-s.common.lib.ciliumNetworkPolicy.rules" (dict "rootContext" $rootContext "rules" . "direction" "ingress" "policyIdentifier" $ciliumNetworkPolicyObject.identifier "resourceKind" $resourceKind)) "rootContext" $rootContext) | nindent 4 -}}
   {{- end }}
   {{- with $ciliumNetworkPolicyObject.ingressDeny }}
   ingressDeny: {{- include "bjw-s.common.lib.common.renderString" (dict "value" (toYaml .) "rootContext" $rootContext) | nindent 4 -}}
   {{- end }}
   {{- with $ciliumNetworkPolicyObject.egress }}
-  egress: {{- include "bjw-s.common.lib.common.renderString" (dict "value" (include "bjw-s.common.lib.ciliumNetworkPolicy.rules" (dict "rootContext" $rootContext "rules" . "direction" "egress")) "rootContext" $rootContext) | nindent 4 -}}
+  egress: {{- include "bjw-s.common.lib.common.renderString" (dict "value" (include "bjw-s.common.lib.ciliumNetworkPolicy.rules" (dict "rootContext" $rootContext "rules" . "direction" "egress" "policyIdentifier" $ciliumNetworkPolicyObject.identifier "resourceKind" $resourceKind)) "rootContext" $rootContext) | nindent 4 -}}
   {{- end }}
   {{- with $ciliumNetworkPolicyObject.egressDeny }}
   egressDeny: {{- include "bjw-s.common.lib.common.renderString" (dict "value" (toYaml .) "rootContext" $rootContext) | nindent 4 -}}

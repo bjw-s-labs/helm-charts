@@ -25,11 +25,19 @@
           "$ref": "definitions.json#/$defs/annotations"
         },
         "controller": {
-          "description": "Controller this CiliumNetworkPolicy should target.",
+          "description": "Controller this CiliumNetworkPolicy should target. Mutually exclusive with controllers and endpointSelector.",
           "type": "string"
         },
+        "controllers": {
+          "description": "Controllers this CiliumNetworkPolicy should target. Each entry can be an exact controller identifier or a regular expression. Mutually exclusive with controller and endpointSelector.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
         "extraSelectorLabels": {
-          "description": "Additional match labels to add to the endpoint selector. These are merged with labels derived from the controller identifier.",
+          "description": "Additional match labels to add to the endpoint selector. These are merged with labels derived from the controller selection.",
           "type": "object",
           "additionalProperties": {
             "type": "string"
@@ -39,7 +47,7 @@
           "$ref": "definitions.json#/$defs/labels"
         },
         "endpointSelector": {
-          "description": "Custom endpointSelector for the CiliumNetworkPolicy. Takes precedence over targeting a controller via the controller identifier.",
+          "description": "Custom endpointSelector for the CiliumNetworkPolicy. Mutually exclusive with controller and controllers.",
           "$ref": "k8s-api.json#/$defs/meta.v1.LabelSelector"
         },
         "nodeSelector": {
@@ -85,21 +93,27 @@
           "maxLength": 32
         }
       },
-      "dependentSchemas": {
-        "endpointSelector": {
-          "not": {
+      "not": {
+        "anyOf": [
+          {
             "required": [
-              "controller"
+              "controller",
+              "controllers"
             ]
-          }
-        },
-        "controller": {
-          "not": {
+          },
+          {
             "required": [
+              "controller",
+              "endpointSelector"
+            ]
+          },
+          {
+            "required": [
+              "controllers",
               "endpointSelector"
             ]
           }
-        }
+        ]
       },
       "anyOf": [
         {
@@ -215,7 +229,7 @@
               },
               {
                 "required": [
-                  "fromController"
+                  "fromControllers"
                 ]
               }
             ]
@@ -253,7 +267,7 @@
         },
         {
           "required": [
-            "fromController"
+            "fromControllers"
           ]
         }
       ]
@@ -377,7 +391,7 @@
               },
               {
                 "required": [
-                  "toController"
+                  "toControllers"
                 ]
               }
             ]
@@ -425,7 +439,7 @@
         },
         {
           "required": [
-            "toController"
+            "toControllers"
           ]
         }
       ]
@@ -512,7 +526,7 @@
       ]
     },
     "ingressRules": {
-      "description": "Ingress allow rules accept these direct Cilium 1.20.2 keys: fromEndpoints, fromRequires, fromCIDR, fromCIDRSet, fromEntities, fromGroups, fromNodes, toPorts, icmps, and authentication. Peer selector keys are mutually exclusive by presence, with fromController treated as fromEndpoints; icmps and toPorts are mutually exclusive by presence. Nested values remain permissive, but unknown direct fields are rejected. authentication is composable.",
+      "description": "Ingress allow rules accept these direct Cilium 1.20.2 keys: fromEndpoints, fromRequires, fromCIDR, fromCIDRSet, fromEntities, fromGroups, fromNodes, toPorts, icmps, and authentication. Peer selector keys are mutually exclusive by presence, with fromControllers treated as fromEndpoints; icmps and toPorts are mutually exclusive by presence. Nested values remain permissive, but unknown direct fields are rejected. authentication is composable.",
       "type": "array",
       "items": {
         "type": "object",
@@ -536,14 +550,17 @@
           "toPorts": {},
           "icmps": {},
           "authentication": {},
-          "fromController": {
-            "type": "string"
+          "fromControllers": {
+            "description": "Controllers whose pods this peer selects. Each entry is an exact identifier or regular expression.",
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string" }
           }
         }
       }
     },
     "ingressDenyRules": {
-      "description": "Ingress deny rules accept these direct Cilium 1.20.2 keys: fromEndpoints, fromRequires, fromCIDR, fromCIDRSet, fromEntities, fromGroups, fromNodes, toPorts, and icmps. Peer keys are mutually exclusive by presence, and icmps and toPorts are mutually exclusive by presence. Nested values remain permissive, but unknown direct fields are rejected. Deny rules do not support fromController or authentication.",
+      "description": "Ingress deny rules accept these direct Cilium 1.20.2 keys: fromEndpoints, fromRequires, fromCIDR, fromCIDRSet, fromEntities, fromGroups, fromNodes, toPorts, and icmps. Peer keys are mutually exclusive by presence, and icmps and toPorts are mutually exclusive by presence. Nested values remain permissive, but unknown direct fields are rejected. Deny rules do not support fromControllers or authentication.",
       "type": "array",
       "items": {
         "type": "object",
@@ -570,7 +587,7 @@
       }
     },
     "egressRules": {
-      "description": "Egress allow rules accept these direct Cilium 1.20.2 keys: toEndpoints, toRequires, toCIDR, toCIDRSet, toEntities, toServices, toGroups, toNodes, toPorts, toFQDNs, icmps, and authentication. Peer selector keys are mutually exclusive by presence, with toController treated as toEndpoints; icmps and toPorts are mutually exclusive by presence. Nested values remain permissive, but unknown direct fields are rejected. authentication is composable.",
+      "description": "Egress allow rules accept these direct Cilium 1.20.2 keys: toEndpoints, toRequires, toCIDR, toCIDRSet, toEntities, toServices, toGroups, toNodes, toPorts, toFQDNs, icmps, and authentication. Peer selector keys are mutually exclusive by presence, with toControllers treated as toEndpoints; icmps and toPorts are mutually exclusive by presence. Nested values remain permissive, but unknown direct fields are rejected. authentication is composable.",
       "type": "array",
       "items": {
         "type": "object",
@@ -596,14 +613,17 @@
           "toFQDNs": {},
           "icmps": {},
           "authentication": {},
-          "toController": {
-            "type": "string"
+          "toControllers": {
+            "description": "Controllers whose pods this peer selects. Each entry is an exact identifier or regular expression.",
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string" }
           }
         }
       }
     },
     "egressDenyRules": {
-      "description": "Egress deny rules accept these direct Cilium 1.20.2 keys: toEndpoints, toRequires, toCIDR, toCIDRSet, toEntities, toServices, toGroups, toNodes, toPorts, and icmps. Peer keys are mutually exclusive by presence, and icmps and toPorts are mutually exclusive by presence. Nested values remain permissive, but unknown direct fields are rejected. Deny rules do not support toController or authentication.",
+      "description": "Egress deny rules accept these direct Cilium 1.20.2 keys: toEndpoints, toRequires, toCIDR, toCIDRSet, toEntities, toServices, toGroups, toNodes, toPorts, and icmps. Peer keys are mutually exclusive by presence, and icmps and toPorts are mutually exclusive by presence. Nested values remain permissive, but unknown direct fields are rejected. Deny rules do not support toControllers or authentication.",
       "type": "array",
       "items": {
         "type": "object",
