@@ -4,8 +4,10 @@ Secondary entrypoint and primary loader for the common chart
 {{- define "bjw-s.common.loader.generate" -}}
   {{- $rootContext := $ -}}
 
-  {{- /* Single-pass evaluation against the post-merge root context. */ -}}
-  {{- $evaluatedValues := include "bjw-s.common.values.evaluateTemplate" (dict "rootContext" $rootContext "value" (deepCopy $rootContext.Values)) | fromJson -}}
+  {{- /* Evaluate templates against the post-merge root context. */ -}}
+  {{- $passes := dig "global" "templateEvaluation" "passes" 1 $rootContext.Values -}}
+  {{- $excludePaths := dig "global" "templateEvaluation" "excludePaths" list $rootContext.Values -}}
+  {{- $evaluatedValues := include "bjw-s.common.values.evaluateTemplate" (dict "rootContext" $rootContext "value" (deepCopy $rootContext.Values) "passes" $passes "excludePaths" $excludePaths) | fromJson -}}
   {{- $renderContext := merge (dict) $rootContext -}}
   {{- $_ := set $renderContext "Values" (index $evaluatedValues "value") -}}
   {{- $_ := set $renderContext "TemplateRendering" (dict "valuesRendered" true) -}}

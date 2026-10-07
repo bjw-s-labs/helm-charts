@@ -1,0 +1,30 @@
+---
+title: "templateEvaluation"
+description: "Configure global string template evaluation."
+sidebar:
+  label: "templateEvaluation"
+---
+
+Configure global string template evaluation.
+
+## Type
+
+`object`
+
+## Properties
+
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `excludePaths` | `array` | No | `[]` | Paths excluded from global template evaluation. Each path... |
+| `passes` | `integer` | No | `1` | Maximum number of times each string is evaluated. Increas... |
+
+### Property Details
+
+#### excludePaths
+
+Paths excluded from global template evaluation. Each path is a list of map keys or array indexes represented as strings. Matching paths and their descendants are left unchanged.
+
+#### passes
+
+Maximum number of times each string is evaluated. Increase this to evaluate templates produced by templated values.
