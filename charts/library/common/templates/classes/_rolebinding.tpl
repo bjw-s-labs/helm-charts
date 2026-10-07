@@ -5,13 +5,13 @@ This template serves as a blueprint for generating RoleBinding objects in Kubern
   {{- $rootContext := .rootContext -}}
   {{- $roleBindingObject := .object -}}
 
-  {{- $labels := merge
-    ($roleBindingObject.labels | default dict)
+  {{- $labels := mergeOverwrite
     (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
+    ($roleBindingObject.labels | default dict)
   -}}
-  {{- $annotations := merge
-    ($roleBindingObject.annotations | default dict)
+  {{- $annotations := mergeOverwrite
     (include "bjw-s.common.lib.metadata.globalAnnotations" $rootContext | fromYaml)
+    ($roleBindingObject.annotations | default dict)
   -}}
   {{- $subjects := list -}}
   {{- with $roleBindingObject.subjects -}}

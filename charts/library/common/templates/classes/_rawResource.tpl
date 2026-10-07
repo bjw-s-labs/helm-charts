@@ -17,7 +17,7 @@ within the common library.
     (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
     $userLabels
   -}}
-  {{- $annotations := merge
+  {{- $annotations := mergeOverwrite
     (include "bjw-s.common.lib.metadata.globalAnnotations" $rootContext | fromYaml)
     $userAnnotations
   -}}

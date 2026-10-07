@@ -10,9 +10,9 @@ using the common library.
     (dict "app.kubernetes.io/controller" $hpaObject.controller)
     (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
   -}}
-  {{- $annotations := merge
-    ($hpaObject.annotations | default dict)
+  {{- $annotations := mergeOverwrite
     (include "bjw-s.common.lib.metadata.globalAnnotations" $rootContext | fromYaml)
+    ($hpaObject.annotations | default dict)
   -}}
 
   {{- /* Resolve the controller to determine scaleTargetRef kind */ -}}

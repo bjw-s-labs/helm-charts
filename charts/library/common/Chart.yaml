@@ -40,3 +40,9 @@ annotations:
     - kind: changed
       description: |-
         Improve cilliumNetworkPolicy schema validation
+    - kind: fixed
+      description: |-
+        Fixed resource label merge order
+    - kind: fixed
+      description: |-
+        Fixed resource annotation merge order

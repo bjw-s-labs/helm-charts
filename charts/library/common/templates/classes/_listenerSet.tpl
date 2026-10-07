@@ -6,13 +6,13 @@ created within the common library.
   {{- $rootContext := .rootContext -}}
   {{- $listenerSetObject := .object -}}
 
-  {{- $labels := merge
-    ($listenerSetObject.labels | default dict)
+  {{- $labels := mergeOverwrite
     (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
+    ($listenerSetObject.labels | default dict)
   -}}
-  {{- $annotations := merge
-    ($listenerSetObject.annotations | default dict)
+  {{- $annotations := mergeOverwrite
     (include "bjw-s.common.lib.metadata.globalAnnotations" $rootContext | fromYaml)
+    ($listenerSetObject.annotations | default dict)
   -}}
 ---
 apiVersion: {{ $listenerSetObject.apiVersion }}

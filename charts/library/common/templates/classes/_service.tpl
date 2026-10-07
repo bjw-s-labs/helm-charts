@@ -8,14 +8,14 @@ within the common library.
 
   {{- $svcType := default "ClusterIP" $serviceObject.type -}}
   {{- $enabledPorts := include "bjw-s.common.lib.service.enabledPorts" (dict "rootContext" $rootContext "serviceObject" $serviceObject) | fromYaml }}
-  {{- $labels := merge
+  {{- $labels := mergeOverwrite
+    (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
     (dict "app.kubernetes.io/service" $serviceObject.name)
     ($serviceObject.labels | default dict)
-    (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
   -}}
-  {{- $annotations := merge
-    ($serviceObject.annotations | default dict)
+  {{- $annotations := mergeOverwrite
     (include "bjw-s.common.lib.metadata.globalAnnotations" $rootContext | fromYaml)
+    ($serviceObject.annotations | default dict)
   -}}
 ---
 apiVersion: v1
