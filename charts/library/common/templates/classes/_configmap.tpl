@@ -6,13 +6,13 @@ within the common library.
   {{- $rootContext := .rootContext -}}
   {{- $configMapObject := .object -}}
 
-  {{- $labels := merge
-    ($configMapObject.labels | default dict)
+  {{- $labels := mergeOverwrite
     (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
+    ($configMapObject.labels | default dict)
   -}}
-  {{- $annotations := merge
-    ($configMapObject.annotations | default dict)
+  {{- $annotations := mergeOverwrite
     (include "bjw-s.common.lib.metadata.globalAnnotations" $rootContext | fromYaml)
+    ($configMapObject.annotations | default dict)
   -}}
 ---
 apiVersion: v1

@@ -14,13 +14,13 @@ within the common library.
   {{- if $rootContext.Capabilities.APIVersions.Has (printf "gateway.networking.k8s.io/v1/%s" $routeKind) }}
     {{- $apiVersion = "gateway.networking.k8s.io/v1" -}}
   {{- end -}}
-  {{- $labels := merge
-    ($routeObject.labels | default dict)
+  {{- $labels := mergeOverwrite
     (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
+    ($routeObject.labels | default dict)
   -}}
-  {{- $annotations := merge
-    ($routeObject.annotations | default dict)
+  {{- $annotations := mergeOverwrite
     (include "bjw-s.common.lib.metadata.globalAnnotations" $rootContext | fromYaml)
+    ($routeObject.annotations | default dict)
   -}}
 ---
 apiVersion: {{ $apiVersion }}

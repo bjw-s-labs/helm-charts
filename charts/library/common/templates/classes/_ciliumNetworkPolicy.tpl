@@ -6,13 +6,13 @@ within the common library.
   {{- $rootContext := .rootContext -}}
   {{- $ciliumNetworkPolicyObject := .object -}}
 
-  {{- $labels := merge
-    ($ciliumNetworkPolicyObject.labels | default dict)
+  {{- $labels := mergeOverwrite
     (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
+    ($ciliumNetworkPolicyObject.labels | default dict)
   -}}
-  {{- $annotations := merge
-    ($ciliumNetworkPolicyObject.annotations | default dict)
+  {{- $annotations := mergeOverwrite
     (include "bjw-s.common.lib.metadata.globalAnnotations" $rootContext | fromYaml)
+    ($ciliumNetworkPolicyObject.annotations | default dict)
   -}}
   {{- $clusterwide := eq ($ciliumNetworkPolicyObject.type | default "cilium") "ciliumClusterwide" -}}
   {{- $resourceKind := ternary "CiliumClusterwideNetworkPolicy" "CiliumNetworkPolicy" $clusterwide -}}

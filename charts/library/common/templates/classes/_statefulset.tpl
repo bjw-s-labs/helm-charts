@@ -6,14 +6,14 @@ within the common library.
   {{- $rootContext := .rootContext -}}
   {{- $statefulsetObject := .object -}}
 
-  {{- $labels := merge
+  {{- $labels := mergeOverwrite
+    (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
     (dict "app.kubernetes.io/controller" $statefulsetObject.identifier)
     ($statefulsetObject.labels | default dict)
-    (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
   -}}
-  {{- $annotations := merge
-    ($statefulsetObject.annotations | default dict)
+  {{- $annotations := mergeOverwrite
     (include "bjw-s.common.lib.metadata.globalAnnotations" $rootContext | fromYaml)
+    ($statefulsetObject.annotations | default dict)
   -}}
 ---
 apiVersion: apps/v1

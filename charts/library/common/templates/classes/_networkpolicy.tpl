@@ -6,13 +6,13 @@ within the common library.
   {{- $rootContext := .rootContext -}}
   {{- $networkPolicyObject := .object -}}
 
-  {{- $labels := merge
-    ($networkPolicyObject.labels | default dict)
+  {{- $labels := mergeOverwrite
     (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
+    ($networkPolicyObject.labels | default dict)
   -}}
-  {{- $annotations := merge
-    ($networkPolicyObject.annotations | default dict)
+  {{- $annotations := mergeOverwrite
     (include "bjw-s.common.lib.metadata.globalAnnotations" $rootContext | fromYaml)
+    ($networkPolicyObject.annotations | default dict)
   -}}
   {{- $podSelector := dict -}}
   {{- if (hasKey $networkPolicyObject "podSelector") -}}

@@ -6,14 +6,14 @@ within the common library.
   {{- $rootContext := .rootContext -}}
   {{- $jobObject := .object -}}
 
-  {{- $labels := merge
+  {{- $labels := mergeOverwrite
+    (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
     (dict "app.kubernetes.io/controller" $jobObject.identifier)
     ($jobObject.labels | default dict)
-    (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
   -}}
-  {{- $annotations := merge
-    ($jobObject.annotations | default dict)
+  {{- $annotations := mergeOverwrite
     (include "bjw-s.common.lib.metadata.globalAnnotations" $rootContext | fromYaml)
+    ($jobObject.annotations | default dict)
   -}}
 
   {{- $jobSettings := dig "job" dict $jobObject -}}

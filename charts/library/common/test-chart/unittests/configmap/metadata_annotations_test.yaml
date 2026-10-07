@@ -56,6 +56,24 @@ tests:
             global_annotation: test
             test_annotation: test
 
+  - it: resource annotations override global annotations
+    set:
+      global.annotations:
+        test_annotation: global
+      configMaps:
+        config:
+          data:
+            test: test
+          annotations:
+            test_annotation: configmap
+    documentSelector:
+      path: $[?(@.kind == "ConfigMap")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: metadata.annotations.test_annotation
+          value: configmap
+
   - it: default metadata from folder should pass
     set:
       configMaps:

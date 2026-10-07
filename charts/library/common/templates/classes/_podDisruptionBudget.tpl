@@ -10,9 +10,9 @@ using the common library.
     (dict "app.kubernetes.io/controller" $podDisruptionBudgetObject.controller)
     (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
   -}}
-  {{- $annotations := merge
-    ($podDisruptionBudgetObject.annotations | default dict)
+  {{- $annotations := mergeOverwrite
     (include "bjw-s.common.lib.metadata.globalAnnotations" $rootContext | fromYaml)
+    ($podDisruptionBudgetObject.annotations | default dict)
   -}}
 
   {{- $controllerObject := include "bjw-s.common.lib.controller.getByIdentifier" (dict "rootContext" $rootContext "id" $podDisruptionBudgetObject.controller) | fromYaml -}}

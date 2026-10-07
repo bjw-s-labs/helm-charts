@@ -6,14 +6,14 @@ using the common library.
   {{- $rootContext := .rootContext -}}
   {{- $deploymentObject := .object -}}
 
-  {{- $labels := merge
+  {{- $labels := mergeOverwrite
+    (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
     (dict "app.kubernetes.io/controller" $deploymentObject.identifier)
     ($deploymentObject.labels | default dict)
-    (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
   -}}
-  {{- $annotations := merge
-    ($deploymentObject.annotations | default dict)
+  {{- $annotations := mergeOverwrite
     (include "bjw-s.common.lib.metadata.globalAnnotations" $rootContext | fromYaml)
+    ($deploymentObject.annotations | default dict)
   -}}
 ---
 apiVersion: apps/v1

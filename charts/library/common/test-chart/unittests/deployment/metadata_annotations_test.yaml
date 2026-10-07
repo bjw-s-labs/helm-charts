@@ -46,6 +46,20 @@ tests:
             global_annotation: test
             test_annotation: test
 
+  - it: resource annotations override global annotations
+    set:
+      global.annotations:
+        test_annotation: global
+      controllers.main.annotations:
+        test_annotation: controller
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: metadata.annotations.test_annotation
+          value: controller
+
   - it: annotations with template functions should be rendered
     set:
       controllers.main.annotations:

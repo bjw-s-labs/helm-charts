@@ -6,13 +6,13 @@ within the common library.
   {{- $rootContext := .rootContext -}}
   {{- $externalSecretObject := .object -}}
 
-  {{- $labels := merge
-    ($externalSecretObject.labels | default dict)
+  {{- $labels := mergeOverwrite
     (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
+    ($externalSecretObject.labels | default dict)
   -}}
-  {{- $annotations := merge
-    ($externalSecretObject.annotations | default dict)
+  {{- $annotations := mergeOverwrite
     (include "bjw-s.common.lib.metadata.globalAnnotations" $rootContext | fromYaml)
+    ($externalSecretObject.annotations | default dict)
   -}}
   {{- $secretStoreRef := mergeOverwrite
     (deepCopy ($rootContext.Values.defaultExternalSecretStoreRef | default dict))

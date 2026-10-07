@@ -62,6 +62,20 @@ tests:
             helm.sh/chart: common-test-1.0.0
             test_label: test
 
+  - it: resource labels override generated and global labels
+    set:
+      global.labels:
+        app.kubernetes.io/name: global-name
+      controllers.main.labels:
+        app.kubernetes.io/name: controller-name
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/name"]
+          value: controller-name
+
   - it: labels with template functions should be rendered
     set:
       controllers.main.labels:

@@ -6,13 +6,13 @@ using the common library.
   {{- $rootContext := .rootContext -}}
   {{- $serviceAccountObject := .object -}}
 
-  {{- $labels := merge
-    ($serviceAccountObject.labels | default dict)
+  {{- $labels := mergeOverwrite
     (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
+    ($serviceAccountObject.labels | default dict)
   -}}
-  {{- $annotations := merge
-    ($serviceAccountObject.annotations | default dict)
+  {{- $annotations := mergeOverwrite
     (include "bjw-s.common.lib.metadata.globalAnnotations" $rootContext | fromYaml)
+    ($serviceAccountObject.annotations | default dict)
   -}}
 ---
 apiVersion: v1
