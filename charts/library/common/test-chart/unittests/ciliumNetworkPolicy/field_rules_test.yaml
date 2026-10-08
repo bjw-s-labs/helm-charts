@@ -148,7 +148,7 @@ tests:
       - notExists:
           path: spec.egressDeny
 
-  - it: translates ingress fromController into fromEndpoints
+  - it: translates ingress fromControllers into fromEndpoints
     set:
       controllers.secondary:
         containers:
@@ -160,7 +160,7 @@ tests:
         type: cilium
         controller: main
         ingress:
-          - fromController: secondary
+          - fromControllers: [secondary]
             toPorts:
               - ports:
                   - port: "443"
@@ -177,12 +177,12 @@ tests:
                 app.kubernetes.io/instance: RELEASE-NAME
                 app.kubernetes.io/name: RELEASE-NAME
       - notExists:
-          path: spec.ingress[0].fromController
+          path: spec.ingress[0].fromControllers
       - equal:
           path: spec.ingress[0].toPorts[0].ports[0].port
           value: "443"
 
-  - it: translates egress toController into toEndpoints
+  - it: translates egress toControllers into toEndpoints
     set:
       controllers.secondary:
         containers:
@@ -194,7 +194,7 @@ tests:
         type: cilium
         controller: main
         egress:
-          - toController: secondary
+          - toControllers: [secondary]
             toPorts:
               - ports:
                   - port: "443"
@@ -211,12 +211,87 @@ tests:
                 app.kubernetes.io/instance: RELEASE-NAME
                 app.kubernetes.io/name: RELEASE-NAME
       - notExists:
-          path: spec.egress[0].toController
+          path: spec.egress[0].toControllers
       - equal:
           path: spec.egress[0].toPorts[0].ports[0].protocol
           value: TCP
 
-  - it: rejects fromController references to disabled controllers
+  - it: translates regular expression toControllers into a shared endpoint selector
+    set:
+      controllers:
+        worker-low:
+          extraSelectorLabels:
+            tier: low
+          containers:
+            main:
+              image:
+                repository: nginx
+                tag: latest
+        worker-high:
+          extraSelectorLabels:
+            tier: high
+          containers:
+            main:
+              image:
+                repository: nginx
+                tag: latest
+      networkpolicies.main:
+        type: cilium
+        controller: main
+        egress:
+          - toControllers: [worker-.*]
+    documentSelector:
+      path: $[?(@.kind == "CiliumNetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.egress[0].toEndpoints
+          value:
+            - matchLabels:
+                app.kubernetes.io/instance: RELEASE-NAME
+                app.kubernetes.io/name: RELEASE-NAME
+              matchExpressions:
+                - key: app.kubernetes.io/controller
+                  operator: In
+                  values:
+                    - worker-high
+                    - worker-low
+
+  - it: translates multiple ingress fromControllers into one endpoint selector
+    set:
+      controllers.secondary:
+        containers:
+          main:
+            image:
+              repository: nginx
+              tag: latest
+      networkpolicies.main:
+        type: cilium
+        controller: main
+        ingress:
+          - fromControllers: [secondary, main]
+            toPorts:
+              - ports:
+                  - port: "443"
+    documentSelector:
+      path: $[?(@.kind == "CiliumNetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.ingress[0].fromEndpoints
+          value:
+            - matchLabels:
+                app.kubernetes.io/instance: RELEASE-NAME
+                app.kubernetes.io/name: RELEASE-NAME
+              matchExpressions:
+                - key: app.kubernetes.io/controller
+                  operator: In
+                  values: [main, secondary]
+      - equal:
+          path: spec.ingress[0].toPorts[0].ports[0].port
+          value: "443"
+
+  - it: rejects fromControllers references to disabled controllers
     set:
       controllers.secondary:
         enabled: false
@@ -229,12 +304,12 @@ tests:
         type: cilium
         controller: main
         ingress:
-          - fromController: secondary
+          - fromControllers: [secondary]
     asserts:
       - failedTemplate:
-          errorMessage: "CiliumNetworkPolicy 'main': Ingress rule references controller 'secondary', but no enabled controller exists with that identifier. Enable 'controllers.secondary' or choose an enabled controller."
+          errorMessage: "CiliumNetworkPolicy 'main': Controller reference 'secondary' matched no enabled controllers. Update 'networkpolicies.main.ingress[0].fromControllers' to match one of: [main]."
 
-  - it: rejects ingress fromController with explicit fromEndpoints
+  - it: rejects ingress fromControllers with explicit fromEndpoints
     set:
       controllers.secondary:
         containers:
@@ -246,7 +321,7 @@ tests:
         type: cilium
         controller: main
         ingress:
-          - fromController: secondary
+          - fromControllers: [secondary]
             fromEndpoints:
               - matchLabels:
                   role: explicitly-selected
@@ -254,7 +329,7 @@ tests:
       - failedTemplate:
           errorPattern: values don't meet the specifications of the schema
 
-  - it: rejects egress toController with explicit toEndpoints
+  - it: rejects egress toControllers with explicit toEndpoints
     set:
       controllers.secondary:
         containers:
@@ -266,7 +341,7 @@ tests:
         type: cilium
         controller: main
         egress:
-          - toController: secondary
+          - toControllers: [secondary]
             toEndpoints:
               - matchLabels:
                   role: explicitly-selected
@@ -274,7 +349,7 @@ tests:
       - failedTemplate:
           errorPattern: values don't meet the specifications of the schema
 
-  - it: rejects ingress toController as a wrong-direction shorthand
+  - it: rejects ingress toControllers as a wrong-direction shorthand
     set:
       controllers.secondary:
         containers:
@@ -286,12 +361,12 @@ tests:
         type: cilium
         controller: main
         ingress:
-          - toController: secondary
+          - toControllers: [secondary]
     asserts:
       - failedTemplate:
           errorPattern: values don't meet the specifications of the schema
 
-  - it: rejects egress fromController as a wrong-direction shorthand
+  - it: rejects egress fromControllers as a wrong-direction shorthand
     set:
       controllers.secondary:
         containers:
@@ -303,7 +378,7 @@ tests:
         type: cilium
         controller: main
         egress:
-          - fromController: secondary
+          - fromControllers: [secondary]
     asserts:
       - failedTemplate:
           errorPattern: values don't meet the specifications of the schema
@@ -522,7 +597,7 @@ tests:
         type: cilium
         controller: main
         ingress:
-          - fromController: secondary
+          - fromControllers: [secondary]
             fromEntities: [cluster]
     asserts:
       - failedTemplate:
@@ -542,7 +617,7 @@ tests:
       - failedTemplate:
           errorPattern: values don't meet the specifications of the schema
 
-  - it: rejects an egress toController with another peer key
+  - it: rejects an egress toControllers with another peer key
     set:
       controllers.secondary:
         containers:
@@ -554,19 +629,19 @@ tests:
         type: cilium
         controller: main
         egress:
-          - toController: secondary
+          - toControllers: [secondary]
             toEntities: [cluster]
     asserts:
       - failedTemplate:
           errorPattern: values don't meet the specifications of the schema
 
-  - it: rejects an empty egress toController with another peer key
+  - it: rejects an empty egress toControllers with another peer key
     set:
       networkpolicies.main:
         type: cilium
         controller: main
         egress:
-          - toController: ""
+          - toControllers: []
             toEntities: [cluster]
     asserts:
       - failedTemplate:

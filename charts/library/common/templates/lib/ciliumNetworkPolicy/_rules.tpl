@@ -5,21 +5,17 @@ Render Cilium rules, expanding the direction-specific controller shorthand into 
   {{- $rootContext := .rootContext -}}
   {{- $rules := .rules -}}
   {{- $direction := .direction -}}
+  {{- $policyIdentifier := .policyIdentifier -}}
+  {{- $resourceKind := .resourceKind -}}
   {{- $endpointField := ternary "fromEndpoints" "toEndpoints" (eq $direction "ingress") -}}
-  {{- $controllerField := ternary "fromController" "toController" (eq $direction "ingress") -}}
+  {{- $controllerField := ternary "fromControllers" "toControllers" (eq $direction "ingress") -}}
   {{- $renderedRules := list -}}
-  {{- range $rule := $rules -}}
+  {{- range $ruleIndex, $rule := $rules -}}
     {{- $renderedRule := deepCopy $rule -}}
     {{- if hasKey $renderedRule $controllerField -}}
-      {{- $controllerIdentifier := get $renderedRule $controllerField -}}
-      {{- $controllerObject := include "bjw-s.common.lib.controller.getByIdentifier" (dict "rootContext" $rootContext "id" $controllerIdentifier) | fromYaml -}}
-      {{- $selectorLabels := include "bjw-s.common.lib.controller.metadata.selectorLabels" (dict "rootContext" $rootContext "controllerObject" $controllerObject) | fromYaml -}}
-      {{- $endpoint := dict "matchLabels" $selectorLabels -}}
-      {{- $endpoints := list $endpoint -}}
-      {{- if hasKey $renderedRule $endpointField -}}
-        {{- $endpoints = concat (get $renderedRule $endpointField) $endpoints -}}
-      {{- end -}}
-      {{- $_ := set $renderedRule $endpointField $endpoints -}}
+      {{- $identifiers := include "bjw-s.common.lib.controller.resolveReferences" (dict "rootContext" $rootContext "references" (get $renderedRule $controllerField) "resourceKind" $resourceKind "policyIdentifier" $policyIdentifier "referencePath" (printf "networkpolicies.%s.%s[%d].%s" $policyIdentifier $direction $ruleIndex $controllerField)) | fromYamlArray -}}
+      {{- $endpoint := include "bjw-s.common.lib.networkpolicy.controllerSelector" (dict "rootContext" $rootContext "controllerIdentifiers" $identifiers) | fromYaml -}}
+      {{- $_ := set $renderedRule $endpointField (list $endpoint) -}}
       {{- $_ := unset $renderedRule $controllerField -}}
     {{- end -}}
     {{- $renderedRules = append $renderedRules $renderedRule -}}

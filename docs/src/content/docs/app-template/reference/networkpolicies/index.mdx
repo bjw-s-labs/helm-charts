@@ -56,13 +56,14 @@ CiliumNetworkPolicy implementation to render.
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
 | `annotations` | `object / null` | No | - | Annotations to set on the item. Keys and values support H... |
-| `controller` | `string` | No | - | Controller this CiliumNetworkPolicy should target. |
+| `controller` | `string` | No | - | Controller this CiliumNetworkPolicy should target. Mutual... |
+| `controllers` | `array` | No | - | Controllers this CiliumNetworkPolicy should target. Each ... |
 | `description` | `string` | No | - | Human-readable description of the policy. |
 | `egress` | `array` | No | - | Egress allow rules. At most one peer selector may be set.... |
 | `egressDeny` | `array` | No | - | Egress deny rules. At most one peer selector may be set. ... |
 | `enableDefaultDeny` | `object` | No | - | Configure whether the selected endpoints enter default-de... |
 | `enabled` | `boolean` | No | `true` | Set to false to disable the CiliumNetworkPolicy. |
-| `endpointSelector` | `object` | No | - | Custom endpointSelector for the CiliumNetworkPolicy. Take... |
+| `endpointSelector` | `object` | No | - | Custom endpointSelector for the CiliumNetworkPolicy. Mutu... |
 | `extraSelectorLabels` | `object` | No | - | Additional match labels to add to the endpoint selector. ... |
 | `forceRename` | `string` | No | - | Override the default resource name. Mutually exclusive wi... |
 | `ingress` | `array` | **Yes** | - | Ingress allow rules. At most one peer selector may be set... |
@@ -78,6 +79,12 @@ CiliumNetworkPolicy implementation to render.
 #### `annotations`
 
 Annotations to set on the item. Keys and values support Helm templating.
+#### `controller`
+
+Controller this CiliumNetworkPolicy should target. Mutually exclusive with controllers and endpointSelector.
+#### `controllers`
+
+Controllers this CiliumNetworkPolicy should target. Each entry can be an exact controller identifier or a regular expression. Mutually exclusive with controller and endpointSelector.
 #### `egress`
 
 Egress allow rules. At most one peer selector may be set. toPorts may be combined with a peer selector; icmps may not.
@@ -89,10 +96,10 @@ Egress deny rules. At most one peer selector may be set. toPorts may be combined
 Configure whether the selected endpoints enter default-deny mode for ingress and egress traffic.
 #### `endpointSelector`
 
-Custom endpointSelector for the CiliumNetworkPolicy. Takes precedence over targeting a controller via the controller identifier.
+Custom endpointSelector for the CiliumNetworkPolicy. Mutually exclusive with controller and controllers.
 #### `extraSelectorLabels`
 
-Additional match labels to add to the endpoint selector. These are merged with labels derived from the controller identifier.
+Additional match labels to add to the endpoint selector. These are merged with labels derived from the controller selection.
 #### `forceRename`
 
 Override the default resource name. Mutually exclusive with prefix and suffix.
@@ -139,13 +146,14 @@ networkpolicies:
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
 | `annotations` | `object / null` | No | - | Annotations to set on the item. Keys and values support H... |
-| `controller` | `string` | No | - | Controller this CiliumNetworkPolicy should target. |
+| `controller` | `string` | No | - | Controller this CiliumNetworkPolicy should target. Mutual... |
+| `controllers` | `array` | No | - | Controllers this CiliumNetworkPolicy should target. Each ... |
 | `description` | `string` | No | - | Human-readable description of the policy. |
 | `egress` | `array` | No | - | Egress allow rules. At most one peer selector may be set.... |
 | `egressDeny` | `array` | No | - | Egress deny rules. At most one peer selector may be set. ... |
 | `enableDefaultDeny` | `object` | No | - | Configure whether the selected endpoints enter default-de... |
 | `enabled` | `boolean` | No | `true` | Set to false to disable the CiliumNetworkPolicy. |
-| `endpointSelector` | `object` | No | - | Custom endpointSelector for the CiliumNetworkPolicy. Take... |
+| `endpointSelector` | `object` | No | - | Custom endpointSelector for the CiliumNetworkPolicy. Mutu... |
 | `extraSelectorLabels` | `object` | No | - | Additional match labels to add to the endpoint selector. ... |
 | `forceRename` | `string` | No | - | Override the default resource name. Mutually exclusive wi... |
 | `ingress` | `array` | **Yes** | - | Ingress allow rules. At most one peer selector may be set... |
@@ -161,6 +169,12 @@ networkpolicies:
 #### `annotations`
 
 Annotations to set on the item. Keys and values support Helm templating.
+#### `controller`
+
+Controller this CiliumNetworkPolicy should target. Mutually exclusive with controllers and endpointSelector.
+#### `controllers`
+
+Controllers this CiliumNetworkPolicy should target. Each entry can be an exact controller identifier or a regular expression. Mutually exclusive with controller and endpointSelector.
 #### `egress`
 
 Egress allow rules. At most one peer selector may be set. toPorts may be combined with a peer selector; icmps may not.
@@ -172,10 +186,10 @@ Egress deny rules. At most one peer selector may be set. toPorts may be combined
 Configure whether the selected endpoints enter default-deny mode for ingress and egress traffic.
 #### `endpointSelector`
 
-Custom endpointSelector for the CiliumNetworkPolicy. Takes precedence over targeting a controller via the controller identifier.
+Custom endpointSelector for the CiliumNetworkPolicy. Mutually exclusive with controller and controllers.
 #### `extraSelectorLabels`
 
-Additional match labels to add to the endpoint selector. These are merged with labels derived from the controller identifier.
+Additional match labels to add to the endpoint selector. These are merged with labels derived from the controller selection.
 #### `forceRename`
 
 Override the default resource name. Mutually exclusive with prefix and suffix.
@@ -209,12 +223,13 @@ Common properties:
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
 | `annotations` | `object / null` | No | - | Annotations to set on the item. Keys and values support H... |
-| `controller` | `string` | No | - | Controller this NetworkPolicy should target. |
+| `controller` | `string` | No | - | Controller this NetworkPolicy should target. Mutually exc... |
+| `controllers` | `array` | No | - | Controllers this NetworkPolicy should target. Each entry ... |
 | `enabled` | `boolean` | No | `true` | Set to false to disable the NetworkPolicy. |
 | `extraSelectorLabels` | `object` | No | - | Additional match labels to add to the pod selector. These... |
 | `forceRename` | `string` | No | - | Override the default resource name. Mutually exclusive wi... |
 | `labels` | `object / null` | No | - | Labels to set on the item. Keys and values support Helm t... |
-| `podSelector` | `any` | No | - | Custom podSelector for the NetworkPolicy. Takes precedenc... |
+| `podSelector` | `any` | No | - | Custom podSelector for the NetworkPolicy. Mutually exclus... |
 | `policyTypes` | `array` | **Yes** | - | Policy types for the NetworkPolicy. |
 | `prefix` | `string` | No | `` | Prefix to prepend to the resource name. Mutually exclusiv... |
 | [`rules`](./rules/) | `object` | **Yes** | - | Ingress and egress rules for the NetworkPolicy. See https... |
@@ -227,9 +242,17 @@ Common properties:
 
 Annotations to set on the item. Keys and values support Helm templating.
 
+#### controller
+
+Controller this NetworkPolicy should target. Mutually exclusive with controllers and podSelector.
+
+#### controllers
+
+Controllers this NetworkPolicy should target. Each entry can be an exact controller identifier or a regular expression. Mutually exclusive with controller and podSelector.
+
 #### extraSelectorLabels
 
-Additional match labels to add to the pod selector. These are merged with labels derived from the controller identifier.
+Additional match labels to add to the pod selector. These are merged with labels derived from the controller selection.
 
 #### forceRename
 
@@ -241,7 +264,7 @@ Labels to set on the item. Keys and values support Helm templating.
 
 #### podSelector
 
-Custom podSelector for the NetworkPolicy. Takes precedence over targeting a controller via the controller identifier.
+Custom podSelector for the NetworkPolicy. Mutually exclusive with controller and controllers.
 
 #### prefix
 

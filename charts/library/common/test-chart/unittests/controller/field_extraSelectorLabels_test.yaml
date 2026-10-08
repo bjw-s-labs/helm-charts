@@ -209,12 +209,12 @@ tests:
         rules:
           ingress:
             - from:
-                - controller: backend
+                - controllers: [backend]
               ports:
                 - port: 80
           egress:
             - to:
-                - controller: backend
+                - controllers: [backend]
               ports:
                 - port: 80
       networkpolicies.cilium:
@@ -222,17 +222,17 @@ tests:
         type: cilium
         controller: main
         ingress:
-          - fromController: backend
+          - fromControllers: [backend]
         egress:
-          - toController: backend
+          - toControllers: [backend]
       networkpolicies.clusterwide:
         forceRename: clusterwide
         type: ciliumClusterwide
         controller: main
         ingress:
-          - fromController: backend
+          - fromControllers: [backend]
         egress:
-          - toController: backend
+          - toControllers: [backend]
     asserts:
       - documentSelector:
           path: $[?(@.kind == "Deployment")].metadata.name
@@ -433,7 +433,7 @@ tests:
         rules:
           ingress:
             - from:
-                - controller: main
+                - controllers: [main]
       networkpolicies.cilium:
         forceRename: cilium
         type: cilium
@@ -441,7 +441,7 @@ tests:
         extraSelectorLabels:
           component: cilium
         ingress:
-          - fromController: main
+          - fromControllers: [main]
     asserts:
       - documentSelector:
           path: $[?(@.kind == "Deployment")].metadata.name
