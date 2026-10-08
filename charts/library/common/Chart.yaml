@@ -35,7 +35,7 @@ annotations:
       description: |-
         Added support for referencing controllers in cillium(Cluster)NetworkPolicy rules
     - kind: added
-      description: |-        
+      description: |-
         Added configurable recursive string template evaluation with path exclusions
     - kind: added
       description: |-
