@@ -33,13 +33,28 @@ annotations:
         Added support for templateable annotation/label keys
     - kind: added
       description: |-
+        Added support for referencing controllers in cillium(Cluster)NetworkPolicy rules
+    - kind: added
+      description: |-
+        Added configurable recursive string template evaluation with path exclusions
+    - kind: added
+      description: |-
         Added support for referencing controller in cillium(Cluster)NetworkPolicy rules
     - kind: added
       description: |-
         Added support for referencing controller in networkPolicy rules
     - kind: added
       description: |-
-        Added support for creating the Helm release namespace
+        Added support for referencing controllers in networkPolicy rules
     - kind: changed
       description: |-
         Improve cilliumNetworkPolicy schema validation
+    - kind: added
+      description: |-
+        Added support for targeting multiple controllers by identifier or regular expression from NetworkPolicy resources
+    - kind: fixed
+      description: |-
+        Fixed resource label merge order
+    - kind: fixed
+      description: |-
+        Fixed resource annotation merge order

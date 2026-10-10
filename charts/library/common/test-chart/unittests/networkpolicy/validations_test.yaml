@@ -22,7 +22,7 @@ tests:
           rules: {}
     asserts:
       - failedTemplate:
-          errorMessage: "NetworkPolicy 'main': controller or podSelector field is required because automatic controller detection is not possible (found 2 enabled controllers). Please specify which controller this NetworkPolicy should reference."
+          errorMessage: "NetworkPolicy 'main': controller, controllers, or podSelector field is required because automatic controller detection is not possible (found 2 enabled controllers). Please specify which controllers this NetworkPolicy should reference."
 
   - it: networkpolicy auto-detects single controller when controller not specified
     set:
@@ -57,7 +57,7 @@ tests:
     asserts:
       - failedTemplate: {}
 
-  - it: networkpolicy fails validation for an unknown rule peer controller
+  - it: networkpolicy fails validation for an unknown rule peer controller reference
     set:
       networkpolicies.main:
         controller: main
@@ -65,7 +65,113 @@ tests:
         rules:
           ingress:
             - from:
-                - controller: missing
+                - controllers: [missing]
     asserts:
       - failedTemplate:
-          errorMessage: "NetworkPolicy 'main': Ingress rule references controller 'missing', but no enabled controller exists with that identifier. Enable 'controllers.missing' or choose an enabled controller."
+          errorMessage: "NetworkPolicy 'main': Controller reference 'missing' matched no enabled controllers. Update 'networkpolicies.main.rules.ingress[0].from[0].controllers' to match one of: [main]."
+
+  - it: networkpolicy rejects the singular rule peer controller field
+    set:
+      networkpolicies.main:
+        controller: main
+        policyTypes: [Ingress]
+        rules:
+          ingress:
+            - from:
+                - controller: main
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: networkpolicy rejects empty rule peer controllers
+    set:
+      networkpolicies.main:
+        controller: main
+        policyTypes: [Ingress]
+        rules:
+          ingress:
+            - from:
+                - controllers: []
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: networkpolicy validates every controller reference
+    set:
+      networkpolicies.main:
+        controllers:
+          - main
+          - missing
+        policyTypes:
+          - Ingress
+        rules: {}
+    asserts:
+      - failedTemplate:
+          errorMessage: "NetworkPolicy 'main': Controller reference 'missing' matched no enabled controllers. Update 'networkpolicies.main.controllers' to match one of: [main]."
+
+  - it: networkpolicy rejects controller regular expressions without matches
+    set:
+      networkpolicies.main:
+        controllers:
+          - worker-.*
+        policyTypes:
+          - Ingress
+        rules: {}
+    asserts:
+      - failedTemplate:
+          errorMessage: "NetworkPolicy 'main': Controller reference 'worker-.*' matched no enabled controllers. Update 'networkpolicies.main.controllers' to match one of: [main]."
+
+  - it: networkpolicy rejects a rule peer regular expression without matches
+    set:
+      networkpolicies.main:
+        controller: main
+        policyTypes: [Ingress]
+        rules:
+          ingress:
+            - from:
+                - controllers: [worker-.*]
+    asserts:
+      - failedTemplate:
+          errorMessage: "NetworkPolicy 'main': Controller reference 'worker-.*' matched no enabled controllers. Update 'networkpolicies.main.rules.ingress[0].from[0].controllers' to match one of: [main]."
+
+  - it: networkpolicy reports an invalid controller regular expression
+    set:
+      networkpolicies.main:
+        controllers: ["[broken"]
+        policyTypes: [Ingress]
+        rules: {}
+    asserts:
+      - failedTemplate:
+          errorMessage: "NetworkPolicy 'main': Controller reference '[broken' is not a valid regular expression. Fix 'networkpolicies.main.controllers'."
+
+  - it: networkpolicy reports an invalid rule peer regular expression
+    set:
+      networkpolicies.main:
+        controller: main
+        policyTypes: [Ingress]
+        rules:
+          ingress:
+            - from:
+                - controllers: ["[broken"]
+    asserts:
+      - failedTemplate:
+          errorMessage: "NetworkPolicy 'main': Controller reference '[broken' is not a valid regular expression. Fix 'networkpolicies.main.rules.ingress[0].from[0].controllers'."
+
+  - it: networkpolicy does not interpret a disabled exact identifier as a regex
+    set:
+      controllers:
+        worker.v1:
+          enabled: false
+        worker-v1:
+          containers:
+            main:
+              image:
+                repository: nginx
+                tag: latest
+      networkpolicies.main:
+        controllers: [worker.v1]
+        policyTypes: [Ingress]
+        rules: {}
+    asserts:
+      - failedTemplate:
+          errorMessage: "NetworkPolicy 'main': Controller reference 'worker.v1' matched no enabled controllers. Update 'networkpolicies.main.controllers' to match one of: [main, worker-v1]."

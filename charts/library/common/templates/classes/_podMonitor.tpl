@@ -2,13 +2,13 @@
   {{- $rootContext := .rootContext -}}
   {{- $podMonitorObject := .object -}}
   {{- $ctx := dict "rootContext" $rootContext "podMonitorObject" $podMonitorObject -}}
-  {{- $labels := merge
-    ($podMonitorObject.labels | default dict)
+  {{- $labels := mergeOverwrite
     (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
+    ($podMonitorObject.labels | default dict)
   -}}
-  {{- $annotations := merge
-    ($podMonitorObject.annotations | default dict)
+  {{- $annotations := mergeOverwrite
     (include "bjw-s.common.lib.metadata.globalAnnotations" $rootContext | fromYaml)
+    ($podMonitorObject.annotations | default dict)
   -}}
 
   {{- $controllerObject := dict -}}

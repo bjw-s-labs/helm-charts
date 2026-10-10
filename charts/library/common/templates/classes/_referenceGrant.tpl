@@ -55,13 +55,13 @@ It returns empty output when no cross-namespace reference is detected.
 
       {{- /* Only render if there are services to grant access to */ -}}
       {{- if $serviceNames -}}
-        {{- $labels := merge
-          ($routeObject.labels | default dict)
+        {{- $labels := mergeOverwrite
           (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
+          ($routeObject.labels | default dict)
         -}}
-        {{- $annotations := merge
-          ($routeObject.annotations | default dict)
+        {{- $annotations := mergeOverwrite
           (include "bjw-s.common.lib.metadata.globalAnnotations" $rootContext | fromYaml)
+          ($routeObject.annotations | default dict)
         -}}
 ---
 apiVersion: {{ $apiVersion }}

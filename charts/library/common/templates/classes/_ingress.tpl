@@ -7,13 +7,13 @@ within the common library.
   {{- $rootContext := .rootContext -}}
   {{- $ingressObject := .object -}}
 
-  {{- $labels := merge
-    ($ingressObject.labels | default dict)
+  {{- $labels := mergeOverwrite
     (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
+    ($ingressObject.labels | default dict)
   -}}
-  {{- $annotations := merge
-    ($ingressObject.annotations | default dict)
+  {{- $annotations := mergeOverwrite
     (include "bjw-s.common.lib.metadata.globalAnnotations" $rootContext | fromYaml)
+    ($ingressObject.annotations | default dict)
   -}}
 ---
 apiVersion: networking.k8s.io/v1

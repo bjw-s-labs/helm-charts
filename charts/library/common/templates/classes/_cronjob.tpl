@@ -8,14 +8,14 @@ using the common library.
 
   {{- $timeZone := dig "cronjob" "timeZone" "" $cronjobObject -}}
 
-  {{- $labels := merge
+  {{- $labels := mergeOverwrite
+    (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
     (dict "app.kubernetes.io/controller" $cronjobObject.identifier)
     ($cronjobObject.labels | default dict)
-    (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
   -}}
-  {{- $annotations := merge
-    ($cronjobObject.annotations | default dict)
+  {{- $annotations := mergeOverwrite
     (include "bjw-s.common.lib.metadata.globalAnnotations" $rootContext | fromYaml)
+    ($cronjobObject.annotations | default dict)
   -}}
 
   {{- $cronJobSettings := dig "cronjob" dict $cronjobObject -}}

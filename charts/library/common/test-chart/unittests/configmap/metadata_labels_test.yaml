@@ -69,6 +69,24 @@ tests:
             helm.sh/chart: common-test-1.0.0
             test_label: test
 
+  - it: resource labels override generated and global labels
+    set:
+      global.labels:
+        app.kubernetes.io/name: global-name
+      configMaps:
+        config:
+          data:
+            test: test
+          labels:
+            app.kubernetes.io/name: configmap-name
+    documentSelector:
+      path: $[?(@.kind == "ConfigMap")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/name"]
+          value: configmap-name
+
   - it: default metadata from folder should pass
     set:
       configMaps:

@@ -2,13 +2,13 @@
   {{- $rootContext := .rootContext -}}
   {{- $serviceMonitorObject := .object -}}
   {{- $ctx := dict "rootContext" $rootContext "serviceMonitorObject" $serviceMonitorObject -}}
-  {{- $labels := merge
-    ($serviceMonitorObject.labels | default dict)
+  {{- $labels := mergeOverwrite
     (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
+    ($serviceMonitorObject.labels | default dict)
   -}}
-  {{- $annotations := merge
-    ($serviceMonitorObject.annotations | default dict)
+  {{- $annotations := mergeOverwrite
     (include "bjw-s.common.lib.metadata.globalAnnotations" $rootContext | fromYaml)
+    ($serviceMonitorObject.annotations | default dict)
   -}}
   {{ $service := dict -}}
   {{ $serviceName := "" -}}

@@ -20,6 +20,17 @@ global:
   # configured. If any serviceAccount entries are present, the default is not
   # created and user configuration takes precedence.
   createDefaultServiceAccount: true
+  # -- Configure global string template evaluation.
+  templateEvaluation: {}
+    # -- Maximum number of times each string is evaluated. Increase this to evaluate
+    # templates produced by templated values.
+    # passes: 1
+    # -- Paths excluded from global template evaluation. Each path is a list of map
+    # keys or array indexes represented as strings. Matching paths and their
+    # descendants are left unchanged.
+    #   excludePaths:
+    #     - [controllers, main, containers, main, env, VPN_PORT_FORWARDING_UP_COMMAND]
+    # excludePaths: []
 
 # -- Configure the creation of the Helm release namespace.
 namespace:
@@ -2433,15 +2444,20 @@ networkpolicies: {}
     # type:
     # -- Annotations to set on the item. Keys and values support Helm templating.
     # annotations: {}
-    # -- (string) Controller this NetworkPolicy should target.
+    # -- (string) Controller this NetworkPolicy should target. Mutually exclusive
+    # with controllers and podSelector.
     # controller:
+    # -- (list) Controllers this NetworkPolicy should target. Each entry can be an
+    # exact controller identifier or a regular expression. Mutually exclusive with
+    # controller and podSelector.
+    # controllers:
     # -- Additional match labels to add to the pod selector. These are merged with
-    # labels derived from the controller identifier.
+    # labels derived from the controller selection.
     # extraSelectorLabels: {}
     # -- Labels to set on the item. Keys and values support Helm templating.
     # labels: {}
-    # -- Custom podSelector for the NetworkPolicy. Takes precedence over targeting a
-    # controller via the controller identifier.
+    # -- Custom podSelector for the NetworkPolicy. Mutually exclusive with
+    # controller and controllers.
     # podSelector: null
     # -- Policy types for the NetworkPolicy.
     # policyTypes: ["Egress"]
