@@ -6,14 +6,14 @@ within the common library.
   {{- $rootContext := .rootContext -}}
   {{- $daemonsetObject := .object -}}
 
-  {{- $labels := merge
+  {{- $labels := mergeOverwrite
+    (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
     (dict "app.kubernetes.io/controller" $daemonsetObject.identifier)
     ($daemonsetObject.labels | default dict)
-    (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
   -}}
-  {{- $annotations := merge
-    ($daemonsetObject.annotations | default dict)
+  {{- $annotations := mergeOverwrite
     (include "bjw-s.common.lib.metadata.globalAnnotations" $rootContext | fromYaml)
+    ($daemonsetObject.annotations | default dict)
   -}}
 ---
 apiVersion: apps/v1
@@ -62,8 +62,7 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-      app.kubernetes.io/controller: {{ $daemonsetObject.identifier }}
-      {{- include "bjw-s.common.lib.metadata.selectorLabels" $rootContext | nindent 6 }}
+      {{- include "bjw-s.common.lib.controller.metadata.selectorLabels" (dict "rootContext" $rootContext "controllerObject" $daemonsetObject) | nindent 6 }}
   template:
     metadata:
       annotations: {{ include "bjw-s.common.lib.pod.metadata.annotations" (dict "rootContext" $rootContext "controllerObject" $daemonsetObject) | nindent 8 }}

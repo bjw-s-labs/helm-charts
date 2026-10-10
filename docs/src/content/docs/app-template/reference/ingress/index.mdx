@@ -49,22 +49,30 @@ Available properties:
 
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
-| `annotations` | `object / null` | No | - | Annotations to set on the item. |
+| `annotations` | `object / null` | No | - | Annotations to set on the item. Keys and values support H... |
 | `className` | `string` | No | - | Set the ingressClass used for this Ingress. |
 | [`defaultBackend`](./defaultbackend/) | `object` | No | - | Set the defaultBackend for this Ingress. This disables an... |
 | `enabled` | `boolean` | No | `true` | Set to false to disable the Ingress. |
 | `forceRename` | `string` | No | - | Override the default resource name. Mutually exclusive wi... |
 | `hosts` | `array` | No | - | Configure the hosts for the Ingress. |
-| `labels` | `object / null` | No | - | Labels to set on the item. |
+| `labels` | `object / null` | No | - | Labels to set on the item. Keys and values support Helm t... |
 | `prefix` | `string` | No | `` | Prefix to prepend to the resource name. Mutually exclusiv... |
 | `suffix` | `string` | No | - | Suffix to append to the resource name. Defaults to the re... |
 | `tls` | `array` | No | - | Configure TLS for the Ingress. |
 
 ### Property Details
 
+#### annotations
+
+Annotations to set on the item. Keys and values support Helm templating.
+
 #### forceRename
 
 Override the default resource name. Mutually exclusive with prefix and suffix.
+
+#### labels
+
+Labels to set on the item. Keys and values support Helm templating.
 
 #### prefix
 

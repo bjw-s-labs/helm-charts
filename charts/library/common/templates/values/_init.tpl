@@ -2,7 +2,8 @@
 Merge the local chart values and the common chart defaults
 */}}
 {{/*
-String evaluation is a single pass against the post-merge root context.
+Strings are evaluated against the post-merge root context.
+Annotation, label and extra selector label keys are evaluated because they are user-defined labels and metadata.
 ExternalSecret target template data is intentionally deferred for downstream evaluation.
 */}}
 {{- define "bjw-s.common.values.evaluateTemplate" -}}
@@ -10,9 +11,16 @@ ExternalSecret target template data is intentionally deferred for downstream eva
   {{- $rootContext := .rootContext -}}
   {{- $path := .path | default list -}}
   {{- $deferTpl := .deferTpl | default false -}}
+  {{- $passes := .passes -}}
+  {{- $excludePaths := .excludePaths -}}
   {{- $result := $value -}}
   {{- if kindIs "map" $value -}}
     {{- $result = dict -}}
+    {{- $renderMapKeys := and
+      (not $deferTpl)
+      (gt (len $path) 0)
+      (has (last $path) (list "annotations" "labels" "extraSelectorLabels"))
+    -}}
     {{- range $key, $item := $value -}}
       {{- $itemPath := append $path (toString $key) -}}
       {{- $itemDeferTpl := $deferTpl -}}
@@ -20,19 +28,40 @@ ExternalSecret target template data is intentionally deferred for downstream eva
       {{- if and (eq (len $itemPath) 5) (eq (index $itemPath 0) "externalSecrets") (eq (index $itemPath 2) "target") (eq (index $itemPath 3) "template") (eq (index $itemPath 4) "data") -}}
         {{- $itemDeferTpl = true -}}
       {{- end -}}
-      {{- $itemResult := include "bjw-s.common.values.evaluateTemplate" (dict "rootContext" $rootContext "value" $item "path" $itemPath "deferTpl" $itemDeferTpl) | fromJson -}}
-      {{- $_ := set $result $key (index $itemResult "value") -}}
+      {{- $resultKey := toString $key -}}
+      {{- if and $renderMapKeys (contains "{{" $resultKey) -}}
+        {{- $renderedKey := include "bjw-s.common.values.evaluateTemplate" (dict "rootContext" $rootContext "value" $resultKey "path" $itemPath "deferTpl" $itemDeferTpl "passes" $passes "excludePaths" $excludePaths) | fromJson -}}
+        {{- $resultKey = index $renderedKey "value" -}}
+      {{- end -}}
+      {{- $itemResult := include "bjw-s.common.values.evaluateTemplate" (dict "rootContext" $rootContext "value" $item "path" $itemPath "deferTpl" $itemDeferTpl "passes" $passes "excludePaths" $excludePaths) | fromJson -}}
+      {{- $_ := set $result $resultKey (index $itemResult "value") -}}
     {{- end -}}
   {{- else if kindIs "slice" $value -}}
     {{- $result = list -}}
-    {{- range $item := $value -}}
-      {{- $itemResult := include "bjw-s.common.values.evaluateTemplate" (dict "rootContext" $rootContext "value" $item "path" $path "deferTpl" $deferTpl) | fromJson -}}
+    {{- range $index, $item := $value -}}
+      {{- $itemPath := append $path (toString $index) -}}
+      {{- $itemResult := include "bjw-s.common.values.evaluateTemplate" (dict "rootContext" $rootContext "value" $item "path" $itemPath "deferTpl" $deferTpl "passes" $passes "excludePaths" $excludePaths) | fromJson -}}
       {{- $result = append $result (index $itemResult "value") -}}
     {{- end -}}
   {{- else if kindIs "string" $value -}}
-    {{- if and (not $deferTpl) (contains "{{" $value) -}}
-      {{- $rendered := tpl $value $rootContext -}}
-      {{- $result = $rendered -}}
+    {{- if not $deferTpl -}}
+      {{- $excluded := false -}}
+      {{- range $excludePath := $excludePaths -}}
+        {{- if and (le (len $excludePath) (len $path)) (deepEqual $excludePath (slice $path 0 (len $excludePath))) -}}
+          {{- $excluded = true -}}
+        {{- end -}}
+      {{- end -}}
+      {{- $stringPasses := ternary 0 $passes $excluded -}}
+      {{- range until ($stringPasses | int) -}}
+        {{- if not (contains "{{" $result) -}}
+          {{- break -}}
+        {{- end -}}
+        {{- $rendered := tpl $result $rootContext -}}
+        {{- if eq $rendered $result -}}
+          {{- break -}}
+        {{- end -}}
+        {{- $result = $rendered -}}
+      {{- end -}}
     {{- end -}}
   {{- end -}}
   {{- toJson (dict "value" $result) -}}

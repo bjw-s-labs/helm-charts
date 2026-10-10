@@ -1,6 +1,10 @@
 package schema
 
 import (
+	"encoding/json"
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/kaptinlin/jsonschema"
@@ -69,6 +73,28 @@ func TestCollectAllRequired(t *testing.T) {
 	}
 }
 
+func TestCollectAllProperties_DeepCompositionAndCycle(t *testing.T) {
+	root := &jsonschema.Schema{}
+	current := root
+	for range 40 {
+		next := &jsonschema.Schema{}
+		current.AllOf = []*jsonschema.Schema{next}
+		current = next
+	}
+	props := jsonschema.SchemaMap{"deep": {}}
+	current.Properties = &props
+
+	// A back-edge models a recursive in-memory schema graph. It must not turn
+	// a deep, otherwise valid walk into either a stack overflow or a silent
+	// fixed-depth truncation.
+	current.AllOf = []*jsonschema.Schema{root}
+
+	got := CollectAllProperties(root)
+	if _, ok := got["deep"]; !ok {
+		t.Errorf("deep property was silently omitted: %#v", got)
+	}
+}
+
 func TestHasAnyProperties_Nil(t *testing.T) {
 	if HasAnyProperties(nil) {
 		t.Error("HasAnyProperties(nil) should return false")
@@ -92,5 +118,256 @@ func TestHasAnyProperties_ViaAllOf(t *testing.T) {
 	}
 	if !HasAnyProperties(schema) {
 		t.Error("HasAnyProperties should return true for schema with allOf properties")
+	}
+}
+
+func TestDereferenceSchema_PreservesRefSibling(t *testing.T) {
+	tmpDir := t.TempDir()
+	rootPath := filepath.Join(tmpDir, "root.json")
+	childPath := filepath.Join(tmpDir, "child.json")
+
+	if err := os.WriteFile(rootPath, []byte(`{
+		"$id": "https://example.test/root.json",
+		"type": "object",
+		"properties": {
+			"value": {
+				"$ref": "child.json",
+				"description": "local description"
+			}
+		}
+	}`), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(childPath, []byte(`{
+		"$id": "https://example.test/child.json",
+		"type": "string",
+		"description": "target description"
+	}`), 0o600); err != nil {
+		t.Fatal(err)
+	}
+
+	output, err := DereferenceSchema(rootPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var schema map[string]any
+	if err := json.Unmarshal(output, &schema); err != nil {
+		t.Fatal(err)
+	}
+	properties := schema["properties"].(map[string]any)
+	value := properties["value"].(map[string]any)
+	if _, exists := value["$ref"]; exists {
+		t.Fatal("dereferenced property still contains $ref")
+	}
+	if got := value["description"]; got != "local description" {
+		t.Errorf("description = %v, want local description", got)
+	}
+	if got := value["type"]; got != "string" {
+		t.Errorf("type = %v, want string", got)
+	}
+}
+
+func TestDereferenceSchema_ComposesRefSiblings(t *testing.T) {
+	tmpDir := t.TempDir()
+	rootPath := filepath.Join(tmpDir, "root.json")
+	childPath := filepath.Join(tmpDir, "child.json")
+
+	writeSchemaFile(t, rootPath, `{
+		"$id": "https://example.test/root.json",
+		"type": "object",
+		"properties": {
+			"value": {"$ref": "child.json", "type": "integer"}
+		}
+	}`)
+	writeSchemaFile(t, childPath, `{
+		"$id": "https://example.test/child.json",
+		"type": "string",
+		"minLength": 1
+	}`)
+
+	output, err := DereferenceSchema(rootPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	compiled, err := Compile(output)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, instance := range []string{`{"value":"text"}`, `{"value":1}`} {
+		if result := compiled.ValidateJSON([]byte(instance)); result.Valid {
+			t.Errorf("dereferenced schema accepted %s; $ref and sibling constraints must both apply", instance)
+		}
+	}
+}
+
+func TestDereferenceSchema_Draft7IgnoresRefSiblings(t *testing.T) {
+	tmpDir := t.TempDir()
+	rootPath := filepath.Join(tmpDir, "root.json")
+	childPath := filepath.Join(tmpDir, "child.json")
+
+	writeSchemaFile(t, rootPath, `{
+		"$schema": "http://json-schema.org/draft-07/schema#",
+		"$id": "https://example.test/root.json",
+		"type": "object",
+		"properties": {
+			"value": {"$ref": "child.json", "type": "integer"}
+		}
+	}`)
+	writeSchemaFile(t, childPath, `{
+		"$id": "https://example.test/child.json",
+		"type": "string"
+	}`)
+
+	output, err := DereferenceSchema(rootPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	compiled, err := Compile(output)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result := compiled.ValidateJSON([]byte(`{"value":"text"}`)); !result.Valid {
+		t.Errorf("draft-07 output rejected the referenced string: %#v", result.Errors)
+	}
+	if result := compiled.ValidateJSON([]byte(`{"value":1}`)); result.Valid {
+		t.Error("draft-07 output accepted the ignored sibling type instead of the referenced string type")
+	}
+}
+
+func writeSchemaFile(t *testing.T, path, contents string) {
+	t.Helper()
+	if err := os.WriteFile(path, []byte(contents), 0o600); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestDereferenceSchema_ResolvesAnchor(t *testing.T) {
+	tmpDir := t.TempDir()
+	rootPath := filepath.Join(tmpDir, "root.json")
+	childPath := filepath.Join(tmpDir, "child.json")
+
+	writeSchemaFile(t, rootPath, `{
+		"$id": "https://example.test/root.json",
+		"type": "object",
+		"properties": {
+			"value": {"$ref": "child.json#value"}
+		}
+	}`)
+	writeSchemaFile(t, childPath, `{
+		"$id": "https://example.test/child.json",
+		"$defs": {
+			"value": {"$anchor": "value", "type": "string", "minLength": 1}
+		}
+	}`)
+
+	output, err := DereferenceSchema(rootPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var document map[string]any
+	if err := json.Unmarshal(output, &document); err != nil {
+		t.Fatal(err)
+	}
+	properties := document["properties"].(map[string]any)
+	value := properties["value"].(map[string]any)
+	if _, exists := value["$ref"]; exists {
+		t.Fatal("anchored reference still contains $ref")
+	}
+	if got := value["type"]; got != "string" {
+		t.Errorf("type = %v, want string", got)
+	}
+}
+
+func TestDereferenceSchema_PreservesDynamicReference(t *testing.T) {
+	tmpDir := t.TempDir()
+	rootPath := filepath.Join(tmpDir, "root.json")
+
+	writeSchemaFile(t, rootPath, `{
+		"$id": "https://example.test/root.json",
+		"$defs": {
+			"node": {
+				"$dynamicAnchor": "node",
+				"type": "object",
+				"properties": {"child": {"$dynamicRef": "#node"}}
+			}
+		},
+		"$ref": "#/$defs/node"
+	}`)
+
+	output, err := DereferenceSchema(rootPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var document map[string]any
+	if err := json.Unmarshal(output, &document); err != nil {
+		t.Fatal(err)
+	}
+	properties := document["properties"].(map[string]any)
+	child := properties["child"].(map[string]any)
+	if got := child["$dynamicRef"]; got != "#node" {
+		t.Errorf("$dynamicRef = %v, want #node", got)
+	}
+}
+
+func TestDereferenceSchema_RejectsUnresolvedReference(t *testing.T) {
+	tmpDir := t.TempDir()
+	rootPath := filepath.Join(tmpDir, "root.json")
+	writeSchemaFile(t, rootPath, `{
+		"$id": "https://example.test/root.json",
+		"properties": {"value": {"$ref": "missing.json#/$defs/value"}}
+	}`)
+
+	_, err := DereferenceSchema(rootPath)
+	if err == nil {
+		t.Fatal("DereferenceSchema should reject an unresolved reference")
+	}
+	if !strings.Contains(err.Error(), `unresolved $ref "missing.json#/$defs/value"`) {
+		t.Fatalf("error = %q, want unresolved reference context", err)
+	}
+}
+
+func TestDereferenceSchema_RejectsDuplicateResourceIDs(t *testing.T) {
+	tmpDir := t.TempDir()
+	rootPath := filepath.Join(tmpDir, "root.json")
+	writeSchemaFile(t, rootPath, `{
+		"$id": "https://example.test/root.json",
+		"type": "object"
+	}`)
+	writeSchemaFile(t, filepath.Join(tmpDir, "first.json"), `{
+		"$id": "https://example.test/shared.json",
+		"type": "string"
+	}`)
+	writeSchemaFile(t, filepath.Join(tmpDir, "second.json"), `{
+		"$id": "https://example.test/shared.json",
+		"type": "integer"
+	}`)
+
+	_, err := DereferenceSchema(rootPath)
+	if err == nil {
+		t.Fatal("DereferenceSchema should reject duplicate resource IDs")
+	}
+	if !strings.Contains(err.Error(), `duplicate schema resource ID "https://example.test/shared.json"`) {
+		t.Fatalf("error = %q, want duplicate resource ID context", err)
+	}
+}
+
+func TestDereferenceSchema_IgnoresLinkedDuplicateResources(t *testing.T) {
+	tmpDir := t.TempDir()
+	rootPath := filepath.Join(tmpDir, "root.json")
+	childPath := filepath.Join(tmpDir, "child.json")
+	writeSchemaFile(t, rootPath, `{
+		"$id": "https://example.test/root.json",
+		"properties": {"value": {"$ref": "child.json"}}
+	}`)
+	writeSchemaFile(t, childPath, `{
+		"$id": "https://example.test/child.json",
+		"type": "string"
+	}`)
+	if err := os.Symlink("child.json", filepath.Join(tmpDir, "linked-child.json")); err != nil {
+		t.Skipf("symlinks unavailable: %v", err)
+	}
+
+	if _, err := DereferenceSchema(rootPath); err != nil {
+		t.Fatalf("DereferenceSchema should ignore a linked duplicate resource: %v", err)
 	}
 }

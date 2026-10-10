@@ -1,6 +1,7 @@
 package docs
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
@@ -111,6 +112,48 @@ func TestGenerator_Generate_IndexContent(t *testing.T) {
 	}
 	if !strings.Contains(content, "[`service`]") {
 		t.Error("Missing service link")
+	}
+}
+
+func TestGenerator_Generate_SafePropertyPaths(t *testing.T) {
+	schema := []byte(`{
+		"type": "object",
+		"properties": {
+			".": {"type": "string"}
+		}
+	}`)
+
+	tmpDir := t.TempDir()
+	if err := NewGenerator(tmpDir).Generate(schema); err != nil {
+		t.Fatalf("Generate failed: %v", err)
+	}
+	if _, err := os.Stat(filepath.Join(tmpDir, "key-2e", "index.mdx")); err != nil {
+		t.Fatalf("safe property page was not created: %v", err)
+	}
+	index, err := os.ReadFile(filepath.Join(tmpDir, "index.mdx"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(index), "title: Values Reference") || !strings.Contains(string(index), "./key-2e/") {
+		t.Errorf("root index was overwritten or has the wrong link:\n%s", index)
+	}
+}
+
+func TestGenerator_Generate_RejectsPropertyPathCollisions(t *testing.T) {
+	schema := []byte(`{
+		"type": "object",
+		"properties": {
+			"Foo": {"type": "string"},
+			"foo": {"type": "string"}
+		}
+	}`)
+
+	err := NewGenerator(t.TempDir()).Generate(schema)
+	if err == nil {
+		t.Fatal("Generate should reject colliding documentation paths")
+	}
+	if !strings.Contains(err.Error(), `properties "Foo" and "foo" map to the same documentation path "foo"`) {
+		t.Fatalf("error = %q, want collision context", err)
 	}
 }
 
@@ -271,6 +314,72 @@ func TestCollectAllProperties_WithAllOf(t *testing.T) {
 	}
 }
 
+func TestGenerator_Generate_RootAllOfProperties(t *testing.T) {
+	schema := []byte(`{
+		"type": "object",
+		"allOf": [
+			{
+				"properties": {
+					"settings": {
+						"allOf": [
+							{"properties": {"enabled": {"type": "boolean", "description": "Enable settings"}}}
+						]
+					}
+				}
+			}
+		]
+	}`)
+
+	outputDir := t.TempDir()
+	if err := NewGenerator(outputDir).Generate(schema); err != nil {
+		t.Fatalf("Generate failed: %v", err)
+	}
+
+	index, err := os.ReadFile(filepath.Join(outputDir, "index.mdx"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(index), "settings") {
+		t.Errorf("root allOf property is missing from index:\n%s", index)
+	}
+	page, err := os.ReadFile(filepath.Join(outputDir, "settings", "index.mdx"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(page), "enabled") {
+		t.Errorf("nested allOf property is missing from page:\n%s", page)
+	}
+}
+
+func TestGenerator_Generate_RejectsExcessiveNesting(t *testing.T) {
+	nested := any(map[string]any{"type": "string"})
+	for i := 0; i <= maxRecursionDepth; i++ {
+		nested = map[string]any{
+			"type": "object",
+			"properties": map[string]any{
+				"level": nested,
+			},
+		}
+	}
+	schema, err := json.Marshal(map[string]any{
+		"type": "object",
+		"properties": map[string]any{
+			"root": nested,
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = NewGenerator(t.TempDir()).Generate(schema)
+	if err == nil {
+		t.Fatal("Generate succeeded, want a nesting-depth error")
+	}
+	if !strings.Contains(err.Error(), "supported documentation depth") {
+		t.Errorf("unexpected error: %v", err)
+	}
+}
+
 func TestTruncateDescription(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -326,7 +435,8 @@ func TestGenerator_Generate_OneOfSchema(t *testing.T) {
 						{
 							"properties": {
 								"type": {"type": "string", "const": "pvc", "description": "Type of persistence"},
-								"enabled": {"type": "boolean", "description": "Enable persistence"}
+								"enabled": {"type": "boolean", "description": "Enable persistence"},
+								"longDescription": {"type": "string", "description": "This complete variant property description is deliberately longer than the compact table summary limit and must remain fully readable below the table"}
 							}
 						}
 					]
@@ -360,6 +470,14 @@ func TestGenerator_Generate_OneOfSchema(t *testing.T) {
 	// Properties from the variant should be listed.
 	if !strings.Contains(contentStr, "| `enabled`") {
 		t.Error("Missing enabled property from oneOf variant")
+	}
+	// Variant property tables stay compact, while long descriptions are exposed
+	// in a details block below the table.
+	if !strings.Contains(contentStr, "| `longDescription` | `string` | No | - | This complete variant property description is deliberatel... |") {
+		t.Error("Missing truncated longDescription row from oneOf variant")
+	}
+	if !strings.Contains(contentStr, "<details>") || !strings.Contains(contentStr, "This complete variant property description is deliberately longer than the compact table summary limit and must remain fully readable below the table") {
+		t.Error("Missing full longDescription details block for oneOf variant")
 	}
 }
 

@@ -32,12 +32,12 @@ Available properties:
 
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
-| `annotations` | `object / null` | No | - | Annotations to set on the item. |
+| `annotations` | `object / null` | No | - | Annotations to set on the item. Keys and values support H... |
 | [`controller`](./controller/) | `object` | No | - | Controller whose pods to monitor. |
 | `enabled` | `boolean` | No | `true` | Set to false to disable the PodMonitor. |
 | `forceRename` | `string` | No | - | Override the default resource name. Mutually exclusive wi... |
 | `jobLabel` | `string` | No | `app.kubernetes.io/name` | The label to use to retrieve the job name from the target... |
-| `labels` | `object / null` | No | - | Labels to set on the item. |
+| `labels` | `object / null` | No | - | Labels to set on the item. Keys and values support Helm t... |
 | `podMetricsEndpoints` | `array` | No | - | Pod metrics endpoints allowed as part of this PodMonitor.... |
 | `podTargetLabels` | `array` | No | - | Transfers labels from the Kubernetes Pod onto the created... |
 | `prefix` | `string` | No | `` | Prefix to prepend to the resource name. Mutually exclusiv... |
@@ -46,6 +46,10 @@ Available properties:
 
 ### Property Details
 
+#### annotations
+
+Annotations to set on the item. Keys and values support Helm templating.
+
 #### forceRename
 
 Override the default resource name. Mutually exclusive with prefix and suffix.
@@ -53,6 +57,10 @@ Override the default resource name. Mutually exclusive with prefix and suffix.
 #### jobLabel
 
 The label to use to retrieve the job name from the target pod&#39;s metadata. Defaults to &#39;app.kubernetes.io/name&#39;.
+
+#### labels
+
+Labels to set on the item. Keys and values support Helm templating.
 
 #### podMetricsEndpoints
 

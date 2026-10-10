@@ -6,6 +6,28 @@ templates:
 values:
   - ../_values/controllers_main_default_container.yaml
 tests:
+  - it: renders controller selector labels without the loader and without changing the controller object
+    set:
+      global: {}
+      variables.directControllerSelectorTest: true
+      controllers.main.extraSelectorLabels:
+        component: "{{ .Release.Name }}"
+        '{{ print "track" }}': stable
+      controllers.main.labels:
+        metadata-only: ignored
+    asserts:
+      - equal:
+          path: metadata.labels
+          value:
+            app.kubernetes.io/name: common-test
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/controller: main
+            component: RELEASE-NAME
+            track: stable
+      - equal:
+          path: data.originalComponent
+          value: "{{ .Release.Name }}"
+
   - it: renders strings when invoked without the loader context
     set:
       variables:

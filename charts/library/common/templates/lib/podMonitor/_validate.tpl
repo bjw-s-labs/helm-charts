@@ -10,7 +10,7 @@ Validate podMonitor values
   {{/* Verify automatic controller detection */}}
   {{- if not (eq 1 (len $enabledControllers)) -}}
     {{- if and
-        (empty (dig "selector" nil $podMonitorObject))
+        (not (hasKey $podMonitorObject "selector"))
         (empty (dig "controller" "identifier" nil $podMonitorObject))
     -}}
       {{- fail (printf "PodMonitor '%s': Either 'controller.identifier' or 'selector' is required because automatic controller detection is not possible (found %d enabled controllers). Specify the target controller explicitly." $podMonitorObject.identifier (len $enabledControllers)) -}}

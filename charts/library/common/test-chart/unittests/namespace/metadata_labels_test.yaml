@@ -1,0 +1,66 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: namespace - metadata - labels
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+set:
+  namespace.create: true
+tests:
+  - it: default labels
+    documentSelector:
+      path: $[?(@.kind == "Namespace")].metadata.name
+      value: NAMESPACE
+    asserts:
+      - equal:
+          path: metadata.labels
+          value:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: RELEASE-NAME
+            helm.sh/chart: common-test-1.0.0
+
+  - it: custom labels
+    set:
+      namespace.labels:
+        namespace-label: namespace
+        templated-label: "{{ .Release.Name }}"
+    documentSelector:
+      path: $[?(@.kind == "Namespace")].metadata.name
+      value: NAMESPACE
+    asserts:
+      - equal:
+          path: metadata.labels
+          value:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: RELEASE-NAME
+            helm.sh/chart: common-test-1.0.0
+            namespace-label: namespace
+            templated-label: RELEASE-NAME
+
+  - it: custom labels mixed with global labels
+    set:
+      global.labels:
+        global-label: global
+        shared-label: global
+      namespace.labels:
+        namespace-label: namespace
+        shared-label: namespace
+        templated-label: "{{ .Release.Name }}"
+    documentSelector:
+      path: $[?(@.kind == "Namespace")].metadata.name
+      value: NAMESPACE
+    asserts:
+      - equal:
+          path: metadata.labels
+          value:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: RELEASE-NAME
+            global-label: global
+            helm.sh/chart: common-test-1.0.0
+            namespace-label: namespace
+            shared-label: namespace
+            templated-label: RELEASE-NAME

@@ -147,3 +147,530 @@ tests:
           path: spec.ingressDeny
       - notExists:
           path: spec.egressDeny
+
+  - it: translates ingress fromControllers into fromEndpoints
+    set:
+      controllers.secondary:
+        containers:
+          main:
+            image:
+              repository: nginx
+              tag: latest
+      networkpolicies.main:
+        type: cilium
+        controller: main
+        ingress:
+          - fromControllers: [secondary]
+            toPorts:
+              - ports:
+                  - port: "443"
+                    protocol: TCP
+    documentSelector:
+      path: $[?(@.kind == "CiliumNetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.ingress[0].fromEndpoints
+          value:
+            - matchLabels:
+                app.kubernetes.io/controller: secondary
+                app.kubernetes.io/instance: RELEASE-NAME
+                app.kubernetes.io/name: RELEASE-NAME
+      - notExists:
+          path: spec.ingress[0].fromControllers
+      - equal:
+          path: spec.ingress[0].toPorts[0].ports[0].port
+          value: "443"
+
+  - it: translates egress toControllers into toEndpoints
+    set:
+      controllers.secondary:
+        containers:
+          main:
+            image:
+              repository: nginx
+              tag: latest
+      networkpolicies.main:
+        type: cilium
+        controller: main
+        egress:
+          - toControllers: [secondary]
+            toPorts:
+              - ports:
+                  - port: "443"
+                    protocol: TCP
+    documentSelector:
+      path: $[?(@.kind == "CiliumNetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.egress[0].toEndpoints
+          value:
+            - matchLabels:
+                app.kubernetes.io/controller: secondary
+                app.kubernetes.io/instance: RELEASE-NAME
+                app.kubernetes.io/name: RELEASE-NAME
+      - notExists:
+          path: spec.egress[0].toControllers
+      - equal:
+          path: spec.egress[0].toPorts[0].ports[0].protocol
+          value: TCP
+
+  - it: translates regular expression toControllers into a shared endpoint selector
+    set:
+      controllers:
+        worker-low:
+          extraSelectorLabels:
+            tier: low
+          containers:
+            main:
+              image:
+                repository: nginx
+                tag: latest
+        worker-high:
+          extraSelectorLabels:
+            tier: high
+          containers:
+            main:
+              image:
+                repository: nginx
+                tag: latest
+      networkpolicies.main:
+        type: cilium
+        controller: main
+        egress:
+          - toControllers: [worker-.*]
+    documentSelector:
+      path: $[?(@.kind == "CiliumNetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.egress[0].toEndpoints
+          value:
+            - matchLabels:
+                app.kubernetes.io/instance: RELEASE-NAME
+                app.kubernetes.io/name: RELEASE-NAME
+              matchExpressions:
+                - key: app.kubernetes.io/controller
+                  operator: In
+                  values:
+                    - worker-high
+                    - worker-low
+
+  - it: translates multiple ingress fromControllers into one endpoint selector
+    set:
+      controllers.secondary:
+        containers:
+          main:
+            image:
+              repository: nginx
+              tag: latest
+      networkpolicies.main:
+        type: cilium
+        controller: main
+        ingress:
+          - fromControllers: [secondary, main]
+            toPorts:
+              - ports:
+                  - port: "443"
+    documentSelector:
+      path: $[?(@.kind == "CiliumNetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.ingress[0].fromEndpoints
+          value:
+            - matchLabels:
+                app.kubernetes.io/instance: RELEASE-NAME
+                app.kubernetes.io/name: RELEASE-NAME
+              matchExpressions:
+                - key: app.kubernetes.io/controller
+                  operator: In
+                  values: [main, secondary]
+      - equal:
+          path: spec.ingress[0].toPorts[0].ports[0].port
+          value: "443"
+
+  - it: rejects fromControllers references to disabled controllers
+    set:
+      controllers.secondary:
+        enabled: false
+        containers:
+          main:
+            image:
+              repository: nginx
+              tag: latest
+      networkpolicies.main:
+        type: cilium
+        controller: main
+        ingress:
+          - fromControllers: [secondary]
+    asserts:
+      - failedTemplate:
+          errorMessage: "CiliumNetworkPolicy 'main': Controller reference 'secondary' matched no enabled controllers. Update 'networkpolicies.main.ingress[0].fromControllers' to match one of: [main]."
+
+  - it: rejects ingress fromControllers with explicit fromEndpoints
+    set:
+      controllers.secondary:
+        containers:
+          main:
+            image:
+              repository: nginx
+              tag: latest
+      networkpolicies.main:
+        type: cilium
+        controller: main
+        ingress:
+          - fromControllers: [secondary]
+            fromEndpoints:
+              - matchLabels:
+                  role: explicitly-selected
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects egress toControllers with explicit toEndpoints
+    set:
+      controllers.secondary:
+        containers:
+          main:
+            image:
+              repository: nginx
+              tag: latest
+      networkpolicies.main:
+        type: cilium
+        controller: main
+        egress:
+          - toControllers: [secondary]
+            toEndpoints:
+              - matchLabels:
+                  role: explicitly-selected
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects ingress toControllers as a wrong-direction shorthand
+    set:
+      controllers.secondary:
+        containers:
+          main:
+            image:
+              repository: nginx
+              tag: latest
+      networkpolicies.main:
+        type: cilium
+        controller: main
+        ingress:
+          - toControllers: [secondary]
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects egress fromControllers as a wrong-direction shorthand
+    set:
+      controllers.secondary:
+        containers:
+          main:
+            image:
+              repository: nginx
+              tag: latest
+      networkpolicies.main:
+        type: cilium
+        controller: main
+        egress:
+          - fromControllers: [secondary]
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: renders representative fields and permissive nested values for every rule list
+    set:
+      networkpolicies.main:
+        type: cilium
+        controller: main
+        ingress:
+          - authentication:
+              mode: required
+              nested:
+                arbitrary: true
+            fromCIDRSet:
+              - cidr: 10.0.0.0/8
+                except:
+                  - 10.1.0.0/16
+            fromRequires:
+              - matchLabels:
+                  required/key: value
+            toPorts:
+              - ports:
+                  - port: "443"
+                    protocol: TCP
+        ingressDeny:
+          - fromEntities:
+              - world
+            fromRequires:
+              - matchLabels:
+                  deny/key: value
+            icmps:
+              - fields:
+                  - type: 3
+        egress:
+          - authentication:
+              mode: required
+            toFQDNs:
+              - matchPattern: "*.example.com"
+            toRequires:
+              - matchLabels:
+                  required/egress: value
+            icmps:
+              - fields:
+                  - type: 0
+        egressDeny:
+          - toCIDR:
+              - 192.0.2.0/24
+            toRequires:
+              - matchLabels:
+                  deny/egress: value
+            toPorts:
+              - ports:
+                  - port: "53"
+                    protocol: UDP
+    documentSelector:
+      path: $[?(@.kind == "CiliumNetworkPolicy")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.ingressDeny[0].fromRequires[0].matchLabels.deny/key
+          value: value
+      - equal:
+          path: spec.egressDeny[0].toPorts[0].ports[0].protocol
+          value: UDP
+
+  - it: rejects unknown direct ingress rule fields
+    set:
+      networkpolicies.main:
+        type: cilium
+        controller: main
+        ingress:
+          - unknownDirectField: true
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects unknown direct ingress deny rule fields
+    set:
+      networkpolicies.main:
+        type: cilium
+        controller: main
+        ingressDeny:
+          - unknownDirectField: true
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects unknown direct egress rule fields
+    set:
+      networkpolicies.main:
+        type: cilium
+        controller: main
+        egress:
+          - unknownDirectField: true
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects unknown direct egress deny rule fields
+    set:
+      networkpolicies.main:
+        type: cilium
+        controller: main
+        egressDeny:
+          - unknownDirectField: true
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects toFQDNs in egress deny rules
+    set:
+      networkpolicies.main:
+        type: cilium
+        controller: main
+        egressDeny:
+          - toFQDNs:
+              - matchName: example.com
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects mixed non-empty ingress allow peer selectors
+    set:
+      networkpolicies.main:
+        type: cilium
+        controller: main
+        ingress:
+          - fromEntities: [cluster]
+            fromCIDR: [10.0.0.0/8]
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects mixed non-empty ingress deny peer selectors
+    set:
+      networkpolicies.main:
+        type: cilium
+        controller: main
+        ingressDeny:
+          - fromGroups: [group-a]
+            fromNodes: [node-a]
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects mixed non-empty egress allow peer selectors
+    set:
+      networkpolicies.main:
+        type: cilium
+        controller: main
+        egress:
+          - toServices: [service-a]
+            toFQDNs: [example.com]
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects mixed non-empty egress deny peer selectors
+    set:
+      networkpolicies.main:
+        type: cilium
+        controller: main
+        egressDeny:
+          - toCIDR: [10.0.0.0/8]
+            toEntities: [cluster]
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects an empty ingress fromEndpoints key with another peer selector
+    set:
+      networkpolicies.main:
+        type: cilium
+        controller: main
+        ingress:
+          - fromEndpoints: []
+            fromEntities: [cluster]
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects an empty egress toFQDNs key with another peer selector
+    set:
+      networkpolicies.main:
+        type: cilium
+        controller: main
+        egress:
+          - toFQDNs: []
+            toEndpoints: [endpoint-a]
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects an empty egress deny toCIDR key with another peer selector
+    set:
+      networkpolicies.main:
+        type: cilium
+        controller: main
+        egressDeny:
+          - toCIDR: []
+            toEntities: [cluster]
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects an ingress allow controller shorthand mixed with another peer
+    set:
+      controllers.secondary:
+        containers:
+          main:
+            image:
+              repository: nginx
+              tag: latest
+      networkpolicies.main:
+        type: cilium
+        controller: main
+        ingress:
+          - fromControllers: [secondary]
+            fromEntities: [cluster]
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects non-empty icmps with toPorts in an egress deny rule
+    set:
+      networkpolicies.main:
+        type: cilium
+        controller: main
+        egressDeny:
+          - toPorts:
+              - ports: [{port: "443", protocol: TCP}]
+            icmps:
+              - fields: [{type: 8}]
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects an egress toControllers with another peer key
+    set:
+      controllers.secondary:
+        containers:
+          main:
+            image:
+              repository: nginx
+              tag: latest
+      networkpolicies.main:
+        type: cilium
+        controller: main
+        egress:
+          - toControllers: [secondary]
+            toEntities: [cluster]
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects an empty egress toControllers with another peer key
+    set:
+      networkpolicies.main:
+        type: cilium
+        controller: main
+        egress:
+          - toControllers: []
+            toEntities: [cluster]
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects icmps with toPorts in an ingress allow rule
+    set:
+      networkpolicies.main:
+        type: cilium
+        controller: main
+        ingress:
+          - icmps:
+              - fields: [{type: 8}]
+            toPorts:
+              - ports: [{port: "443", protocol: TCP}]
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema
+
+  - it: rejects icmps with toPorts in an ingress deny rule
+    set:
+      networkpolicies.main:
+        type: cilium
+        controller: main
+        ingressDeny:
+          - icmps:
+              - fields: [{type: 8}]
+            toPorts:
+              - ports: [{port: "443", protocol: TCP}]
+    asserts:
+      - failedTemplate:
+          errorPattern: values don't meet the specifications of the schema

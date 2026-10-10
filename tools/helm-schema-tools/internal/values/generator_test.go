@@ -1,10 +1,12 @@
 package values
 
 import (
+	"encoding/json"
 	"regexp"
 	"strings"
 	"testing"
 
+	schemautil "github.com/bjw-s-labs/helm-charts/tools/helm-schema-tools/internal/schema"
 	"gopkg.in/yaml.v3"
 )
 
@@ -388,6 +390,123 @@ func TestGenerator_Generate_RequiredNullableUsesDefault(t *testing.T) {
 
 	if !strings.Contains(string(result), "timeout: 30") {
 		t.Errorf("Required nullable integer should emit its default; got:\n%s", string(result))
+	}
+}
+
+func TestGenerator_Generate_TypedConstValues(t *testing.T) {
+	schema := []byte(`{
+		"type": "object",
+		"required": ["enabled", "port", "selector"],
+		"properties": {
+			"enabled": {"type": "boolean", "const": true},
+			"port": {"type": "integer", "const": 8443},
+			"selector": {"type": "object", "const": {"app": "api"}}
+		}
+	}`)
+
+	generated, err := NewGenerator().Generate(schema)
+	if err != nil {
+		t.Fatalf("Generate failed: %v", err)
+	}
+	var values map[string]any
+	if err := yaml.Unmarshal(generated, &values); err != nil {
+		t.Fatalf("generated YAML is invalid: %v\n%s", err, generated)
+	}
+	if got := values["enabled"]; got != true {
+		t.Errorf("enabled = %#v, want true\n%s", got, generated)
+	}
+	if got := values["port"]; got != 8443 {
+		t.Errorf("port = %#v, want 8443\n%s", got, generated)
+	}
+	selector, ok := values["selector"].(map[string]any)
+	if !ok || selector["app"] != "api" {
+		t.Errorf("selector = %#v, want map[app:api]\n%s", values["selector"], generated)
+	}
+	compiled, err := schemautil.Compile(schema)
+	if err != nil {
+		t.Fatal(err)
+	}
+	encoded, err := json.Marshal(values)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result := compiled.ValidateJSON(encoded); !result.Valid {
+		t.Errorf("generated typed constants do not satisfy the schema: %#v\n%s", result.Errors, generated)
+	}
+}
+
+func TestGenerator_Generate_RequiredConstrainedPlaceholders(t *testing.T) {
+	schema := []byte(`{
+		"type": "object",
+		"required": ["name", "port", "labels"],
+		"properties": {
+			"name": {"type": "string", "minLength": 3, "pattern": "^[a-z]+$"},
+			"port": {"type": "integer", "minimum": 1024},
+			"labels": {
+				"type": "array",
+				"minItems": 2,
+				"items": {"type": "string", "minLength": 2}
+			}
+		}
+	}`)
+
+	generated, err := NewGenerator().Generate(schema)
+	if err != nil {
+		t.Fatalf("Generate failed: %v", err)
+	}
+
+	var values map[string]any
+	if err := yaml.Unmarshal(generated, &values); err != nil {
+		t.Fatalf("generated YAML is invalid: %v\n%s", err, generated)
+	}
+	compiled, err := schemautil.Compile(schema)
+	if err != nil {
+		t.Fatal(err)
+	}
+	encoded, err := json.Marshal(values)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result := compiled.ValidateJSON(encoded); !result.Valid {
+		t.Errorf("generated constrained placeholders do not satisfy the schema: %#v\n%s", result.Errors, generated)
+	}
+}
+
+func TestGenerator_Generate_RequiredUnsynthesizablePlaceholderFails(t *testing.T) {
+	schema := []byte(`{
+		"type": "object",
+		"required": ["code"],
+		"properties": {
+			"code": {"type": "string", "pattern": "^[0-9]{5}$"}
+		}
+	}`)
+
+	_, err := NewGenerator().Generate(schema)
+	if err == nil {
+		t.Fatal("Generate succeeded, want an error for an unsynthesizable required value")
+	}
+	if !strings.Contains(err.Error(), "cannot generate a valid placeholder for required string") {
+		t.Errorf("unexpected error: %v", err)
+	}
+}
+
+func TestGenerator_Generate_RootAllOfProperties(t *testing.T) {
+	schema := []byte(`{
+		"type": "object",
+		"allOf": [
+			{
+				"required": ["enabled"],
+				"properties": {"enabled": {"type": "boolean", "default": true}}
+			}
+		]
+	}`)
+
+	generated, err := NewGenerator().Generate(schema)
+	if err != nil {
+		t.Fatalf("Generate failed: %v", err)
+	}
+	if !strings.Contains(string(generated), "enabled: true") {
+		t.Errorf("allOf property is missing from generated values:\n%s", generated)
 	}
 }
 

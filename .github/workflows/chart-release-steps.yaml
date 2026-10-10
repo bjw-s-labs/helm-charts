@@ -90,6 +90,10 @@ jobs:
             }
             core.setOutput('changelog', changelog);
 
+      - name: Build chart tools
+        working-directory: src
+        run: just chart::build-tools
+
       - name: Dereference JSON schema before packaging
         env:
           CHART: ${{ inputs.chart }}

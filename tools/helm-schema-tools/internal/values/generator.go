@@ -3,8 +3,10 @@ package values
 import (
 	"bytes"
 	"embed"
+	"encoding/json"
 	"fmt"
 	"maps"
+	"math"
 	"slices"
 	"strings"
 	"text/template"
@@ -72,11 +74,12 @@ func (g *Generator) Generate(schemaBytes []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	g.order.BindCompiledSchema(schema)
 	var entries []*Entry
-	if schema.Properties != nil {
-		requiredSet := schemautil.MakeSet(schema.Required)
-		entries, err = g.buildEntries(*schema.Properties, requiredSet, "", 0)
+	rootProperties := schemautil.CollectAllProperties(schema)
+	if len(rootProperties) > 0 {
+		requiredSet := schemautil.MakeSet(schemautil.CollectAllRequired(schema))
+		entries, err = g.buildEntries(rootProperties, requiredSet, "", 0, schema)
 		if err != nil {
 			return nil, err
 		}
@@ -95,8 +98,9 @@ func (g *Generator) buildEntries(
 	requiredSet map[string]bool,
 	schemaPath string,
 	depth int,
+	parent *jsonschema.Schema,
 ) ([]*Entry, error) {
-	keys := g.order.OrderKeys(schemaPath+"/properties", slices.Collect(maps.Keys(props)))
+	keys := g.order.OrderKeysForSchema(parent, schemaPath+"/properties", slices.Collect(maps.Keys(props)))
 	entries := make([]*Entry, 0, len(keys))
 	for _, key := range keys {
 		prop := props[key]
@@ -153,7 +157,10 @@ func (g *Generator) buildEntry(key string, prop *jsonschema.Schema, fc fieldCtx)
 
 // fillValue returns keep=false when the entry should be dropped entirely.
 func (g *Generator) fillValue(e *Entry, prop *jsonschema.Schema, fc fieldCtx) (bool, error) {
-	if prop.Const != nil && prop.Const.IsSet && len(prop.Type) == 0 {
+	if prop.Const != nil && prop.Const.IsSet {
+		if !validSchemaValue(prop, prop.Const.Value) {
+			return false, fmt.Errorf("const value does not satisfy its schema")
+		}
 		e.Value = constValue(prop)
 		return true, nil
 	}
@@ -164,9 +171,11 @@ func (g *Generator) fillValue(e *Entry, prop *jsonschema.Schema, fc fieldCtx) (b
 	case typeObject:
 		return g.fillObject(e, prop, fc)
 	case typeArray:
-		e.Value = "[]"
+		return g.fillArray(e, prop, fc)
 	default:
-		g.fillScalar(e, prop, propType, fc)
+		if err := g.fillScalar(e, prop, propType, fc); err != nil {
+			return false, err
+		}
 	}
 	return true, nil
 }
@@ -181,8 +190,15 @@ func (g *Generator) fillObject(e *Entry, prop *jsonschema.Schema, fc fieldCtx) (
 	// a synthetic `main:` example below it as commented-out lines so users can
 	// still see the expected shape. This matches the helm-docs/bjw-s
 	// convention used in hand-maintained values.yaml files.
-	if prop.AdditionalProperties != nil && prop.Properties == nil {
-		e.Value = "{}"
+	if prop.AdditionalProperties != nil && len(schemautil.CollectAllProperties(prop)) == 0 {
+		if validSchemaValue(prop, map[string]any{}) {
+			e.Value = "{}"
+		} else if !fc.required {
+			e.CommentOut = true
+			return true, nil
+		} else {
+			return false, fmt.Errorf("cannot generate a valid placeholder for required object at %s", fc.path)
+		}
 		if schemautil.HasAnyProperties(prop.AdditionalProperties) {
 			example, err := g.buildMapExample(prop.AdditionalProperties, fc.path+"/additionalProperties", fc.depth)
 			if err != nil {
@@ -199,8 +215,15 @@ func (g *Generator) fillObject(e *Entry, prop *jsonschema.Schema, fc fieldCtx) (
 
 	allProps := schemautil.CollectAllProperties(prop)
 	if len(allProps) == 0 {
-		e.Value = "{}"
-		return true, nil
+		if validSchemaValue(prop, map[string]any{}) {
+			e.Value = "{}"
+			return true, nil
+		}
+		if !fc.required {
+			e.CommentOut = true
+			return true, nil
+		}
+		return false, fmt.Errorf("cannot generate a valid placeholder for required object at %s", fc.path)
 	}
 
 	// Optional nested objects without a default collapse to `{}` plus a
@@ -212,7 +235,7 @@ func (g *Generator) fillObject(e *Entry, prop *jsonschema.Schema, fc fieldCtx) (
 	if fc.depth >= 1 && !fc.required && prop.Default == nil {
 		e.Value = "{}"
 		requiredSet := schemautil.MakeSet(schemautil.CollectAllRequired(prop))
-		children, err := g.buildEntries(allProps, requiredSet, fc.path, fc.depth+1)
+		children, err := g.buildEntries(allProps, requiredSet, fc.path, fc.depth+1, prop)
 		if err != nil {
 			return false, err
 		}
@@ -225,7 +248,7 @@ func (g *Generator) fillObject(e *Entry, prop *jsonschema.Schema, fc fieldCtx) (
 	}
 
 	requiredSet := schemautil.MakeSet(schemautil.CollectAllRequired(prop))
-	children, err := g.buildEntries(allProps, requiredSet, fc.path, fc.depth+1)
+	children, err := g.buildEntries(allProps, requiredSet, fc.path, fc.depth+1, prop)
 	if err != nil {
 		return false, err
 	}
@@ -236,7 +259,7 @@ func (g *Generator) fillObject(e *Entry, prop *jsonschema.Schema, fc fieldCtx) (
 func (g *Generator) buildMapExample(itemSchema *jsonschema.Schema, itemSchemaPath string, depth int) ([]*Entry, error) {
 	allProps := schemautil.CollectAllProperties(itemSchema)
 	requiredSet := schemautil.MakeSet(schemautil.CollectAllRequired(itemSchema))
-	children, err := g.buildEntries(allProps, requiredSet, itemSchemaPath, depth+1)
+	children, err := g.buildEntries(allProps, requiredSet, itemSchemaPath, depth+1, itemSchema)
 	if err != nil {
 		return nil, err
 	}
@@ -284,92 +307,280 @@ func commentifyYAML(yaml string) string {
 }
 
 // fillScalar populates e.Value / e.CommentOut for string, number, bool, null.
-func (g *Generator) fillScalar(e *Entry, prop *jsonschema.Schema, propType string, fc fieldCtx) {
+func (g *Generator) fillScalar(e *Entry, prop *jsonschema.Schema, propType string, fc fieldCtx) error {
 	switch propType {
 	case typeString:
-		g.fillString(e, prop, fc)
+		return g.fillString(e, prop, fc)
 	case typeInteger, typeNumber:
-		g.fillNumber(e, prop, propType, fc)
+		return g.fillNumber(e, prop, propType, fc)
 	case typeBoolean:
-		g.fillBool(e, prop, fc)
+		return g.fillBool(e, prop, fc)
 	default:
 		e.Value = typeNull
 	}
+	return nil
 }
 
-func (g *Generator) fillString(e *Entry, prop *jsonschema.Schema, fc fieldCtx) {
+func (g *Generator) fillString(e *Entry, prop *jsonschema.Schema, fc fieldCtx) error {
 	// Nullable-and-optional fields emit `null` even when the schema has a
 	// default. Chart templates that distinguish "unset" from "explicit zero"
 	// (via kindIs or hasKey) rely on this semantic — injecting the default
 	// would change the rendered manifest from "field omitted" to "field = 0".
 	if !fc.required && allowsNull(prop) {
 		e.Value = typeNull
-		return
+		return nil
 	}
 	if prop.Default != nil {
-		if s, ok := prop.Default.(string); ok {
-			e.Value = yamlQuoteString(s)
-			return
+		if validSchemaValue(prop, prop.Default) {
+			e.Value = inlineYAMLValue(prop.Default)
+			return nil
 		}
+	}
+	if fc.required {
+		value, ok := placeholderValue(prop, typeString)
+		if !ok {
+			return fmt.Errorf("cannot generate a valid placeholder for required string at %s", fc.path)
+		}
+		e.Value = inlineYAMLValue(value)
+		return nil
+	}
+	e.CommentOut = true
+	return nil
+}
+
+func (g *Generator) fillNumber(e *Entry, prop *jsonschema.Schema, propType string, fc fieldCtx) error {
+	if !fc.required && allowsNull(prop) {
+		e.Value = typeNull
+		return nil
+	}
+	if prop.Default != nil && validSchemaValue(prop, prop.Default) {
+		e.Value = inlineYAMLValue(prop.Default)
+		return nil
+	}
+	if fc.required {
+		value, ok := placeholderValue(prop, propType)
+		if !ok {
+			return fmt.Errorf("cannot generate a valid placeholder for required %s at %s", propType, fc.path)
+		}
+		e.Value = inlineYAMLValue(value)
+		return nil
+	}
+	e.CommentOut = true
+	return nil
+}
+
+func (g *Generator) fillBool(e *Entry, prop *jsonschema.Schema, fc fieldCtx) error {
+	if !fc.required && allowsNull(prop) {
+		e.Value = typeNull
+		return nil
+	}
+	if prop.Default != nil && validSchemaValue(prop, prop.Default) {
+		e.Value = inlineYAMLValue(prop.Default)
+		return nil
+	}
+	if fc.required {
+		value, ok := placeholderValue(prop, typeBoolean)
+		if !ok {
+			return fmt.Errorf("cannot generate a valid placeholder for required boolean at %s", fc.path)
+		}
+		e.Value = inlineYAMLValue(value)
+		return nil
+	}
+	e.CommentOut = true
+	return nil
+}
+
+func (g *Generator) fillArray(e *Entry, prop *jsonschema.Schema, fc fieldCtx) (bool, error) {
+	// Keep the familiar empty-list value when it is valid. If an empty list
+	// violates a constraint, optional fields are omitted and required fields
+	// receive a schema-validated example instead of an invalid placeholder.
+	if validSchemaValue(prop, []any{}) {
+		e.Value = "[]"
+		return true, nil
+	}
+	if !fc.required {
+		e.CommentOut = true
+		return true, nil
+	}
+
+	value, ok := placeholderValue(prop, typeArray)
+	if !ok {
+		return false, fmt.Errorf("cannot generate a valid placeholder for required array at %s", fc.path)
+	}
+	e.Value = inlineYAMLValue(value)
+	return true, nil
+}
+
+// validSchemaValue reports whether a candidate can safely be written as a
+// real values.yaml entry. JSON Schema defaults and examples are annotations,
+// so they must be checked rather than trusted.
+func validSchemaValue(prop *jsonschema.Schema, value any) bool {
+	return prop != nil && prop.Validate(value).IsValid()
+}
+
+// placeholderValue returns a small, schema-valid example value, or false when
+// doing so would require guessing (for example, a complex regular expression
+// without an example). Callers use that failure to omit optional values or
+// return a clear error for required ones.
+func placeholderValue(prop *jsonschema.Schema, propType string) (any, bool) {
+	return placeholderValueAtDepth(prop, propType, 0)
+}
+
+func placeholderValueAtDepth(prop *jsonschema.Schema, propType string, depth int) (any, bool) {
+	if prop == nil || depth > 32 {
+		return nil, false
+	}
+
+	candidates := make([]any, 0, len(prop.Enum)+len(prop.Examples)+8)
+	if prop.Default != nil {
+		candidates = append(candidates, prop.Default)
 	}
 	if prop.Const != nil && prop.Const.IsSet {
-		if s, ok := prop.Const.Value.(string); ok {
-			e.Value = yamlQuoteString(s)
+		candidates = append(candidates, prop.Const.Value)
+	}
+	candidates = append(candidates, prop.Enum...)
+	candidates = append(candidates, prop.Examples...)
+
+	if propType == "" || propType == typeNull {
+		propType = getSchemaType(prop)
+	}
+	switch propType {
+	case typeString:
+		minLength := 0
+		if prop.MinLength != nil {
+			minLength = int(math.Ceil(*prop.MinLength))
+		}
+		candidates = append(candidates,
+			strings.Repeat("x", minLength),
+			strings.Repeat("X", minLength),
+			"example", "Example", "main", "0", "true", "",
+		)
+	case typeInteger, typeNumber:
+		candidates = append(candidates, numericCandidates(prop, propType)...)
+	case typeBoolean:
+		candidates = append(candidates, false, true)
+	case typeArray:
+		candidates = append(candidates, arrayCandidates(prop, depth)...)
+	case typeObject:
+		if candidate, ok := objectCandidate(prop, depth); ok {
+			candidates = append(candidates, candidate)
+		}
+	case typeNull:
+		candidates = append(candidates, nil)
+	}
+
+	for _, candidate := range candidates {
+		if validSchemaValue(prop, candidate) {
+			return candidate, true
+		}
+	}
+	return nil, false
+}
+
+func numericCandidates(prop *jsonschema.Schema, propType string) []any {
+	candidates := []any{0, 1, -1}
+	if propType == typeNumber {
+		candidates = []any{0.0, 1.0, -1.0}
+	}
+
+	appendBound := func(bound *jsonschema.Rat, lower, exclusive bool) {
+		if bound == nil || bound.Rat == nil {
 			return
 		}
-	}
-	dummy := ""
-	if len(prop.Enum) > 0 {
-		if s, ok := prop.Enum[0].(string); ok {
-			dummy = s
-		}
-	}
-	if fc.required {
-		e.Value = yamlQuoteString(dummy)
-		return
-	}
-	e.CommentOut = true
-}
-
-func (g *Generator) fillNumber(e *Entry, prop *jsonschema.Schema, propType string, fc fieldCtx) {
-	if !fc.required && allowsNull(prop) {
-		e.Value = typeNull
-		return
-	}
-	if prop.Default != nil {
-		e.Value = fmt.Sprintf("%v", prop.Default)
-		return
-	}
-	if fc.required {
-		if propType == typeNumber {
-			e.Value = "0.0"
-		} else {
-			e.Value = "0"
-		}
-		return
-	}
-	e.CommentOut = true
-}
-
-func (g *Generator) fillBool(e *Entry, prop *jsonschema.Schema, fc fieldCtx) {
-	if !fc.required && allowsNull(prop) {
-		e.Value = typeNull
-		return
-	}
-	if prop.Default != nil {
-		if b, ok := prop.Default.(bool); ok {
-			e.Value = boolYAML(b)
+		value, _ := bound.Float64()
+		if propType == typeInteger {
+			if lower {
+				value = math.Ceil(value)
+				if exclusive && bound.IsInt() {
+					value++
+				}
+			} else {
+				value = math.Floor(value)
+				if exclusive && bound.IsInt() {
+					value--
+				}
+			}
+			candidates = append(candidates, int64(value))
 			return
 		}
+		if exclusive {
+			if lower {
+				value = math.Nextafter(value, math.Inf(1))
+			} else {
+				value = math.Nextafter(value, math.Inf(-1))
+			}
+		}
+		candidates = append(candidates, value)
 	}
-	if fc.required {
-		e.Value = "false"
-		return
-	}
-	e.CommentOut = true
+
+	appendBound(prop.Minimum, true, false)
+	appendBound(prop.ExclusiveMinimum, true, true)
+	appendBound(prop.Maximum, false, false)
+	appendBound(prop.ExclusiveMaximum, false, true)
+	return candidates
 }
 
-// constValue renders a pure const schema value as a YAML scalar string.
+func arrayCandidates(prop *jsonschema.Schema, depth int) []any {
+	candidates := []any{[]any{}}
+	if prop.MinItems == nil || *prop.MinItems <= 0 {
+		return candidates
+	}
+	count := int(math.Ceil(*prop.MinItems))
+	if prop.Items == nil {
+		return append(candidates, makeRepeatedValues("example", count))
+	}
+
+	item, ok := placeholderValueAtDepth(prop.Items, getSchemaType(prop.Items), depth+1)
+	if !ok {
+		return candidates
+	}
+	return append(candidates, makeRepeatedValues(item, count))
+}
+
+func makeRepeatedValues(value any, count int) []any {
+	values := make([]any, count)
+	for i := range values {
+		values[i] = value
+	}
+	return values
+}
+
+func objectCandidate(prop *jsonschema.Schema, depth int) (map[string]any, bool) {
+	properties := schemautil.CollectAllProperties(prop)
+	if len(properties) == 0 {
+		return map[string]any{}, true
+	}
+	required := schemautil.MakeSet(schemautil.CollectAllRequired(prop))
+	candidate := make(map[string]any, len(required))
+	for _, key := range schemautil.SortedKeys(properties) {
+		if !required[key] {
+			continue
+		}
+		value, ok := placeholderValueAtDepth(properties[key], getSchemaType(properties[key]), depth+1)
+		if !ok {
+			return nil, false
+		}
+		candidate[key] = value
+	}
+	return candidate, true
+}
+
+// inlineYAMLValue returns a single-line YAML representation. JSON flow values
+// are valid YAML and preserve concrete types for arrays and objects.
+func inlineYAMLValue(value any) string {
+	if s, ok := value.(string); ok {
+		return yamlQuoteString(s)
+	}
+	encoded, err := json.Marshal(value)
+	if err == nil {
+		return string(encoded)
+	}
+	return fmt.Sprintf("%v", value)
+}
+
+// constValue renders a schema const as an inline YAML value. JSON flow values
+// are valid YAML, so objects and arrays remain valid without teaching the
+// line-oriented template how to render arbitrary nested constants.
 func constValue(prop *jsonschema.Schema) string {
 	switch v := prop.Const.Value.(type) {
 	case string:
@@ -377,6 +588,10 @@ func constValue(prop *jsonschema.Schema) string {
 	case bool:
 		return boolYAML(v)
 	default:
+		encoded, err := json.Marshal(v)
+		if err == nil {
+			return string(encoded)
+		}
 		return fmt.Sprintf("%v", v)
 	}
 }
@@ -414,7 +629,7 @@ func helmDocsTypeHint(prop *jsonschema.Schema) string {
 }
 
 // collectTypeHints walks a schema and returns every helm-docs type hint it can
-// derive, including those from oneOf/anyOf branches.
+// derive, including those from composition branches.
 func collectTypeHints(prop *jsonschema.Schema) []string {
 	if prop == nil {
 		return nil
@@ -442,10 +657,13 @@ func collectTypeHints(prop *jsonschema.Schema) []string {
 	for _, sub := range prop.AnyOf {
 		out = append(out, collectTypeHints(sub)...)
 	}
+	for _, sub := range prop.AllOf {
+		out = append(out, collectTypeHints(sub)...)
+	}
 	// Structural inference when no non-null type was found.
 	hasNonNull := slices.ContainsFunc(out, func(s string) bool { return s != typeNull })
 	if !hasNonNull {
-		if prop.Properties != nil || prop.AdditionalProperties != nil {
+		if schemautil.HasAnyProperties(prop) || prop.AdditionalProperties != nil {
 			out = append(out, "object")
 		} else if prop.Items != nil {
 			out = append(out, "list")
@@ -460,7 +678,7 @@ func isStructuredMapType(prop *jsonschema.Schema) bool {
 	if prop == nil || prop.AdditionalProperties == nil {
 		return false
 	}
-	if prop.Properties != nil && len(*prop.Properties) > 0 {
+	if schemautil.HasAnyProperties(prop) {
 		return false
 	}
 	return schemautil.HasAnyProperties(prop.AdditionalProperties)
@@ -506,7 +724,7 @@ func allowsNull(prop *jsonschema.Schema) bool {
 }
 
 // getSchemaType returns the primary non-null type, falling back to structural
-// inference and then oneOf/anyOf branch types.
+// inference and then composition branch types.
 func getSchemaType(prop *jsonschema.Schema) string {
 	for _, t := range prop.Type {
 		if t != typeNull {
@@ -516,11 +734,16 @@ func getSchemaType(prop *jsonschema.Schema) string {
 	if len(prop.Type) > 0 {
 		return prop.Type[0] // only null
 	}
-	if prop.Properties != nil || prop.AdditionalProperties != nil {
+	if schemautil.HasAnyProperties(prop) || prop.AdditionalProperties != nil {
 		return typeObject
 	}
 	if prop.Items != nil {
 		return typeArray
+	}
+	for _, sub := range prop.AllOf {
+		if t := getSchemaType(sub); t != typeNull {
+			return t
+		}
 	}
 	for _, sub := range prop.OneOf {
 		if t := getSchemaType(sub); t != typeNull {

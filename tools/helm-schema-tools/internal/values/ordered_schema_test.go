@@ -86,6 +86,57 @@ func TestOrderedSchema_NestedProperties(t *testing.T) {
 	}
 }
 
+func TestOrderedSchema_ComposedPropertiesFollowSourceBranches(t *testing.T) {
+	raw := []byte(`{
+		"allOf": [
+			{
+				"properties": {
+					"repository": {"type": "string"},
+					"tag": {"type": "string"},
+					"digest": {"type": "string"}
+				}
+			}
+		],
+		"properties": {
+			"pullPolicy": {"type": "string"}
+		}
+	}`)
+	o, err := NewOrderedSchema(raw)
+	if err != nil {
+		t.Fatalf("NewOrderedSchema failed: %v", err)
+	}
+
+	got := o.OrderKeys("/properties", []string{"pullPolicy", "digest", "repository", "tag"})
+	want := []string{"repository", "tag", "digest", "pullPolicy"}
+	if !equalStrings(got, want) {
+		t.Fatalf("OrderKeys = %v, want %v", got, want)
+	}
+}
+
+func TestOrderedSchema_PrefersLocalDeclarationWhenItMatchesMoreFields(t *testing.T) {
+	raw := []byte(`{
+		"allOf": [{
+			"properties": {
+				"external": {"type": "string"}
+			}
+		}],
+		"properties": {
+			"first": {"type": "string"},
+			"second": {"type": "string"}
+		}
+	}`)
+	o, err := NewOrderedSchema(raw)
+	if err != nil {
+		t.Fatalf("NewOrderedSchema failed: %v", err)
+	}
+
+	got := o.OrderKeys("/properties", []string{"second", "external", "first"})
+	want := []string{"first", "second", "external"}
+	if !equalStrings(got, want) {
+		t.Fatalf("OrderKeys = %v, want %v", got, want)
+	}
+}
+
 func TestGenerator_Generate_PreservesSchemaOrder(t *testing.T) {
 	schema := []byte(`{
 		"$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -112,6 +163,49 @@ func TestGenerator_Generate_PreservesSchemaOrder(t *testing.T) {
 	// Declaration order is zebra, alpha, mango — not alphabetical.
 	if iZebra >= iAlpha || iAlpha >= iMango {
 		t.Errorf("keys not in declaration order (zebra < alpha < mango):\n%s", yaml)
+	}
+}
+
+func TestGenerator_Generate_ComposedObjectUsesBoundSchemaOrder(t *testing.T) {
+	schema := []byte(`{
+		"type": "object",
+		"properties": {
+			"image": {
+				"type": "object",
+				"allOf": [{
+					"properties": {
+						"repository": {"type": "string"},
+						"tag": {"type": "string"},
+						"digest": {"type": "string"}
+					}
+				}],
+				"properties": {
+					"pullPolicy": {"type": "string"}
+				}
+			}
+		}
+	}`)
+	g := NewGenerator()
+	out, err := g.Generate(schema)
+	if err != nil {
+		t.Fatalf("Generate failed: %v", err)
+	}
+	yaml := string(out)
+	positions := []int{
+		strings.Index(yaml, "repository:"),
+		strings.Index(yaml, "tag:"),
+		strings.Index(yaml, "digest:"),
+		strings.Index(yaml, "pullPolicy:"),
+	}
+	for i, position := range positions {
+		if position < 0 {
+			t.Fatalf("expected composed image field %d in output:\n%s", i, yaml)
+		}
+	}
+	for i := 1; i < len(positions); i++ {
+		if positions[i-1] >= positions[i] {
+			t.Fatalf("composed fields are not in source order: %v\n%s", positions, yaml)
+		}
 	}
 }
 

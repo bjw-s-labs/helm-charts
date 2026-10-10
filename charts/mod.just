@@ -6,7 +6,7 @@ default:
   just -l chart
 
 [doc('Run ct lint --config .ci/ct/ct.yaml --charts charts/CHART')]
-lint CHART:
+lint CHART: build-tools
   #!/usr/bin/env bash
   set -euo pipefail
   REPO_ROOT="{{ justfile_dir() }}"
@@ -21,12 +21,14 @@ lint CHART:
     ( cd "$CHART_DIR" && bash "$REPO_ROOT/.ci/scripts/use-local-common.sh" )
   fi
   if [[ -f "$CHART_DIR/values.schema.json" ]]; then
-    schematools-cli process dereference "$CHART_DIR/values.schema.json" --to-file "$CHART_DIR/values.schema.json"
+    "$REPO_ROOT/tools/helm-schema-tools/helm-schema-tools" dereference \
+      --schema "$CHART_DIR/values.schema.json" \
+      --output "$CHART_DIR/values.schema.json"
   fi
   ( cd "$REPO_ROOT" && ct lint --config .ci/ct/ct.yaml --charts "charts/{{CHART}}" )
 
 [doc('Run helm unittest -f "unittests/GLOB" against the chart test harness')]
-unit-test CHART GLOB="**/*_test.yaml":
+unit-test CHART GLOB="**/*_test.yaml": build-tools
   #!/usr/bin/env bash
   set -euo pipefail
   PLUGIN_VERSION="1.1.2"
@@ -45,7 +47,9 @@ unit-test CHART GLOB="**/*_test.yaml":
     ( cd "$TEST_CHART" && bash "$REPO_ROOT/.ci/scripts/use-local-common.sh" )
   fi
   if [[ -f "$CHART_DIR/values.schema.json" ]]; then
-    schematools-cli process dereference "$CHART_DIR/values.schema.json" --to-file "$CHART_DIR/values.schema.json"
+    "$REPO_ROOT/tools/helm-schema-tools/helm-schema-tools" dereference \
+      --schema "$CHART_DIR/values.schema.json" \
+      --output "$CHART_DIR/values.schema.json"
   fi
   if ! helm plugin list | awk -v version="$PLUGIN_VERSION" '$1 == "unittest" && $2 == version { found=1 } END { exit !found }'; then
     helm plugin uninstall unittest || true
@@ -55,7 +59,7 @@ unit-test CHART GLOB="**/*_test.yaml":
   ( cd "$TEST_CHART" && helm unittest -f "unittests/{{GLOB}}" . )
 
 [doc('Run ct install --config .ci/ct/ct.yaml --charts TEST_CHART')]
-integration-test CHART:
+integration-test CHART: build-tools
   #!/usr/bin/env bash
   set -euo pipefail
   REPO_ROOT="{{ justfile_dir() }}"
@@ -73,12 +77,14 @@ integration-test CHART:
     ( cd "$TEST_CHART" && bash "$REPO_ROOT/.ci/scripts/use-local-common.sh" )
   fi
   if [[ -f "$CHART_DIR/values.schema.json" ]]; then
-    schematools-cli process dereference "$CHART_DIR/values.schema.json" --to-file "$CHART_DIR/values.schema.json"
+    "$REPO_ROOT/tools/helm-schema-tools/helm-schema-tools" dereference \
+      --schema "$CHART_DIR/values.schema.json" \
+      --output "$CHART_DIR/values.schema.json"
   fi
   ( cd "$REPO_ROOT" && ct install --config .ci/ct/ct.yaml --charts "$TEST_CHART_RELATIVE" )
 
 [doc('Render a chart with helm template')]
-template CHART *ARGS:
+template CHART *ARGS: build-tools
   #!/usr/bin/env bash
   set -euo pipefail
   REPO_ROOT="{{ justfile_dir() }}"
@@ -96,7 +102,9 @@ template CHART *ARGS:
     ( cd "$TEST_CHART" && bash "$REPO_ROOT/.ci/scripts/use-local-common.sh" )
   fi
   if [[ -f "$CHART_DIR/values.schema.json" ]]; then
-    schematools-cli process dereference "$CHART_DIR/values.schema.json" --to-file "$CHART_DIR/values.schema.json"
+    "$REPO_ROOT/tools/helm-schema-tools/helm-schema-tools" dereference \
+      --schema "$CHART_DIR/values.schema.json" \
+      --output "$CHART_DIR/values.schema.json"
   fi
   ( cd "$TEST_CHART" && helm dep update )
   ( cd "$TEST_CHART" && helm template {{ARGS}} . )

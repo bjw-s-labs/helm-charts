@@ -4,6 +4,8 @@ set -euo pipefail
 schema_file=''
 output_file=''
 allow_missing=false
+repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
+tool="$repo_root/tools/helm-schema-tools/helm-schema-tools"
 
 usage() {
   printf 'Usage: %s --schema-file PATH --output-file PATH [--allow-missing]\n' "$0" >&2
@@ -49,4 +51,9 @@ if [[ ! -f "$schema_file" ]]; then
   exit 1
 fi
 
-exec schematools-cli process dereference "$schema_file" --to-file "$output_file"
+if [[ ! -x "$tool" ]]; then
+  printf 'Schema tool not found: %s\nBuild it with: just chart::build-tools\n' "$tool" >&2
+  exit 1
+fi
+
+exec "$tool" dereference --schema "$schema_file" --output "$output_file"

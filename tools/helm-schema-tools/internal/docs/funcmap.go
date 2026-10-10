@@ -1,6 +1,7 @@
 package docs
 
 import (
+	"encoding/hex"
 	"fmt"
 	"html"
 	"strings"
@@ -32,10 +33,31 @@ func funcMap() template.FuncMap {
 		"descWithExtras": descriptionWithExtras,
 		"add1":           func(i int) int { return i + 1 },
 		"sub":            func(a, b int) int { return a - b },
-		"lower":          strings.ToLower,
+		"slug":           documentationSlug,
 		"allExamples":    collectAllExamples,
 		"mdxSafe":        mdxSafe,
 	}
+}
+
+// documentationSlug returns a single, safe directory and URL segment for a
+// schema property. Existing camelCase property names retain their historical
+// lowercase paths; other names are byte-encoded to prevent path traversal,
+// separators, and MDX-link ambiguity.
+func documentationSlug(name string) string {
+	lower := strings.ToLower(name)
+	if lower != "" {
+		safe := true
+		for _, r := range lower {
+			if !((r >= 'a' && r <= 'z') || (r >= '0' && r <= '9') || r == '-') {
+				safe = false
+				break
+			}
+		}
+		if safe {
+			return lower
+		}
+	}
+	return "key-" + hex.EncodeToString([]byte(name))
 }
 
 // typeString returns a display string for a schema's type.
@@ -51,7 +73,7 @@ func typeString(schema *jsonschema.Schema) string {
 		}
 		return strings.Join(schema.Type, " / ")
 	}
-	if schema.Properties != nil || schema.AdditionalProperties != nil {
+	if schemautil.HasAnyProperties(schema) || schema.AdditionalProperties != nil {
 		return "object"
 	}
 	if schema.Items != nil {
@@ -60,8 +82,10 @@ func typeString(schema *jsonschema.Schema) string {
 	if len(schema.Enum) > 0 {
 		return "enum"
 	}
-	// Collect types from oneOf/anyOf branches for union types like `string | object`.
-	types := collectBranchTypes(schema.OneOf)
+	// Collect types from composition branches for schemas that express their
+	// type indirectly.
+	types := collectBranchTypes(schema.AllOf)
+	types = append(types, collectBranchTypes(schema.OneOf)...)
 	types = append(types, collectBranchTypes(schema.AnyOf)...)
 	if len(types) > 0 {
 		return strings.Join(schemautil.DeduplicateStrings(types), " / ")
@@ -135,7 +159,7 @@ func hasNestedContent(schema *jsonschema.Schema) bool {
 	if schema == nil {
 		return false
 	}
-	if schema.Properties != nil && len(*schema.Properties) > 0 {
+	if len(schemautil.CollectAllProperties(schema)) > 0 {
 		return true
 	}
 	if schema.AdditionalProperties != nil {

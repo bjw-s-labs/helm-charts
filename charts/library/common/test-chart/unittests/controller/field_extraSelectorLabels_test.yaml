@@ -1,0 +1,627 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: controller - fields - extraSelectorLabels
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+tests:
+  - it: Deployment pod identity includes templated extras but excludes regular metadata
+    set:
+      controllers.main:
+        type: deployment
+        extraSelectorLabels:
+          component: '{{ .Release.Name }}'
+          '{{ print "track" }}': stable
+        labels:
+          controller-only: metadata
+        pod:
+          labels:
+            pod-only: metadata
+    asserts:
+      - documentSelector:
+          path: $[?(@.kind == "Deployment")].metadata.name
+          value: release-name
+        equal:
+          path: spec.template.metadata.labels
+          value:
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/controller: main
+            component: RELEASE-NAME
+            track: stable
+            pod-only: metadata
+      - documentSelector:
+          path: $[?(@.kind == "Deployment")].metadata.name
+          value: release-name
+        equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/controller: main
+            component: RELEASE-NAME
+            track: stable
+  - it: StatefulSet pod identity includes templated extras but excludes regular metadata
+    set:
+      controllers.main:
+        type: statefulset
+        extraSelectorLabels:
+          component: '{{ .Release.Name }}'
+          '{{ print "track" }}': stable
+        labels:
+          controller-only: metadata
+        pod:
+          labels:
+            pod-only: metadata
+    asserts:
+      - documentSelector:
+          path: $[?(@.kind == "StatefulSet")].metadata.name
+          value: release-name
+        equal:
+          path: spec.template.metadata.labels
+          value:
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/controller: main
+            component: RELEASE-NAME
+            track: stable
+            pod-only: metadata
+      - documentSelector:
+          path: $[?(@.kind == "StatefulSet")].metadata.name
+          value: release-name
+        equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/controller: main
+            component: RELEASE-NAME
+            track: stable
+  - it: DaemonSet pod identity includes templated extras but excludes regular metadata
+    set:
+      controllers.main:
+        type: daemonset
+        extraSelectorLabels:
+          component: '{{ .Release.Name }}'
+          '{{ print "track" }}': stable
+        labels:
+          controller-only: metadata
+        pod:
+          labels:
+            pod-only: metadata
+    asserts:
+      - documentSelector:
+          path: $[?(@.kind == "DaemonSet")].metadata.name
+          value: release-name
+        equal:
+          path: spec.template.metadata.labels
+          value:
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/controller: main
+            component: RELEASE-NAME
+            track: stable
+            pod-only: metadata
+      - documentSelector:
+          path: $[?(@.kind == "DaemonSet")].metadata.name
+          value: release-name
+        equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/controller: main
+            component: RELEASE-NAME
+            track: stable
+  - it: Job pod identity includes templated extras but excludes regular metadata
+    set:
+      controllers.main:
+        type: job
+        extraSelectorLabels:
+          component: '{{ .Release.Name }}'
+          '{{ print "track" }}': stable
+        labels:
+          controller-only: metadata
+        pod:
+          labels:
+            pod-only: metadata
+    asserts:
+      - documentSelector:
+          path: $[?(@.kind == "Job")].metadata.name
+          value: release-name
+        equal:
+          path: spec.template.metadata.labels
+          value:
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/controller: main
+            component: RELEASE-NAME
+            track: stable
+            pod-only: metadata
+  - it: CronJob pod identity includes templated extras but excludes regular metadata
+    set:
+      controllers.main:
+        type: cronjob
+        extraSelectorLabels:
+          component: '{{ .Release.Name }}'
+          '{{ print "track" }}': stable
+        labels:
+          controller-only: metadata
+        pod:
+          labels:
+            pod-only: metadata
+        cronjob:
+          schedule: '* * * * *'
+    asserts:
+      - documentSelector:
+          path: $[?(@.kind == "CronJob")].metadata.name
+          value: release-name
+        equal:
+          path: spec.jobTemplate.spec.template.metadata.labels
+          value:
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/controller: main
+            component: RELEASE-NAME
+            track: stable
+            pod-only: metadata
+  - it: all generated pod selectors use the referenced controller identity without leaking between controllers
+    set:
+      controllers.main:
+        forceRename: app
+        extraSelectorLabels:
+          component: app
+        podDisruptionBudget:
+          minAvailable: 1
+        pod:
+          topologySpreadConstraints:
+            - maxSkew: 1
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: DoNotSchedule
+      controllers.backend:
+        containers:
+          main:
+            image:
+              repository: nginx
+              tag: stable
+        forceRename: db
+        extraSelectorLabels:
+          component: db
+      service.main:
+        forceRename: svc
+        controller: main
+        ports:
+          http:
+            port: 80
+      podMonitor.main:
+        forceRename: monitor
+        controller:
+          identifier: main
+        podMetricsEndpoints:
+          - port: http
+      networkpolicies.native:
+        forceRename: native
+        controller: main
+        policyTypes:
+          - Ingress
+          - Egress
+        rules:
+          ingress:
+            - from:
+                - controllers: [backend]
+              ports:
+                - port: 80
+          egress:
+            - to:
+                - controllers: [backend]
+              ports:
+                - port: 80
+      networkpolicies.cilium:
+        forceRename: cilium
+        type: cilium
+        controller: main
+        ingress:
+          - fromControllers: [backend]
+        egress:
+          - toControllers: [backend]
+      networkpolicies.clusterwide:
+        forceRename: clusterwide
+        type: ciliumClusterwide
+        controller: main
+        ingress:
+          - fromControllers: [backend]
+        egress:
+          - toControllers: [backend]
+    asserts:
+      - documentSelector:
+          path: $[?(@.kind == "Deployment")].metadata.name
+          value: app
+        equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/controller: main
+            component: app
+      - documentSelector:
+          path: $[?(@.kind == "Deployment")].metadata.name
+          value: app
+        equal:
+          path: spec.template.metadata.labels
+          value:
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/controller: main
+            component: app
+      - documentSelector:
+          path: $[?(@.kind == "Deployment")].metadata.name
+          value: db
+        equal:
+          path: spec.template.metadata.labels
+          value:
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/controller: backend
+            component: db
+      - documentSelector:
+          path: $[?(@.kind == "Service")].metadata.name
+          value: svc
+        equal:
+          path: spec.selector
+          value:
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/controller: main
+            component: app
+      - documentSelector:
+          path: $[?(@.kind == "PodMonitor")].metadata.name
+          value: monitor
+        equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/controller: main
+            component: app
+      - documentSelector:
+          path: $[?(@.kind == "PodDisruptionBudget")].metadata.name
+          value: app
+        equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/controller: main
+            component: app
+      - documentSelector:
+          path: $[?(@.kind == "Deployment")].metadata.name
+          value: app
+        equal:
+          path: spec.template.spec.topologySpreadConstraints[0].labelSelector.matchLabels
+          value:
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/controller: main
+            component: app
+      - documentSelector:
+          path: $[?(@.kind == "NetworkPolicy")].metadata.name
+          value: native
+        equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/controller: main
+            component: app
+      - documentSelector:
+          path: $[?(@.kind == "NetworkPolicy")].metadata.name
+          value: native
+        equal:
+          path: spec.ingress
+          value:
+            - from:
+                - podSelector:
+                    matchLabels:
+                      app.kubernetes.io/name: RELEASE-NAME
+                      app.kubernetes.io/instance: RELEASE-NAME
+                      app.kubernetes.io/controller: backend
+                      component: db
+              ports:
+                - port: 80
+      - documentSelector:
+          path: $[?(@.kind == "NetworkPolicy")].metadata.name
+          value: native
+        equal:
+          path: spec.egress
+          value:
+            - to:
+                - podSelector:
+                    matchLabels:
+                      app.kubernetes.io/name: RELEASE-NAME
+                      app.kubernetes.io/instance: RELEASE-NAME
+                      app.kubernetes.io/controller: backend
+                      component: db
+              ports:
+                - port: 80
+      - documentSelector:
+          path: $[?(@.kind == "CiliumNetworkPolicy")].metadata.name
+          value: cilium
+        equal:
+          path: spec.endpointSelector.matchLabels
+          value:
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/controller: main
+            component: app
+      - documentSelector:
+          path: $[?(@.kind == "CiliumNetworkPolicy")].metadata.name
+          value: cilium
+        equal:
+          path: spec.ingress
+          value:
+            - fromEndpoints:
+                - matchLabels:
+                    app.kubernetes.io/name: RELEASE-NAME
+                    app.kubernetes.io/instance: RELEASE-NAME
+                    app.kubernetes.io/controller: backend
+                    component: db
+      - documentSelector:
+          path: $[?(@.kind == "CiliumNetworkPolicy")].metadata.name
+          value: cilium
+        equal:
+          path: spec.egress
+          value:
+            - toEndpoints:
+                - matchLabels:
+                    app.kubernetes.io/name: RELEASE-NAME
+                    app.kubernetes.io/instance: RELEASE-NAME
+                    app.kubernetes.io/controller: backend
+                    component: db
+      - documentSelector:
+          path: $[?(@.kind == "CiliumClusterwideNetworkPolicy")].metadata.name
+          value: clusterwide
+        equal:
+          path: spec.endpointSelector.matchLabels
+          value:
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/controller: main
+            component: app
+      - documentSelector:
+          path: $[?(@.kind == "CiliumClusterwideNetworkPolicy")].metadata.name
+          value: clusterwide
+        equal:
+          path: spec.ingress
+          value:
+            - fromEndpoints:
+                - matchLabels:
+                    app.kubernetes.io/name: RELEASE-NAME
+                    app.kubernetes.io/instance: RELEASE-NAME
+                    app.kubernetes.io/controller: backend
+                    component: db
+      - documentSelector:
+          path: $[?(@.kind == "CiliumClusterwideNetworkPolicy")].metadata.name
+          value: clusterwide
+        equal:
+          path: spec.egress
+          value:
+            - toEndpoints:
+                - matchLabels:
+                    app.kubernetes.io/name: RELEASE-NAME
+                    app.kubernetes.io/instance: RELEASE-NAME
+                    app.kubernetes.io/controller: backend
+                    component: db
+  - it: resource extras override only their own selector and never change controller peer references or pod labels
+    set:
+      controllers.main.extraSelectorLabels:
+        component: app
+      service.main:
+        forceRename: svc
+        extraSelectorLabels:
+          component: service
+        ports:
+          http:
+            port: 80
+      networkpolicies.native:
+        forceRename: native
+        controller: main
+        extraSelectorLabels:
+          component: native
+        policyTypes:
+          - Ingress
+        rules:
+          ingress:
+            - from:
+                - controllers: [main]
+      networkpolicies.cilium:
+        forceRename: cilium
+        type: cilium
+        controller: main
+        extraSelectorLabels:
+          component: cilium
+        ingress:
+          - fromControllers: [main]
+    asserts:
+      - documentSelector:
+          path: $[?(@.kind == "Deployment")].metadata.name
+          value: release-name
+        equal:
+          path: spec.template.metadata.labels
+          value:
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/controller: main
+            component: app
+      - documentSelector:
+          path: $[?(@.kind == "Service")].metadata.name
+          value: svc
+        equal:
+          path: spec.selector
+          value:
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/controller: main
+            component: service
+      - documentSelector:
+          path: $[?(@.kind == "NetworkPolicy")].metadata.name
+          value: native
+        equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/controller: main
+            component: native
+      - documentSelector:
+          path: $[?(@.kind == "NetworkPolicy")].metadata.name
+          value: native
+        equal:
+          path: spec.ingress[0].from[0].podSelector.matchLabels
+          value:
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/controller: main
+            component: app
+      - documentSelector:
+          path: $[?(@.kind == "CiliumNetworkPolicy")].metadata.name
+          value: cilium
+        equal:
+          path: spec.endpointSelector.matchLabels
+          value:
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/controller: main
+            component: cilium
+      - documentSelector:
+          path: $[?(@.kind == "CiliumNetworkPolicy")].metadata.name
+          value: cilium
+        equal:
+          path: spec.ingress[0].fromEndpoints[0].matchLabels
+          value:
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/controller: main
+            component: app
+  - it: regular pod and global labels cannot override the canonical selector labels
+    set:
+      defaultPodOptionsStrategy: merge
+      global.propagateGlobalMetadataToPods: true
+      global.labels:
+        component: global
+        app.kubernetes.io/controller: global
+        global-only: kept
+      defaultPodOptions.labels:
+        component: default
+        default-only: kept
+      controllers.main.extraSelectorLabels:
+        component: app
+        app.kubernetes.io/controller: identity
+      controllers.main.pod.labels:
+        component: pod
+        app.kubernetes.io/name: pod
+        app.kubernetes.io/instance: pod
+        '{{ print "app.kubernetes.io/controller" }}': pod
+    asserts:
+      - documentSelector:
+          path: $[?(@.kind == "Deployment")].metadata.name
+          value: release-name
+        equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/controller: identity
+            component: app
+      - documentSelector:
+          path: $[?(@.kind == "Deployment")].metadata.name
+          value: release-name
+        equal:
+          path: spec.template.metadata.labels
+          value:
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/controller: identity
+            component: app
+            global-only: kept
+            default-only: kept
+  - it: explicit empty controller extras preserve the existing selector
+    set:
+      controllers.main.extraSelectorLabels: {}
+    asserts:
+      - documentSelector:
+          path: $[?(@.kind == "Deployment")].metadata.name
+          value: release-name
+        equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/controller: main
+      - documentSelector:
+          path: $[?(@.kind == "Deployment")].metadata.name
+          value: release-name
+        equal:
+          path: spec.template.metadata.labels
+          value:
+            app.kubernetes.io/name: RELEASE-NAME
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/controller: main
+  - it: explicit topology selectors remain intact when controller extras are present
+    set:
+      controllers.main.extraSelectorLabels:
+        component: app
+      controllers.main.pod.topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector: {}
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app: custom
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchExpressions:
+              - key: app
+                operator: Exists
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app: '{{ .Release.Name }}'
+    asserts:
+      - documentSelector:
+          path: $[?(@.kind == "Deployment")].metadata.name
+          value: release-name
+        equal:
+          path: spec.template.spec.topologySpreadConstraints
+          value:
+            - maxSkew: 1
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: DoNotSchedule
+              labelSelector: {}
+            - maxSkew: 1
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: DoNotSchedule
+              labelSelector:
+                matchLabels:
+                  app: custom
+            - maxSkew: 1
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: DoNotSchedule
+              labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: Exists
+            - maxSkew: 1
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: DoNotSchedule
+              labelSelector:
+                matchLabels:
+                  app: RELEASE-NAME

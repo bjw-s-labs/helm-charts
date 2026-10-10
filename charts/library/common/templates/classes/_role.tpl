@@ -5,13 +5,13 @@ This template serves as a blueprint for generating Role objects in Kubernetes.
   {{- $rootContext := .rootContext -}}
   {{- $roleObject := .object -}}
 
-  {{- $labels := merge
-    ($roleObject.labels | default dict)
+  {{- $labels := mergeOverwrite
     (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
+    ($roleObject.labels | default dict)
   -}}
-  {{- $annotations := merge
-    ($roleObject.annotations | default dict)
+  {{- $annotations := mergeOverwrite
     (include "bjw-s.common.lib.metadata.globalAnnotations" $rootContext | fromYaml)
+    ($roleObject.annotations | default dict)
   -}}
   {{- $rules := "" -}}
   {{- with $roleObject.rules -}}

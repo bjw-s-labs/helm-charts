@@ -8,14 +8,14 @@ within the common library.
 
   {{- $svcType := default "ClusterIP" $serviceObject.type -}}
   {{- $enabledPorts := include "bjw-s.common.lib.service.enabledPorts" (dict "rootContext" $rootContext "serviceObject" $serviceObject) | fromYaml }}
-  {{- $labels := merge
+  {{- $labels := mergeOverwrite
+    (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
     (dict "app.kubernetes.io/service" $serviceObject.name)
     ($serviceObject.labels | default dict)
-    (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
   -}}
-  {{- $annotations := merge
-    ($serviceObject.annotations | default dict)
+  {{- $annotations := mergeOverwrite
     (include "bjw-s.common.lib.metadata.globalAnnotations" $rootContext | fromYaml)
+    ($serviceObject.annotations | default dict)
   -}}
 ---
 apiVersion: v1
@@ -38,9 +38,6 @@ metadata:
 spec:
   {{- if (eq $svcType "ClusterIP") }}
   type: ClusterIP
-  {{- if $serviceObject.clusterIP }}
-  clusterIP: {{ $serviceObject.clusterIP }}
-  {{end}}
   {{- else if eq $svcType "LoadBalancer" }}
   type: {{ $svcType }}
   {{- if $serviceObject.loadBalancerIP }}
@@ -60,6 +57,9 @@ spec:
   {{- end }}
   {{- else }}
   type: {{ $svcType }}
+  {{- end }}
+  {{- if and (ne $svcType "ExternalName") $serviceObject.clusterIP }}
+  clusterIP: {{ $serviceObject.clusterIP }}
   {{- end }}
   {{- if $serviceObject.internalTrafficPolicy }}
   internalTrafficPolicy: {{ $serviceObject.internalTrafficPolicy }}
@@ -125,10 +125,10 @@ spec:
       {{- end }}
     {{- end }}
   {{- end -}}
+  {{- $controllerObject := include "bjw-s.common.lib.controller.getByIdentifier" (dict "rootContext" $rootContext "id" $serviceObject.controller) | fromYaml -}}
   {{- with (merge
     ($serviceObject.extraSelectorLabels | default dict)
-    (dict "app.kubernetes.io/controller" $serviceObject.controller)
-    (include "bjw-s.common.lib.metadata.selectorLabels" $rootContext | fromYaml)
+    (include "bjw-s.common.lib.controller.metadata.selectorLabels" (dict "rootContext" $rootContext "controllerObject" $controllerObject) | fromYaml)
   ) }}
   selector: {{- toYaml . | nindent 4 }}
   {{- end }}

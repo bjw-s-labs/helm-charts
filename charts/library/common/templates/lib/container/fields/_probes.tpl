@@ -41,14 +41,25 @@ Probes used by the container.
         {{- $probeHeader := "" -}}
 
         {{- /* Determine probe type */ -}}
-        {{- if eq $probeValues.type "AUTO" -}}
+        {{- if and (hasKey $probeValues "command") (or (not (hasKey $probeValues "type")) (eq $probeValues.type "AUTO")) -}}
+          {{- $probeType = "COMMAND" -}}
+        {{- else if eq $probeValues.type "AUTO" -}}
           {{- $probeType = $primaryServiceDefaultPort.protocol -}}
         {{- else -}}
           {{- $probeType = $probeValues.type | default "TCP" -}}
         {{- end -}}
 
+        {{- /* Command probe configuration */ -}}
+        {{- if eq $probeType "COMMAND" -}}
+          {{- if not $probeValues.command -}}
+            {{- fail (printf "Container '%s': Command is required for %s COMMAND probe. Specify 'controllers.%s.containers.%s.probes.%s.command'." $containerObject.identifier $probeName $controllerObject.identifier $containerObject.identifier $probeName) -}}
+          {{- end -}}
+          {{- $probeHeader = "exec" -}}
+          {{- $command := include "bjw-s.common.lib.common.renderString" (dict "value" ($probeValues.command | toYaml) "rootContext" $rootContext) | fromYamlArray -}}
+          {{- $_ := set $probeDefinition $probeHeader (dict "command" $command) -}}
+
         {{- /* HTTP(S) probe configuration */ -}}
-        {{- if or ( eq $probeType "HTTPS" ) ( eq $probeType "HTTP" ) -}}
+        {{- else if or ( eq $probeType "HTTPS" ) ( eq $probeType "HTTP" ) -}}
           {{- $probeHeader = "httpGet" -}}
           {{- $_ := set $probeDefinition $probeHeader (
             dict
@@ -57,7 +68,7 @@ Probes used by the container.
             )
           -}}
 
-        {{- /* GPRC probe configuration */ -}}
+        {{- /* GRPC probe configuration */ -}}
         {{- else if (eq $probeType "GRPC") -}}
           {{- $probeHeader = "grpc" -}}
           {{- $_ := set $probeDefinition $probeHeader dict -}}
@@ -71,16 +82,18 @@ Probes used by the container.
           {{- $_ := set $probeDefinition $probeHeader dict -}}
         {{- end -}}
 
-        {{- if $probeValues.port -}}
-          {{- if kindIs "float64" $probeValues.port -}}
-            {{- $_ := set (index $probeDefinition $probeHeader) "port" $probeValues.port -}}
-          {{- else if kindIs "string" $probeValues.port -}}
-            {{- $_ := set (index $probeDefinition $probeHeader) "port" (include "bjw-s.common.lib.common.renderString" (dict "value" ( $probeValues.port | toString ) "rootContext" $rootContext)) -}}
+        {{- if ne $probeType "COMMAND" -}}
+          {{- if $probeValues.port -}}
+            {{- if kindIs "float64" $probeValues.port -}}
+              {{- $_ := set (index $probeDefinition $probeHeader) "port" $probeValues.port -}}
+            {{- else if kindIs "string" $probeValues.port -}}
+              {{- $_ := set (index $probeDefinition $probeHeader) "port" (include "bjw-s.common.lib.common.renderString" (dict "value" ( $probeValues.port | toString ) "rootContext" $rootContext)) -}}
+            {{- end -}}
+          {{- else if $primaryServiceDefaultPort.targetPort -}}
+            {{- $_ := set (index $probeDefinition $probeHeader) "port" $primaryServiceDefaultPort.targetPort -}}
+          {{- else if $primaryServiceDefaultPort.port -}}
+            {{- $_ := set (index $probeDefinition $probeHeader) "port" ($primaryServiceDefaultPort.port | toString | atoi ) -}}
           {{- end -}}
-        {{- else if $primaryServiceDefaultPort.targetPort -}}
-          {{- $_ := set (index $probeDefinition $probeHeader) "port" $primaryServiceDefaultPort.targetPort -}}
-        {{- else if $primaryServiceDefaultPort.port -}}
-          {{- $_ := set (index $probeDefinition $probeHeader) "port" ($primaryServiceDefaultPort.port | toString | atoi ) -}}
         {{- end -}}
       {{- end -}}
 

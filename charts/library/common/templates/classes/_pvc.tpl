@@ -6,13 +6,13 @@ within the common library.
   {{- $rootContext := .rootContext -}}
   {{- $pvcObject := .object -}}
 
-  {{- $labels := merge
-    ($pvcObject.labels | default dict)
+  {{- $labels := mergeOverwrite
     (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
+    ($pvcObject.labels | default dict)
   -}}
-  {{- $annotations := merge
-    ($pvcObject.annotations | default dict)
+  {{- $annotations := mergeOverwrite
     (include "bjw-s.common.lib.metadata.globalAnnotations" $rootContext | fromYaml)
+    ($pvcObject.annotations | default dict)
   -}}
   {{- if $pvcObject.retain }}
     {{- $annotations = merge

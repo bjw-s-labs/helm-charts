@@ -6,14 +6,14 @@ within the common library.
   {{- $rootContext := .rootContext -}}
   {{- $statefulsetObject := .object -}}
 
-  {{- $labels := merge
+  {{- $labels := mergeOverwrite
+    (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
     (dict "app.kubernetes.io/controller" $statefulsetObject.identifier)
     ($statefulsetObject.labels | default dict)
-    (include "bjw-s.common.lib.metadata.allLabels" $rootContext | fromYaml)
   -}}
-  {{- $annotations := merge
-    ($statefulsetObject.annotations | default dict)
+  {{- $annotations := mergeOverwrite
     (include "bjw-s.common.lib.metadata.globalAnnotations" $rootContext | fromYaml)
+    ($statefulsetObject.annotations | default dict)
   -}}
 ---
 apiVersion: apps/v1
@@ -56,8 +56,7 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-      app.kubernetes.io/controller: {{ $statefulsetObject.identifier }}
-      {{- include "bjw-s.common.lib.metadata.selectorLabels" $rootContext | nindent 6 }}
+      {{- include "bjw-s.common.lib.controller.metadata.selectorLabels" (dict "rootContext" $rootContext "controllerObject" $statefulsetObject) | nindent 6 }}
   {{- $serviceName := include "bjw-s.common.lib.chart.names.fullname" $rootContext }}
   {{- with (dig "statefulset" "serviceName" nil $statefulsetObject) }}
     {{- if kindIs "map" . }}
