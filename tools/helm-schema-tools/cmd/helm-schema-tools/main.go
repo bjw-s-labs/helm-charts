@@ -30,17 +30,19 @@ func main() {
 
 func dereferenceCmd() *cobra.Command {
 	var schemaPath, outputPath string
+	var schemaRoots []string
 
 	cmd := &cobra.Command{
 		Use:   "dereference",
 		Short: "Resolve local JSON Schema $ref entries",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runDereference(schemaPath, outputPath)
+			return runDereference(schemaPath, outputPath, schemaRoots)
 		},
 	}
 
 	cmd.Flags().StringVarP(&schemaPath, "schema", "s", "", "Path to the root JSON Schema file (required)")
 	cmd.Flags().StringVarP(&outputPath, "output", "o", "", "Output path for the dereferenced schema (required)")
+	cmd.Flags().StringArrayVar(&schemaRoots, "schema-root", nil, "Additional local directory to search for referenced schemas (repeatable)")
 
 	_ = cmd.MarkFlagRequired("schema")
 	_ = cmd.MarkFlagRequired("output")
@@ -48,8 +50,8 @@ func dereferenceCmd() *cobra.Command {
 	return cmd
 }
 
-func runDereference(schemaPath, outputPath string) error {
-	schemaBytes, err := schema.DereferenceSchema(schemaPath)
+func runDereference(schemaPath, outputPath string, schemaRoots []string) error {
+	schemaBytes, err := schema.DereferenceSchemaWithRoots(schemaPath, schemaRoots)
 	if err != nil {
 		return fmt.Errorf("failed to dereference schema: %w", err)
 	}

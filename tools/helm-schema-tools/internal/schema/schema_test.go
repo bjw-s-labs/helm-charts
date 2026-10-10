@@ -167,6 +167,48 @@ func TestDereferenceSchema_PreservesRefSibling(t *testing.T) {
 	}
 }
 
+func TestDereferenceSchemaWithRoots_ResolvesRemoteIDFromAdditionalRoot(t *testing.T) {
+	tmpDir := t.TempDir()
+	chartDir := filepath.Join(tmpDir, "app-template")
+	dependencySchemaDir := filepath.Join(tmpDir, "library", "common", "schemas")
+	if err := os.MkdirAll(chartDir, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.MkdirAll(dependencySchemaDir, 0o700); err != nil {
+		t.Fatal(err)
+	}
+
+	rootPath := filepath.Join(chartDir, "values.schema.json")
+	writeSchemaFile(t, rootPath, `{
+		"$id": "https://example.test/app-template/values.schema.json",
+		"type": "object",
+		"properties": {
+			"value": {"$ref": "https://example.test/common/schemas/value.json"}
+		}
+	}`)
+	writeSchemaFile(t, filepath.Join(dependencySchemaDir, "value.json"), `{
+		"$id": "https://example.test/common/schemas/value.json",
+		"type": "string"
+	}`)
+
+	output, err := DereferenceSchemaWithRoots(rootPath, []string{filepath.Join(tmpDir, "library", "common")})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var document map[string]any
+	if err := json.Unmarshal(output, &document); err != nil {
+		t.Fatal(err)
+	}
+	properties := document["properties"].(map[string]any)
+	value := properties["value"].(map[string]any)
+	if _, exists := value["$ref"]; exists {
+		t.Fatal("additional-root reference still contains $ref")
+	}
+	if got := value["type"]; got != "string" {
+		t.Errorf("type = %v, want string", got)
+	}
+}
+
 func TestDereferenceSchema_ComposesRefSiblings(t *testing.T) {
 	tmpDir := t.TempDir()
 	rootPath := filepath.Join(tmpDir, "root.json")

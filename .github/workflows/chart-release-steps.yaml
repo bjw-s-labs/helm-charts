@@ -98,7 +98,7 @@ jobs:
         env:
           CHART: ${{ inputs.chart }}
         run: |
-          src/.ci/scripts/dereference-json-schema.sh --schema-file "src/charts/$CHART/values.schema.json" --output-file "src/charts/$CHART/values.schema.json" --allow-missing
+          src/.ci/scripts/dereference-json-schema.sh --schema-file "src/charts/$CHART/values.schema.json" --output-file "src/charts/$CHART/values.schema.json" --schema-root src/charts --allow-missing
 
       - name: Package Helm chart
         id: package-chart

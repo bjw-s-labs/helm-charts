@@ -285,66 +285,82 @@ func collectPropertyOrdersByPath(node *yaml.Node, path string, orders map[string
 }
 
 // collectLocalSchemaResources maps schema IDs and local file URIs to source
-// documents next to the root schema. The JSON Schema compiler, rather than
-// this package, owns reference parsing and resolution.
-func collectLocalSchemaResources(inputPath string) (*localSchemaRegistry, error) {
+// documents next to the root schema and under any additional schema roots. The
+// JSON Schema compiler, rather than this package, owns reference parsing and
+// resolution.
+func collectLocalSchemaResources(inputPath string, schemaRoots []string) (*localSchemaRegistry, error) {
 	root := filepath.Dir(inputPath)
 	registry := &localSchemaRegistry{
 		schemas:         make(map[string][]byte),
 		documents:       make(map[string]string),
 		sourceDocuments: make(map[string][]byte),
 	}
+	seenFiles := make(map[string]struct{})
 	rootAbsolute, err := filepath.Abs(inputPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to resolve root schema path: %w", err)
 	}
 
-	err = filepath.WalkDir(root, func(path string, entry os.DirEntry, walkErr error) error {
-		if walkErr != nil {
-			return walkErr
-		}
-		// Charts commonly expose their parent values.schema.json through a
-		// test-chart symlink. It is not a separate schema resource; following it
-		// would manufacture a duplicate $id and make resolution depend on the
-		// directory layout rather than the reference graph.
-		if entry.IsDir() || entry.Type()&os.ModeSymlink != 0 || filepath.Ext(path) != ".json" {
-			return nil
-		}
-
-		contents, err := os.ReadFile(path) //nolint:gosec // path is rooted at the user-provided schema path
-		if err != nil {
-			return err
-		}
-		var resource any
-		if err := json.Unmarshal(contents, &resource); err != nil {
-			// Ignore unrelated or malformed JSON files in the schema directory.
-			return nil
-		}
-		absolutePath, err := filepath.Abs(path)
-		if err != nil {
-			return err
-		}
-		fileURI := (&url.URL{Scheme: "file", Path: absolutePath}).String()
-		resourceID := fileURI
-		if resourceObject, ok := resource.(map[string]any); ok {
-			if id, ok := resourceObject["$id"].(string); ok && id != "" {
-				resourceID = id
+	collectRoot := func(schemaRoot string) error {
+		return filepath.WalkDir(schemaRoot, func(path string, entry os.DirEntry, walkErr error) error {
+			if walkErr != nil {
+				return walkErr
 			}
+			// Charts commonly expose their parent values.schema.json through a
+			// test-chart symlink. It is not a separate schema resource; following it
+			// would manufacture a duplicate $id and make resolution depend on the
+			// directory layout rather than the reference graph.
+			if entry.IsDir() || entry.Type()&os.ModeSymlink != 0 || filepath.Ext(path) != ".json" {
+				return nil
+			}
+
+			absolutePath, err := filepath.Abs(path)
+			if err != nil {
+				return err
+			}
+			if _, seen := seenFiles[absolutePath]; seen {
+				return nil
+			}
+			seenFiles[absolutePath] = struct{}{}
+
+			contents, err := os.ReadFile(absolutePath) //nolint:gosec // path is rooted at the user-provided schema paths
+			if err != nil {
+				return err
+			}
+			var resource any
+			if err := json.Unmarshal(contents, &resource); err != nil {
+				// Ignore unrelated or malformed JSON files in the schema directory.
+				return nil
+			}
+			fileURI := (&url.URL{Scheme: "file", Path: absolutePath}).String()
+			resourceID := fileURI
+			if resourceObject, ok := resource.(map[string]any); ok {
+				if id, ok := resourceObject["$id"].(string); ok && id != "" {
+					resourceID = id
+				}
+			}
+			if existingPath, exists := registry.documents[resourceID]; exists && existingPath != absolutePath {
+				return fmt.Errorf("duplicate schema resource ID %q in %q and %q", resourceID, existingPath, absolutePath)
+			}
+			registry.documents[fileURI] = absolutePath
+			registry.schemas[resourceID] = contents
+			registry.sourceDocuments[resourceID] = contents
+			registry.documents[resourceID] = absolutePath
+			if absolutePath == rootAbsolute {
+				registry.rootID = resourceID
+			}
+			return nil
+		})
+	}
+
+	for _, schemaRoot := range append([]string{root}, schemaRoots...) {
+		absoluteRoot, err := filepath.Abs(schemaRoot)
+		if err != nil {
+			return nil, fmt.Errorf("failed to resolve schema root %q: %w", schemaRoot, err)
 		}
-		if existingPath, exists := registry.documents[resourceID]; exists && existingPath != absolutePath {
-			return fmt.Errorf("duplicate schema resource ID %q in %q and %q", resourceID, existingPath, absolutePath)
+		if err := collectRoot(absoluteRoot); err != nil {
+			return nil, fmt.Errorf("failed to collect local schema resources from %q: %w", schemaRoot, err)
 		}
-		registry.documents[fileURI] = absolutePath
-		registry.schemas[resourceID] = contents
-		registry.sourceDocuments[resourceID] = contents
-		registry.documents[resourceID] = absolutePath
-		if absolutePath == rootAbsolute {
-			registry.rootID = resourceID
-		}
-		return nil
-	})
-	if err != nil {
-		return nil, fmt.Errorf("failed to collect local schema resources: %w", err)
 	}
 
 	if registry.rootID == "" {
@@ -818,7 +834,14 @@ func materializeSchemaObject(s *jsonschema.Schema, out map[string]any, stack map
 // schema document. Local sibling keywords override referenced keywords, which
 // preserves the JSON Schema 2020-12 semantics used by this repository.
 func DereferenceSchema(inputPath string) ([]byte, error) {
-	registry, err := collectLocalSchemaResources(inputPath)
+	return DereferenceSchemaWithRoots(inputPath, nil)
+}
+
+// DereferenceSchemaWithRoots resolves local JSON Schema references and
+// references whose resource IDs are available under the supplied local roots.
+// It emits a single schema document without contacting the network.
+func DereferenceSchemaWithRoots(inputPath string, schemaRoots []string) ([]byte, error) {
+	registry, err := collectLocalSchemaResources(inputPath, schemaRoots)
 	if err != nil {
 		return nil, err
 	}
