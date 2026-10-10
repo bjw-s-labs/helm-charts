@@ -42,6 +42,9 @@ annotations:
         Added support for referencing controller in cillium(Cluster)NetworkPolicy rules
     - kind: added
       description: |-
+        Added support for referencing controller in networkPolicy rules
+    - kind: added
+      description: |-
         Added support for referencing controllers in networkPolicy rules
     - kind: changed
       description: |-

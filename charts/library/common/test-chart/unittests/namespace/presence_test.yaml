@@ -1,0 +1,25 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: namespace - presence
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+tests:
+  - it: namespace is not created by default
+    asserts:
+      - not: true
+        containsDocument:
+          apiVersion: v1
+          kind: Namespace
+          any: true
+
+  - it: namespace can be created
+    set:
+      namespace.create: true
+    asserts:
+      - containsDocument:
+          apiVersion: v1
+          kind: Namespace
+          name: NAMESPACE
+          any: true

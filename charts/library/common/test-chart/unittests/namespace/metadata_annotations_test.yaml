@@ -1,0 +1,53 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: namespace - metadata - annotations
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+set:
+  namespace.create: true
+tests:
+  - it: no annotations are set by default
+    documentSelector:
+      path: $[?(@.kind == "Namespace")].metadata.name
+      value: NAMESPACE
+    asserts:
+      - notExists:
+          path: metadata.annotations
+
+  - it: custom annotations
+    set:
+      namespace.annotations:
+        namespace-annotation: namespace
+        templated-annotation: "{{ .Release.Name }}"
+    documentSelector:
+      path: $[?(@.kind == "Namespace")].metadata.name
+      value: NAMESPACE
+    asserts:
+      - equal:
+          path: metadata.annotations
+          value:
+            namespace-annotation: namespace
+            templated-annotation: RELEASE-NAME
+
+  - it: custom annotations mixed with global annotations
+    set:
+      global.annotations:
+        global-annotation: global
+        shared-annotation: global
+      namespace.annotations:
+        namespace-annotation: namespace
+        shared-annotation: namespace
+        templated-annotation: "{{ .Release.Name }}"
+    documentSelector:
+      path: $[?(@.kind == "Namespace")].metadata.name
+      value: NAMESPACE
+    asserts:
+      - equal:
+          path: metadata.annotations
+          value:
+            global-annotation: global
+            namespace-annotation: namespace
+            shared-annotation: namespace
+            templated-annotation: RELEASE-NAME

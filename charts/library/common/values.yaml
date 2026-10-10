@@ -32,6 +32,15 @@ global:
     #     - [controllers, main, containers, main, env, VPN_PORT_FORWARDING_UP_COMMAND]
     # excludePaths: []
 
+# -- Configure the creation of the Helm release namespace.
+namespace:
+  # -- Set to true to create the Helm release namespace.
+  create: false
+  # -- Annotations to set on the item. Keys and values support Helm templating.
+  annotations: {}
+  # -- Labels to set on the item. Keys and values support Helm templating.
+  labels: {}
+
 # -- Set the strategy for the default pod options. Defaults to overwrite.
 # overwrite: If pod-level options are set, use those instead of the defaults.
 # merge: If pod-level options are set, merge them with the defaults.
