@@ -16,6 +16,16 @@ Configure the creation of the Helm release namespace.
 
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
-| `annotations` | `object / null` | No | - | Annotations to set on the item. |
+| `annotations` | `object / null` | No | - | Annotations to set on the item. Keys and values support H... |
 | `create` | `boolean` | No | `false` | Set to true to create the Helm release namespace. |
-| `labels` | `object / null` | No | - | Labels to set on the item. |
+| `labels` | `object / null` | No | - | Labels to set on the item. Keys and values support Helm t... |
+
+### Property Details
+
+#### annotations
+
+Annotations to set on the item. Keys and values support Helm templating.
+
+#### labels
+
+Labels to set on the item. Keys and values support Helm templating.

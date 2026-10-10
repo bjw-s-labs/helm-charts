@@ -36,9 +36,9 @@ global:
 namespace:
   # -- Set to true to create the Helm release namespace.
   create: false
-  # -- Annotations to set on the item.
+  # -- Annotations to set on the item. Keys and values support Helm templating.
   annotations: {}
-  # -- Labels to set on the item.
+  # -- Labels to set on the item. Keys and values support Helm templating.
   labels: {}
 
 # -- Set the strategy for the default pod options. Defaults to overwrite.
