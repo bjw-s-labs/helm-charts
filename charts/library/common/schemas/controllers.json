@@ -578,6 +578,9 @@
         },
         "storageClass": {
           "type": "string"
+        },
+        "volumeMode": {
+          "$ref": "persistence.json#/$defs/volumeMode"
         }
       }
     }

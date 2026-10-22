@@ -2,13 +2,30 @@
 volumeMounts used by the container.
 */}}
 {{- define "bjw-s.common.lib.container.field.volumeMounts" -}}
+  {{- include "bjw-s.common.lib.container.persistenceMounts" (dict "ctx" .ctx "block" false) -}}
+{{- end -}}
+
+{{/*
+volumeDevices used by the container.
+*/}}
+{{- define "bjw-s.common.lib.container.field.volumeDevices" -}}
+  {{- include "bjw-s.common.lib.container.persistenceMounts" (dict "ctx" .ctx "block" true) -}}
+{{- end -}}
+
+{{/*
+Persistence items attached to the container: volumeMounts when block is false,
+volumeDevices for volumeMode Block items when block is true.
+*/}}
+{{- define "bjw-s.common.lib.container.persistenceMounts" -}}
   {{- $ctx := .ctx -}}
+  {{- $block := .block -}}
   {{- $rootContext := $ctx.rootContext -}}
   {{- $controllerObject := $ctx.controllerObject -}}
   {{- $containerObject := $ctx.containerObject -}}
 
   {{- /* Default to empty dict */ -}}
   {{- $persistenceItemsToProcess := dict -}}
+  {{- $persistenceItemSources := dict -}}
   {{- $enabledVolumeMounts := list -}}
 
   {{- /* Collect regular persistence items */ -}}
@@ -21,6 +38,7 @@ volumeMounts used by the container.
 
     {{- if $persistenceEnabled -}}
       {{- $_ := set $persistenceItemsToProcess $identifier $persistenceValues -}}
+      {{- $_ := set $persistenceItemSources $identifier (dict "kind" "Persistence" "path" (printf "persistence.%s" $identifier)) -}}
     {{- end -}}
   {{- end -}}
 
@@ -41,17 +59,26 @@ volumeMounts used by the container.
         {{- if not (empty (dig "advancedMounts" nil $persistenceValues)) -}}
           {{- $_ := set $mountValues "advancedMounts" (dict $controllerObject.identifier $persistenceValues.advancedMounts) -}}
         {{- end -}}
+        {{- with $persistenceValues.volumeMode -}}
+          {{- $_ := set $mountValues "volumeMode" . -}}
+        {{- end -}}
         {{- $_ := set $persistenceItemsToProcess $persistenceValues.name $mountValues -}}
+        {{- $_ := set $persistenceItemSources $persistenceValues.name (dict "kind" "VolumeClaimTemplate" "path" (printf "controllers.%s.statefulset.volumeClaimTemplates.%s" $controllerObject.identifier $persistenceValues.name)) -}}
       {{- end -}}
     {{- end -}}
   {{- end -}}
 
   {{- range $identifier, $persistenceValues := $persistenceItemsToProcess -}}
+    {{- $isBlock := eq "Block" ($persistenceValues.volumeMode | default "") -}}
+    {{- if eq $isBlock $block -}}
+    {{- $source := get $persistenceItemSources $identifier -}}
     {{- /* Set some default values */ -}}
 
-    {{- /* Set the default mountPath to /<name_of_the_peristence_item> */ -}}
+    {{- /* Set the default mountPath to /<name_of_the_peristence_item>, or /dev/<name> for a block device */ -}}
     {{- $mountPath := (printf "/%v" $identifier) -}}
-    {{- if eq "hostPath" (default "persistentVolumeClaim" $persistenceValues.type) -}}
+    {{- if $isBlock -}}
+      {{- $mountPath = (printf "/dev/%v" $identifier) -}}
+    {{- else if eq "hostPath" (default "persistentVolumeClaim" $persistenceValues.type) -}}
       {{- $mountPath = $persistenceValues.hostPath -}}
     {{- end -}}
 
@@ -69,6 +96,11 @@ volumeMounts used by the container.
         {{- end -}}
       {{- end -}}
 
+      {{- /* volumeDevices names must be unique within a container */ -}}
+      {{- if and $isBlock (gt (len $mounts) 1) -}}
+        {{- fail (printf "%s '%s': A volumeMode Block item can only be attached once per container, but container '%s' of controller '%s' has %d mounts. Keep a single mount for it under '%s'." $source.kind $identifier $containerObject.identifier $controllerObject.identifier (len $mounts) $source.path) -}}
+      {{- end -}}
+
       {{- range $mounts -}}
         {{- $volumeMount := dict -}}
         {{- $_ := set $volumeMount "name" $identifier -}}
@@ -76,6 +108,15 @@ volumeMounts used by the container.
         {{- /* Use the specified mountPath if provided */ -}}
         {{- with .path -}}
           {{- $mountPath = (include "bjw-s.common.lib.common.renderString" (dict "value" . "rootContext" $rootContext)) -}}
+        {{- end -}}
+
+        {{- if $isBlock -}}
+          {{- if or .subPath .subPathExpr .readOnly .mountPropagation -}}
+            {{- fail (printf "%s '%s': subPath, subPathExpr, readOnly and mountPropagation are not supported for a volumeMode Block item. Remove them from its mounts under '%s', or set its volumeMode to Filesystem." $source.kind $identifier $source.path) -}}
+          {{- end -}}
+          {{- $_ := set $volumeMount "devicePath" $mountPath -}}
+          {{- $enabledVolumeMounts = append $enabledVolumeMounts $volumeMount -}}
+          {{- continue -}}
         {{- end -}}
         {{- $_ := set $volumeMount "mountPath" $mountPath -}}
 
@@ -106,8 +147,9 @@ volumeMounts used by the container.
     {{- else -}}
       {{- $volumeMount := dict -}}
       {{- $_ := set $volumeMount "name" $identifier -}}
-      {{- $_ := set $volumeMount "mountPath" $mountPath -}}
+      {{- $_ := set $volumeMount (ternary "devicePath" "mountPath" $isBlock) $mountPath -}}
       {{- $enabledVolumeMounts = append $enabledVolumeMounts $volumeMount -}}
+    {{- end -}}
     {{- end -}}
   {{- end -}}
 

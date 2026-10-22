@@ -1,0 +1,253 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: container - fields - volumeDevices
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+tests:
+  - it: filesystem persistence should not render volumeDevices
+    set:
+      persistence:
+        config:
+          accessMode: ReadWriteOnce
+          size: 1Gi
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].volumeDevices
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts
+          value:
+            - name: config
+              mountPath: /config
+
+  - it: Block persistence should default devicePath to /dev/<identifier>
+    set:
+      persistence:
+        data:
+          accessMode: ReadWriteOnce
+          size: 1Gi
+          volumeMode: Block
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].volumeMounts
+      - equal:
+          path: spec.template.spec.containers[0].volumeDevices
+          value:
+            - name: data
+              devicePath: /dev/data
+      - equal:
+          path: spec.template.spec.volumes
+          value:
+            - name: data
+              persistentVolumeClaim:
+                claimName: release-name
+
+  - it: Block existingClaim with globalMounts should use path as devicePath
+    set:
+      persistence:
+        data:
+          existingClaim: my-block-claim
+          volumeMode: Block
+          globalMounts:
+            - path: /dev/xvdh
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeDevices
+          value:
+            - name: data
+              devicePath: /dev/xvdh
+
+  - it: Block advancedMounts should only attach to the selected container
+    set:
+      controllers:
+        main:
+          containers:
+            second:
+              image:
+                repository: ghcr.io/mendhak/http-https-echo
+                tag: 31
+      persistence:
+        data:
+          existingClaim: my-block-claim
+          volumeMode: Block
+          advancedMounts:
+            main:
+              second:
+                - path: /dev/block0
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].volumeDevices
+      - equal:
+          path: spec.template.spec.containers[1].volumeDevices
+          value:
+            - name: data
+              devicePath: /dev/block0
+
+  - it: mixed Block and Filesystem persistence should split devices and mounts
+    set:
+      persistence:
+        config:
+          accessMode: ReadWriteOnce
+          size: 1Gi
+        data:
+          existingClaim: my-block-claim
+          volumeMode: Block
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts
+          value:
+            - name: config
+              mountPath: /config
+      - equal:
+          path: spec.template.spec.containers[0].volumeDevices
+          value:
+            - name: data
+              devicePath: /dev/data
+
+  - it: Block ephemeral volume should render volumeDevices
+    set:
+      persistence:
+        scratch:
+          type: ephemeral
+          accessMode: ReadWriteOnce
+          size: 1Gi
+          volumeMode: Block
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeDevices
+          value:
+            - name: scratch
+              devicePath: /dev/scratch
+      - equal:
+          path: spec.template.spec.volumes[0].ephemeral.volumeClaimTemplate.spec.volumeMode
+          value: Block
+
+  - it: Block with subPath should fail
+    set:
+      persistence:
+        data:
+          existingClaim: my-block-claim
+          volumeMode: Block
+          globalMounts:
+            - path: /dev/xvdh
+              subPath: home
+    asserts:
+      - failedTemplate:
+          errorMessage: "Persistence 'data': subPath, subPathExpr, readOnly and mountPropagation are not supported for a volumeMode Block item. Remove them from its mounts under 'persistence.data', or set its volumeMode to Filesystem."
+
+  - it: Block with readOnly should fail
+    set:
+      persistence:
+        data:
+          existingClaim: my-block-claim
+          volumeMode: Block
+          globalMounts:
+            - path: /dev/xvdh
+              readOnly: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "Persistence 'data': subPath, subPathExpr, readOnly and mountPropagation are not supported for a volumeMode Block item. Remove them from its mounts under 'persistence.data', or set its volumeMode to Filesystem."
+
+  - it: Block with empty or false mount options should pass
+    set:
+      persistence:
+        data:
+          existingClaim: my-block-claim
+          volumeMode: Block
+          globalMounts:
+            - path: /dev/xvdh
+              subPath: ""
+              subPathExpr: ""
+              readOnly: false
+              mountPropagation: ""
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeDevices
+          value:
+            - name: data
+              devicePath: /dev/xvdh
+
+  - it: Block with multiple globalMounts should fail
+    set:
+      persistence:
+        data:
+          existingClaim: my-block-claim
+          volumeMode: Block
+          globalMounts:
+            - path: /dev/one
+            - path: /dev/two
+    asserts:
+      - failedTemplate:
+          errorMessage: "Persistence 'data': A volumeMode Block item can only be attached once per container, but container 'main' of controller 'main' has 2 mounts. Keep a single mount for it under 'persistence.data'."
+
+  - it: Block with a globalMount and an advancedMount for the same container should fail
+    set:
+      persistence:
+        data:
+          existingClaim: my-block-claim
+          volumeMode: Block
+          globalMounts:
+            - path: /dev/one
+          advancedMounts:
+            main:
+              main:
+                - path: /dev/two
+    asserts:
+      - failedTemplate:
+          errorMessage: "Persistence 'data': A volumeMode Block item can only be attached once per container, but container 'main' of controller 'main' has 2 mounts. Keep a single mount for it under 'persistence.data'."
+
+  - it: Block attached once to each of two containers should pass
+    set:
+      controllers:
+        main:
+          containers:
+            second:
+              image:
+                repository: ghcr.io/mendhak/http-https-echo
+                tag: 31
+      persistence:
+        data:
+          existingClaim: my-block-claim
+          volumeMode: Block
+          advancedMounts:
+            main:
+              main:
+                - path: /dev/one
+              second:
+                - path: /dev/two
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeDevices
+          value:
+            - name: data
+              devicePath: /dev/one
+      - equal:
+          path: spec.template.spec.containers[1].volumeDevices
+          value:
+            - name: data
+              devicePath: /dev/two
