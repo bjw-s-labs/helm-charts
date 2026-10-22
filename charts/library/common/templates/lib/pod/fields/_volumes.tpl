@@ -123,6 +123,9 @@ Returns the value for volumes
       {{- with $persistenceValues.size -}}
         {{- $_ := set $vct.spec "resources" (dict "requests" (dict "storage" .)) -}}
       {{- end -}}
+      {{- with $persistenceValues.volumeMode -}}
+        {{- $_ := set $vct.spec "volumeMode" . -}}
+      {{- end -}}
       {{- $_ := set $volume.ephemeral "volumeClaimTemplate" $vct -}}
 
     {{- /* hostPath persistence type */ -}}

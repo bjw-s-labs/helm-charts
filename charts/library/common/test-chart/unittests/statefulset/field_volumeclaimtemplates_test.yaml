@@ -83,3 +83,80 @@ tests:
       - equal:
           path: spec.volumeClaimTemplates[0].spec.dataSource.name
           value: RELEASE-NAME-config
+
+  - it: volumeClaimTemplates with volumeMode Block should pass
+    set:
+      controllers.main:
+        statefulset:
+          volumeClaimTemplates:
+            - name: "storage"
+              size: "10Gi"
+              accessMode: "ReadWriteOnce"
+              volumeMode: Block
+              globalMounts:
+                - path: /dev/xvdh
+    documentSelector:
+      path: $[?(@.kind == "StatefulSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.volumeClaimTemplates[0].spec.volumeMode
+          value: Block
+      - notExists:
+          path: spec.template.spec.containers[0].volumeMounts
+      - equal:
+          path: spec.template.spec.containers[0].volumeDevices
+          value:
+            - name: storage
+              devicePath: /dev/xvdh
+
+  - it: volumeClaimTemplates with volumeMode Block should default devicePath
+    set:
+      controllers.main:
+        statefulset:
+          volumeClaimTemplates:
+            - name: "storage"
+              size: "10Gi"
+              accessMode: "ReadWriteOnce"
+              volumeMode: Block
+    documentSelector:
+      path: $[?(@.kind == "StatefulSet")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeDevices
+          value:
+            - name: storage
+              devicePath: /dev/storage
+
+  - it: volumeClaimTemplates with volumeMode Block and subPath should fail
+    set:
+      controllers.main:
+        statefulset:
+          volumeClaimTemplates:
+            - name: "storage"
+              size: "10Gi"
+              accessMode: "ReadWriteOnce"
+              volumeMode: Block
+              globalMounts:
+                - path: /dev/xvdh
+                  subPath: home
+    asserts:
+      - failedTemplate:
+          errorMessage: "VolumeClaimTemplate 'storage': subPath, subPathExpr, readOnly and mountPropagation are not supported for a volumeMode Block item. Remove them from its mounts under 'controllers.main.statefulset.volumeClaimTemplates.storage', or set its volumeMode to Filesystem."
+
+  - it: volumeClaimTemplates with volumeMode Block and multiple mounts should fail
+    set:
+      controllers.main:
+        statefulset:
+          volumeClaimTemplates:
+            - name: "storage"
+              size: "10Gi"
+              accessMode: "ReadWriteOnce"
+              volumeMode: Block
+              globalMounts:
+                - path: /dev/one
+                - path: /dev/two
+    asserts:
+      - failedTemplate:
+          errorMessage: "VolumeClaimTemplate 'storage': A volumeMode Block item can only be attached once per container, but container 'main' of controller 'main' has 2 mounts. Keep a single mount for it under 'controllers.main.statefulset.volumeClaimTemplates.storage'."

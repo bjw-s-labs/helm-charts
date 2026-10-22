@@ -298,6 +298,7 @@ persistence:
 | `size` | `string` | **Yes** | - | The amount of storage that is requested for the persisten... |
 | `storageClass` | `string` | No | - | Storage Class for the config volume. If set to &#39;-&#39... |
 | `suffix` | `string` | No | - | Suffix to append to the resource name. Defaults to the re... |
+| `volumeMode` | `string` | No | - | volumeMode of the claim. With Block, each mount is attach... |
 | `volumeName` | `string` | No | - |  |
 
 <details>
@@ -338,6 +339,9 @@ If undefined (the default) or set to null, no storageClassName spec is set, choo
 #### `suffix`
 
 Suffix to append to the resource name. Defaults to the resource identifier if there are multiple items, otherwise empty. Mutually exclusive with forceRename.
+#### `volumeMode`
+
+volumeMode of the claim. With Block, each mount is attached to the container as a raw device (volumeDevices) at its path, defaulting to /dev/&lt;identifier&gt;; subPath, subPathExpr, readOnly and mountPropagation are not supported.
 </details>
 
   </TabItem>
@@ -358,6 +362,7 @@ persistence:
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
 | `existingClaim` | `string` | **Yes** | - | The name of an existing PersistentVolumeClaim to use. Thi... |
+| `volumeMode` | `string` | No | - | volumeMode of the claim. With Block, each mount is attach... |
 
 <details>
 <summary>Property details</summary>
@@ -365,6 +370,9 @@ persistence:
 
 The name of an existing PersistentVolumeClaim to use.
 This will not create a new PVC, but use the existing one instead.
+#### `volumeMode`
+
+volumeMode of the claim. With Block, each mount is attached to the container as a raw device (volumeDevices) at its path, defaulting to /dev/&lt;identifier&gt;; subPath, subPathExpr, readOnly and mountPropagation are not supported.
 </details>
 
   </TabItem>
@@ -481,6 +489,7 @@ persistence:
 | `accessMode` | `string` | No | - | AccessMode for the ephemeral volume. Make sure to select ... |
 | `size` | `string` | No | - | The amount of storage that is requested for the ephemeral... |
 | `storageClass` | `string` | No | - | Storage Class for the ephemeral volume. If set to &#39;-&... |
+| `volumeMode` | `string` | No | - | volumeMode of the claim. With Block, each mount is attach... |
 
 <details>
 <summary>Property details</summary>
@@ -497,6 +506,9 @@ Storage Class for the ephemeral volume.
 If set to &#39;-&#39;, dynamic provisioning is disabled.
 If set to something else, the given storageClass is used.
 If undefined (the default) or set to null, no storageClassName spec is set, choosing the default provisioner.
+#### `volumeMode`
+
+volumeMode of the claim. With Block, each mount is attached to the container as a raw device (volumeDevices) at its path, defaulting to /dev/&lt;identifier&gt;; subPath, subPathExpr, readOnly and mountPropagation are not supported.
 </details>
 
   </TabItem>
@@ -634,6 +646,7 @@ Common properties:
 | `storageClass` | `string` | No | - | Storage Class for the config volume. If set to &#39;-&#39... |
 | `suffix` | `string` | No | - | Suffix to append to the resource name. Defaults to the re... |
 | `type` | `any` | No | - |  |
+| `volumeMode` | `string` | No | - | volumeMode of the claim. With Block, each mount is attach... |
 | `volumeName` | `string` | No | - |  |
 
 ### Property Details
@@ -685,6 +698,12 @@ If undefined (the default) or set to null, no storageClassName spec is set, choo
 #### suffix
 
 Suffix to append to the resource name. Defaults to the resource identifier if there are multiple items, otherwise empty. Mutually exclusive with forceRename.
+
+#### volumeMode
+
+volumeMode of the claim. With Block, each mount is attached to the container as a raw device (volumeDevices) at its path, defaulting to /dev/&lt;identifier&gt;; subPath, subPathExpr, readOnly and mountPropagation are not supported.
+
+**Allowed values:** `Filesystem`, `Block`
 
 ## Related Pages
 

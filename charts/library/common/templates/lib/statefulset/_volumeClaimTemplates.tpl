@@ -22,6 +22,9 @@ spec:
   {{- if $values.storageClass }}
   storageClassName: {{ if (eq "-" $values.storageClass) }}""{{- else }}{{ $values.storageClass | quote }}{{- end }}
   {{- end }}
+  {{- with $values.volumeMode }}
+  volumeMode: {{ . | quote }}
+  {{- end }}
   {{- with $values.dataSource }}
   dataSource: {{- include "bjw-s.common.lib.common.renderString" (dict "value" (toYaml .) "rootContext" $rootContext) | nindent 10 }}
   {{- end }}

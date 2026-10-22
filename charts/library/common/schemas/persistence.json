@@ -107,6 +107,9 @@
         },
         "volumeName": {
           "type": "string"
+        },
+        "volumeMode": {
+          "$ref": "#/$defs/volumeMode"
         }
       }
     },
@@ -126,6 +129,9 @@
         "existingClaim": {
           "type": "string",
           "description": "The name of an existing PersistentVolumeClaim to use.\nThis will not create a new PVC, but use the existing one instead."
+        },
+        "volumeMode": {
+          "$ref": "#/$defs/volumeMode"
         }
       }
     },
@@ -393,6 +399,9 @@
         "size": {
           "type": "string",
           "description": "The amount of storage that is requested for the ephemeral volume."
+        },
+        "volumeMode": {
+          "$ref": "#/$defs/volumeMode"
         }
       }
     },
@@ -675,7 +684,7 @@
       "properties": {
         "path": {
           "type": "string",
-          "description": "The path where the volume should be mounted in the container.\nIf not specified, the mount path will be set to /<identifier_of_the_peristence_item>."
+          "description": "The path where the volume should be mounted in the container.\nIf not specified, the mount path will be set to /<identifier_of_the_peristence_item>.\nFor a volumeMode Block item this is the devicePath, defaulting to /dev/<identifier_of_the_persistence_item>."
         },
         "readOnly": {
           "type": "boolean"
@@ -691,6 +700,14 @@
           "type": "string"
         }
       }
+    },
+    "volumeMode": {
+      "type": "string",
+      "enum": [
+        "Filesystem",
+        "Block"
+      ],
+      "description": "volumeMode of the claim. With Block, each mount is attached to the container as a raw device (volumeDevices) at its path, defaulting to /dev/<identifier>; subPath, subPathExpr, readOnly and mountPropagation are not supported."
     }
   }
 }

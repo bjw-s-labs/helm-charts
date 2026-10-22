@@ -1,0 +1,52 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: pvc - fields - volumeMode
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+set:
+  persistence.config:
+    accessMode: ReadWriteOnce
+    size: 1Gi
+
+tests:
+  - it: default should pass
+    documentSelector:
+      path: $[?(@.kind == "PersistentVolumeClaim")].metadata.name
+      value: release-name
+    asserts:
+      - notExists:
+          path: spec.volumeMode
+
+  - it: Block should pass
+    set:
+      persistence.config:
+        volumeMode: Block
+    documentSelector:
+      path: $[?(@.kind == "PersistentVolumeClaim")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.volumeMode
+          value: Block
+
+  - it: Filesystem should pass
+    set:
+      persistence.config:
+        volumeMode: Filesystem
+    documentSelector:
+      path: $[?(@.kind == "PersistentVolumeClaim")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.volumeMode
+          value: Filesystem
+
+  - it: invalid value should fail schema validation
+    set:
+      persistence.config:
+        volumeMode: Raw
+    asserts:
+      - failedTemplate:
+          errorPattern: "/persistence/config/volumeMode': value must be one of 'Filesystem', 'Block'"
