@@ -727,7 +727,7 @@
         "values": {
           "description": "Values holds the values for this Helm release.",
           "x-kubernetes-preserve-unknown-fields": true,
-          "$ref": "https://raw.githubusercontent.com/owner/helm-charts/common-4.6.3/charts/library/common/values.schema.json"
+          "$ref": "https://raw.githubusercontent.com/owner/helm-charts/common-4.7.0/charts/library/common/values.schema.json"
         },
         "valuesFrom": {
           "description": "ValuesFrom holds references to resources containing Helm values for this HelmRelease, and information about how they should be merged.",

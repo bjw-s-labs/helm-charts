@@ -41,6 +41,11 @@
             "description": "ReplicaSet revision history limit.",
             "type": "integer"
           },
+          "minReadySeconds": {
+            "description": "Seconds a new Deployment pod must be ready before it counts as available.",
+            "type": "integer",
+            "minimum": 0
+          },
           "rollingUpdate": {
             "description": "Controller upgrade strategy options.",
             "type": "object"

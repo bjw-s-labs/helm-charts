@@ -42,6 +42,9 @@ spec:
   {{- else }}
   replicas: 1
   {{- end }}
+  {{- with $deploymentObject.minReadySeconds }}
+  minReadySeconds: {{ . }}
+  {{- end }}
   strategy:
     type: {{ $deploymentObject.strategy }}
     {{- with $deploymentObject.rollingUpdate }}

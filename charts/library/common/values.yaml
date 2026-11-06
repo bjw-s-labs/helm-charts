@@ -130,6 +130,8 @@ controllers: {}
 #       partition:
 #     # -- ReplicaSet revision history limit
 #     revisionHistoryLimit: 3
+#     # -- Seconds a new Deployment pod must be ready before it counts as available
+#     minReadySeconds:
 
 #     # -- Set the controller service account name
 #     # This is entirely optional, if empty or `null` the controller will use the default service account

@@ -1,0 +1,29 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: deployment - fields - minReadySeconds
+templates:
+  - common.yaml
+values:
+  - ../_values/controllers_main_default_container.yaml
+set:
+  controllers.main.type: deployment
+tests:
+  - it: default should omit minReadySeconds
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - notExists:
+          path: spec.minReadySeconds
+
+  - it: custom minReadySeconds should pass
+    set:
+      controllers.main:
+        minReadySeconds: 60
+    documentSelector:
+      path: $[?(@.kind == "Deployment")].metadata.name
+      value: release-name
+    asserts:
+      - equal:
+          path: spec.minReadySeconds
+          value: 60
