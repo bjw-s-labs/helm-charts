@@ -16,6 +16,9 @@ sources:
   - https://github.com/bjw-s-labs/helm-charts
 annotations:
   artifacthub.io/changes: |-
+    - kind: fixed
+      description: |-
+        Fixed loader.generate failing when .Values is Helm's own Values type (no .Values.common)
     - kind: added
       description: |-
         Added controller extraSelectorLabels and a shared controller selector labels helper
