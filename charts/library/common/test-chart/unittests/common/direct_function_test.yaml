@@ -49,3 +49,21 @@ tests:
       - equal:
           path: data.value
           value: rendered-value
+
+  - it: renders the loader when .Values is Helm's own Values type
+    set:
+      variables:
+        typedValuesGenerateTest: true
+      configMaps:
+        config:
+          data:
+            release: "{{ .Release.Name }}"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: release-name-common-test
+      - equal:
+          path: data.release
+          value: RELEASE-NAME
