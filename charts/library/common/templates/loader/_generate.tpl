@@ -5,8 +5,10 @@ Secondary entrypoint and primary loader for the common chart
   {{- $rootContext := $ -}}
 
   {{- /* Evaluate templates against the post-merge root context. */ -}}
-  {{- $passes := dig "global" "templateEvaluation" "passes" 1 $rootContext.Values -}}
-  {{- $excludePaths := dig "global" "templateEvaluation" "excludePaths" list $rootContext.Values -}}
+  {{- /* dig needs a plain map. .Values is still Helm's own Values type when values.init did not replace it (no .Values.common). */ -}}
+  {{- $plainValues := mustMergeOverwrite (dict) $rootContext.Values -}}
+  {{- $passes := dig "global" "templateEvaluation" "passes" 1 $plainValues -}}
+  {{- $excludePaths := dig "global" "templateEvaluation" "excludePaths" list $plainValues -}}
   {{- $evaluatedValues := include "bjw-s.common.values.evaluateTemplate" (dict "rootContext" $rootContext "value" (deepCopy $rootContext.Values) "passes" $passes "excludePaths" $excludePaths) | fromJson -}}
   {{- $renderContext := merge (dict) $rootContext -}}
   {{- $_ := set $renderContext "Values" (index $evaluatedValues "value") -}}
