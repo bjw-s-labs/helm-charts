@@ -2551,6 +2551,11 @@ persistence: {}
     # storageClass:
     # -- (string)
     # volumeName:
+    # -- (string) volumeMode of the claim. With Block, each mount is attached to the
+    # container as a raw device (volumeDevices) at its path, defaulting to
+    # /dev/<identifier>; subPath, subPathExpr, readOnly and mountPropagation are not
+    # supported.
+    # volumeMode:
     # -- Explicitly configure mounts for specific controllers and containers.
     # Structure: advancedMounts.<controller_name>.<container_name>[].path Use this
     # instead of globalMounts when different controllers need different mount

@@ -23,3 +23,10 @@ data:
 ---
 {{- include "bjw-s.common.class.configMap" (dict "rootContext" $ "object" (dict "name" "direct-class" "data" (dict "value" "{{ .Values.variables.value }}"))) }}
 {{- end -}}
+{{- if $variables.typedValuesGenerateTest -}}
+{{- /* Call the loader with Helm's own Values type, as a parent chart without .Values.common does. */ -}}
+{{- $typedValues := $.Subcharts.common.Values -}}
+{{- $_ := mergeOverwrite $typedValues (dict "configMaps" .Values.configMaps) -}}
+{{- $context := dict "Values" $typedValues "Release" $.Release "Chart" $.Chart "Capabilities" $.Capabilities "Template" $.Template "Files" $.Files }}
+{{ include "bjw-s.common.loader.generate" $context }}
+{{- end -}}

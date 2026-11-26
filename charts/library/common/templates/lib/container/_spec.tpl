@@ -65,4 +65,7 @@ tty: {{ . }}
   {{- with (include "bjw-s.common.lib.container.field.volumeMounts" (dict "ctx" $ctx) | trim) }}
 volumeMounts: {{ . | trim | nindent 2 }}
   {{- end -}}
+  {{- with (include "bjw-s.common.lib.container.field.volumeDevices" (dict "ctx" $ctx) | trim) }}
+volumeDevices: {{ . | trim | nindent 2 }}
+  {{- end -}}
 {{- end -}}

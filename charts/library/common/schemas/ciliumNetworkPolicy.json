@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.3.0/charts/library/common/schemas/ciliumNetworkPolicy.json",
+  "$id": "https://raw.githubusercontent.com/bjw-s-labs/helm-charts/common-5.4.0/charts/library/common/schemas/ciliumNetworkPolicy.json",
   "$comment": "These are direct top-level cilium.io/v2 rule-item allowlists based on Cilium v1.20.2: https://raw.githubusercontent.com/cilium/cilium/v1.20.2/pkg/k8s/apis/cilium.io/client/crds/v2/ciliumnetworkpolicies.yaml. Nested allowed values remain intentionally permissive.",
   "$defs": {
     "base": {

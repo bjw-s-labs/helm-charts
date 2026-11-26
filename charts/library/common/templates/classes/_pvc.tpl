@@ -50,6 +50,9 @@ spec:
   {{- if $pvcObject.volumeName }}
   volumeName: {{ $pvcObject.volumeName | quote }}
   {{- end }}
+  {{- with $pvcObject.volumeMode }}
+  volumeMode: {{ . | quote }}
+  {{- end }}
   {{- with $pvcObject.dataSource }}
   dataSource: {{- include "bjw-s.common.lib.common.renderString" (dict "value" (toYaml .) "rootContext" $rootContext) | nindent 10 }}
   {{- end }}
