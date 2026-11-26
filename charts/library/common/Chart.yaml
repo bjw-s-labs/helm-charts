@@ -16,6 +16,12 @@ sources:
   - https://github.com/bjw-s-labs/helm-charts
 annotations:
   artifacthub.io/changes: |-
+    - kind: added
+      description: |-
+        Added volumeMode (Filesystem | Block) for persistentVolumeClaim (including existingClaim), ephemeral and statefulset volumeClaimTemplates. Block items are attached to containers as volumeDevices (raw block devices) instead of volumeMounts.
+    - kind: fixed
+      description: |-
+        Fixed loader.generate failing when .Values is Helm's own Values type (no .Values.common)
     - kind: fixed
       description: |-
         Fixed loader.generate failing when .Values is Helm's own Values type (no .Values.common)
