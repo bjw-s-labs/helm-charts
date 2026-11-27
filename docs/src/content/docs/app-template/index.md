@@ -64,10 +64,10 @@ persistence:
 
 ## Next steps
 
-- [Get started](./getting-started.md) with deploying your first application
-- Browse the [How-to guides](./howto/) for common configuration patterns
-- Explore [Examples](./examples/) for complex deployments
-- View the [Values Reference](./reference/) for all available options
+- [Get started](/helm-charts/docs/app-template/getting-started/) with deploying your first application
+- Browse the [How-to guides](/helm-charts/docs/app-template/howto/) for common configuration patterns
+- Explore [Examples](/helm-charts/docs/app-template/examples/) for complex deployments
+- View the [Values Reference](/helm-charts/docs/app-template/reference/) for all available options
 
 ## Source code
 

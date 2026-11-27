@@ -55,6 +55,6 @@ controllers:
 
 ## Next steps
 
-- Browse the [Values Reference](./reference/) for all available options
-- See [How-to guides](./howto/) for common configuration patterns
-- Check out [Examples](./examples/) for complex deployments
+- Browse the [Values Reference](/helm-charts/docs/app-template/reference/) for all available options
+- See [How-to guides](/helm-charts/docs/app-template/howto/) for common configuration patterns
+- Check out [Examples](/helm-charts/docs/app-template/examples/) for complex deployments
